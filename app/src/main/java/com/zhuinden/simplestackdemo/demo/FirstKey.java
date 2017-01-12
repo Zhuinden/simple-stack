@@ -39,4 +39,17 @@ public class FirstKey implements Parcelable, Key {
     public int layout() {
         return R.layout.path_first;
     }
+
+    @Override
+    public int hashCode() {
+        return FirstKey.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+        return obj instanceof FirstKey;
+    }
 }

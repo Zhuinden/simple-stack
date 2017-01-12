@@ -40,4 +40,17 @@ public class SecondKey implements Key {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
     }
+
+    @Override
+    public int hashCode() {
+        return SecondKey.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+        return obj instanceof SecondKey;
+    }
 }
