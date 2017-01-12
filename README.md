@@ -1,2 +1,4 @@
 # simple-stack-demo
-Simple Stack Demo
+
+[DEMO PROJECT]
+This is a demo project to serve as an example for writing a simple backstack.
