@@ -1,25 +1,28 @@
 package com.zhuinden.simplestackdemoexample;
 
+import android.content.Context;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
+
 import com.zhuinden.simplestackdemo.stack.Backstack;
 import com.zhuinden.simplestackdemo.stack.StateChange;
 import com.zhuinden.simplestackdemo.stack.StateChanger;
-import com.zhuinden.simplestackdemoexample.demo.BackstackHolder;
 import com.zhuinden.simplestackdemoexample.demo.FirstKey;
 import com.zhuinden.simplestackdemoexample.demo.Key;
-import com.zhuinden.simplestackdemoexample.R;
-import com.zhuinden.simplestackdemoexample.demo.KeyHolder;
+import com.zhuinden.simplestackdemoexample.demo.KeyContextWrapper;
 
 import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements StateChanger {
+    public static final String BACKSTACK = "BACKSTACK";
+
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -33,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
 
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
-            keys = savedInstanceState.getParcelableArrayList("BACKSTACK");
+            keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
         } else {
             keys = new ArrayList<>();
             keys.add(new FirstKey());
@@ -62,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         super.onSaveInstanceState(outState);
         ArrayList<Parcelable> history = new ArrayList<>();
         history.addAll(backstack.getHistory());
-        outState.putParcelableArrayList("BACKSTACK", history);
+        outState.putParcelableArrayList(BACKSTACK, history);
     }
 
     @Override
@@ -80,12 +83,17 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         }
         root.removeAllViews();
         Key newKey = stateChange.topNewState();
-        View view = LayoutInflater.from(this).inflate(newKey.layout(), root, false);
-        BackstackHolder backstackHolder = (BackstackHolder)view;
-        backstackHolder.setBackstack(backstack);
-        KeyHolder keyHolder = (KeyHolder)view;
-        keyHolder.setKey(newKey);
+        Context newContext = new KeyContextWrapper(this, newKey);
+        View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
         root.addView(view);
         completionCallback.stateChangeComplete();
+    }
+
+    @Override
+    public Object getSystemService(String name) {
+        if(BACKSTACK.equals(name)) {
+            return backstack;
+        }
+        return super.getSystemService(name);
     }
 }

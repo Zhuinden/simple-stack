@@ -37,6 +37,8 @@ Afterwards, the backstack operators allow changing between states.
 
 ``` java
 public class MainActivity extends AppCompatActivity implements StateChanger {
+    public static final String BACKSTACK = "BACKSTACK";
+
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -48,31 +50,29 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // initialize backstack from persisted state if exists, otherwise with new elements.
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
-            keys = savedInstanceState.getParcelableArrayList("BACKSTACK");
+            keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
         } else {
             keys = new ArrayList<>();
             keys.add(new FirstKey());
+
         }
         backstack = (Backstack)getLastCustomNonConfigurationInstance();
         if(backstack == null) {
             backstack = new Backstack(keys);
         }
-        
-        // set this as state changer, and handle initialization
         backstack.setStateChanger(this);
     }
 
     @Override
-    public Object onRetainCustomNonConfigurationInstance() { // persist stack across config change
+    public Object onRetainCustomNonConfigurationInstance() {
         return backstack;
     }
 
     @Override
     public void onBackPressed() {
-        if(!backstack.goBack()) { // handle back press
+        if(!backstack.goBack()) {
             super.onBackPressed();
         }
     }
@@ -82,12 +82,12 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         super.onSaveInstanceState(outState);
         ArrayList<Parcelable> history = new ArrayList<>();
         history.addAll(backstack.getHistory());
-        outState.putParcelableArrayList("BACKSTACK", history); // persist state of backstack across config change/process death
+        outState.putParcelableArrayList(BACKSTACK, history);
     }
 
     @Override
     protected void onDestroy() {
-        backstack.removeStateChanger(); // backstack survives config change, so Activity should remove its reference
+        backstack.removeStateChanger();
         super.onDestroy();
     }
 
@@ -98,15 +98,20 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
             completionCallback.stateChangeComplete();
             return;
         }
-        root.removeAllViews(); // no state persistence for previous views yet
+        root.removeAllViews();
         Key newKey = stateChange.topNewState();
-        View view = LayoutInflater.from(this).inflate(newKey.layout(), root, false);
-        BackstackHolder backstackHolder = (BackstackHolder)view;
-        backstackHolder.setBackstack(backstack); // view currently doesn't implicitly receive the backstack
-        KeyHolder keyHolder = (KeyHolder)view;
-        keyHolder.setKey(newKey); // view currently doesn't implicitly receive the key
+        Context newContext = new KeyContextWrapper(this, newKey);
+        View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
         root.addView(view);
         completionCallback.stateChangeComplete();
+    }
+
+    @Override
+    public Object getSystemService(String name) {
+        if(BACKSTACK.equals(name)) {
+            return backstack;
+        }
+        return super.getSystemService(name);
     }
 }
 ```
@@ -117,8 +122,4 @@ Currently, the backstack does **not** do viewstate persistence, only stores the 
 
 Scheduling a state change while a state change is already in progress throws an `IllegalStateException` instead of queueing it.
 
-## Demo limitations
-
-In the demo, keys associated with the given custom views are manually set for the custom views, therefore it is set via an interface, but is not accessible for any child views of the custom viewgroup.
-
-In the demo, the backstack is also manually set to the custom viewgroup using a `BackStackHolder` interface, instead of implicitly providing it via the Context.
+It is possible to start a state change even after `onPause()` instead of queueing it.
