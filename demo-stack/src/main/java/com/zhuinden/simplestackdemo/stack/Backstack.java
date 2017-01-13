@@ -94,7 +94,7 @@ public class Backstack {
         return true;
     }
 
-    public void setHistory(ArrayList<Parcelable> newHistory, StateChange.Direction direction) {
+    public void setHistory(List<Parcelable> newHistory, StateChange.Direction direction) {
         checkStateChanger();
         checkStateChangeInProgress();
         if(newHistory == null || newHistory.isEmpty()) {
@@ -126,7 +126,7 @@ public class Backstack {
         }
     }
 
-    private void changeState(ArrayList<Parcelable> newHistory, StateChange.Direction direction, boolean initialization) {
+    private void changeState(List<Parcelable> newHistory, StateChange.Direction direction, boolean initialization) {
         List<Parcelable> previousState;
         if(initialization) {
             previousState = Collections.emptyList();
