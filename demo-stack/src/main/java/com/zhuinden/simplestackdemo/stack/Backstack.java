@@ -134,7 +134,7 @@ public class Backstack {
             previousState = new ArrayList<>();
             previousState.addAll(stack);
         }
-        final StateChange stateChange = new StateChange(previousState, Collections.unmodifiableList(newHistory), direction);
+        final StateChange stateChange = new StateChange(Collections.unmodifiableList(previousState), Collections.unmodifiableList(newHistory), direction);
         isStateChangeInProgress = true;
         stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
             @Override
