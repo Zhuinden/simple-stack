@@ -10,7 +10,7 @@ Currently it's 3 files (and 5 classes):
 - [StateChanger](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChanger.java): interface for a class that listens to changes inside the Backstack.
 - [StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java): represents a state change inside the backstack, providing previous state, new state, and the direction of the change.
 
-- [StateChange.Direction]([StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java)): represents the direction of the change.
+- [StateChange.Direction](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java): represents the direction of the change.
 - [StateChanger.Callback](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChanger.java): the callback that signals to the backstack that the state change is complete.
 
 ## Operators
