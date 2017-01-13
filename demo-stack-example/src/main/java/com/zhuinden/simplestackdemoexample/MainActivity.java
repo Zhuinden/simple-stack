@@ -13,6 +13,7 @@ import com.zhuinden.simplestackdemoexample.demo.BackstackHolder;
 import com.zhuinden.simplestackdemoexample.demo.FirstKey;
 import com.zhuinden.simplestackdemoexample.demo.Key;
 import com.zhuinden.simplestackdemoexample.R;
+import com.zhuinden.simplestackdemoexample.demo.KeyHolder;
 
 import java.util.ArrayList;
 import butterknife.BindView;
@@ -82,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         View view = LayoutInflater.from(this).inflate(newKey.layout(), root, false);
         BackstackHolder backstackHolder = (BackstackHolder)view;
         backstackHolder.setBackstack(backstack);
+        KeyHolder keyHolder = (KeyHolder)view;
+        keyHolder.setKey(newKey);
         root.addView(view);
         completionCallback.stateChangeComplete();
     }

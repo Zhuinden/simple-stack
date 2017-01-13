@@ -10,8 +10,7 @@ import com.zhuinden.simplestackdemo.stack.Backstack;
  * Created by Owner on 2017. 01. 12..
  */
 
-public class SecondView extends RelativeLayout implements BackstackHolder {
-
+public class SecondView extends RelativeLayout implements BackstackHolder, KeyHolder {
     public SecondView(Context context) {
         super(context);
     }
@@ -31,8 +30,15 @@ public class SecondView extends RelativeLayout implements BackstackHolder {
 
     Backstack backstack;
 
+    SecondKey secondKey;
+
     @Override
     public void setBackstack(Backstack backstack) {
         this.backstack = backstack;
+    }
+
+    @Override
+    public void setKey(Key key) {
+        this.secondKey = (SecondKey)key;
     }
 }

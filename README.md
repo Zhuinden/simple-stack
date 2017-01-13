@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         View view = LayoutInflater.from(this).inflate(newKey.layout(), root, false);
         BackstackHolder backstackHolder = (BackstackHolder)view;
         backstackHolder.setBackstack(backstack); // view currently doesn't implicitly receive the backstack
+        KeyHolder keyHolder = (KeyHolder)view;
+        keyHolder.setKey(newKey); // view currently doesn't implicitly receive the key
         root.addView(view);
         completionCallback.stateChangeComplete();
     }
@@ -117,6 +119,6 @@ Scheduling a state change while a state change is already in progress throws an 
 
 ## Demo limitations
 
-In the demo, keys associated with the given custom views are currently not manually set for the custom views, therefore it is not accessible at the moment.
+In the demo, keys associated with the given custom views are manually set for the custom views, therefore it is set via an interface, but is not accessible for any child views of the custom viewgroup.
 
-In the demo, the backstack is manually set to the custom viewgroup using a `BackStackHolder` interface, instead of implicitly providing it via the Context.
+In the demo, the backstack is also manually set to the custom viewgroup using a `BackStackHolder` interface, instead of implicitly providing it via the Context.
