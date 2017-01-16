@@ -27,9 +27,10 @@ public class Backstack {
     public static final int REATTACH = 1;
     //
 
-    private final List<Parcelable> initialParameters;
+    private final List<Parcelable> originalStack = new ArrayList<>();
 
-    private ArrayList<Parcelable> stack = new ArrayList<>();
+    private final List<Parcelable> initialParameters;
+    private List<Parcelable> stack = originalStack;
 
     private LinkedList<PendingStateChange> queuedStateChanges = new LinkedList<>();
 
@@ -71,6 +72,7 @@ public class Backstack {
                 }
                 ArrayList<Parcelable> newHistory = new ArrayList<>();
                 newHistory.addAll(stack.isEmpty() ? initialParameters : stack);
+                stack = initialParameters;
                 enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
             }
         }
@@ -172,9 +174,12 @@ public class Backstack {
     }
 
     private void completeStateChange(StateChange stateChange) {
-        if(!stateChange.previousState.isEmpty() || (stateChange.previousState.isEmpty() && stack.isEmpty())) {
-            this.stack.clear();
-            this.stack.addAll(stateChange.newState);
+        if(!stateChange.previousState.isEmpty() || (stateChange.previousState.isEmpty() && initialParameters == stack)) {
+            if(initialParameters == stack) {
+                stack = originalStack;
+            }
+            stack.clear();
+            stack.addAll(stateChange.newState);
         }
 
         PendingStateChange pendingStateChange = queuedStateChanges.remove(0);
