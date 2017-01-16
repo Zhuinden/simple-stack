@@ -1,9 +1,9 @@
 # Change log
 
--Simple Stack 0.2.1 (2017-01-??)
+-Simple Stack 0.2.1 (2017-01-17)
 ---------------------------------
 - Added `ReentranceTest` and ported to `simple-stack-demo` codebase
-- Fixed some bugs based on `ReentranceTest`
+- Fixed some bugs based on `ReentranceTest` - all tests pass now
 
 -Simple Stack 0.2.0 (2017-01-16)
 ---------------------------------

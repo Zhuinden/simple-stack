@@ -64,17 +64,23 @@ public class Backstack {
         this.stateChanger = stateChanger;
         if(registerMode == INITIALIZE) {
             if(queuedStateChanges.size() <= 1 || stack.isEmpty()) {
+                boolean didInitialize = false;
                 if(!queuedStateChanges.isEmpty()) {
                     PendingStateChange pendingStateChange = queuedStateChanges.get(0);
                     if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
                         beginStateChangeIfPossible();
+                        didInitialize = true;
                     }
                 }
-                ArrayList<Parcelable> newHistory = new ArrayList<>();
-                newHistory.addAll(stack.isEmpty() ? initialParameters : stack);
-                stack = initialParameters;
-                enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
+                if(!didInitialize) {
+                    ArrayList<Parcelable> newHistory = new ArrayList<>();
+                    newHistory.addAll(stack.isEmpty() ? initialParameters : stack);
+                    stack = initialParameters;
+                    enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
+                }
             }
+        } else {
+            beginStateChangeIfPossible();
         }
     }
 
@@ -87,7 +93,7 @@ public class Backstack {
 
         ArrayList<Parcelable> newHistory = new ArrayList<>();
         boolean isNewKey = true;
-        for(Parcelable key : stack) {
+        for(Parcelable key : selectActiveHistory()) {
             newHistory.add(key);
             if(key.equals(newKey)) {
                 isNewKey = false;
@@ -115,8 +121,10 @@ public class Backstack {
             return false;
         }
         ArrayList<Parcelable> newHistory = new ArrayList<>();
-        for(int i = 0; i < stack.size() - 1; i++) {
-            newHistory.add(stack.get(i));
+
+        List<Parcelable> activeHistory = selectActiveHistory();
+        for(int i = 0; i < activeHistory.size() - 1; i++) {
+            newHistory.add(activeHistory.get(i));
         }
         enqueueStateChange(newHistory, StateChange.Direction.BACKWARD, false);
         return true;
@@ -126,7 +134,6 @@ public class Backstack {
         checkNewHistory(newHistory);
         enqueueStateChange(newHistory, direction, false);
     }
-
 
     public List<Parcelable> getHistory() {
         List<Parcelable> copy = new ArrayList<>();
@@ -138,6 +145,16 @@ public class Backstack {
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
+    }
+
+    private List<Parcelable> selectActiveHistory() {
+        if(stack.isEmpty() && queuedStateChanges.size() <= 0) {
+            return initialParameters;
+        } else if(queuedStateChanges.size() <= 0) {
+            return stack;
+        } else {
+            return queuedStateChanges.getLast().newHistory;
+        }
     }
 
     private void beginStateChangeIfPossible() {
@@ -177,17 +194,15 @@ public class Backstack {
     }
 
     private void completeStateChange(StateChange stateChange) {
-        if(!stateChange.previousState.isEmpty() || (stateChange.previousState.isEmpty() && initialParameters == stack)) {
-            if(initialParameters == stack) {
-                stack = originalStack;
-            }
-            stack.clear();
-            stack.addAll(stateChange.newState);
+        if(initialParameters == stack) {
+            stack = originalStack;
         }
+        stack.clear();
+        stack.addAll(stateChange.newState);
 
         PendingStateChange pendingStateChange = queuedStateChanges.remove(0);
         if(pendingStateChange.getStatus() != PendingStateChange.Status.IN_PROGRESS) {
-            throw new IllegalStateException("An error occurred in backstack state management: " + //
+            throw new IllegalStateException("An error occurred in state management: " + //
                     "expected [" + PendingStateChange.Status.IN_PROGRESS + "] but was [" + pendingStateChange.getStatus() + "]");
         }
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);

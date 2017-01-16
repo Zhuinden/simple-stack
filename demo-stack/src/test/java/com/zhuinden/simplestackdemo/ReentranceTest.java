@@ -255,7 +255,7 @@ public class ReentranceTest {
     }
 
     @Test
-    public void handleStateChangeerSetInMidFlightWaitsForBootstrap() {
+    public void handleStateChangerSetInMidFlightWaitsForBootstrap() {
         flow = new Backstack(ListBuilder.single(new Catalog()));
         flow.setStateChanger(new StateChanger() {
             @Override
