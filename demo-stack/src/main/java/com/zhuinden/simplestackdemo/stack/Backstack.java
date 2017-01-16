@@ -5,7 +5,9 @@ import android.support.annotation.IntDef;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -23,19 +25,21 @@ public class Backstack {
 
     public static final int INITIALIZE = 0;
     public static final int REATTACH = 1;
-
     //
+
+    private final List<Parcelable> initialParameters;
+
     private ArrayList<Parcelable> stack = new ArrayList<>();
 
-    private StateChanger stateChanger;
+    private LinkedList<PendingStateChange> queuedStateChanges = new LinkedList<>();
 
-    private boolean isStateChangeInProgress;
+    private StateChanger stateChanger;
 
     public Backstack(Parcelable... initialKeys) {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
-        Collections.addAll(stack, initialKeys);
+        initialParameters = Collections.unmodifiableList(new ArrayList<>(Arrays.asList(initialKeys)));
     }
 
     public Backstack(List<Parcelable> initialKeys) {
@@ -45,7 +49,7 @@ public class Backstack {
         if(initialKeys.size() <= 0) {
             throw new IllegalArgumentException("Initial key list should contain at least one element");
         }
-        stack.addAll(initialKeys);
+        initialParameters = Collections.unmodifiableList(new ArrayList<>(initialKeys));
     }
 
     public boolean hasStateChanger() {
@@ -58,9 +62,17 @@ public class Backstack {
         }
         this.stateChanger = stateChanger;
         if(registerMode == INITIALIZE) {
-            ArrayList<Parcelable> newHistory = new ArrayList<>();
-            newHistory.addAll(stack);
-            changeState(newHistory, StateChange.Direction.REPLACE, true);
+            if(queuedStateChanges.size() <= 1) {
+                if(!queuedStateChanges.isEmpty()) {
+                    PendingStateChange pendingStateChange = queuedStateChanges.get(0);
+                    if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
+                        beginStateChangeIfPossible();
+                    }
+                }
+                ArrayList<Parcelable> newHistory = new ArrayList<>();
+                newHistory.addAll(stack.isEmpty() ? initialParameters : stack);
+                enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
+            }
         }
     }
 
@@ -70,8 +82,6 @@ public class Backstack {
 
     public void goTo(Parcelable newKey) {
         checkNewKey(newKey);
-        checkStateChanger();
-        checkStateChangeInProgress();
 
         ArrayList<Parcelable> newHistory = new ArrayList<>();
         boolean isNewKey = true;
@@ -89,20 +99,16 @@ public class Backstack {
         } else {
             direction = StateChange.Direction.BACKWARD;
         }
-        changeState(newHistory, direction, false);
+        enqueueStateChange(newHistory, direction, false);
     }
 
     public boolean goBack() {
-        if(isStateChangeInProgress) {
+        if(!queuedStateChanges.isEmpty() && queuedStateChanges.get(0)
+                .getStatus()
+                .ordinal() >= PendingStateChange.Status.IN_PROGRESS.ordinal()) {
             return true;
         }
-
-        checkStateChanger();
-
-        if(stack.size() <= 0) {
-            throw new IllegalStateException("Cannot go back when stack has no items");
-        }
-        if(stack.size() == 1) {
+        if(stack.size() <= 1) {
             stack.clear();
             return false;
         }
@@ -110,18 +116,15 @@ public class Backstack {
         for(int i = 0; i < stack.size() - 1; i++) {
             newHistory.add(stack.get(i));
         }
-        changeState(newHistory, StateChange.Direction.BACKWARD, false);
+        enqueueStateChange(newHistory, StateChange.Direction.BACKWARD, false);
         return true;
     }
 
     public void setHistory(List<Parcelable> newHistory, StateChange.Direction direction) {
-        checkStateChanger();
-        checkStateChangeInProgress();
-        if(newHistory == null || newHistory.isEmpty()) {
-            throw new NullPointerException("New history cannot be null or empty");
-        }
-        changeState(newHistory, direction, false);
+        checkNewHistory(newHistory);
+        enqueueStateChange(newHistory, direction, false);
     }
+
 
     public List<Parcelable> getHistory() {
         List<Parcelable> copy = new ArrayList<>();
@@ -129,26 +132,27 @@ public class Backstack {
         return Collections.unmodifiableList(copy);
     }
 
-    //
-    private void checkStateChangeInProgress() {
-        if(isStateChangeInProgress) {
-            throw new IllegalStateException("Cannot execute state change while another state change is in progress"); // FIXME: Flow allows queueing traversals
+    private void enqueueStateChange(List<Parcelable> newHistory, StateChange.Direction direction, boolean initialization) {
+        PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
+        queuedStateChanges.add(pendingStateChange);
+        beginStateChangeIfPossible();
+    }
+
+    private void beginStateChangeIfPossible() {
+        if(hasStateChanger() && !queuedStateChanges.isEmpty()) {
+            PendingStateChange pendingStateChange = queuedStateChanges.get(0);
+            if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
+                pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
+                changeState(pendingStateChange);
+            }
         }
     }
 
-    private void checkStateChanger() {
-        if(stateChanger == null) {
-            throw new IllegalStateException("State changes are not possible while state changer is not set"); // FIXME: Flow allows queueing traversals
-        }
-    }
+    private void changeState(PendingStateChange pendingStateChange) {
+        boolean initialization = pendingStateChange.initialization;
+        List<Parcelable> newHistory = pendingStateChange.newHistory;
+        StateChange.Direction direction = pendingStateChange.direction;
 
-    private void checkNewKey(Parcelable newKey) {
-        if(newKey == null) {
-            throw new NullPointerException("Key cannot be null");
-        }
-    }
-
-    private void changeState(List<Parcelable> newHistory, StateChange.Direction direction, boolean initialization) {
         List<Parcelable> previousState;
         if(initialization) {
             previousState = Collections.emptyList();
@@ -159,7 +163,6 @@ public class Backstack {
         final StateChange stateChange = new StateChange(Collections.unmodifiableList(previousState),
                 Collections.unmodifiableList(newHistory),
                 direction);
-        isStateChangeInProgress = true;
         stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
             @Override
             public void stateChangeComplete() {
@@ -169,8 +172,30 @@ public class Backstack {
     }
 
     private void completeStateChange(StateChange stateChange) {
-        this.stack.clear();
-        this.stack.addAll(stateChange.newState);
-        isStateChangeInProgress = false;
+        if(!stateChange.previousState.isEmpty() || (stateChange.previousState.isEmpty() && stack.isEmpty())) {
+            this.stack.clear();
+            this.stack.addAll(stateChange.newState);
+        }
+
+        PendingStateChange pendingStateChange = queuedStateChanges.remove(0);
+        if(pendingStateChange.getStatus() != PendingStateChange.Status.IN_PROGRESS) {
+            throw new IllegalStateException("An error occurred in backstack state management: " + //
+                    "expected [" + PendingStateChange.Status.IN_PROGRESS + "] but was [" + pendingStateChange.getStatus() + "]");
+        }
+        pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
+        beginStateChangeIfPossible();
+    }
+
+    // argument checks
+    private void checkNewHistory(List<Parcelable> newHistory) {
+        if(newHistory == null || newHistory.isEmpty()) {
+            throw new IllegalArgumentException("New history cannot be null or empty");
+        }
+    }
+
+    private void checkNewKey(Parcelable newKey) {
+        if(newKey == null) {
+            throw new IllegalArgumentException("Key cannot be null");
+        }
     }
 }

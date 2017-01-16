@@ -3,6 +3,7 @@ package com.zhuinden.simplestackdemo.stack;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import java.util.List;
 /**
  * Created by Owner on 2017. 01. 12..
@@ -31,6 +32,10 @@ public class StateChange {
 
     public List<Parcelable> getNewState() {
         return newState;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 
     @Nullable
