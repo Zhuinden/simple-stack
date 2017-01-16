@@ -78,6 +78,8 @@ public class Backstack {
                     stack = initialParameters;
                     enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
                 }
+            } else {
+                beginStateChangeIfPossible();
             }
         } else {
             beginStateChangeIfPossible();
