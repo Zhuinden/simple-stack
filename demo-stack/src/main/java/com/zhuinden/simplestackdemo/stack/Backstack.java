@@ -63,7 +63,7 @@ public class Backstack {
         }
         this.stateChanger = stateChanger;
         if(registerMode == INITIALIZE) {
-            if(queuedStateChanges.size() <= 1) {
+            if(queuedStateChanges.size() <= 1 || stack.isEmpty()) {
                 if(!queuedStateChanges.isEmpty()) {
                     PendingStateChange pendingStateChange = queuedStateChanges.get(0);
                     if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
@@ -150,7 +150,7 @@ public class Backstack {
         }
     }
 
-    private void changeState(PendingStateChange pendingStateChange) {
+    private void changeState(final PendingStateChange pendingStateChange) {
         boolean initialization = pendingStateChange.initialization;
         List<Parcelable> newHistory = pendingStateChange.newHistory;
         StateChange.Direction direction = pendingStateChange.direction;
@@ -168,6 +168,9 @@ public class Backstack {
         stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
             @Override
             public void stateChangeComplete() {
+                if(pendingStateChange.getStatus() == PendingStateChange.Status.COMPLETED) {
+                    throw new IllegalStateException("State change completion cannot be called multiple times!");
+                }
                 completeStateChange(stateChange);
             }
         });

@@ -29,7 +29,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,63 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class FlowTest {
-    static class TestKey
-            implements Parcelable {
-        final String name;
-
-        TestKey(String name) {
-            this.name = name;
-        }
-
-        protected TestKey(Parcel in) {
-            name = in.readString();
-        }
-
-        public static final Creator<TestKey> CREATOR = new Creator<TestKey>() {
-            @Override
-            public TestKey createFromParcel(Parcel in) {
-                return new TestKey(in);
-            }
-
-            @Override
-            public TestKey[] newArray(int size) {
-                return new TestKey[size];
-            }
-        };
-
-        @Override
-        public boolean equals(Object o) {
-            if(this == o) {
-                return true;
-            }
-            if(o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            TestKey key = (TestKey) o;
-            return name.equals(key.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s{%h}", name, this);
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(name);
-        }
-    }
-
     static class Uno
             implements Parcelable {
         public Uno() {
@@ -494,43 +436,4 @@ public class FlowTest {
         assertThat(flow.goBack()).isFalse();
     }
 
-    static class ListBuilder {
-        private List<Parcelable> list = new ArrayList<>();
-
-        public static ListBuilder emptyBuilder() {
-            return new ListBuilder();
-        }
-
-        public static List<Parcelable> single(Parcelable parcelable) {
-            ListBuilder listBuilder = new ListBuilder();
-            listBuilder.list.add(parcelable);
-            return listBuilder.list;
-        }
-
-        public ListBuilder pushAll(Parcelable[] collection) {
-            this.list.addAll(Arrays.asList(collection));
-            return this;
-        }
-
-        public ListBuilder pushAll(Collection<? extends Parcelable> collection) {
-            this.list.addAll(collection);
-            return this;
-        }
-
-        public ListBuilder removeLast() {
-            if(list.size() > 0) {
-                list.remove(list.size() - 1);
-            }
-            return this;
-        }
-
-        public ListBuilder push(Parcelable parcelable) {
-            list.add(parcelable);
-            return this;
-        }
-
-        public List<Parcelable> build() {
-            return list;
-        }
-    }
 }
