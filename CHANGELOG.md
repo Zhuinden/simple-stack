@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 0.2.1 (2017-01-??)
+---------------------------------
+- Added `ReentranceTest` and ported to `simple-stack-demo` codebase
+- Fixed some bugs based on `ReentranceTest`
+
+-Simple Stack 0.2.0 (2017-01-16)
+---------------------------------
+- State changes are now enqueued while `StateChanger` is not available (after `onPause()`) or a state change is already in progress
+- Added `FlowTest` and ported to `simple-stack-demo` codebase
+
 Simple Stack 0.1.1 (2017-01-14)
 ---------------------------------
 - Key and backstack are now provided to custom viewgroup via `getSystemService()`
