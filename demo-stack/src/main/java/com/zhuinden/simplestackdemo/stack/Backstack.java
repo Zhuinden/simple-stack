@@ -1,16 +1,30 @@
 package com.zhuinden.simplestackdemo.stack;
 
 import android.os.Parcelable;
+import android.support.annotation.IntDef;
 
+import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Created by Owner on 2017. 01. 12..
  */
 
 public class Backstack {
+    //
+    @Retention(SOURCE)
+    @IntDef({INITIALIZE, REATTACH})
+    public @interface StateChangerRegisterMode {
+    }
+
+    public static final int INITIALIZE = 0;
+    public static final int REATTACH = 1;
+
+    //
     private ArrayList<Parcelable> stack = new ArrayList<>();
 
     private StateChanger stateChanger;
@@ -34,14 +48,20 @@ public class Backstack {
         stack.addAll(initialKeys);
     }
 
-    public void setStateChanger(StateChanger stateChanger) {
+    public boolean hasStateChanger() {
+        return stateChanger != null;
+    }
+
+    public void setStateChanger(StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
         if(stateChanger == null) {
             throw new NullPointerException("New state changer cannot be null");
         }
         this.stateChanger = stateChanger;
-        ArrayList<Parcelable> newHistory = new ArrayList<>();
-        newHistory.addAll(stack);
-        changeState(newHistory, StateChange.Direction.REPLACE, true);
+        if(registerMode == INITIALIZE) {
+            ArrayList<Parcelable> newHistory = new ArrayList<>();
+            newHistory.addAll(stack);
+            changeState(newHistory, StateChange.Direction.REPLACE, true);
+        }
     }
 
     public void removeStateChanger() {
@@ -104,7 +124,9 @@ public class Backstack {
     }
 
     public List<Parcelable> getHistory() {
-        return Collections.unmodifiableList(stack);
+        List<Parcelable> copy = new ArrayList<>();
+        copy.addAll(stack);
+        return Collections.unmodifiableList(copy);
     }
 
     //
@@ -134,7 +156,9 @@ public class Backstack {
             previousState = new ArrayList<>();
             previousState.addAll(stack);
         }
-        final StateChange stateChange = new StateChange(Collections.unmodifiableList(previousState), Collections.unmodifiableList(newHistory), direction);
+        final StateChange stateChange = new StateChange(Collections.unmodifiableList(previousState),
+                Collections.unmodifiableList(newHistory),
+                direction);
         isStateChangeInProgress = true;
         stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
             @Override

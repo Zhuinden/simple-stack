@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         if(backstack == null) {
             backstack = new Backstack(keys);
         }
-        backstack.setStateChanger(this);
+        backstack.setStateChanger(this, Backstack.INITIALIZE);
     }
 
     @Override
@@ -69,9 +69,19 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
     }
 
     @Override
-    protected void onDestroy() {
-        backstack.removeStateChanger();
-        super.onDestroy();
+    protected void onPostResume() {
+        super.onPostResume();
+        if(!backstack.hasStateChanger()) {
+            backstack.setStateChanger(this, Backstack.REATTACH);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if(backstack.hasStateChanger()) {
+            backstack.removeStateChanger();
+        }
+        super.onPause();
     }
 
     @Override
