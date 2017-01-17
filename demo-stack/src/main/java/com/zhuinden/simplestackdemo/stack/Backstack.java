@@ -62,28 +62,16 @@ public class Backstack {
             throw new NullPointerException("New state changer cannot be null");
         }
         this.stateChanger = stateChanger;
-        if(registerMode == INITIALIZE) {
-            if(queuedStateChanges.size() <= 1 || stack.isEmpty()) {
-                boolean didInitialize = false;
-                if(!queuedStateChanges.isEmpty()) {
-                    PendingStateChange pendingStateChange = queuedStateChanges.get(0);
-                    if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
-                        beginStateChangeIfPossible();
-                        didInitialize = true;
-                    }
-                }
-                if(!didInitialize) {
-                    ArrayList<Parcelable> newHistory = new ArrayList<>();
-                    newHistory.addAll(stack.isEmpty() ? initialParameters : stack);
-                    stack = initialParameters;
-                    enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
-                }
-            } else {
-                beginStateChangeIfPossible();
+        if(registerMode == INITIALIZE && (queuedStateChanges.size() <= 1 || stack.isEmpty())) {
+            if(!beginStateChangeIfPossible()) {
+                ArrayList<Parcelable> newHistory = new ArrayList<>();
+                newHistory.addAll(stack.isEmpty() ? initialParameters : stack);
+                stack = initialParameters;
+                enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
             }
-        } else {
-            beginStateChangeIfPossible();
+            return;
         }
+        beginStateChangeIfPossible();
     }
 
     public void removeStateChanger() {
@@ -159,14 +147,16 @@ public class Backstack {
         }
     }
 
-    private void beginStateChangeIfPossible() {
+    private boolean beginStateChangeIfPossible() {
         if(hasStateChanger() && !queuedStateChanges.isEmpty()) {
             PendingStateChange pendingStateChange = queuedStateChanges.get(0);
             if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
                 pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
                 changeState(pendingStateChange);
+                return true;
             }
         }
+        return false;
     }
 
     private void changeState(final PendingStateChange pendingStateChange) {
