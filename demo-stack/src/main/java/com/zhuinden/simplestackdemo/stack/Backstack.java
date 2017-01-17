@@ -65,7 +65,7 @@ public class Backstack {
         if(registerMode == INITIALIZE && (queuedStateChanges.size() <= 1 || stack.isEmpty())) {
             if(!beginStateChangeIfPossible()) {
                 ArrayList<Parcelable> newHistory = new ArrayList<>();
-                newHistory.addAll(stack.isEmpty() ? initialParameters : stack);
+                newHistory.addAll(selectActiveHistory());
                 stack = initialParameters;
                 enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
             }
