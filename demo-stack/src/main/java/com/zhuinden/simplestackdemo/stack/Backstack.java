@@ -101,9 +101,7 @@ public class Backstack {
     }
 
     public boolean goBack() {
-        if(!queuedStateChanges.isEmpty() && queuedStateChanges.get(0)
-                .getStatus()
-                .ordinal() >= PendingStateChange.Status.IN_PROGRESS.ordinal()) {
+        if(!queuedStateChanges.isEmpty() && queuedStateChanges.get(0).getStatus() != PendingStateChange.Status.COMPLETED) {
             return true;
         }
         if(stack.size() <= 1) {
