@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemo;
+package com.zhuinden.simplestackdemo.stack;
 
 /*
  * Copyright 2014 Square Inc.
@@ -19,10 +19,6 @@ package com.zhuinden.simplestackdemo;
 
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-
-import com.zhuinden.simplestackdemo.stack.Backstack;
-import com.zhuinden.simplestackdemo.stack.StateChange;
-import com.zhuinden.simplestackdemo.stack.StateChanger;
 
 import org.junit.Before;
 import org.junit.Test;

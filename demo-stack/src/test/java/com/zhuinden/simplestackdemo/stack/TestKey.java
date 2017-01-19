@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemo;
+package com.zhuinden.simplestackdemo.stack;
 
 import android.os.Parcel;
 import android.os.Parcelable;

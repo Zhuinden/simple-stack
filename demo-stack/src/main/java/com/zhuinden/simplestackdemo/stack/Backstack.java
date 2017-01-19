@@ -191,10 +191,6 @@ public class Backstack {
         stack.addAll(stateChange.newState);
 
         PendingStateChange pendingStateChange = queuedStateChanges.remove(0);
-        if(pendingStateChange.getStatus() != PendingStateChange.Status.IN_PROGRESS) {
-            throw new IllegalStateException("An error occurred in state management: " + //
-                    "expected [" + PendingStateChange.Status.IN_PROGRESS + "] but was [" + pendingStateChange.getStatus() + "]");
-        }
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
         beginStateChangeIfPossible();
     }
