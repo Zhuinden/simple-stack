@@ -25,30 +25,37 @@ public class HistoryBuilder {
         return new HistoryBuilder();
     }
 
-    public static ArrayList<Parcelable> single(Parcelable parcelable) {
+    public static ArrayList<Parcelable> single(Parcelable key) {
         return newBuilder()
-                .add(parcelable)
+                .add(key)
                 .build();
     }
 
     public HistoryBuilder addAll(List<? extends Parcelable> collection) {
+        if(collection == null) {
+            throw new IllegalArgumentException("Provided collection cannot be null");
+        }
         this.list.addAll(collection);
         return this;
     }
 
     public HistoryBuilder removeLast() {
-        if(list.size() > 0) {
-            list.remove(list.size() - 1);
+        if(list.isEmpty()) {
+            throw new IllegalStateException("Cannot remove element from empty list");
         }
+        list.remove(list.size() - 1);
         return this;
     }
 
-    public HistoryBuilder removeUntil(Parcelable state) {
-        while(!list.isEmpty() && !peek().equals(state)) {
+    public HistoryBuilder removeUntil(Parcelable key) {
+        if(key == null) {
+            throw new IllegalArgumentException("History key cannot be null");
+        }
+        while(!list.isEmpty() && !peek().equals(key)) {
             removeLast();
         }
         if(list.isEmpty()) {
-            throw new IllegalArgumentException("[" + state + "] was not found in history!");
+            throw new IllegalArgumentException("[" + key + "] was not found in history!");
         }
         return this;
     }
@@ -58,8 +65,11 @@ public class HistoryBuilder {
         return (T)(list.isEmpty() ? null : list.get(list.size() - 1));
     }
 
-    public HistoryBuilder add(Parcelable parcelable) {
-        list.add(parcelable);
+    public HistoryBuilder add(Parcelable key) {
+        if(key == null) {
+            throw new IllegalArgumentException("History key cannot be null");
+        }
+        list.add(key);
         return this;
     }
 
