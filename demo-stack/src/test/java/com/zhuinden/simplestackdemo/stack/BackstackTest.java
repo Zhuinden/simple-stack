@@ -101,6 +101,23 @@ public class BackstackTest {
     }
 
     @Test
+    public void goBackShouldReturnFalseWithOneElement() {
+        TestKey hi = new TestKey("hi");
+        Backstack backstack = new Backstack(hi);
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+                callback = completionCallback;
+            }
+        }, Backstack.INITIALIZE);
+
+        callback.stateChangeComplete();
+        assertThat(backstack.goBack()).isFalse();
+    }
+
+
+    @Test
     public void topPreviousStateReturnsNullDuringInitializeStateChange() {
         TestKey hi = new TestKey("hi");
         Backstack backstack = new Backstack(hi);

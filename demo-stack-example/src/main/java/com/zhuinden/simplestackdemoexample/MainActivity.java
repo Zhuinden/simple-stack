@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestackdemo.stack.Backstack;
+import com.zhuinden.simplestackdemo.stack.HistoryBuilder;
 import com.zhuinden.simplestackdemo.stack.StateChange;
 import com.zhuinden.simplestackdemo.stack.StateChanger;
 import com.zhuinden.simplestackdemoexample.demo.FirstKey;
@@ -38,8 +39,7 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         if(savedInstanceState != null) {
             keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
         } else {
-            keys = new ArrayList<>();
-            keys.add(new FirstKey());
+            keys = HistoryBuilder.single(new FirstKey());
         }
         backstack = (Backstack)getLastCustomNonConfigurationInstance();
         if(backstack == null) {
@@ -63,9 +63,7 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        ArrayList<Parcelable> history = new ArrayList<>();
-        history.addAll(backstack.getHistory());
-        outState.putParcelableArrayList(BACKSTACK, history);
+        outState.putParcelableArrayList(BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
     }
 
     @Override
