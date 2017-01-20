@@ -43,6 +43,21 @@ public class HistoryBuilder {
         return this;
     }
 
+    public HistoryBuilder removeUntil(Parcelable state) {
+        while(!list.isEmpty() && !peek().equals(state)) {
+            removeLast();
+        }
+        if(list.isEmpty()) {
+            throw new IllegalArgumentException("[" + state + "] was not found in history!");
+        }
+        return this;
+    }
+
+    public <T extends Parcelable> T peek() {
+        // noinspection unchecked
+        return (T)(list.isEmpty() ? null : list.get(list.size() - 1));
+    }
+
     public HistoryBuilder add(Parcelable parcelable) {
         list.add(parcelable);
         return this;
