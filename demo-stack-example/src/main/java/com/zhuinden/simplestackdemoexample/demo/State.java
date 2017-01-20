@@ -106,4 +106,20 @@ public class State implements Parcelable {
             dest.writeBundle(bundle);
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+        if(!(obj instanceof State)) {
+            return false;
+        }
+        return ((State)obj).getKey().equals(this.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return key.hashCode();
+    }
 }

@@ -30,7 +30,6 @@ public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
     public static final String BACKSTACK = "BACKSTACK";
-
     public static final String STATES = "STATES";
 
     @BindView(R.id.root)

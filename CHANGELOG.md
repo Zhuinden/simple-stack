@@ -1,5 +1,8 @@
 # Change log
 
+-Simple Stack 0.3.1 (2017-01-20)
+---------------------------------
+- Added missing `equals()`/`hashCode()` to `State` class in example
 
 -Simple Stack 0.3.0 (2017-01-20)
 ---------------------------------
