@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -15,19 +16,28 @@ import com.zhuinden.simplestackdemo.stack.StateChanger;
 import com.zhuinden.simplestackdemoexample.demo.FirstKey;
 import com.zhuinden.simplestackdemoexample.demo.Key;
 import com.zhuinden.simplestackdemoexample.demo.KeyContextWrapper;
+import com.zhuinden.simplestackdemoexample.demo.State;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements StateChanger {
+public class MainActivity
+        extends AppCompatActivity
+        implements StateChanger {
     public static final String BACKSTACK = "BACKSTACK";
+    public static final String STATES = "STATES";
 
     @BindView(R.id.root)
     RelativeLayout root;
 
     Backstack backstack;
+
+    Map<Key, State> keyStateMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +48,16 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
             keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
+            List<State> states = savedInstanceState.getParcelableArrayList(STATES);
+            if(states != null) {
+                for(State state : states) {
+                    keyStateMap.put(state.getKey(), state);
+                }
+            }
         } else {
             keys = HistoryBuilder.single(new FirstKey());
         }
-        backstack = (Backstack)getLastCustomNonConfigurationInstance();
+        backstack = (Backstack) getLastCustomNonConfigurationInstance();
         if(backstack == null) {
             backstack = new Backstack(keys);
         }
@@ -62,8 +78,19 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        if(root != null) {
+            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
+            root.getChildAt(0).saveHierarchyState(viewHierarchyState);
+            Key currentKey = KeyContextWrapper.getKey(root.getChildAt(0).getContext());
+            State currentState = State.builder()
+                    .setKey(currentKey)
+                    .setViewHierarchyState(viewHierarchyState)
+                    .build();
+            keyStateMap.put(currentKey, currentState);
+        }
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
+        outState.putParcelableArrayList(STATES, new ArrayList<>(keyStateMap.values()));
     }
 
     @Override
@@ -89,11 +116,26 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
             completionCallback.stateChangeComplete();
             return;
         }
+        if(stateChange.topPreviousState() != null) {
+            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
+            Key previousKey = stateChange.topPreviousState();
+            root.getChildAt(0).saveHierarchyState(viewHierarchyState);
+            State previousState = State.builder()
+                    .setKey(previousKey)
+                    .setViewHierarchyState(viewHierarchyState)
+                    .build();
+            keyStateMap.put(previousKey, previousState);
+        }
         root.removeAllViews();
         Key newKey = stateChange.topNewState();
         Context newContext = new KeyContextWrapper(this, newKey);
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
+        if(keyStateMap.containsKey(newKey)) {
+            State state = keyStateMap.get(newKey);
+            view.restoreHierarchyState(state.getViewHierarchyState());
+        }
         root.addView(view);
+        keyStateMap.keySet().retainAll(stateChange.getNewState());
         completionCallback.stateChangeComplete();
     }
 

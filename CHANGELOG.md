@@ -1,5 +1,13 @@
 # Change log
 
+-Simple Stack 0.3.0 (2017-01-20)
+---------------------------------
+- Added view persistence to example code (`MainActivity`)
+
+-Simple Stack 0.2.6 (2017-01-20)
+---------------------------------
+- Added `HistoryBuilder` for convenience
+
 -Simple Stack 0.2.5 (2017-01-17)
 ---------------------------------
 - Minor bug fixes and simplifications
