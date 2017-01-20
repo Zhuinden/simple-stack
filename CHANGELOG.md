@@ -1,5 +1,6 @@
 # Change log
 
+
 -Simple Stack 0.3.0 (2017-01-20)
 ---------------------------------
 - Added view persistence to example code (`MainActivity`)

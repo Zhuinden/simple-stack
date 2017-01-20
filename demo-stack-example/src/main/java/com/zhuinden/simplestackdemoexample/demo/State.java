@@ -14,7 +14,7 @@ public class State implements Parcelable {
     private SparseArray<Parcelable> viewHierarchyState;
     private Bundle bundle;
 
-    State() {
+    private State() {
     }
 
     public Key getKey() {
