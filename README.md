@@ -54,15 +54,13 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
         if(savedInstanceState != null) {
             keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
         } else {
-            keys = new ArrayList<>();
-            keys.add(new FirstKey());
-
+            keys = HistoryBuilder.single(new FirstKey());
         }
         backstack = (Backstack)getLastCustomNonConfigurationInstance();
         if(backstack == null) {
             backstack = new Backstack(keys);
         }
-        backstack.setStateChanger(this);
+        backstack.setStateChanger(this, Backstack.INITIALIZE);
     }
 
     @Override
@@ -80,15 +78,23 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        ArrayList<Parcelable> history = new ArrayList<>();
-        history.addAll(backstack.getHistory());
-        outState.putParcelableArrayList(BACKSTACK, history);
+        outState.putParcelableArrayList(BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
     }
 
     @Override
-    protected void onDestroy() {
-        backstack.removeStateChanger();
-        super.onDestroy();
+    protected void onPostResume() {
+        super.onPostResume();
+        if(!backstack.hasStateChanger()) {
+            backstack.setStateChanger(this, Backstack.REATTACH);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if(backstack.hasStateChanger()) {
+            backstack.removeStateChanger();
+        }
+        super.onPause();
     }
 
     @Override
@@ -119,7 +125,3 @@ public class MainActivity extends AppCompatActivity implements StateChanger {
 ## Limitations
 
 Currently, the backstack does **not** do viewstate persistence, only stores the `ArrayList<Parcelable>` that represents the given screens.
-
-Scheduling a state change while a state change is already in progress throws an `IllegalStateException` instead of queueing it.
-
-It is possible to start a state change even after `onPause()` instead of queueing it.
