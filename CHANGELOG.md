@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 0.3.2 (2017-01-21)
+---------------------------------
+- Add check for if `key` is `null` in `State`'s `Builder.build()`
+
 -Simple Stack 0.3.1 (2017-01-20)
 ---------------------------------
 - Added missing `equals()`/`hashCode()` to `State` class in example

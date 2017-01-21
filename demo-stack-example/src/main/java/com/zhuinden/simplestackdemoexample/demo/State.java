@@ -60,6 +60,9 @@ public class State implements Parcelable {
         }
 
         public State build() {
+            if(key == null) {
+                throw new IllegalStateException("You cannot create a State without associating a Key with it.");
+            }
             State state = new State();
             state.key = key;
             state.viewHierarchyState = viewHierarchyState;
