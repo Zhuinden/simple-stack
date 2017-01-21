@@ -8,32 +8,32 @@ Currently it's 3 files (and 5 classes):
 
 - [BackStack](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/Backstack.java): exposes operators for manipulating the backstack, and stores current history.
 - [StateChanger](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChanger.java): interface for a class that listens to changes inside the Backstack.
-- [StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java): represents a state change inside the backstack, providing previous state, new state, and the direction of the change.
+- [StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java): represents a savedState change inside the backstack, providing previous savedState, new savedState, and the direction of the change.
 
 - [StateChange.Direction](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java): represents the direction of the change.
-- [StateChanger.Callback](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChanger.java): the callback that signals to the backstack that the state change is complete.
+- [StateChanger.Callback](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChanger.java): the callback that signals to the backstack that the savedState change is complete.
 
 ## Operators
 
-The Backstack provides 3 convenient operators for manipulating state.
+The Backstack provides 3 convenient operators for manipulating savedState.
 
-- `goTo()`: if state does not previously exist in the backstack, then adds it to the stack. Otherwise navigate back to given state.
-- `goBack()`: returns boolean if state change is in progress, or if there are more than 1 entries in history (and handled the back press). Otherwise, return false.
-- `setHistory()`: sets the state to the provided elements.
+- `goTo()`: if savedState does not previously exist in the backstack, then adds it to the stack. Otherwise navigate back to given savedState.
+- `goBack()`: returns boolean if savedState change is in progress, or if there are more than 1 entries in history (and handled the back press). Otherwise, return false.
+- `setHistory()`: sets the savedState to the provided elements.
 
 ## What does it do?
 
 Currently, the backstack stores the screens, and persists them across configuration change / process death.
 
-The backstack also allows navigation between the states, and enables handling this state change using the `StateChanger`.
+The backstack also allows navigation between the savedStates, and enables handling this savedState change using the `StateChanger`.
 
 ## How does it work?
 
-The backstack must be initialized with at least one initial state, and a state changer must be set when it is able to handle the state change.
+The backstack must be initialized with at least one initial savedState, and a savedState changer must be set when it is able to handle the savedState change.
 
-Setting a state changer begins an `initialization` (in Flow terms, a bootstrap traversal), which provides a state change in form of `{[], [{...}, {...}]}`.
+Setting a savedState changer begins an `initialization` (in Flow terms, a bootstrap traversal), which provides a savedState change in form of `{[], [{...}, {...}]}`.
 
-Afterwards, the backstack operators allow changing between states.
+Afterwards, the backstack operators allow changing between savedStates.
 
 ``` java
 public class MainActivity
@@ -47,7 +47,7 @@ public class MainActivity
 
     Backstack backstack;
 
-    Map<Key, State> keyStateMap = new HashMap<>();
+    Map<Key, SavedState> keyStateMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +58,10 @@ public class MainActivity
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
             keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
-            List<State> states = savedInstanceState.getParcelableArrayList(STATES);
-            if(states != null) {
-                for(State state : states) {
-                    keyStateMap.put(state.getKey(), state);
+            List<SavedState> savedStates = savedInstanceState.getParcelableArrayList(STATES);
+            if(savedStates != null) {
+                for(SavedState savedState : savedStates) {
+                    keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
         } else {
@@ -92,11 +92,11 @@ public class MainActivity
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             root.getChildAt(0).saveHierarchyState(viewHierarchyState);
             Key currentKey = KeyContextWrapper.getKey(root.getChildAt(0).getContext());
-            State currentState = State.builder()
+            SavedState currentSavedState = SavedState.builder()
                     .setKey(currentKey)
                     .setViewHierarchyState(viewHierarchyState)
                     .build();
-            keyStateMap.put(currentKey, currentState);
+            keyStateMap.put(currentKey, currentSavedState);
         }
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
@@ -130,19 +130,19 @@ public class MainActivity
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             Key previousKey = stateChange.topPreviousState();
             root.getChildAt(0).saveHierarchyState(viewHierarchyState);
-            State previousState = State.builder()
+            SavedState previousSavedState = SavedState.builder()
                     .setKey(previousKey)
                     .setViewHierarchyState(viewHierarchyState)
                     .build();
-            keyStateMap.put(previousKey, previousState);
+            keyStateMap.put(previousKey, previousSavedState);
         }
         root.removeAllViews();
         Key newKey = stateChange.topNewState();
         Context newContext = new KeyContextWrapper(this, newKey);
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
         if(keyStateMap.containsKey(newKey)) {
-            State state = keyStateMap.get(newKey);
-            view.restoreHierarchyState(state.getViewHierarchyState());
+            SavedState savedState = keyStateMap.get(newKey);
+            view.restoreHierarchyState(savedState.getViewHierarchyState());
         }
         root.addView(view);
         keyStateMap.keySet().retainAll(stateChange.getNewState());

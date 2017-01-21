@@ -9,12 +9,13 @@ import android.util.SparseArray;
  * Created by Owner on 2017. 01. 20..
  */
 
-public class State implements Parcelable {
+public class SavedState
+        implements Parcelable {
     private Key key;
     private SparseArray<Parcelable> viewHierarchyState;
     private Bundle bundle;
 
-    private State() {
+    private SavedState() {
     }
 
     public Key getKey() {
@@ -59,19 +60,19 @@ public class State implements Parcelable {
             return this;
         }
 
-        public State build() {
+        public SavedState build() {
             if(key == null) {
-                throw new IllegalStateException("You cannot create a State without associating a Key with it.");
+                throw new IllegalStateException("You cannot create a SavedState without associating a Key with it.");
             }
-            State state = new State();
-            state.key = key;
-            state.viewHierarchyState = viewHierarchyState;
-            state.bundle = bundle;
-            return state;
+            SavedState savedState = new SavedState();
+            savedState.key = key;
+            savedState.viewHierarchyState = viewHierarchyState;
+            savedState.bundle = bundle;
+            return savedState;
         }
     }
 
-    protected State(Parcel in) {
+    protected SavedState(Parcel in) {
         key = in.readParcelable(Key.class.getClassLoader());
         // noinspection unchecked
         viewHierarchyState = in.readSparseArray(getClass().getClassLoader());
@@ -81,15 +82,15 @@ public class State implements Parcelable {
         }
     }
 
-    public static final Creator<State> CREATOR = new Creator<State>() {
+    public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
         @Override
-        public State createFromParcel(Parcel in) {
-            return new State(in);
+        public SavedState createFromParcel(Parcel in) {
+            return new SavedState(in);
         }
 
         @Override
-        public State[] newArray(int size) {
-            return new State[size];
+        public SavedState[] newArray(int size) {
+            return new SavedState[size];
         }
     };
 
@@ -115,10 +116,10 @@ public class State implements Parcelable {
         if(obj == null) {
             return false;
         }
-        if(!(obj instanceof State)) {
+        if(!(obj instanceof SavedState)) {
             return false;
         }
-        return ((State)obj).getKey().equals(this.key);
+        return ((SavedState)obj).getKey().equals(this.key);
     }
 
     @Override

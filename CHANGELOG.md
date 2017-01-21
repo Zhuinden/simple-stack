@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 0.3.3 (2017-01-21)
+---------------------------------
+- Rename `State` to `SavedState`
+
 -Simple Stack 0.3.2 (2017-01-21)
 ---------------------------------
 - Add check for if `key` is `null` in `State`'s `Builder.build()`
@@ -27,7 +31,7 @@
 
 -Simple Stack 0.2.0 (2017-01-16)
 ---------------------------------
-- State changes are now enqueued while `StateChanger` is not available (after `onPause()`) or a state change is already in progress
+- State changes are now enqueued while `StateChanger` is not available (after `onPause()`) or a savedState change is already in progress
 - Added `FlowTest` and ported to `simple-stack-demo` codebase
 
 Simple Stack 0.1.1 (2017-01-14)
@@ -37,11 +41,11 @@ Simple Stack 0.1.1 (2017-01-14)
 Simple Stack 0.1.0 (2017-01-13)
 ---------------------------------
 - Added initial `Backstack`, `StateChange` and `StateChanger` classes.
-- Backstack allows manipulation of state via `goTo()`, `goBack()` and `setHistory()`.
+- Backstack allows manipulation of savedState via `goTo()`, `goBack()` and `setHistory()`.
 - Demo persists backstack history through config change and process death.
 
 Limitations:
 - ViewState is not persisted
-- scheduling state changes (starting a state change while another is in progress) is not allowed
-- there is a possibility that state change can occur even after `onPause()`
+- scheduling savedState changes (starting a savedState change while another is in progress) is not allowed
+- there is a possibility that savedState change can occur even after `onPause()`
 - key and backstack are manually set to the custom viewgroup, which means these are not directly accessible in their child views (and the interfaces are ugly anyways)

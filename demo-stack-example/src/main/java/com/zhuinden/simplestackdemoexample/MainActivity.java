@@ -16,7 +16,7 @@ import com.zhuinden.simplestackdemo.stack.StateChanger;
 import com.zhuinden.simplestackdemoexample.demo.FirstKey;
 import com.zhuinden.simplestackdemoexample.demo.Key;
 import com.zhuinden.simplestackdemoexample.demo.KeyContextWrapper;
-import com.zhuinden.simplestackdemoexample.demo.State;
+import com.zhuinden.simplestackdemoexample.demo.SavedState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class MainActivity
 
     Backstack backstack;
 
-    Map<Key, State> keyStateMap = new HashMap<>();
+    Map<Key, SavedState> keyStateMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +48,10 @@ public class MainActivity
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
             keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
-            List<State> states = savedInstanceState.getParcelableArrayList(STATES);
-            if(states != null) {
-                for(State state : states) {
-                    keyStateMap.put(state.getKey(), state);
+            List<SavedState> savedStates = savedInstanceState.getParcelableArrayList(STATES);
+            if(savedStates != null) {
+                for(SavedState savedState : savedStates) {
+                    keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
         } else {
@@ -82,11 +82,11 @@ public class MainActivity
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             root.getChildAt(0).saveHierarchyState(viewHierarchyState);
             Key currentKey = KeyContextWrapper.getKey(root.getChildAt(0).getContext());
-            State currentState = State.builder()
+            SavedState currentSavedState = SavedState.builder()
                     .setKey(currentKey)
                     .setViewHierarchyState(viewHierarchyState)
                     .build();
-            keyStateMap.put(currentKey, currentState);
+            keyStateMap.put(currentKey, currentSavedState);
         }
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
@@ -120,19 +120,19 @@ public class MainActivity
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             Key previousKey = stateChange.topPreviousState();
             root.getChildAt(0).saveHierarchyState(viewHierarchyState);
-            State previousState = State.builder()
+            SavedState previousSavedState = SavedState.builder()
                     .setKey(previousKey)
                     .setViewHierarchyState(viewHierarchyState)
                     .build();
-            keyStateMap.put(previousKey, previousState);
+            keyStateMap.put(previousKey, previousSavedState);
         }
         root.removeAllViews();
         Key newKey = stateChange.topNewState();
         Context newContext = new KeyContextWrapper(this, newKey);
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
         if(keyStateMap.containsKey(newKey)) {
-            State state = keyStateMap.get(newKey);
-            view.restoreHierarchyState(state.getViewHierarchyState());
+            SavedState savedState = keyStateMap.get(newKey);
+            view.restoreHierarchyState(savedState.getViewHierarchyState());
         }
         root.addView(view);
         keyStateMap.keySet().retainAll(stateChange.getNewState());
