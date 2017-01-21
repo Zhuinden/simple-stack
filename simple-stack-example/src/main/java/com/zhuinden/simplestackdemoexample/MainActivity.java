@@ -76,18 +76,22 @@ public class MainActivity
         }
     }
 
+    private void persistViewToState(View view) {
+        if(view != null) {
+            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
+            Key key = KeyContextWrapper.getKey(view.getContext());
+            view.saveHierarchyState(viewHierarchyState);
+            SavedState previousSavedState = SavedState.builder() //
+                    .setKey(key) //
+                    .setViewHierarchyState(viewHierarchyState) //
+                    .build();
+            keyStateMap.put(key, previousSavedState);
+        }
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if(root != null) {
-            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-            root.getChildAt(0).saveHierarchyState(viewHierarchyState);
-            Key currentKey = KeyContextWrapper.getKey(root.getChildAt(0).getContext());
-            SavedState currentSavedState = SavedState.builder()
-                    .setKey(currentKey)
-                    .setViewHierarchyState(viewHierarchyState)
-                    .build();
-            keyStateMap.put(currentKey, currentSavedState);
-        }
+        persistViewToState(root.getChildAt(0));
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
         outState.putParcelableArrayList(STATES, new ArrayList<>(keyStateMap.values()));
@@ -116,16 +120,7 @@ public class MainActivity
             completionCallback.stateChangeComplete();
             return;
         }
-        if(stateChange.topPreviousState() != null) {
-            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-            Key previousKey = stateChange.topPreviousState();
-            root.getChildAt(0).saveHierarchyState(viewHierarchyState);
-            SavedState previousSavedState = SavedState.builder()
-                    .setKey(previousKey)
-                    .setViewHierarchyState(viewHierarchyState)
-                    .build();
-            keyStateMap.put(previousKey, previousSavedState);
-        }
+        persistViewToState(root.getChildAt(0));
         root.removeAllViews();
         Key newKey = stateChange.topNewState();
         Context newContext = new KeyContextWrapper(this, newKey);
