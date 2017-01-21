@@ -1,1 +1,1 @@
-include ':demo-stack', ':demo-stack-example'
+include ':simple-stack', ':simple-stack-example'
