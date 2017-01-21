@@ -2,6 +2,11 @@
 
 This is a simple backstack implementation that will serve as basis for a series of Medium articles.
 
+- [Part 1: Creating a basic backstack](https://medium.com/@Zhuinden/towards-a-fragmentless-world-creating-a-flow-like-custom-backstack-part-1-cf551ebda624#.wkshdkeb6)
+- [Part 2: Sharing data to custom views using `getSystemService()` and `ContextWrapper`](https://medium.com/@Zhuinden/data-and-service-sharing-to-custom-views-with-contextwrappers-and-getsystemservice-creating-a-flow-aedeabbd9567#.43l4qxahe)
+- [Part 3: Queueing state changes and handling `onPause()`](https://medium.com/@Zhuinden/queueing-state-changes-and-handling-onpause-creating-a-flow-like-custom-backstack-part-3-d08d69a98141#.dxfkhzji3)
+- [Part 4: Persisting view-state when using a custom backstack](https://medium.com/@Zhuinden/persisting-view-state-when-using-a-custom-backstack-creating-a-flow-like-backstack-part-4-5e0ba00ed80c#.ktath328c)
+
 ## What is it?
 
 Currently it's 3 files (and 5 classes):
