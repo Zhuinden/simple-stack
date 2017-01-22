@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemoexample.demo;
+package com.zhuinden.simplestack;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -9,9 +9,9 @@ import android.view.LayoutInflater;
  * Created by Zhuinden on 2017.01.14..
  */
 
-public class KeyContextWrapper
+class KeyContextWrapper
         extends ContextWrapper {
-    public static final String KEY = "KEY";
+    static final String KEY = "Backstack.KEY";
 
     LayoutInflater layoutInflater;
 

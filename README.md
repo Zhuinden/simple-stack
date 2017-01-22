@@ -7,16 +7,28 @@ This is a simple backstack implementation that will serve as basis for a series 
 - [Part 3: Queueing state changes and handling `onPause()`](https://medium.com/@Zhuinden/queueing-state-changes-and-handling-onpause-creating-a-flow-like-custom-backstack-part-3-d08d69a98141#.dxfkhzji3)
 - [Part 4: Persisting view-state when using a custom backstack](https://medium.com/@Zhuinden/persisting-view-state-when-using-a-custom-backstack-creating-a-flow-like-backstack-part-4-5e0ba00ed80c#.ktath328c)
 
+- Part 5 (TBW): Hiding Activity-lifecycle integration inside Delegate class
+
 ## What is it?
 
-Currently it's 3 files (and 5 classes):
+Currently it's the following files:
 
-- [BackStack](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/Backstack.java): exposes operators for manipulating the backstack, and stores current history.
-- [StateChanger](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChanger.java): interface for a class that listens to changes inside the Backstack.
-- [StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java): represents a state change inside the backstack, providing previous state, new state, and the direction of the change.
+- [Backstack](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java): exposes operators for manipulating the backstack, and stores current history.
+- [StateChanger](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java): interface for a class that listens to changes inside the Backstack.
+- [StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): represents a state change inside the backstack, providing previous state, new state, and the direction of the change.
 
-- [StateChange.Direction](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChange.java): represents the direction of the change.
-- [StateChanger.Callback](https://github.com/Zhuinden/simple-stack-demo/blob/master/demo-stack/src/main/java/com/zhuinden/simplestackdemo/stack/StateChanger.java): the callback that signals to the backstack that the state change is complete.
+- [StateChange.Direction](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): represents the direction of the change.
+- [StateChanger.Callback](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): the callback that signals to the backstack that the state change is complete.
+
+- [PendingStateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/PendingStateChange.java): represents a change that will occur when possible.
+
+- [HistoryBuilder](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/HistoryBuilder.java): Convenience class for building `ArrayList<Parcelable>`.
+
+- [SavedState](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/SavedState.java): contains the key, the view state and an optional Bundle. It is used for view state persistence.
+
+- [KeyContextWrapper](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/KeyContextWrapper.java): enables the ability to use `KeyContextWrapper.getKey(context)` to obtain key parameter in custom viewgroup.
+
+- [BackstackDelegate](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java): delegate class to hide Activity lifecycle integration.
 
 ## Operators
 
@@ -32,6 +44,8 @@ Currently, the backstack stores the screens, and persists them across configurat
 
 The backstack also allows navigation between the states, and enables handling this state change using the `StateChanger`.
 
+Also provides delegate class that hides Activity lifecycle integration, and manages view state persistence.
+
 ## How does it work?
 
 The backstack must be initialized with at least one initial state, and a state changer must be set when it is able to handle the state change.
@@ -44,15 +58,10 @@ Afterwards, the backstack operators allow changing between states.
 public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
-    public static final String BACKSTACK = "BACKSTACK";
-    public static final String STATES = "STATES";
-
     @BindView(R.id.root)
     RelativeLayout root;
 
-    Backstack backstack;
-
-    Map<Key, SavedState> keyStateMap = new HashMap<>();
+    BackstackDelegate backstackDelegate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,72 +69,49 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        ArrayList<Parcelable> keys;
-        if(savedInstanceState != null) {
-            keys = savedInstanceState.getParcelableArrayList(BACKSTACK);
-            List<SavedState> savedStates = savedInstanceState.getParcelableArrayList(STATES);
-            if(savedStates != null) {
-                for(SavedState savedState : savedStates) {
-                    keyStateMap.put(savedState.getKey(), savedState);
-                }
-            }
-        } else {
-            keys = HistoryBuilder.single(new FirstKey());
-        }
-        backstack = (Backstack) getLastCustomNonConfigurationInstance();
-        if(backstack == null) {
-            backstack = new Backstack(keys);
-        }
-        backstack.setStateChanger(this, Backstack.INITIALIZE);
+        backstackDelegate = new BackstackDelegate(this);
+        backstackDelegate.onCreate(savedInstanceState, //
+                getLastCustomNonConfigurationInstance(), //
+                HistoryBuilder.single(new FirstKey()));
     }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        return backstack;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(!backstack.goBack()) {
-            super.onBackPressed();
-        }
-    }
-
-    private void persistViewToState(View view) {
-        if(view != null) {
-            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-            Key key = KeyContextWrapper.getKey(view.getContext());
-            view.saveHierarchyState(viewHierarchyState);
-            SavedState previousSavedState = SavedState.builder() //
-                    .setKey(key) //
-                    .setViewHierarchyState(viewHierarchyState) //
-                    .build();
-            keyStateMap.put(key, previousSavedState);
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        persistViewToState(root.getChildAt(0));
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
-        outState.putParcelableArrayList(STATES, new ArrayList<>(keyStateMap.values()));
+        return backstackDelegate.onRetainCustomNonConfigurationInstance();
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        if(!backstack.hasStateChanger()) {
-            backstack.setStateChanger(this, Backstack.REATTACH);
+        backstackDelegate.onPostResume();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!backstackDelegate.onBackPressed()) {
+            super.onBackPressed();
         }
     }
 
     @Override
     protected void onPause() {
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
-        }
+        backstackDelegate.onPause();
         super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        backstackDelegate.persistViewToState(root.getChildAt(0));
+        backstackDelegate.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public Object getSystemService(String name) {
+        if(backstackDelegate != null && backstackDelegate.isSystemService(name)) {
+            return backstackDelegate.getSystemService(name);
+        }
+        return super.getSystemService(name);
     }
 
     @Override
@@ -135,26 +121,18 @@ public class MainActivity
             completionCallback.stateChangeComplete();
             return;
         }
-        persistViewToState(root.getChildAt(0));
+        backstackDelegate.persistViewToState(root.getChildAt(0));
         root.removeAllViews();
         Key newKey = stateChange.topNewState();
-        Context newContext = new KeyContextWrapper(this, newKey);
+        Context newContext = stateChange.createContext(this, newKey);
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        if(keyStateMap.containsKey(newKey)) {
-            SavedState savedState = keyStateMap.get(newKey);
+        if(backstackDelegate.hasSavedState(newKey)) {
+            SavedState savedState = backstackDelegate.getSavedState(newKey);
             view.restoreHierarchyState(savedState.getViewHierarchyState());
         }
         root.addView(view);
-        keyStateMap.keySet().retainAll(stateChange.getNewState());
+        backstackDelegate.clearStatesNotIn(stateChange.getNewState());
         completionCallback.stateChangeComplete();
-    }
-
-    @Override
-    public Object getSystemService(String name) {
-        if(BACKSTACK.equals(name)) {
-            return backstack;
-        }
-        return super.getSystemService(name);
     }
 }
 ```

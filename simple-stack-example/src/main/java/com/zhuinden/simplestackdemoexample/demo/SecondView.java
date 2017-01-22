@@ -6,7 +6,6 @@ import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestackdemoexample.MainActivity;
 
 /**
  * Created by Owner on 2017. 01. 12..
@@ -37,9 +36,8 @@ public class SecondView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            // noinspection ResourceType
-            backstack = (Backstack) context.getSystemService(MainActivity.BACKSTACK);
-            secondKey = KeyContextWrapper.getKey(context);
+            backstack = Backstack.get(context);
+            secondKey = Backstack.getKey(context);
         }
     }
 

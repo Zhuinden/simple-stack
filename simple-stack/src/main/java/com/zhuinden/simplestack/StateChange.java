@@ -1,5 +1,6 @@
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -52,5 +53,10 @@ public class StateChange {
     public <T extends Parcelable> T topNewState() {
         // noinspection unchecked
         return (T)newState.get(newState.size()-1);
+    }
+
+    @NonNull
+    public KeyContextWrapper createContext(Context base, Parcelable key) {
+        return new KeyContextWrapper(base, key);
     }
 }

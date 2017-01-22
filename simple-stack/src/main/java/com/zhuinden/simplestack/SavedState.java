@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemoexample.demo;
+package com.zhuinden.simplestack;
 
 import android.os.Bundle;
 import android.os.Parcel;
@@ -11,14 +11,14 @@ import android.util.SparseArray;
 
 public class SavedState
         implements Parcelable {
-    private Key key;
+    private Parcelable key;
     private SparseArray<Parcelable> viewHierarchyState;
     private Bundle bundle;
 
     private SavedState() {
     }
 
-    public Key getKey() {
+    public Parcelable getKey() {
         return key;
     }
 
@@ -35,14 +35,14 @@ public class SavedState
     }
 
     public static class Builder {
-        private Key key;
+        private Parcelable key;
         private SparseArray<Parcelable> viewHierarchyState;
         private Bundle bundle;
 
         Builder() {
         }
 
-        public Builder setKey(Key key) {
+        public Builder setKey(Parcelable key) {
             if(key == null) {
                 throw new IllegalArgumentException("Key cannot be null");
             }
@@ -73,7 +73,7 @@ public class SavedState
     }
 
     protected SavedState(Parcel in) {
-        key = in.readParcelable(Key.class.getClassLoader());
+        key = in.readParcelable(getClass().getClassLoader());
         // noinspection unchecked
         viewHierarchyState = in.readSparseArray(getClass().getClassLoader());
         boolean hasBundle = in.readByte() > 0;

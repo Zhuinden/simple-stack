@@ -1,5 +1,18 @@
 # Change log
 
+-Simple Stack 0.5.0 (2017-01-22)
+---------------------------------
+- Added `BackstackDelegate` class to hide activity lifecycle integration
+- Moved `SavedState` into library
+- Added `Backstack.get(Context)` method to obtain Backstack of instance shared by the delegate
+- Moved `KeyContextWrapper` into library, and it is now package-private
+- Added `StateChange.createContext(base, key)` method to create `KeyContextWrapper`
+- `KeyContextWrapper.getKey(Context)` is now `Backstack.getKey(Context)`
+
+-Simple Stack 0.4.0 (2017-01-21)
+---------------------------------
+- Rename packages from `demostack` to `simplestack`
+
 -Simple Stack 0.3.3 (2017-01-21)
 ---------------------------------
 - Rename `State` to `SavedState`

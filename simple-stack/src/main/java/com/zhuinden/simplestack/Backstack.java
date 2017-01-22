@@ -1,5 +1,6 @@
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 
@@ -17,6 +18,17 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 
 public class Backstack {
+    static final String BACKSTACK = "BACKSTACK";
+
+    public static Backstack get(Context context) {
+        // noinspection ResourceType
+        return (Backstack)context.getSystemService(BACKSTACK);
+    }
+
+    public static <T extends Parcelable> T getKey(Context context) {
+        return KeyContextWrapper.getKey(context);
+    }
+
     //
     @Retention(SOURCE)
     @IntDef({INITIALIZE, REATTACH})

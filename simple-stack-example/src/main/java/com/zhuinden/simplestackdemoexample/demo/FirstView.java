@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestackdemoexample.MainActivity;
 import com.zhuinden.simplestackdemoexample.R;
 
 import butterknife.ButterKnife;
@@ -45,9 +44,8 @@ public class FirstView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            // noinspection ResourceType
-            backstack = (Backstack) context.getSystemService(MainActivity.BACKSTACK);
-            firstKey = KeyContextWrapper.getKey(context);
+            backstack = Backstack.get(context);
+            firstKey = Backstack.getKey(context);
         }
     }
 
