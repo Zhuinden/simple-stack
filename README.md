@@ -1,4 +1,4 @@
-# Simple Stack Demo
+# Simple Stack
 
 This is a simple backstack implementation that will serve as basis for a series of Medium articles.
 
@@ -7,6 +7,10 @@ This is a simple backstack implementation that will serve as basis for a series 
 - [Part 3: Queueing state changes and handling `onPause()`](https://medium.com/@Zhuinden/queueing-state-changes-and-handling-onpause-creating-a-flow-like-custom-backstack-part-3-d08d69a98141#.dxfkhzji3)
 - [Part 4: Persisting view-state when using a custom backstack](https://medium.com/@Zhuinden/persisting-view-state-when-using-a-custom-backstack-creating-a-flow-like-backstack-part-4-5e0ba00ed80c#.ktath328c)
 - [Part 5: Hiding Activity-lifecycle integration inside Delegate class](https://medium.com/@Zhuinden/hiding-the-backstacks-activity-lifecycle-integration-in-a-delegate-class-creating-a-flow-like-695fe16338ff#.w3i1pnmj2)
+
+It is theoretically based on Flow 0.9, mixed with some aspects taken from Flow 1.0-alpha; but written from scratch.
+
+The core concept was simplicity: maybe it should try to do less. In fact, even less than less.
 
 ## What is it?
 
@@ -45,6 +49,30 @@ The backstack also allows navigation between the states, and enables handling th
 
 Also provides delegate class that hides Activity lifecycle integration, and manages view state persistence.
 
+## Using Simple Stack
+
+In order to use Simple Stack, you need to add jitpack to your project root gradle:
+
+    buildscript {
+        repositories {
+            // ...
+            maven { url "https://jitpack.io" }
+        }
+        // ...
+    }
+    allprojects {
+        repositories {
+            // ...
+            maven { url "https://jitpack.io" }
+        }
+        // ...
+    }
+
+
+and add the compile dependency to your module level gradle.
+
+    compile 'com.github.Zhuinden:simple-stack:0.6.0'
+
 ## How does it work?
 
 The backstack must be initialized with at least one initial state, and a state changer must be set when it is able to handle the state change.
@@ -52,6 +80,8 @@ The backstack must be initialized with at least one initial state, and a state c
 Setting a state changer begins an `initialization` (in Flow terms, a bootstrap traversal), which provides a state change in form of `{[], [{...}, {...}]}`.
 
 Afterwards, the backstack operators allow changing between states.
+
+But `BackstackDelegate` is provided as a convenience class to hide the Activity lifecycle integration and state persistence.
 
 ``` java
 public class MainActivity
@@ -113,6 +143,7 @@ public class MainActivity
         return super.getSystemService(name);
     }
 
+    // StateChanger implementation
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {

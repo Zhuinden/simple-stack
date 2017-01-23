@@ -92,6 +92,15 @@ public class BackstackDelegate {
         return null;
     }
 
+    // ----- get backstack
+
+    public Backstack getBackstack() {
+        if(backstack == null) {
+            throw new IllegalStateException("The backstack within the delegate must be initialized by `onCreate()`");
+        }
+        return backstack;
+    }
+
     // ----- viewstate persistence
 
     public void persistViewToState(View view) {

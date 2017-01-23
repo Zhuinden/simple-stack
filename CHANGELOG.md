@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack 0.6.0 (2017-01-23)
+---------------------------------
+- **Simple Stack is now a library!**
+- Added `BackstackDelegate.getBackstack()` for convenience over `Backstack.get(this)` in Activity
+
 -Simple Stack 0.5.1 (2017-01-23)
 ---------------------------------
 - Added `Bundleable` interface to allow saving view's state to Bundle
