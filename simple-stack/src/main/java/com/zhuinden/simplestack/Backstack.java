@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 
 public class Backstack {
-    static final String BACKSTACK = "BACKSTACK";
+    static final String BACKSTACK = "simplestack.BACKSTACK";
 
     public static Backstack get(Context context) {
         // noinspection ResourceType

@@ -16,13 +16,16 @@ import java.util.Map;
  */
 
 public class BackstackDelegate {
-    private static final String STATES = "STATES";
+    private static final String STATES = Backstack.BACKSTACK + "_STATES";
     
     Backstack backstack;
     
     StateChanger stateChanger;
     
     public BackstackDelegate(StateChanger stateChanger) {
+        if(stateChanger == null) {
+            throw new IllegalArgumentException("State changer cannot be null!");
+        }
         this.stateChanger = stateChanger;
     }
 
@@ -61,34 +64,6 @@ public class BackstackDelegate {
         return backstack.goBack();
     }
 
-    public void persistViewToState(View view) {
-        if(view != null) {
-            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-            Parcelable key = KeyContextWrapper.getKey(view.getContext());
-            if(key == null) {
-                throw new IllegalArgumentException("The view [" + view + "] contained no key!");
-            }
-            view.saveHierarchyState(viewHierarchyState);
-            SavedState previousSavedState = SavedState.builder() //
-                    .setKey(key) //
-                    .setViewHierarchyState(viewHierarchyState) //
-                    .build();
-            keyStateMap.put(key, previousSavedState);
-        }
-    }
-
-    public boolean hasSavedState(Parcelable key) {
-        return keyStateMap.containsKey(key);
-    }
-
-    @NonNull
-    public SavedState getSavedState(Parcelable key) {
-        if(!keyStateMap.containsKey(key)) {
-            throw new IllegalStateException("The state map does not contain key [" + key + "]!");
-        }
-        return keyStateMap.get(key);
-    }
-    
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(Backstack.BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
         outState.putParcelableArrayList(STATES, new ArrayList<>(keyStateMap.values()));
@@ -115,6 +90,46 @@ public class BackstackDelegate {
             return backstack;
         }
         return null;
+    }
+
+    // ----- viewstate persistence
+
+    public void persistViewToState(View view) {
+        if(view != null) {
+            Parcelable key = KeyContextWrapper.getKey(view.getContext());
+            if(key == null) {
+                throw new IllegalArgumentException("The view [" + view + "] contained no key!");
+            }
+            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
+            view.saveHierarchyState(viewHierarchyState);
+            Bundle bundle = null;
+            if(view instanceof Bundleable) {
+                bundle = ((Bundleable)view).toBundle();
+            }
+            SavedState previousSavedState = SavedState.builder() //
+                    .setKey(key) //
+                    .setViewHierarchyState(viewHierarchyState) //
+                    .setBundle(bundle) //
+                    .build();
+            keyStateMap.put(key, previousSavedState);
+        }
+    }
+
+    public void restoreViewFromState(View view) {
+        Parcelable newKey = KeyContextWrapper.getKey(view.getContext());
+        SavedState savedState = getSavedState(newKey);
+        view.restoreHierarchyState(savedState.getViewHierarchyState());
+        if(view instanceof Bundleable) {
+            ((Bundleable)view).fromBundle(savedState.getBundle());
+        }
+    }
+
+    @NonNull
+    public SavedState getSavedState(Parcelable key) {
+        if(!keyStateMap.containsKey(key)) {
+            keyStateMap.put(key, SavedState.builder().setKey(key).build());
+        }
+        return keyStateMap.get(key);
     }
 
     public void clearStatesNotIn(List<Parcelable> keys) {

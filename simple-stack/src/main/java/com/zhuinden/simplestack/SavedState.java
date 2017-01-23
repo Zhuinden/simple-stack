@@ -26,8 +26,16 @@ public class SavedState
         return viewHierarchyState;
     }
 
+    public void setViewHierarchyState(SparseArray<Parcelable> viewHierarchyState) {
+        this.viewHierarchyState = viewHierarchyState;
+    }
+
     public Bundle getBundle() {
         return bundle;
+    }
+
+    public void setBundle(Bundle bundle) {
+        this.bundle = bundle;
     }
 
     public static Builder builder() {
@@ -36,7 +44,7 @@ public class SavedState
 
     public static class Builder {
         private Parcelable key;
-        private SparseArray<Parcelable> viewHierarchyState;
+        private SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
         private Bundle bundle;
 
         Builder() {

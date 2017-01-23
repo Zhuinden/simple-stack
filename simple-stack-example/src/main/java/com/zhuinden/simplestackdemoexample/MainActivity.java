@@ -9,7 +9,6 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexample.demo.FirstKey;
@@ -89,10 +88,7 @@ public class MainActivity
         Key newKey = stateChange.topNewState();
         Context newContext = stateChange.createContext(this, newKey);
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        if(backstackDelegate.hasSavedState(newKey)) {
-            SavedState savedState = backstackDelegate.getSavedState(newKey);
-            view.restoreHierarchyState(savedState.getViewHierarchyState());
-        }
+        backstackDelegate.restoreViewFromState(view);
         root.addView(view);
         backstackDelegate.clearStatesNotIn(stateChange.getNewState());
         completionCallback.stateChangeComplete();

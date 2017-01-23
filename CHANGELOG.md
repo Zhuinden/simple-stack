@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 0.5.1 (2017-01-23)
+---------------------------------
+- Added `Bundleable` interface to allow saving view's state to Bundle
+- Added `BackstackDelegate.restoreViewFromState()` method to mirror `persistViewToState()`
+- `getSavedState()` now returns a new `SavedState` instead of throwing error if the key has no state bound to it
+
 -Simple Stack 0.5.0 (2017-01-22)
 ---------------------------------
 - Added `BackstackDelegate` class to hide activity lifecycle integration
@@ -44,7 +50,7 @@
 
 -Simple Stack 0.2.0 (2017-01-16)
 ---------------------------------
-- State changes are now enqueued while `StateChanger` is not available (after `onPause()`) or a savedState change is already in progress
+- State changes are now enqueued while `StateChanger` is not available (after `onPause()`) or a state change is already in progress
 - Added `FlowTest` and ported to `simple-stack-demo` codebase
 
 Simple Stack 0.1.1 (2017-01-14)
@@ -54,11 +60,11 @@ Simple Stack 0.1.1 (2017-01-14)
 Simple Stack 0.1.0 (2017-01-13)
 ---------------------------------
 - Added initial `Backstack`, `StateChange` and `StateChanger` classes.
-- Backstack allows manipulation of savedState via `goTo()`, `goBack()` and `setHistory()`.
+- Backstack allows manipulation of state via `goTo()`, `goBack()` and `setHistory()`.
 - Demo persists backstack history through config change and process death.
 
 Limitations:
 - ViewState is not persisted
-- scheduling savedState changes (starting a savedState change while another is in progress) is not allowed
-- there is a possibility that savedState change can occur even after `onPause()`
+- scheduling state changes (starting a state change while another is in progress) is not allowed
+- there is a possibility that state change can occur even after `onPause()`
 - key and backstack are manually set to the custom viewgroup, which means these are not directly accessible in their child views (and the interfaces are ugly anyways)
