@@ -59,6 +59,9 @@ public class SavedState
         }
 
         public Builder setViewHierarchyState(SparseArray<Parcelable> viewHierarchyState) {
+            if(viewHierarchyState == null) {
+                throw new IllegalArgumentException("Provided sparse array for view hierarchy state cannot be null");
+            }
             this.viewHierarchyState = viewHierarchyState;
             return this;
         }

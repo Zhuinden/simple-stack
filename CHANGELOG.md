@@ -5,6 +5,7 @@
 - Added `Bundleable` interface to allow saving view's state to Bundle
 - Added `BackstackDelegate.restoreViewFromState()` method to mirror `persistViewToState()`
 - `getSavedState()` now returns a new `SavedState` instead of throwing error if the key has no state bound to it
+- Added `SavedState.viewHierarchyState` default value `new SparseArray<>()`, null is prohibited
 
 -Simple Stack 0.5.0 (2017-01-22)
 ---------------------------------
