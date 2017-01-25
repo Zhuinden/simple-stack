@@ -4,9 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.squareup.coordinators.Coordinator;
@@ -27,6 +27,8 @@ import butterknife.ButterKnife;
 public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
+    private static final String TAG = "MainActivity";
+
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -42,6 +44,7 @@ public class MainActivity
             @Nullable
             @Override
             public Coordinator provideCoordinator(View view) {
+                Log.i(TAG, "Providing coordinator for [" + view + "]");
                 Key key = Backstack.getKey(view.getContext());
                 return key.newCoordinator(); // maybe should be obtained from a component
             }
@@ -99,13 +102,16 @@ public class MainActivity
             completionCallback.stateChangeComplete();
             return;
         }
+        Log.i(TAG, "Persisting view state of [" + root.getChildAt(0) + "]");
         backstackDelegate.persistViewToState(root.getChildAt(0));
         root.removeAllViews();
         Key newKey = stateChange.topNewState();
         Context newContext = stateChange.createContext(this, newKey);
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        backstackDelegate.restoreViewFromState(view);
+        Log.i(TAG, "Adding view [" + view + "]");
         root.addView(view);
+        Log.i(TAG, "Restoring view state of [" + view + "]");
+        backstackDelegate.restoreViewFromState(view);
         backstackDelegate.clearStatesNotIn(stateChange.getNewState());
         completionCallback.stateChangeComplete();
     }

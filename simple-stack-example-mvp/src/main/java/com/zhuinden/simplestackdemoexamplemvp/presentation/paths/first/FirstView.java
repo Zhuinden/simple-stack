@@ -5,17 +5,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestackdemoexamplemvp.R;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondKey;
-
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 /**
  * Created by Owner on 2017. 01. 12..
  */
@@ -57,28 +51,15 @@ public class FirstView
         }
     }
 
-    @OnClick(R.id.first_button)
-    public void clickButton(View view) {
-        backstack.goTo(SecondKey.create());
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        ButterKnife.bind(this);
-    }
-
     @Override
     public Bundle toBundle() {
-        Bundle bundle = new Bundle();
-        bundle.putString("HELLO", "WORLD");
-        return bundle;
+        FirstCoordinator firstCoordinator = Coordinators.getCoordinator(this);
+        return firstCoordinator.toBundle();
     }
 
     @Override
     public void fromBundle(@Nullable Bundle bundle) {
-        if(bundle != null) {
-            Log.i(TAG, bundle.getString("HELLO"));
-        }
+        FirstCoordinator firstCoordinator = Coordinators.getCoordinator(this);
+        firstCoordinator.fromBundle(bundle);
     }
 }

@@ -2,17 +2,24 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
+import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.Bundleable;
 
 /**
  * Created by Owner on 2017. 01. 12..
  */
 
 public class SecondView
-        extends RelativeLayout {
+        extends RelativeLayout
+        implements Bundleable {
+    private String state;
+
     public SecondView(Context context) {
         super(context);
         init(context);
@@ -44,4 +51,16 @@ public class SecondView
     Backstack backstack;
 
     SecondKey secondKey;
+
+    @Override
+    public Bundle toBundle() {
+        SecondCoordinator coordinator = Coordinators.getCoordinator(this);
+        return coordinator.toBundle();
+    }
+
+    @Override
+    public void fromBundle(@Nullable Bundle bundle) {
+        SecondCoordinator coordinator = Coordinators.getCoordinator(this);
+        coordinator.fromBundle(bundle);
+    }
 }

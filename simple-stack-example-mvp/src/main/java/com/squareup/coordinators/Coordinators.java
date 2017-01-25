@@ -15,7 +15,7 @@
  */
 package com.squareup.coordinators;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -53,7 +53,8 @@ public final class Coordinators {
     viewGroup.setOnHierarchyChangeListener(new Binder(provider));
   }
 
-  @Nullable public static Coordinator getCoordinator(View view) {
-    return (Coordinator) view.getTag(R.id.coordinator);
+  @NonNull public static <T extends Coordinator> T getCoordinator(View view) {
+    // noinspection unchecked
+    return (T) view.getTag(R.id.coordinator);
   }
 }
