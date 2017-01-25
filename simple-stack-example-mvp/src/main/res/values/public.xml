@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--
+  Unused, present only so we can have private resources. Still subject to change.
+  -->
+  <public name="coordinators_ignore" type="string"/>
+</resources>

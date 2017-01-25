@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/simple-stack" />
             <option value="$PROJECT_DIR$/simple-stack-example" />
+            <option value="$PROJECT_DIR$/simple-stack-example-mvp" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
