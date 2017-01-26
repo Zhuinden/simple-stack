@@ -56,9 +56,11 @@ public class MainView
 
     public void setupViewsForKey(Key key) {
         if(key.shouldShowUp()) {
+            setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
             drawerToggle.setDrawerIndicatorEnabled(false);
             MainActivity.get(getContext()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } else {
+            setDrawerLockMode(LOCK_MODE_UNLOCKED, GravityCompat.START);
             MainActivity.get(getContext()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             drawerToggle.setDrawerIndicatorEnabled(true);
         }
