@@ -137,12 +137,21 @@ public class TasksCoordinator
                 List<Task> tasks = pairOfDiffResultAndTasks.second;
                 tasksAdapter.setData(tasks);
                 diffResult.dispatchUpdatesTo(tasksAdapter);
+                if(tasks.isEmpty()) {
+                    filterType.getValue().showEmptyViews(this);
+                } else {
+                    hideEmptyViews();
+                }
             }
         });
     }
 
+    public void hideEmptyViews() {
+        mTasksView.setVisibility(View.VISIBLE);
+        mNoTasksView.setVisibility(View.GONE);
+    }
 
-    public static class TaskDiffCallback
+    static class TaskDiffCallback
             extends DiffUtil.Callback {
         private List<Task> oldTasks;
         private List<Task> newTasks;
@@ -214,6 +223,31 @@ public class TasksCoordinator
 
     public void refresh() {
         // TODO
+    }
+
+    public void showNoActiveTasks() {
+        showNoTasksViews(tasksView.getContext().getResources().getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false);
+    }
+
+    public void showNoTasks() {
+        showNoTasksViews(tasksView.getContext().getResources().getString(R.string.no_tasks_all),
+                R.drawable.ic_assignment_turned_in_24dp,
+                false);
+    }
+
+    public void showNoCompletedTasks() {
+        showNoTasksViews(tasksView.getContext().getResources().getString(R.string.no_tasks_completed),
+                R.drawable.ic_verified_user_24dp,
+                false);
+    }
+
+    private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
+        mTasksView.setVisibility(View.GONE);
+        mNoTasksView.setVisibility(View.VISIBLE);
+
+        mNoTaskMainView.setText(mainText);
+        mNoTaskIcon.setImageDrawable(tasksView.getContext().getResources().getDrawable(iconRes));
+        mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
     @Override

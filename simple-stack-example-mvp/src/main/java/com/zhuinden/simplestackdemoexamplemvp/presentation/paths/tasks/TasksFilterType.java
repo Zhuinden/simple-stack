@@ -42,6 +42,11 @@ public enum TasksFilterType {
         public int getFilterText() {
             return R.string.label_all;
         }
+
+        @Override
+        public void showEmptyViews(TasksCoordinator tasksCoordinator) {
+            tasksCoordinator.showNoTasks();
+        }
     },
 
     /**
@@ -56,6 +61,11 @@ public enum TasksFilterType {
         @Override
         public int getFilterText() {
             return R.string.label_active;
+        }
+
+        @Override
+        public void showEmptyViews(TasksCoordinator tasksCoordinator) {
+            tasksCoordinator.showNoActiveTasks();
         }
     },
 
@@ -72,9 +82,16 @@ public enum TasksFilterType {
         public int getFilterText() {
             return R.string.label_completed;
         }
+
+        @Override
+        public void showEmptyViews(TasksCoordinator tasksCoordinator) {
+            tasksCoordinator.showNoCompletedTasks();
+        }
     };
 
     public abstract Observable<List<Task>> filterTask(TaskRepository taskRepository);
 
     public abstract int getFilterText();
+
+    public abstract void showEmptyViews(TasksCoordinator tasksCoordinator);
 }
