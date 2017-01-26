@@ -103,6 +103,6 @@ public class TaskRepository {
                     realm.insertOrUpdate(dbTasks);
                 });
             }
-        }).subscribeOn(writeScheduler.getScheduler());
+        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
     }
 }
