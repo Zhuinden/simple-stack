@@ -17,6 +17,14 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 
+import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
+
+import java.util.List;
+
+import rx.Observable;
+
 /**
  * Used with the filter spinner in the tasks list.
  */
@@ -24,15 +32,49 @@ public enum TasksFilterType {
     /**
      * Do not filter tasks.
      */
-    ALL_TASKS,
+    ALL_TASKS {
+        @Override
+        public Observable<List<Task>> filterTask(TaskRepository taskRepository) {
+            return taskRepository.getTasks();
+        }
+
+        @Override
+        public int getFilterText() {
+            return R.string.label_all;
+        }
+    },
 
     /**
      * Filters only the active (not completed yet) tasks.
      */
-    ACTIVE_TASKS,
+    ACTIVE_TASKS {
+        @Override
+        public Observable<List<Task>> filterTask(TaskRepository taskRepository) {
+            return taskRepository.getActiveTasks();
+        }
+
+        @Override
+        public int getFilterText() {
+            return R.string.label_active;
+        }
+    },
 
     /**
      * Filters only the completed tasks.
      */
-    COMPLETED_TASKS
+    COMPLETED_TASKS {
+        @Override
+        public Observable<List<Task>> filterTask(TaskRepository taskRepository) {
+            return taskRepository.getCompletedTasks();
+        }
+
+        @Override
+        public int getFilterText() {
+            return R.string.label_completed;
+        }
+    };
+
+    public abstract Observable<List<Task>> filterTask(TaskRepository taskRepository);
+
+    public abstract int getFilterText();
 }

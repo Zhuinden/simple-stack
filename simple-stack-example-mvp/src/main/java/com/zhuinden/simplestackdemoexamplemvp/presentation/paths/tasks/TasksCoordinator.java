@@ -2,11 +2,14 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jakewharton.rxrelay.BehaviorRelay;
@@ -21,6 +24,7 @@ import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -30,6 +34,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -43,7 +48,6 @@ public class TasksCoordinator
     }
 
     Backstack backstack;
-
 
     @OnClick(R.id.noTasksAdd)
     public void onClickNoTasksAdd() {
@@ -66,10 +70,10 @@ public class TasksCoordinator
     LinearLayout mTasksView;
 
     @BindView(R.id.filteringLabel)
-    TextView mFilteringLabelView;
+    TextView filterLabel;
 
     @BindView(R.id.tasks_list)
-    ListView listView;
+    RecyclerView listView;
 
     @Inject
     TaskRepository taskRepository;
@@ -86,18 +90,18 @@ public class TasksCoordinator
 
     TasksAdapter.TaskItemListener taskItemListener = new TasksAdapter.TaskItemListener() {
         @Override
-        public void onTaskClick(Task clickedTask) {
-            openTaskDetails(clickedTask);
+        public void openTask(Task task) {
+            openTaskDetails(task);
         }
 
         @Override
-        public void completeTask(Task completedTask) {
-            TasksCoordinator.this.completeTask(completedTask);
+        public void completeTask(Task task) {
+            TasksCoordinator.this.completeTask(task);
         }
 
         @Override
-        public void uncompleteTask(Task incompleteTask) {
-            TasksCoordinator.this.uncompleteTask(incompleteTask);
+        public void uncompleteTask(Task task) {
+            TasksCoordinator.this.uncompleteTask(task);
         }
     };
 
@@ -120,21 +124,53 @@ public class TasksCoordinator
         unbinder = ButterKnife.bind(this, view);
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
-        subscription = filterType.asObservable().switchMap((tasksFilterType -> {
-            if(tasksFilterType == TasksFilterType.ALL_TASKS) {
-                return taskRepository.getTasks();
-            } else if(tasksFilterType == TasksFilterType.COMPLETED_TASKS) {
-                return taskRepository.getCompletedTasks();
-            } else if(tasksFilterType == TasksFilterType.ACTIVE_TASKS) {
-                return taskRepository.getActiveTasks();
-            } else {
-                throw new IllegalArgumentException("Filter type [" + tasksFilterType + "] is unbound!");
-            }
-        })).observeOn(AndroidSchedulers.mainThread()).subscribe(tasks -> {
+        listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        subscription = filterType.asObservable() //
+                .doOnNext(tasksFilterType -> filterLabel.setText(tasksFilterType.getFilterText())) //
+                .switchMap((tasksFilterType -> tasksFilterType.filterTask(taskRepository))) //
+                .observeOn(Schedulers.computation())
+                .map(tasks -> Pair.create(DiffUtil.calculateDiff(new TaskDiffCallback(tasksAdapter.getData(), tasks)), tasks))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pairOfDiffResultAndTasks -> {
             if(tasksAdapter != null) {
-                tasksAdapter.replaceData(tasks);
+                DiffUtil.DiffResult diffResult = pairOfDiffResultAndTasks.first;
+                List<Task> tasks = pairOfDiffResultAndTasks.second;
+                tasksAdapter.setData(tasks);
+                diffResult.dispatchUpdatesTo(tasksAdapter);
             }
         });
+    }
+
+
+    public static class TaskDiffCallback
+            extends DiffUtil.Callback {
+        private List<Task> oldTasks;
+        private List<Task> newTasks;
+
+        public TaskDiffCallback(List<Task> oldTasks, List<Task> newTasks) {
+            this.oldTasks = oldTasks;
+            this.newTasks = newTasks;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldTasks == null ? 0 : oldTasks.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newTasks.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return newTasks.get(newItemPosition).id().equals(oldTasks.get(oldItemPosition).id());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return newTasks.get(newItemPosition).equals(oldTasks.get(oldItemPosition));
+        }
     }
 
     @Override
