@@ -7,6 +7,7 @@ import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
+import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -16,8 +17,8 @@ import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 public abstract class StatisticsKey
         implements Key {
     @Override
-    public Coordinator newCoordinator() {
-        return new StatisticsCoordinator();
+    public Coordinator newCoordinator(SingletonComponent singletonComponent) {
+        return singletonComponent.statisticsCoordinator();
     }
 
     public static Parcelable create() {
@@ -41,7 +42,7 @@ public abstract class StatisticsKey
 
     @Override
     public boolean shouldShowUp() {
-        return true;
+        return false;
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.squareup.coordinators.Coordinator;
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
+import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -16,10 +17,9 @@ import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 @AutoValue
 public abstract class AddOrEditTaskKey
         implements Key {
-
     @Override
-    public Coordinator newCoordinator() {
-        return new AddOrEditTaskCoordinator();
+    public Coordinator newCoordinator(SingletonComponent singletonComponent) {
+        return singletonComponent.addOrEditTaskCoordinator();
     }
 
     public static Parcelable create() {

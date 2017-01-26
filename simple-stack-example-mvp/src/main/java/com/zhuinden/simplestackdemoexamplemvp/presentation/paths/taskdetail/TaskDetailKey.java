@@ -6,6 +6,7 @@ import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
+import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -17,8 +18,8 @@ public abstract class TaskDetailKey
     abstract String taskId();
 
     @Override
-    public Coordinator newCoordinator() {
-        return new TaskDetailCoordinator();
+    public Coordinator newCoordinator(SingletonComponent singletonComponent) {
+        return singletonComponent.taskDetailCoordinator();
     }
 
     @Override

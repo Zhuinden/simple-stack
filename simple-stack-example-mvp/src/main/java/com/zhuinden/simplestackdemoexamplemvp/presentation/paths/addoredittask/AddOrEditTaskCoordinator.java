@@ -6,7 +6,6 @@ import android.view.View;
 import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.R;
-import com.zhuinden.simplestackdemoexamplemvp.application.CustomApplication;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 
@@ -20,6 +19,7 @@ import butterknife.Unbinder;
  * Created by Owner on 2017. 01. 26..
  */
 
+// UNSCOPED!
 public class AddOrEditTaskCoordinator
         extends Coordinator { // TODO: add bundleable
     String title;
@@ -27,6 +27,10 @@ public class AddOrEditTaskCoordinator
 
     @Inject
     TaskRepository taskRepository;
+
+    @Inject
+    public AddOrEditTaskCoordinator() {
+    }
 
     Backstack backstack;
 
@@ -47,9 +51,6 @@ public class AddOrEditTaskCoordinator
         super.attach(view);
         unbinder = ButterKnife.bind(this, view);
         backstack = Backstack.get(view.getContext());
-        CustomApplication.get(view.getContext())
-                .getComponent()
-                .inject(this); // TODO: replace with constructor injection via SingletonComponent
     }
 
     @Override

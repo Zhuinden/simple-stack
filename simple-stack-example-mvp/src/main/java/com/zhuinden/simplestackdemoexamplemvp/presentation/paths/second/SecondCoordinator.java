@@ -13,6 +13,8 @@ import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -22,8 +24,12 @@ import butterknife.Unbinder;
 /**
  * Created by Owner on 2017. 01. 25..
  */
-
+// UNSCOPED!
 public class SecondCoordinator extends Coordinator implements Bundleable {
+    @Inject
+    public SecondCoordinator() {
+    }
+
     private static final String TAG = "SecondCoordinator";
 
     String state;

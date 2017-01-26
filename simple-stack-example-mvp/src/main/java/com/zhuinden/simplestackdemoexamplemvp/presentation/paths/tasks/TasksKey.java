@@ -7,6 +7,7 @@ import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
+import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 
 /**
@@ -21,8 +22,8 @@ public abstract class TasksKey
     }
 
     @Override
-    public Coordinator newCoordinator() {
-        return new TasksCoordinator();
+    public Coordinator newCoordinator(SingletonComponent singletonComponent) {
+        return singletonComponent.tasksCoordinator();
     }
 
     @Override

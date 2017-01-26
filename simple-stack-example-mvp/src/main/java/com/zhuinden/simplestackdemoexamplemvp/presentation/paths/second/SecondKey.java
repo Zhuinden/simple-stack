@@ -6,6 +6,7 @@ import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
+import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 
 /**
  * Created by Owner on 2017. 01. 12..
@@ -18,8 +19,8 @@ public abstract class SecondKey implements Key {
     }
 
     @Override
-    public final Coordinator newCoordinator() {
-        return new SecondCoordinator();
+    public final Coordinator newCoordinator(SingletonComponent singletonComponent) {
+        return singletonComponent.secondCoordinator();
     }
 
     @Override

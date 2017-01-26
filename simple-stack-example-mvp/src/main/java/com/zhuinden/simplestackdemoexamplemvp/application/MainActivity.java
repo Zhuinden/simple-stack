@@ -88,7 +88,7 @@ public class MainActivity
             public Coordinator provideCoordinator(View view) {
                 Log.i(TAG, "Providing coordinator for [" + view + "]");
                 Key key = Backstack.getKey(view.getContext());
-                return key.newCoordinator(); // maybe should be obtained from a component
+                return key.newCoordinator(CustomApplication.get(view.getContext()).getComponent());
             }
         });
     }
