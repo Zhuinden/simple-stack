@@ -1,17 +1,28 @@
 package com.zhuinden.simplestackdemoexamplemvp.application;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.squareup.coordinators.Coordinator;
 import com.squareup.coordinators.CoordinatorProvider;
 import com.squareup.coordinators.Coordinators;
+import com.transitionseverywhere.TransitionManager;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
@@ -20,6 +31,8 @@ import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstKey;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsKey;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 
 import javax.inject.Inject;
 
@@ -29,10 +42,100 @@ import butterknife.ButterKnife;
 public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
-    private static final String TAG = "MainActivity";
+    public interface OptionsItemSelectedListener {
+        boolean onOptionsItemSelected(MenuItem menuItem);
+    }
+
+    public static final String TAG = "MainActivity";
+
+    public static MainActivity get(Context context) {
+        // noinspection ResourceType
+        return (MainActivity)context.getSystemService(TAG);
+    }
 
     @BindView(R.id.root)
     RelativeLayout root;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+
+    @BindView(R.id.fab_add_task)
+    FloatingActionButton fabAddTask;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(root != null && root.getChildAt(0) != null) {
+            boolean handled = false;
+            if(root.getChildAt(0) instanceof OptionsItemSelectedListener) {
+                handled = ((OptionsItemSelectedListener)(root.getChildAt(0))).onOptionsItemSelected(item);
+            }
+            if(handled) {
+                return handled;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(root != null && root.getChildAt(0) != null) {
+            Key key = Backstack.getKey(root.getChildAt(0).getContext());
+            getMenuInflater().inflate(key.menu(), menu);
+            return true;
+        }
+        return false;
+    }
+
+    private final NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) item -> {
+        switch (item.getItemId()) {
+            case R.id.list_navigation_menu_item:
+                Backstack.get(MainActivity.this).goTo(TasksKey.create());
+                break;
+            case R.id.statistics_navigation_menu_item:
+                Backstack.get(MainActivity.this).goTo(StatisticsKey.create());
+            default:
+                break;
+        }
+        setCheckedItem(item.getItemId());
+        // Close the navigation drawer when an item is selected.
+        drawerLayout.closeDrawers();
+        return true;
+    };
+
+    private void setCheckedItem(int navigationItemId) {
+        Menu menu = navigationView.getMenu();
+        for(int i = 0; i < menu.size(); i++) {
+            MenuItem menuItem = menu.getItem(i);
+            menuItem.setChecked(menuItem.getItemId() == navigationItemId);
+        }
+    }
+
+    private ActionBarDrawerToggle drawerToggle;
+
+    private void setupViewsForKey(Key key) {
+        if(key.shouldShowUp()) {
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            drawerToggle.setDrawerIndicatorEnabled(true);
+        }
+        drawerToggle.syncState();
+        setCheckedItem(key.navigationViewId());
+        //supportInvalidateOptionsMenu();
+        if(key.isFabVisible()) {
+            fabAddTask.setVisibility(View.VISIBLE);
+        } else {
+            fabAddTask.setVisibility(View.GONE);
+        }
+    }
 
     BackstackDelegate backstackDelegate;
 
@@ -44,6 +147,36 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                supportInvalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                supportInvalidateOptionsMenu();
+            }
+        };
+        drawerLayout.setDrawerListener(drawerToggle);
+
+        drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Backstack.get(MainActivity.this).goBack();
+            }
+        });
+        //actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setHomeButtonEnabled(true);
 
         CustomApplication.get(this).getComponent().inject(this);
         databaseManager.init(this);
@@ -73,6 +206,13 @@ public class MainActivity
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
                 HistoryBuilder.single(FirstKey.create()));
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -88,6 +228,10 @@ public class MainActivity
 
     @Override
     public void onBackPressed() {
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawers();
+            return;
+        }
         if(!backstackDelegate.onBackPressed()) {
             super.onBackPressed();
         }
@@ -108,6 +252,9 @@ public class MainActivity
 
     @Override
     public Object getSystemService(String name) {
+        if(TAG.equals(name)) {
+            return this;
+        }
         if(backstackDelegate != null && backstackDelegate.isSystemService(name)) {
             return backstackDelegate.getSystemService(name);
         }
@@ -121,6 +268,7 @@ public class MainActivity
             completionCallback.stateChangeComplete();
             return;
         }
+        TransitionManager.beginDelayedTransition(root);
         Log.i(TAG, "Persisting view state of [" + root.getChildAt(0) + "]");
         backstackDelegate.persistViewToState(root.getChildAt(0));
         root.removeAllViews();
@@ -132,6 +280,8 @@ public class MainActivity
         Log.i(TAG, "Restoring view state of [" + view + "]");
         backstackDelegate.restoreViewFromState(view);
         backstackDelegate.clearStatesNotIn(stateChange.getNewState());
+
+        setupViewsForKey(newKey);
         completionCallback.stateChangeComplete();
     }
 }

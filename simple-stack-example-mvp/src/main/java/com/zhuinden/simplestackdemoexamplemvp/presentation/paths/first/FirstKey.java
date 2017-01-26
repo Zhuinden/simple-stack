@@ -18,4 +18,24 @@ public abstract class FirstKey implements Key {
     public final Coordinator newCoordinator() {
         return new FirstCoordinator();
     }
+
+    @Override
+    public int menu() {
+        return R.menu.empty_menu;
+    }
+
+    @Override
+    public boolean isFabVisible() {
+        return false;
+    }
+
+    @Override
+    public int navigationViewId() {
+        return 0;
+    }
+
+    @Override
+    public boolean shouldShowUp() {
+        return false;
+    }
 }

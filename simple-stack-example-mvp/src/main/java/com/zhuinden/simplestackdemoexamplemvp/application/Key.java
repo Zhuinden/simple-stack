@@ -12,4 +12,12 @@ public interface Key extends Parcelable {
     int layout();
 
     Coordinator newCoordinator();
+
+    int menu();
+
+    int navigationViewId();
+
+    boolean isFabVisible();
+
+    boolean shouldShowUp();
 }

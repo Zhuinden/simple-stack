@@ -8,11 +8,14 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.squareup.coordinators.Coordinator;
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import butterknife.Unbinder;
 
@@ -33,11 +36,19 @@ public class SecondCoordinator extends Coordinator implements Bundleable {
     @BindView(R.id.second_edittext)
     EditText editText;
 
+    @OnClick(R.id.second_go_to_todos)
+    public void goToTodos() {
+        backstack.goTo(TasksKey.create());
+    }
+
     Unbinder unbinder;
+
+    Backstack backstack;
 
     @Override
     public void attach(View view) {
         Log.i(TAG, "Attached [" + view + "]");
+        backstack = Backstack.get(view.getContext());
         unbinder = ButterKnife.bind(this, view);
     }
 

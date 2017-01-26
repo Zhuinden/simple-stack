@@ -55,4 +55,6 @@ dependencies {
     compile 'com.jakewharton.rxrelay:rxrelay:1.2.0'
 
     apt 'dk.ilios:realmfieldnameshelper:1.1.0'
+
+    compile "com.andkulikov:transitionseverywhere:1.7.0"
 }

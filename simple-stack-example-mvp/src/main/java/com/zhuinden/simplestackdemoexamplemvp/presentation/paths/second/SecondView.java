@@ -18,8 +18,6 @@ import com.zhuinden.simplestack.Bundleable;
 public class SecondView
         extends RelativeLayout
         implements Bundleable {
-    private String state;
-
     public SecondView(Context context) {
         super(context);
         init(context);
