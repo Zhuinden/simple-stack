@@ -1,6 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics;
 
 import android.os.Parcelable;
+import android.view.View;
 
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
@@ -41,5 +42,16 @@ public abstract class StatisticsKey
     @Override
     public boolean shouldShowUp() {
         return true;
+    }
+
+    @Override
+    public View.OnClickListener fabClickListener() {
+        return v -> {
+        };
+    }
+
+    @Override
+    public int fabDrawableIcon() {
+        return 0;
     }
 }

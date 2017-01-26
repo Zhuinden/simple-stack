@@ -1,6 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 
 import android.os.Parcelable;
+import android.view.View;
 
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
@@ -42,5 +43,16 @@ public abstract class AddOrEditTaskKey
     @Override
     public boolean shouldShowUp() {
         return true;
+    }
+
+    @Override
+    public View.OnClickListener fabClickListener() {
+        return v -> {
+        };
+    }
+
+    @Override
+    public int fabDrawableIcon() {
+        return R.drawable.ic_done;
     }
 }

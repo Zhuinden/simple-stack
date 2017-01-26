@@ -1,5 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail;
 
+import android.view.View;
+
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestackdemoexamplemvp.R;
@@ -37,5 +39,16 @@ public abstract class TaskDetailKey
     @Override
     public boolean shouldShowUp() {
         return true;
+    }
+
+    @Override
+    public View.OnClickListener fabClickListener() {
+        return v -> {
+        };
+    }
+
+    @Override
+    public int fabDrawableIcon() {
+        return 0;
     }
 }

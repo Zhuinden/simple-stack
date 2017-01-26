@@ -1,5 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first;
 
+import android.view.View;
+
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestackdemoexamplemvp.R;
@@ -37,5 +39,16 @@ public abstract class FirstKey implements Key {
     @Override
     public boolean shouldShowUp() {
         return false;
+    }
+
+    @Override
+    public View.OnClickListener fabClickListener() {
+        return v -> {
+        };
+    }
+
+    @Override
+    public int fabDrawableIcon() {
+        return 0;
     }
 }

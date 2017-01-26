@@ -1,9 +1,13 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
+import android.view.View;
+
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -39,5 +43,17 @@ public abstract class TasksKey
     @Override
     public boolean shouldShowUp() {
         return false;
+    }
+
+    @Override
+    public View.OnClickListener fabClickListener() {
+        return v -> {
+            Backstack.get(v.getContext()).goTo(AddOrEditTaskKey.create()); // TODO: call presenter
+        };
+    }
+
+    @Override
+    public int fabDrawableIcon() {
+        return R.drawable.ic_add;
     }
 }

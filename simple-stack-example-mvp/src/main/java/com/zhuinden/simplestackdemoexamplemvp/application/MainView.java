@@ -72,6 +72,10 @@ public class MainView
         } else {
             fabAddTask.setVisibility(View.GONE);
         }
+        fabAddTask.setOnClickListener(key.fabClickListener());
+        if(key.fabDrawableIcon() != 0) {
+            fabAddTask.setImageResource(key.fabDrawableIcon());
+        }
     }
 
 
