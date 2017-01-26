@@ -1,11 +1,16 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
-// apply plugin: 'realm-android'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.zhuinden.simplestackdemoexamplemvp"
         minSdkVersion 14
@@ -36,4 +41,15 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
 
     apt 'frankiesardo:auto-parcel:1.0.1'
+
+    apt 'com.google.dagger:dagger-compiler:2.8'
+    compile 'com.google.dagger:dagger:2.8'
+    provided 'org.glassfish:javax.annotation:10.0-b28'
+
+    compile 'io.reactivex:rxjava:1.2.5'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
+    compile 'com.jakewharton.rxrelay:rxrelay:1.2.0'
+
+    apt 'dk.ilios:realmfieldnameshelper:1.1.0'
 }

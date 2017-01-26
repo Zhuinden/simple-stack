@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemoexamplemvp.util;
+package com.zhuinden.simplestackdemoexamplemvp.application;
 
 import android.os.Parcelable;
 

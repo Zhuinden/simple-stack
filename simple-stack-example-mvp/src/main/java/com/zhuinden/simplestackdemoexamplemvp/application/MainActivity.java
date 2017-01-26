@@ -18,8 +18,10 @@ import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstKey;
-import com.zhuinden.simplestackdemoexamplemvp.util.Key;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,11 +36,24 @@ public class MainActivity
 
     BackstackDelegate backstackDelegate;
 
+    @Inject
+    DatabaseManager databaseManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        CustomApplication.get(this).getComponent().inject(this);
+        databaseManager.init(this);
+
+        MainScopeListener mainScopeListener = (MainScopeListener)getSupportFragmentManager().findFragmentByTag("MAIN_SCOPE_LISTENER");
+        if(mainScopeListener == null) {
+            mainScopeListener = new MainScopeListener();
+            getSupportFragmentManager().beginTransaction().add(mainScopeListener, "MAIN_SCOPE_LISTENER").commit();
+        }
+        CustomApplication.get(this).getComponent().inject(mainScopeListener);
 
         Coordinators.installBinder(root, new CoordinatorProvider() {
             @Nullable
@@ -49,7 +64,11 @@ public class MainActivity
                 return key.newCoordinator(); // maybe should be obtained from a component
             }
         });
+    }
 
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
         backstackDelegate = new BackstackDelegate(this);
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
