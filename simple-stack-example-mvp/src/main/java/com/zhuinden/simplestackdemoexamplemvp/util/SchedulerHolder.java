@@ -7,6 +7,7 @@ import rx.Scheduler;
 /**
  * Created by Owner on 2017. 01. 26..
  */
+// NOT SCOPED!
 public class SchedulerHolder {
     private Scheduler scheduler;
 

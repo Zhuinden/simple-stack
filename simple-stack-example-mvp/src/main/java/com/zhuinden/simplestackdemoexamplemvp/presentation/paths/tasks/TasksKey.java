@@ -46,7 +46,7 @@ public abstract class TasksKey
     }
 
     @Override
-    public View.OnClickListener fabClickListener() {
+    public View.OnClickListener fabClickListener(View view) {
         return v -> {
             Backstack.get(v.getContext()).goTo(AddOrEditTaskKey.create()); // TODO: call presenter
         };

@@ -45,7 +45,7 @@ public abstract class StatisticsKey
     }
 
     @Override
-    public View.OnClickListener fabClickListener() {
+    public View.OnClickListener fabClickListener(View view) {
         return v -> {
         };
     }

@@ -42,7 +42,7 @@ public abstract class FirstKey implements Key {
     }
 
     @Override
-    public View.OnClickListener fabClickListener() {
+    public View.OnClickListener fabClickListener(View view) {
         return v -> {
         };
     }

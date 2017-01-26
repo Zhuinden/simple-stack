@@ -56,7 +56,7 @@ public class MainView
 
     private ActionBarDrawerToggle drawerToggle;
 
-    public void setupViewsForKey(Key key) {
+    public void setupViewsForKey(Key key, View newView) {
         if(key.shouldShowUp()) {
             setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
             drawerToggle.setDrawerIndicatorEnabled(false);
@@ -74,7 +74,7 @@ public class MainView
         } else {
             fabAddTask.setVisibility(View.GONE);
         }
-        fabAddTask.setOnClickListener(key.fabClickListener());
+        fabAddTask.setOnClickListener(key.fabClickListener(newView));
         if(key.fabDrawableIcon() != 0) {
             fabAddTask.setImageResource(key.fabDrawableIcon());
         }

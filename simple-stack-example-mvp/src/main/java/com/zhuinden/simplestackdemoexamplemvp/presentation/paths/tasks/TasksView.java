@@ -19,7 +19,9 @@ import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.application.CustomApplication;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
+import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.ScrollChildSwipeRefreshLayout;
@@ -27,9 +29,13 @@ import com.zhuinden.simplestackdemoexamplemvp.util.ScrollChildSwipeRefreshLayout
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 
 import static com.zhuinden.simplestackdemoexamplemvp.util.Preconditions.checkNotNull;
 
@@ -74,6 +80,9 @@ public class TasksView
     @BindView(R.id.tasks_list)
     ListView listView;
 
+    @Inject
+    TaskRepository taskRepository;
+
     TasksAdapter tasksAdapter;
 
     TasksContract.Presenter tasksPresenter;
@@ -94,6 +103,27 @@ public class TasksView
             tasksPresenter.activateTask(activatedTask);
         }
     };
+
+    Subscription subscription;
+
+    @Override
+    protected void onAttachedToWindow() { // TODO: move to coordinators
+        super.onAttachedToWindow();
+        CustomApplication.get(getContext()).getComponent().inject(this);
+        subscription = taskRepository.getTasks().observeOn(AndroidSchedulers.mainThread()).subscribe(tasks -> {
+            if(tasksAdapter != null) {
+                tasksAdapter.replaceData(tasks);
+            }
+        });
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if(!subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
+        super.onDetachedFromWindow();
+    }
 
     @Override
     protected void onFinishInflate() {

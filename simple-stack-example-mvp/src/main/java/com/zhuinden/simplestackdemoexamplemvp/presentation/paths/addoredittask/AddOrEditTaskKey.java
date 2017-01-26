@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
+import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 
@@ -46,8 +47,10 @@ public abstract class AddOrEditTaskKey
     }
 
     @Override
-    public View.OnClickListener fabClickListener() {
+    public View.OnClickListener fabClickListener(View view) {
         return v -> {
+            AddOrEditTaskCoordinator addOrEditTaskCoordinator = Coordinators.getCoordinator(view);
+            addOrEditTaskCoordinator.fabClicked();
         };
     }
 

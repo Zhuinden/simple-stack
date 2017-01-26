@@ -176,7 +176,7 @@ public class MainActivity
         backstackDelegate.restoreViewFromState(view);
         backstackDelegate.clearStatesNotIn(stateChange.getNewState());
 
-        mainView.setupViewsForKey(newKey);
+        mainView.setupViewsForKey(newKey, view);
         completionCallback.stateChangeComplete();
     }
 }

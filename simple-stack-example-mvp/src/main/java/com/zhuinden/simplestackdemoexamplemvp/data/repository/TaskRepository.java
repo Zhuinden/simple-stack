@@ -19,6 +19,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import rx.Observable;
+import rx.Single;
 import rx.Subscriber;
 import rx.subscriptions.Subscriptions;
 
@@ -36,6 +37,10 @@ public class TaskRepository {
     @Inject
     @Named("LOOPER_SCHEDULER")
     SchedulerHolder looperScheduler;
+
+    @Inject
+    @Named("WRITE_SCHEDULER")
+    SchedulerHolder writeScheduler;
 
     @Inject
     public TaskRepository() {
@@ -71,5 +76,31 @@ public class TaskRepository {
                 subscriber.onNext(mapFrom(dbTasks));
             }
         }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
+    }
+
+    @SuppressWarnings("NewApi")
+    public void insertTask(Task task) {
+        Single.create((Single.OnSubscribe<Void>) singleSubscriber -> {
+            try(Realm r = Realm.getDefaultInstance()) {
+                r.executeTransaction(realm -> {
+                    realm.insertOrUpdate(taskMapper.toRealm(task));
+                });
+            }
+        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+    }
+
+    @SuppressWarnings("NewApi")
+    public void insertTasks(List<Task> tasks) {
+        Single.create((Single.OnSubscribe<Void>) singleSubscriber -> {
+            try(Realm r = Realm.getDefaultInstance()) {
+                List<DbTask> dbTasks = new ArrayList<>(tasks.size());
+                for(Task task : tasks) {
+                    dbTasks.add(taskMapper.toRealm(task));
+                }
+                r.executeTransaction(realm -> {
+                    realm.insertOrUpdate(dbTasks);
+                });
+            }
+        }).subscribeOn(writeScheduler.getScheduler());
     }
 }

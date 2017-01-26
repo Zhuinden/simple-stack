@@ -23,7 +23,7 @@ public interface Key extends Parcelable {
 
     boolean shouldShowUp();
 
-    View.OnClickListener fabClickListener();
+    View.OnClickListener fabClickListener(View view);
 
     @DrawableRes
     int fabDrawableIcon();
