@@ -23,17 +23,17 @@ public class TasksAdapter
     public interface TaskItemListener {
         void onTaskClick(Task clickedTask);
 
-        void onCompleteTaskClick(Task completedTask);
+        void completeTask(Task completedTask);
 
-        void onActivateTaskClick(Task activatedTask);
+        void uncompleteTask(Task incompleteTask);
     }
 
     private List<Task> mTasks;
-    private TaskItemListener mItemListener;
+    private TaskItemListener itemListener;
 
     public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
         setList(tasks);
-        mItemListener = itemListener;
+        this.itemListener = itemListener;
     }
 
     public void replaceData(List<Task> tasks) {
@@ -85,12 +85,12 @@ public class TasksAdapter
 
         completeCB.setOnClickListener(v -> {
             if(!task.isCompleted()) {
-                mItemListener.onCompleteTaskClick(task);
+                itemListener.completeTask(task);
             } else {
-                mItemListener.onActivateTaskClick(task);
+                itemListener.uncompleteTask(task);
             }
         });
-        rowView.setOnClickListener(view1 -> mItemListener.onTaskClick(task));
+        rowView.setOnClickListener(view1 -> itemListener.onTaskClick(task));
         return rowView;
     }
 }

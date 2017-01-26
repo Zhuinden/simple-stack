@@ -1,10 +1,13 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 
 import com.squareup.coordinators.Coordinators;
+import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
@@ -17,7 +20,7 @@ import com.zhuinden.simplestackdemoexamplemvp.util.ScrollChildSwipeRefreshLayout
 
 public class TasksView
         extends ScrollChildSwipeRefreshLayout
-        implements MainActivity.OptionsItemSelectedListener, StateChanger {
+        implements MainActivity.OptionsItemSelectedListener, StateChanger, Bundleable {
     public TasksView(Context context) {
         super(context);
     }
@@ -57,5 +60,17 @@ public class TasksView
         clearAnimation();
         // end
         completionCallback.stateChangeComplete();
+    }
+
+    @Override
+    public Bundle toBundle() {
+        TasksCoordinator coordinator = Coordinators.getCoordinator(this);
+        return coordinator.toBundle();
+    }
+
+    @Override
+    public void fromBundle(@Nullable Bundle bundle) {
+        TasksCoordinator coordinator = Coordinators.getCoordinator(this);
+        coordinator.fromBundle(bundle);
     }
 }

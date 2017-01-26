@@ -1,5 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.view.View;
 import android.widget.ImageView;
@@ -7,12 +9,15 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.jakewharton.rxrelay.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import java.util.ArrayList;
@@ -31,9 +36,8 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 // UNSCOPED!
 public class TasksCoordinator
-        extends BaseCoordinator<TasksView> {
-    TasksFilterType filterType;
-
+        extends BaseCoordinator<TasksView>
+        implements Bundleable {
     @Inject
     public TasksCoordinator() {
     }
@@ -74,6 +78,8 @@ public class TasksCoordinator
 
     TasksView tasksView;
 
+    BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.create(TasksFilterType.ALL_TASKS);
+
     Subscription subscription;
 
     Unbinder unbinder;
@@ -85,26 +91,26 @@ public class TasksCoordinator
         }
 
         @Override
-        public void onCompleteTaskClick(Task completedTask) {
-            completeTask(completedTask);
+        public void completeTask(Task completedTask) {
+            TasksCoordinator.this.completeTask(completedTask);
         }
 
         @Override
-        public void onActivateTaskClick(Task activatedTask) {
-            activateTask(activatedTask);
+        public void uncompleteTask(Task incompleteTask) {
+            TasksCoordinator.this.uncompleteTask(incompleteTask);
         }
     };
 
-    private void activateTask(Task activatedTask) {
-
+    private void uncompleteTask(Task task) {
+        taskRepository.insertTask(task.toBuilder().setCompleted(false).build());
     }
 
-    private void completeTask(Task completedTask) {
-
+    private void completeTask(Task task) {
+        taskRepository.insertTask(task.toBuilder().setCompleted(true).build());
     }
 
     private void openTaskDetails(Task clickedTask) {
-
+        backstack.goTo(TaskDetailKey.create(clickedTask.id()));
     }
 
     @Override
@@ -114,7 +120,17 @@ public class TasksCoordinator
         unbinder = ButterKnife.bind(this, view);
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
-        subscription = taskRepository.getTasks().observeOn(AndroidSchedulers.mainThread()).subscribe(tasks -> {
+        subscription = filterType.asObservable().switchMap((tasksFilterType -> {
+            if(tasksFilterType == TasksFilterType.ALL_TASKS) {
+                return taskRepository.getTasks();
+            } else if(tasksFilterType == TasksFilterType.COMPLETED_TASKS) {
+                return taskRepository.getCompletedTasks();
+            } else if(tasksFilterType == TasksFilterType.ACTIVE_TASKS) {
+                return taskRepository.getActiveTasks();
+            } else {
+                throw new IllegalArgumentException("Filter type [" + tasksFilterType + "] is unbound!");
+            }
+        })).observeOn(AndroidSchedulers.mainThread()).subscribe(tasks -> {
             if(tasksAdapter != null) {
                 tasksAdapter.replaceData(tasks);
             }
@@ -145,7 +161,7 @@ public class TasksCoordinator
                     setFiltering(TasksFilterType.ALL_TASKS);
                     break;
             }
-            //loadTasks(false);
+            //loadTasks(false); // reactive data source ftw
             return true;
         });
 
@@ -153,8 +169,7 @@ public class TasksCoordinator
     }
 
     private void setFiltering(TasksFilterType filterType) {
-        this.filterType = filterType;
-        // TODO: change result set in adapter
+        this.filterType.call(filterType);
     }
 
     public void clear() {
@@ -163,5 +178,19 @@ public class TasksCoordinator
 
     public void refresh() {
         // TODO
+    }
+
+    @Override
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putString("FILTERING", filterType.getValue().name());
+        return bundle;
+    }
+
+    @Override
+    public void fromBundle(@Nullable Bundle bundle) {
+        if(bundle != null) {
+            filterType.call(TasksFilterType.valueOf(bundle.getString("FILTERING")));
+        }
     }
 }

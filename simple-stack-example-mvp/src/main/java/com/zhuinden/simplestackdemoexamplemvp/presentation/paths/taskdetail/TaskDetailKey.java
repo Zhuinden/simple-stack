@@ -17,6 +17,10 @@ public abstract class TaskDetailKey
         implements Key {
     abstract String taskId();
 
+    public static TaskDetailKey create(String taskId) {
+        return new AutoValue_TaskDetailKey(R.layout.path_taskdetail, taskId);
+    }
+
     @Override
     public Coordinator newCoordinator(SingletonComponent singletonComponent) {
         return singletonComponent.taskDetailCoordinator();

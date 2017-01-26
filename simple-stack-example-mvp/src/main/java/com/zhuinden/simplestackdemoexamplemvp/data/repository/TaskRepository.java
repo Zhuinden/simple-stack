@@ -80,6 +80,78 @@ public class TaskRepository {
         }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
     }
 
+    public Observable<List<Task>> getCompletedTasks() {
+        return Observable.create(new Observable.OnSubscribe<List<Task>>() {
+            private List<Task> mapFrom(RealmResults<DbTask> dbTasks) {
+                List<Task> tasks = new ArrayList<>(dbTasks.size());
+                for(DbTask dbTask : dbTasks) {
+                    tasks.add(taskMapper.fromRealm(dbTask));
+                }
+                return tasks;
+            }
+
+            @Override
+            public void call(final Subscriber<? super List<Task>> subscriber) {
+                Realm realm = databaseManager.openDatabase();
+                final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
+                        .equalTo(DbTaskFields.COMPLETED, true)
+                        .findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
+                final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
+                    if(!subscriber.isUnsubscribed()) {
+                        List<Task> tasks = mapFrom(element);
+                        if(!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(tasks);
+                        }
+                    }
+                };
+                subscriber.add(Subscriptions.create(() -> {
+                    if(dbTasks.isValid()) {
+                        dbTasks.removeChangeListener(realmChangeListener);
+                    }
+                    databaseManager.closeDatabase();
+                }));
+                dbTasks.addChangeListener(realmChangeListener);
+                subscriber.onNext(mapFrom(dbTasks));
+            }
+        }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
+    }
+
+    public Observable<List<Task>> getActiveTasks() {
+        return Observable.create(new Observable.OnSubscribe<List<Task>>() {
+            private List<Task> mapFrom(RealmResults<DbTask> dbTasks) {
+                List<Task> tasks = new ArrayList<>(dbTasks.size());
+                for(DbTask dbTask : dbTasks) {
+                    tasks.add(taskMapper.fromRealm(dbTask));
+                }
+                return tasks;
+            }
+
+            @Override
+            public void call(final Subscriber<? super List<Task>> subscriber) {
+                Realm realm = databaseManager.openDatabase();
+                final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
+                        .equalTo(DbTaskFields.COMPLETED, false)
+                        .findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
+                final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
+                    if(!subscriber.isUnsubscribed()) {
+                        List<Task> tasks = mapFrom(element);
+                        if(!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(tasks);
+                        }
+                    }
+                };
+                subscriber.add(Subscriptions.create(() -> {
+                    if(dbTasks.isValid()) {
+                        dbTasks.removeChangeListener(realmChangeListener);
+                    }
+                    databaseManager.closeDatabase();
+                }));
+                dbTasks.addChangeListener(realmChangeListener);
+                subscriber.onNext(mapFrom(dbTasks));
+            }
+        }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
+    }
+
     @SuppressWarnings("NewApi")
     public void insertTask(Task task) {
         Single.create((Single.OnSubscribe<Void>) singleSubscriber -> {

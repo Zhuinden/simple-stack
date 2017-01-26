@@ -41,7 +41,11 @@ public abstract class Task {
     }
 
     public static Task createCompletedTaskWithId(String title, String description, String id, boolean completed) {
-        return new AutoValue_Task(id, title, description, completed);
+        return new AutoValue_Task.Builder().setId(id).setTitle(title).setDescription(description).setCompleted(completed).build();
+    }
+
+    public Builder toBuilder() {
+        return new AutoValue_Task.Builder(this);
     }
 
     @Nullable
@@ -63,5 +67,18 @@ public abstract class Task {
 
     public boolean isEmpty() {
         return (title() == null || "".equals(title())) && (description() == null || "".equals(description()));
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder setId(String id);
+
+        public abstract Builder setTitle(String title);
+
+        public abstract Builder setDescription(String description);
+
+        public abstract Builder setCompleted(boolean completed);
+
+        public abstract Task build();
     }
 }
