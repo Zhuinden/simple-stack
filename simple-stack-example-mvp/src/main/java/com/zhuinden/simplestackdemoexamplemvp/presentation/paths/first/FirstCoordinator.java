@@ -5,11 +5,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
-import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondKey;
+import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import javax.inject.Inject;
 
@@ -21,7 +21,9 @@ import butterknife.Unbinder;
  * Created by Owner on 2017. 01. 25..
  */
 // UNSCOPED!
-public class FirstCoordinator extends Coordinator implements Bundleable {
+public class FirstCoordinator
+        extends BaseCoordinator<FirstView>
+        implements Bundleable {
     @Inject
     public FirstCoordinator() {
     }
@@ -36,13 +38,13 @@ public class FirstCoordinator extends Coordinator implements Bundleable {
     }
 
     @Override
-    public void attach(View view) {
+    public void attachView(FirstView view) {
         Log.i(TAG, "Attached [" + view + "]");
         unbinder = ButterKnife.bind(this, view);
     }
 
     @Override
-    public void detach(View view) {
+    public void detachView(FirstView view) {
         Log.i(TAG, "Detached [" + view + "]");
         unbinder.unbind();
     }

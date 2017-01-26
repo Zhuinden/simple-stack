@@ -4,14 +4,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 
-import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
+import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import javax.inject.Inject;
 
@@ -25,7 +24,9 @@ import butterknife.Unbinder;
  * Created by Owner on 2017. 01. 25..
  */
 // UNSCOPED!
-public class SecondCoordinator extends Coordinator implements Bundleable {
+public class SecondCoordinator
+        extends BaseCoordinator<SecondView>
+        implements Bundleable {
     @Inject
     public SecondCoordinator() {
     }
@@ -52,14 +53,14 @@ public class SecondCoordinator extends Coordinator implements Bundleable {
     Backstack backstack;
 
     @Override
-    public void attach(View view) {
+    public void attachView(SecondView view) {
         Log.i(TAG, "Attached [" + view + "]");
         backstack = Backstack.get(view.getContext());
         unbinder = ButterKnife.bind(this, view);
     }
 
     @Override
-    public void detach(View view) {
+    public void detachView(SecondView view) {
         Log.i(TAG, "Detached [" + view + "]");
         unbinder.unbind();
     }

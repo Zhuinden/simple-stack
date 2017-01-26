@@ -1,13 +1,12 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 
 import android.text.Editable;
-import android.view.View;
 
-import com.squareup.coordinators.Coordinator;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
+import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import javax.inject.Inject;
 
@@ -21,7 +20,7 @@ import butterknife.Unbinder;
 
 // UNSCOPED!
 public class AddOrEditTaskCoordinator
-        extends Coordinator { // TODO: add bundleable
+        extends BaseCoordinator<AddOrEditTaskView> { // TODO: add bundleable
     String title;
     String description;
 
@@ -47,16 +46,14 @@ public class AddOrEditTaskCoordinator
     Unbinder unbinder;
 
     @Override
-    public void attach(View view) {
-        super.attach(view);
+    public void attachView(AddOrEditTaskView view) {
         unbinder = ButterKnife.bind(this, view);
         backstack = Backstack.get(view.getContext());
     }
 
     @Override
-    public void detach(View view) {
+    public void detachView(AddOrEditTaskView view) {
         unbinder.unbind();
-        super.detach(view);
     }
 
     public void fabClicked() {

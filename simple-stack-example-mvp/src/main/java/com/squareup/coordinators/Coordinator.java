@@ -39,7 +39,7 @@ public class Coordinator {
    *
    * @see View#onAttachedToWindow()
    */
-  public void attach(View view) {
+  protected void attach(View view) {
   }
 
   /**
@@ -49,7 +49,7 @@ public class Coordinator {
    *
    * @see View#onDetachedFromWindow()
    */
-  public void detach(View view) {
+  protected void detach(View view) {
   }
 
   /**
