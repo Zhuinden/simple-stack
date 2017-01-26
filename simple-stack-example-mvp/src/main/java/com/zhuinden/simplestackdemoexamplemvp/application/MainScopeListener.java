@@ -45,6 +45,7 @@ public class MainScopeListener extends Fragment {
     @Override
     public void onDestroy() {
         databaseManager.closeDatabase();
+        handlerThread.quit();
         super.onDestroy();
     }
 }
