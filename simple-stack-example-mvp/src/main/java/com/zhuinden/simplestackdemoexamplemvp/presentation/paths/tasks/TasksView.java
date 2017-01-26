@@ -16,6 +16,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
@@ -35,7 +37,9 @@ import static com.zhuinden.simplestackdemoexamplemvp.util.Preconditions.checkNot
  * Created by Owner on 2017. 01. 26..
  */
 
-public class TasksView extends ScrollChildSwipeRefreshLayout implements MainActivity.OptionsItemSelectedListener {
+public class TasksView
+        extends ScrollChildSwipeRefreshLayout
+        implements MainActivity.OptionsItemSelectedListener, StateChanger {
     public TasksView(Context context) {
         super(context);
     }
@@ -182,6 +186,16 @@ public class TasksView extends ScrollChildSwipeRefreshLayout implements MainActi
             default:
         }
         return false;
+    }
+
+    @Override
+    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        // hack fix from  http://stackoverflow.com/a/27073879/2413303 to fix view staying on screen
+        setRefreshing(false);
+        destroyDrawingCache();
+        clearAnimation();
+        // end
+        completionCallback.stateChangeComplete();
     }
 
     private static class TasksAdapter extends BaseAdapter { // FIXME: Why on earth does a 9 months old example still use ListView?

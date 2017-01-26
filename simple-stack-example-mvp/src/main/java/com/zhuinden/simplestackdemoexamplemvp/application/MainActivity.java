@@ -161,6 +161,8 @@ public class MainActivity
             completionCallback.stateChangeComplete();
             return;
         }
+        mainView.handleStateChange(stateChange, () -> {
+        });
         TransitionManager.beginDelayedTransition(root);
         Log.i(TAG, "Persisting view state of [" + root.getChildAt(0) + "]");
         backstackDelegate.persistViewToState(root.getChildAt(0));

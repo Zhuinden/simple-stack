@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsKey;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
@@ -29,7 +31,7 @@ import butterknife.ButterKnife;
 
 public class MainView
         extends DrawerLayout
-        implements MainActivity.OptionsItemSelectedListener {
+        implements MainActivity.OptionsItemSelectedListener, StateChanger {
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -184,5 +186,13 @@ public class MainView
             return true;
         }
         return false;
+    }
+
+    public void handleStateChange(StateChange stateChange, StateChanger.Callback callback) {
+        if(root != null && root.getChildAt(0) != null) {
+            if(root.getChildAt(0) instanceof StateChanger) {
+                ((StateChanger) root.getChildAt(0)).handleStateChange(stateChange, callback);
+            }
+        }
     }
 }
