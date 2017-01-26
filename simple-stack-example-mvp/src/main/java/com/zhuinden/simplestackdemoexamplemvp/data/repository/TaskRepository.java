@@ -63,7 +63,9 @@ public class TaskRepository {
                 final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
                     if(!subscriber.isUnsubscribed()) {
                         List<Task> tasks = mapFrom(element);
-                        subscriber.onNext(tasks);
+                        if(!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(tasks);
+                        }
                     }
                 };
                 subscriber.add(Subscriptions.create(() -> {
