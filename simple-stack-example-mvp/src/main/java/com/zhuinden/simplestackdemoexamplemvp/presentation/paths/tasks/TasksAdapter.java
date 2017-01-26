@@ -65,6 +65,7 @@ public class TasksAdapter
         }
 
         public void bind(Task task) {
+            this.task = task;
             title.setText(task.getTitleForList());
             complete.setChecked(task.isCompleted());
             if(task.isCompleted()) {
