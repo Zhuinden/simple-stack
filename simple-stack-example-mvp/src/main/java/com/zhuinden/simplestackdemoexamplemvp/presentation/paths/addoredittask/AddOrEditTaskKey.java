@@ -59,6 +59,7 @@ public abstract class AddOrEditTaskKey
         return v -> {
             AddOrEditTaskCoordinator addOrEditTaskCoordinator = Coordinators.getCoordinator(view);
             addOrEditTaskCoordinator.saveTask();
+            addOrEditTaskCoordinator.navigateBack();
         };
     }
 

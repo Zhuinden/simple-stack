@@ -106,14 +106,17 @@ public class AddOrEditTaskCoordinator
                     .setTitle(title)
                     .setDescription(description)
                     .build());
-            AddOrEditTaskKey addOrEditTaskKey = getKey();
-            if(addOrEditTaskKey.parent() instanceof TasksKey) {
-                messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksCoordinator.SavedSuccessfullyMessage());
-                backstack.goBack();
-            } else {
-                backstack.setHistory(HistoryBuilder.from(backstack.getHistory()).removeUntil(TasksKey.create()).build(),
-                        StateChange.Direction.BACKWARD);
-            }
+        }
+    }
+
+    public void navigateBack() {
+        AddOrEditTaskKey addOrEditTaskKey = getKey();
+        if(addOrEditTaskKey.parent() instanceof TasksKey) {
+            messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksCoordinator.SavedSuccessfullyMessage());
+            backstack.goBack();
+        } else {
+            backstack.setHistory(HistoryBuilder.from(backstack.getHistory()).removeUntil(TasksKey.create()).build(),
+                    StateChange.Direction.BACKWARD);
         }
     }
 
