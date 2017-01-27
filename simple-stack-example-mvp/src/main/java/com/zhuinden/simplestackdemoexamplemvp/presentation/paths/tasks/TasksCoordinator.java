@@ -37,7 +37,7 @@ import butterknife.Unbinder;
  */
 // UNSCOPED!
 public class TasksCoordinator
-        extends BaseCoordinator<TasksView>
+        extends BaseCoordinator<TasksCoordinator, TasksPresenter>
         implements Bundleable, MessageQueue.Receiver {
     public static class SavedSuccessfullyMessage {
     }
@@ -98,21 +98,29 @@ public class TasksCoordinator
     };
 
     @Override
+    public TasksPresenter getPresenter() {
+        return tasksPresenter;
+    }
+
+    @Override
+    public TasksCoordinator getThis() {
+        return this;
+    }
+
+    @Override
     protected Unbinder bindViews(View view) {
         return ButterKnife.bind(this, view);
     }
 
     @Override
-    public void attachView(TasksView view) {
+    public void attachView(View view) {
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-        tasksPresenter.attachCoordinator(this);
     }
 
     @Override
-    public void detachView(TasksView view) {
-        tasksPresenter.detachCoordinator(this);
+    public void detachView(View view) {
     }
 
     @Override
@@ -173,7 +181,7 @@ public class TasksCoordinator
     }
 
     public void refresh() {
-        getView().setRefreshing(true);
+        ((TasksView) getView()).setRefreshing(true);
     }
 
     public void showNoActiveTasks() {

@@ -21,7 +21,7 @@ import butterknife.Unbinder;
  */
 // UNSCOPED!
 public class TaskDetailCoordinator
-        extends BaseCoordinator<TaskDetailView> {
+        extends BaseCoordinator<TaskDetailCoordinator, TaskDetailPresenter> {
     @BindView(R.id.task_detail_title)
     TextView mDetailTitle;
 
@@ -38,34 +38,29 @@ public class TaskDetailCoordinator
     @Inject
     Backstack backstack;
 
-    TaskDetailKey taskDetailKey;
+    @Inject
+    TaskDetailPresenter taskDetailPresenter;
 
-    String taskId;
+    @Override
+    public TaskDetailPresenter getPresenter() {
+        return taskDetailPresenter;
+    }
+
+    @Override
+    public TaskDetailCoordinator getThis() {
+        return this;
+    }
 
     @Override
     protected Unbinder bindViews(View view) {
         return ButterKnife.bind(this, view);
     }
 
-    @Override
-    public void attachView(TaskDetailView view) {
-        taskDetailKey = getKey();
-        this.taskId = taskDetailKey.taskId();
-    }
-
-    @Override
-    public void detachView(TaskDetailView view) {
-    }
-
     public void editTask() {
-        if(taskId == null || "".equals(taskId)) {
-            showMissingTask();
-            return;
-        }
-        showEditTask(taskId);
+        taskDetailPresenter.editTask();
     }
 
-    private void showEditTask(String taskId) {
+    public void showEditTask(String taskId) {
         backstack.goTo(AddOrEditTaskKey.createWithTaskId(getKey(), taskId));
     }
 

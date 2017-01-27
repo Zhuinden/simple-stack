@@ -25,7 +25,7 @@ import rx.schedulers.Schedulers;
  */
 // UNSCOPED!
 public class TasksPresenter
-        extends BasePresenter<TasksCoordinator>
+        extends BasePresenter<TasksCoordinator, TasksPresenter>
         implements Bundleable {
     @Inject
     public TasksPresenter() {

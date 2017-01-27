@@ -5,10 +5,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
-import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import javax.inject.Inject;
@@ -22,37 +20,35 @@ import butterknife.Unbinder;
  */
 // UNSCOPED!
 public class FirstCoordinator
-        extends BaseCoordinator<FirstView>
+        extends BaseCoordinator<FirstCoordinator, FirstPresenter>
         implements Bundleable {
     @Inject
     public FirstCoordinator() {
     }
 
     @Inject
-    Backstack backstack;
+    FirstPresenter firstPresenter;
 
     private static final String TAG = "FirstCoordinator";
 
-    Unbinder unbinder;
-
     @OnClick(R.id.first_button)
     public void clickButton(View view) {
-        backstack.goTo(SecondKey.create());
+        firstPresenter.goToSecondKey();
+    }
+
+    @Override
+    public FirstPresenter getPresenter() {
+        return firstPresenter;
+    }
+
+    @Override
+    public FirstCoordinator getThis() {
+        return this;
     }
 
     @Override
     protected Unbinder bindViews(View view) {
         return ButterKnife.bind(this, view);
-    }
-
-    @Override
-    public void attachView(FirstView view) {
-        Log.i(TAG, "Attached [" + view + "]");
-    }
-
-    @Override
-    public void detachView(FirstView view) {
-        Log.i(TAG, "Detached [" + view + "]");
     }
 
     @Override

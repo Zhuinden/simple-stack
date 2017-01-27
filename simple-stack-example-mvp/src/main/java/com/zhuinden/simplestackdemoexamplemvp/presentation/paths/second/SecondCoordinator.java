@@ -3,14 +3,11 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import javax.inject.Inject;
@@ -26,19 +23,20 @@ import butterknife.Unbinder;
  */
 // UNSCOPED!
 public class SecondCoordinator
-        extends BaseCoordinator<SecondView>
+        extends BaseCoordinator<SecondCoordinator, SecondPresenter>
         implements Bundleable {
     @Inject
     public SecondCoordinator() {
     }
 
-    private static final String TAG = "SecondCoordinator";
+    @Inject
+    SecondPresenter secondPresenter;
 
-    String state;
+    private static final String TAG = "SecondCoordinator";
 
     @OnTextChanged(R.id.second_edittext)
     public void textChanged(Editable editable) {
-        this.state = editable.toString();
+        secondPresenter.updateState(editable.toString());
     }
 
     @BindView(R.id.second_edittext)
@@ -46,11 +44,18 @@ public class SecondCoordinator
 
     @OnClick(R.id.second_go_to_todos)
     public void goToTodos() {
-        backstack.goTo(TasksKey.create());
+        secondPresenter.goToTodos();
     }
 
-    @Inject
-    Backstack backstack;
+    @Override
+    public SecondPresenter getPresenter() {
+        return secondPresenter;
+    }
+
+    @Override
+    public SecondCoordinator getThis() {
+        return this;
+    }
 
     @Override
     protected Unbinder bindViews(View view) {
@@ -58,33 +63,20 @@ public class SecondCoordinator
     }
 
     @Override
-    public void attachView(SecondView view) {
-        Log.i(TAG, "Attached [" + view + "]");
-    }
-
-    @Override
-    public void detachView(SecondView view) {
-        Log.i(TAG, "Detached [" + view + "]");
-    }
-
-    @Override
     public Bundle toBundle() {
-        Log.i(TAG, "To bundle");
-        Bundle bundle = new Bundle();
-        bundle.putString("state", state);
-        return bundle;
+        return secondPresenter.toBundle();
     }
 
     @Override
     public void fromBundle(@Nullable Bundle bundle) {
-        Log.i(TAG, "From bundle");
         if(bundle != null) {
-            setState(bundle.getString("state"));
+            secondPresenter.fromBundle(bundle);
         }
     }
 
-    public void setState(String state) {
-        this.state = state;
-        editText.setText(state);
+    public void setStateText(String state) {
+        if(!editText.getText().toString().equals(state)) {
+            editText.setText(state);
+        }
     }
 }

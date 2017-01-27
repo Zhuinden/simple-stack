@@ -1,12 +1,10 @@
 package com.zhuinden.simplestackdemoexamplemvp.util;
 
-import android.view.View;
-
 /**
  * Created by Owner on 2017. 01. 27..
  */
 
-public abstract class BasePresenter<C extends BaseCoordinator<? extends View>> {
+public abstract class BasePresenter<C extends BaseCoordinator<C, P>, P extends BasePresenter<C, P>> {
     C coordinator;
 
     public C getCoordinator() {

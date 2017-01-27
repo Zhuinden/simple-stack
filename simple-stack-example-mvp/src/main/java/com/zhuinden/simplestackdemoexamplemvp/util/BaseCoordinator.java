@@ -12,35 +12,43 @@ import butterknife.Unbinder;
  * Created by Zhuinden on 2017.01.26..
  */
 
-public abstract class BaseCoordinator<V extends View>
+public abstract class BaseCoordinator<C extends BaseCoordinator<C, P>, P extends BasePresenter<C, P>>
         extends Coordinator {
     Unbinder unbinder;
 
-    V view;
+    View view;
+
+    public abstract P getPresenter();
+
+    public abstract C getThis();
 
     @Override
     protected final void attach(View view) {
         this.unbinder = bindViews(view);
         // noinspection unchecked
-        this.view = (V) view;
+        this.view = view;
         attachView(this.view);
+        getPresenter().attachCoordinator(getThis());
     }
 
     protected abstract Unbinder bindViews(View view);
 
-    public abstract void attachView(V view);
+    public void attachView(View view) {
+    }
 
     @Override
     protected final void detach(View view) {
+        getPresenter().detachCoordinator(getThis());
         detachView(this.view);
         unbinder.unbind();
         unbinder = null;
         this.view = null;
     }
 
-    public abstract void detachView(V view);
+    public void detachView(View view) {
+    }
 
-    public V getView() {
+    public View getView() {
         return view;
     }
 

@@ -14,21 +14,26 @@ import butterknife.Unbinder;
  */
 // UNSCOPED!
 public class StatisticsCoordinator
-        extends BaseCoordinator<StatisticsView> {
+        extends BaseCoordinator<StatisticsCoordinator, StatisticsPresenter> {
     @Inject
     public StatisticsCoordinator() {
+    }
+
+    @Inject
+    StatisticsPresenter statisticsPresenter;
+
+    @Override
+    public StatisticsPresenter getPresenter() {
+        return statisticsPresenter;
+    }
+
+    @Override
+    public StatisticsCoordinator getThis() {
+        return this;
     }
 
     @Override
     protected Unbinder bindViews(View view) {
         return ButterKnife.bind(this, view);
-    }
-
-    @Override
-    public void attachView(StatisticsView view) {
-    }
-
-    @Override
-    public void detachView(StatisticsView view) {
     }
 }
