@@ -1,9 +1,12 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.widget.EditText;
 
 import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemoexamplemvp.R;
@@ -28,7 +31,8 @@ import rx.android.schedulers.AndroidSchedulers;
 
 // UNSCOPED!
 public class AddOrEditTaskCoordinator
-        extends BaseCoordinator<AddOrEditTaskView> { // TODO: add bundleable
+        extends BaseCoordinator<AddOrEditTaskView>
+        implements Bundleable {
     String title;
     String description;
 
@@ -81,10 +85,12 @@ public class AddOrEditTaskCoordinator
             taskRepository.findTask(addOrEditTaskKey.taskId()).observeOn(AndroidSchedulers.mainThread()).subscribe(taskOptional -> {
                 if(taskOptional.isPresent()) {
                     task = taskOptional.get();
-                    this.title = task.title();
-                    this.description = task.description();
-                    addTaskTitle.setText(title);
-                    addTaskDescription.setText(description);
+                    if(this.title == null || this.description == null) {
+                        this.title = task.title();
+                        this.description = task.description();
+                        addTaskTitle.setText(title);
+                        addTaskDescription.setText(description);
+                    }
                 }
             });
         }
@@ -109,6 +115,22 @@ public class AddOrEditTaskCoordinator
                 backstack.setHistory(HistoryBuilder.from(backstack.getHistory()).removeUntil(TasksKey.create()).build(),
                         StateChange.Direction.BACKWARD);
             }
+        }
+    }
+
+    @Override
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putString("title", title);
+        bundle.putString("description", description);
+        return bundle;
+    }
+
+    @Override
+    public void fromBundle(@Nullable Bundle bundle) {
+        if(bundle != null) {
+            title = bundle.getString("title");
+            description = bundle.getString("description");
         }
     }
 }
