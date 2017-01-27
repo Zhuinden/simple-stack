@@ -4,7 +4,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -14,17 +13,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.jakewharton.rxrelay.BehaviorRelay;
-import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
-import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
+
+import org.javatuples.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +31,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -54,11 +47,14 @@ public class TasksCoordinator
     }
 
     @Inject
-    Backstack backstack;
+    TasksPresenter tasksPresenter;
+
+    @Inject
+    Resources resources;
 
     @OnClick(R.id.noTasksAdd)
     public void openAddNewTask() {
-        backstack.goTo(AddOrEditTaskKey.create(getKey()));
+        tasksPresenter.openAddNewTask();
     }
 
     @BindView(R.id.noTasks)
@@ -82,51 +78,24 @@ public class TasksCoordinator
     @BindView(R.id.tasks_list)
     RecyclerView listView;
 
-    @Inject
-    TaskRepository taskRepository;
-
-    @Inject
-    MessageQueue messageQueue;
-
-    @Inject
-    Resources resources;
-
     TasksAdapter tasksAdapter;
-
-    BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.create(TasksFilterType.ALL_TASKS);
-
-    Subscription subscription;
 
     TasksAdapter.TaskItemListener taskItemListener = new TasksAdapter.TaskItemListener() {
         @Override
         public void openTask(Task task) {
-            openTaskDetails(task);
+            tasksPresenter.openTaskDetails(task);
         }
 
         @Override
         public void completeTask(Task task) {
-            TasksCoordinator.this.completeTask(task);
+            tasksPresenter.completeTask(task);
         }
 
         @Override
         public void uncompleteTask(Task task) {
-            TasksCoordinator.this.uncompleteTask(task);
+            tasksPresenter.uncompleteTask(task);
         }
     };
-
-    private void uncompleteTask(Task task) {
-        taskRepository.insertTask(task.toBuilder().setCompleted(false).build());
-        showTaskMarkedActive();
-    }
-
-    private void completeTask(Task task) {
-        taskRepository.insertTask(task.toBuilder().setCompleted(true).build());
-        showTaskMarkedComplete();
-    }
-
-    private void openTaskDetails(Task clickedTask) {
-        backstack.goTo(TaskDetailKey.create(clickedTask.id()));
-    }
 
     @Override
     protected Unbinder bindViews(View view) {
@@ -138,32 +107,12 @@ public class TasksCoordinator
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-        subscription = filterType.asObservable() //
-                .doOnNext(tasksFilterType -> filterLabel.setText(tasksFilterType.getFilterText())) //
-                .switchMap((tasksFilterType -> tasksFilterType.filterTask(taskRepository))) //
-                .observeOn(Schedulers.computation())
-                .map(tasks -> Pair.create(DiffUtil.calculateDiff(new TaskDiffCallback(tasksAdapter.getData(), tasks)), tasks))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pairOfDiffResultAndTasks -> {
-            if(tasksAdapter != null) {
-                DiffUtil.DiffResult diffResult = pairOfDiffResultAndTasks.first;
-                List<Task> tasks = pairOfDiffResultAndTasks.second;
-                tasksAdapter.setData(tasks);
-                diffResult.dispatchUpdatesTo(tasksAdapter);
-                if(tasks.isEmpty()) {
-                    filterType.getValue().showEmptyViews(this);
-                } else {
-                    hideEmptyViews();
-                }
-            }
-        });
-
-        messageQueue.requestMessages(getKey(), this);
+        tasksPresenter.attach(this);
     }
 
-    public void hideEmptyViews() {
-        mTasksView.setVisibility(View.VISIBLE);
-        mNoTasksView.setVisibility(View.GONE);
+    @Override
+    public void detachView(TasksView view) {
+        tasksPresenter.detach(this);
     }
 
     @Override
@@ -173,9 +122,27 @@ public class TasksCoordinator
         }
     }
 
-    @Override
-    public void detachView(TasksView view) {
-        subscription.unsubscribe();
+    public Pair<DiffUtil.DiffResult, List<Task>> calculateDiff(List<Task> tasks) {
+        return Pair.with(DiffUtil.calculateDiff(new TaskDiffCallback(tasksAdapter.getData(), tasks)), tasks);
+    }
+
+    public void hideEmptyViews() {
+        mTasksView.setVisibility(View.VISIBLE);
+        mNoTasksView.setVisibility(View.GONE);
+    }
+
+    public void showTasks(Pair<DiffUtil.DiffResult, List<Task>> pairOfDiffResultAndTasks, TasksFilterType filterType) {
+        if(tasksAdapter != null) {
+            DiffUtil.DiffResult diffResult = pairOfDiffResultAndTasks.getValue0();
+            List<Task> tasks = pairOfDiffResultAndTasks.getValue1();
+            tasksAdapter.setData(tasks);
+            diffResult.dispatchUpdatesTo(tasksAdapter);
+            if(tasks.isEmpty()) {
+                filterType.showEmptyViews(this);
+            } else {
+                hideEmptyViews();
+            }
+        }
     }
 
     public void showFilteringPopupMenu() {
@@ -185,13 +152,13 @@ public class TasksCoordinator
         popup.setOnMenuItemClickListener(item -> {
             switch(item.getItemId()) {
                 case R.id.active:
-                    setFiltering(TasksFilterType.ACTIVE_TASKS);
+                    tasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
                     break;
                 case R.id.completed:
-                    setFiltering(TasksFilterType.COMPLETED_TASKS);
+                    tasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
                     break;
                 default:
-                    setFiltering(TasksFilterType.ALL_TASKS);
+                    tasksPresenter.setFiltering(TasksFilterType.ALL_TASKS);
                     break;
             }
             //loadTasks(false); // reactive data source ftw
@@ -201,13 +168,8 @@ public class TasksCoordinator
         popup.show();
     }
 
-    private void setFiltering(TasksFilterType filterType) {
-        this.filterType.call(filterType);
-    }
-
     public void clearCompletedTasks() {
-        taskRepository.deleteCompletedTasks();
-        showCompletedTasksCleared();
+        tasksPresenter.deleteCompletedTasks();
     }
 
     public void refresh() {
@@ -263,17 +225,19 @@ public class TasksCoordinator
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
+    public void setFilterLabelText(int filterText) {
+        filterLabel.setText(filterText);
+    }
+
     @Override
     public Bundle toBundle() {
-        Bundle bundle = new Bundle();
-        bundle.putString("FILTERING", filterType.getValue().name());
-        return bundle;
+        return tasksPresenter.toBundle();
     }
 
     @Override
     public void fromBundle(@Nullable Bundle bundle) {
         if(bundle != null) {
-            filterType.call(TasksFilterType.valueOf(bundle.getString("FILTERING")));
+            tasksPresenter.fromBundle(bundle);
         }
     }
 }
