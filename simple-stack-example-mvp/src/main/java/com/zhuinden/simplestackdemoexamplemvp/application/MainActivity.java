@@ -23,7 +23,7 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstKey;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 
 import javax.inject.Inject;
@@ -80,7 +80,7 @@ public class MainActivity
         backstackDelegate = new BackstackDelegate(null /* delayed init */);
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
-                HistoryBuilder.single(FirstKey.create()));
+                HistoryBuilder.single(TasksKey.create()));
 
         backstackHolder.setBackstack(backstackDelegate.getBackstack());
 
