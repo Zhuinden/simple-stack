@@ -95,7 +95,7 @@ public class AddOrEditTaskCoordinator
         unbinder.unbind();
     }
 
-    public void fabClicked() {
+    public void saveTask() {
         if((title != null && !"".equals(title)) && (description != null && !"".equals(description))) {
             taskRepository.insertTask(task == null ? Task.createNewActiveTask(title, description) : task.toBuilder()
                     .setTitle(title)

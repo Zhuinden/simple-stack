@@ -58,7 +58,7 @@ public abstract class AddOrEditTaskKey
     public View.OnClickListener fabClickListener(View view) {
         return v -> {
             AddOrEditTaskCoordinator addOrEditTaskCoordinator = Coordinators.getCoordinator(view);
-            addOrEditTaskCoordinator.fabClicked();
+            addOrEditTaskCoordinator.saveTask();
         };
     }
 
