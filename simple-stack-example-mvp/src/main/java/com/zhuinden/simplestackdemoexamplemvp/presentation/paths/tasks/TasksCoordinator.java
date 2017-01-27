@@ -243,7 +243,7 @@ public class TasksCoordinator
     }
 
     public void clearCompleteds() {
-        // TODO
+        taskRepository.deleteCompletedTasks();
         showCompletedTasksCleared();
     }
 

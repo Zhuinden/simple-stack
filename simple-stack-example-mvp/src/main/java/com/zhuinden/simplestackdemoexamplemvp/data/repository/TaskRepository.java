@@ -177,4 +177,18 @@ public class TaskRepository {
             }
         }).subscribeOn(writeScheduler.getScheduler()).subscribe();
     }
+
+    @SuppressWarnings("NewApi")
+    public void deleteCompletedTasks() {
+        Single.create((Single.OnSubscribe<Void>) singleSubscriber -> {
+            try(Realm r = Realm.getDefaultInstance()) {
+                r.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.where(DbTask.class).equalTo(DbTaskFields.COMPLETED, true).findAll().deleteAllFromRealm();
+                    }
+                });
+            }
+        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+    }
 }
