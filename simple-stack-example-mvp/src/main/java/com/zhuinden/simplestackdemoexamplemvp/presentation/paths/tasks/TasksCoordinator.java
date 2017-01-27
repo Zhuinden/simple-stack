@@ -107,12 +107,12 @@ public class TasksCoordinator
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-        tasksPresenter.attach(this);
+        tasksPresenter.attachCoordinator(this);
     }
 
     @Override
     public void detachView(TasksView view) {
-        tasksPresenter.detach(this);
+        tasksPresenter.detachCoordinator(this);
     }
 
     @Override

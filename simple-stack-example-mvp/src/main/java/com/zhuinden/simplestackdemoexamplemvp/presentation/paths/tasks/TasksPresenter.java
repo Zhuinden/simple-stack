@@ -11,6 +11,7 @@ import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailKey;
+import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
 
 import javax.inject.Inject;
@@ -24,6 +25,7 @@ import rx.schedulers.Schedulers;
  */
 // UNSCOPED!
 public class TasksPresenter
+        extends BasePresenter<TasksCoordinator>
         implements Bundleable {
     @Inject
     public TasksPresenter() {
@@ -45,10 +47,8 @@ public class TasksPresenter
 
     Subscription subscription;
 
-    TasksCoordinator tasksCoordinator;
-
-    public void attach(TasksCoordinator tasksCoordinator) {
-        this.tasksCoordinator = tasksCoordinator;
+    @Override
+    public void onAttach(TasksCoordinator tasksCoordinator) {
         subscription = filterType.asObservable() //
                 .doOnNext(tasksFilterType -> tasksCoordinator.setFilterLabelText(tasksFilterType.getFilterText())) //
                 .switchMap((tasksFilterType -> tasksFilterType.filterTask(taskRepository))) //
@@ -64,13 +64,13 @@ public class TasksPresenter
         messageQueue.requestMessages(tasksCoordinator.getKey(), tasksCoordinator);
     }
 
-    public void detach(TasksCoordinator tasksCoordinator) {
+    @Override
+    public void onDetach(TasksCoordinator coordinator) {
         subscription.unsubscribe();
-        this.tasksCoordinator = null;
     }
 
     public void openAddNewTask() {
-        backstack.goTo(AddOrEditTaskKey.create(tasksCoordinator.getKey()));
+        backstack.goTo(AddOrEditTaskKey.create(getCoordinator().getKey()));
     }
 
     public void openTaskDetails(Task task) {
@@ -79,17 +79,17 @@ public class TasksPresenter
 
     public void completeTask(Task task) {
         taskRepository.insertTask(task.toBuilder().setCompleted(true).build());
-        tasksCoordinator.showTaskMarkedComplete();
+        getCoordinator().showTaskMarkedComplete();
     }
 
     public void uncompleteTask(Task task) {
         taskRepository.insertTask(task.toBuilder().setCompleted(false).build());
-        tasksCoordinator.showTaskMarkedActive();
+        getCoordinator().showTaskMarkedActive();
     }
 
     public void deleteCompletedTasks() {
         taskRepository.deleteCompletedTasks();
-        tasksCoordinator.showCompletedTasksCleared();
+        getCoordinator().showCompletedTasksCleared();
     }
 
     public void setFiltering(TasksFilterType filterType) {
