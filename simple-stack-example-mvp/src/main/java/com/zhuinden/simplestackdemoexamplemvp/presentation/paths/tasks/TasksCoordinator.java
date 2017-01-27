@@ -176,44 +176,12 @@ public class TasksCoordinator
         }
     }
 
-    static class TaskDiffCallback
-            extends DiffUtil.Callback {
-        private List<Task> oldTasks;
-        private List<Task> newTasks;
-
-        public TaskDiffCallback(List<Task> oldTasks, List<Task> newTasks) {
-            this.oldTasks = oldTasks;
-            this.newTasks = newTasks;
-        }
-
-        @Override
-        public int getOldListSize() {
-            return oldTasks == null ? 0 : oldTasks.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newTasks.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return newTasks.get(newItemPosition).id().equals(oldTasks.get(oldItemPosition).id());
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            return newTasks.get(newItemPosition).equals(oldTasks.get(oldItemPosition));
-        }
-    }
-
     @Override
     public void detachView(TasksView view) {
         subscription.unsubscribe();
         unbinder.unbind();
         tasksView = null;
     }
-
 
     public void showFilteringPopupMenu() {
         PopupMenu popup = new PopupMenu(tasksView.getContext(), MainActivity.get(tasksView.getContext()).findViewById(R.id.menu_filter));
@@ -242,13 +210,13 @@ public class TasksCoordinator
         this.filterType.call(filterType);
     }
 
-    public void clearCompleteds() {
+    public void clearCompletedTasks() {
         taskRepository.deleteCompletedTasks();
         showCompletedTasksCleared();
     }
 
     public void refresh() {
-        // TODO
+        tasksView.setRefreshing(true);
     }
 
     public void showNoActiveTasks() {

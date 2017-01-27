@@ -47,7 +47,7 @@ public class MainActivity
 
     public static MainActivity get(Context context) {
         // noinspection ResourceType
-        return (MainActivity)context.getSystemService(TAG);
+        return (MainActivity) context.getSystemService(TAG);
     }
 
     @Override
@@ -67,20 +67,21 @@ public class MainActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        mainView.onCreate();
-
+        CustomApplication.get(this).initialize();
         CustomApplication.get(this).getComponent().inject(this);
         databaseManager.init(this);
 
-        MainScopeListener mainScopeListener = (MainScopeListener)getSupportFragmentManager().findFragmentByTag("MAIN_SCOPE_LISTENER");
+        super.onCreate(savedInstanceState);
+
+        MainScopeListener mainScopeListener = (MainScopeListener) getSupportFragmentManager().findFragmentByTag("MAIN_SCOPE_LISTENER");
         if(mainScopeListener == null) {
             mainScopeListener = new MainScopeListener();
             getSupportFragmentManager().beginTransaction().add(mainScopeListener, "MAIN_SCOPE_LISTENER").commit();
         }
-        CustomApplication.get(this).getComponent().inject(mainScopeListener);
+
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        mainView.onCreate();
 
         Coordinators.installBinder(root, new CoordinatorProvider() {
             @Nullable

@@ -80,7 +80,6 @@ public class MainView
         }
     }
 
-
     private final NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) item -> {
         switch(item.getItemId()) {
             case R.id.list_navigation_menu_item:
@@ -96,7 +95,6 @@ public class MainView
         drawerLayout.closeDrawers();
         return true;
     };
-
 
     public MainView(Context context) {
         super(context);
@@ -166,8 +164,6 @@ public class MainView
                 Backstack.get(getContext()).goBack();
             }
         });
-        //actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setHomeButtonEnabled(true);
     }

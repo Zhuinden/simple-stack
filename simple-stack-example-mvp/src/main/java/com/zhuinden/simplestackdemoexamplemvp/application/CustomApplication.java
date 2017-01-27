@@ -13,10 +13,13 @@ import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonCom
 public class CustomApplication extends Application {
     SingletonComponent singletonComponent;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        singletonComponent = DaggerSingletonComponent.create();
+    private static CustomApplication INSTANCE;
+
+    public void initialize() {
+        if(INSTANCE == null) {
+            INSTANCE = this;
+            singletonComponent = DaggerSingletonComponent.create();
+        }
     }
 
     public static CustomApplication get(Context context) {
@@ -25,5 +28,9 @@ public class CustomApplication extends Application {
 
     public SingletonComponent getComponent() {
         return singletonComponent;
+    }
+
+    public static CustomApplication get() {
+        return INSTANCE;
     }
 }

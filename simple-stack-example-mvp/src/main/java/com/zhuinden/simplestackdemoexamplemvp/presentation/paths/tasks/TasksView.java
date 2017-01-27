@@ -42,7 +42,7 @@ public class TasksView
                 tasksCoordinator.showFilteringPopupMenu();
                 return true;
             case R.id.menu_clear:
-                tasksCoordinator.clearCompleteds();
+                tasksCoordinator.clearCompletedTasks();
                 return true;
             case R.id.menu_refresh:
                 tasksCoordinator.refresh();

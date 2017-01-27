@@ -29,6 +29,7 @@ public class MainScopeListener extends Fragment {
 
     public MainScopeListener() {
         setRetainInstance(true);
+        CustomApplication.get().getComponent().inject(this);
     }
 
     @Override
