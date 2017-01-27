@@ -1,13 +1,20 @@
 package com.zhuinden.simplestackdemoexamplemvp.data.manager;
 
 import android.content.Context;
-import android.util.Log;
+
+import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.subscriptions.Subscriptions;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -18,10 +25,11 @@ public class DatabaseManager {
     public DatabaseManager() {
     }
 
-    private static final String TAG = "DatabaseManager";
+    @Inject
+    @Named("LOOPER_SCHEDULER")
+    SchedulerHolder looperScheduler;
 
-    ThreadLocal<Realm> realms = new ThreadLocal<>();
-    ThreadLocal<Integer> instanceCount = new ThreadLocal<>();
+    private static final String TAG = "DatabaseManager";
 
     public void init(Context context) {
         Realm.init(context);
@@ -29,48 +37,32 @@ public class DatabaseManager {
         Realm.setDefaultConfiguration(realmConfiguration);
     }
 
-    public Realm openDatabase() {
-        Realm realm = realms.get();
-        if(realm == null) {
-            realm = Realm.getDefaultInstance();
-            realms.set(realm);
-            instanceCount.set(1);
-            Log.i(TAG, "Opening Realm with instance count [" + instanceCount.get() + "]");
-        } else {
-            Integer count = instanceCount.get();
-            count = ++count;
-            instanceCount.set(count);
-            Log.i(TAG, "Incrementing Realm instance count to [" + count + "]");
-        }
-        return realm;
-    }
+    Subscription subscription;
 
-    public Realm getDatabase() {
-        Realm realm = realms.get();
-        if(realm == null) {
-            throw new IllegalStateException("Realm was not opened on this thread!");
-        }
-        Log.i(TAG, "Getting Realm with instance count [" + instanceCount.get() + "]");
-        return realm;
+    public void openDatabase() {
+        subscription = Observable.create(new Observable.OnSubscribe<Realm>() {
+            @Override
+            public void call(final Subscriber<? super Realm> subscriber) {
+                final Realm observableRealm = Realm.getDefaultInstance();
+                final RealmChangeListener<Realm> listener = realm -> {
+                    if(!subscriber.isUnsubscribed()) {
+                        subscriber.onNext(observableRealm);
+                    }
+                };
+                observableRealm.addChangeListener(listener);
+                subscriber.add(Subscriptions.create(() -> {
+                    observableRealm.removeChangeListener(listener);
+                    observableRealm.close();
+                }));
+                subscriber.onNext(observableRealm);
+            }
+        }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler()).subscribe();
     }
 
     public void closeDatabase() {
-        Realm realm = realms.get();
-        if(realm == null) {
-            throw new IllegalStateException("There is no open Realm on this thread!");
-        }
-        Integer count = instanceCount.get();
-        if(count == null) {
-            throw new IllegalStateException("Instance count should exist but doesn't!");
-        }
-        count = --count;
-        if(count <= 0) {
-            if(!realm.isClosed()) {
-                realm.close();
-            }
-            realms.remove();
-            instanceCount.remove();
-            Log.i(TAG, "Closing Realm.");
+        if(subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+            subscription = null;
         }
     }
 }

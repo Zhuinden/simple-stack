@@ -2,7 +2,6 @@ package com.zhuinden.simplestackdemoexamplemvp.data.repository;
 
 import com.zhuinden.simplestackdemoexamplemvp.data.entity.DbTask;
 import com.zhuinden.simplestackdemoexamplemvp.data.entity.DbTaskFields;
-import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.mapper.TaskMapper;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder;
@@ -31,9 +30,6 @@ import rx.subscriptions.Subscriptions;
 @Singleton
 public class TaskRepository {
     @Inject
-    DatabaseManager databaseManager;
-
-    @Inject
     TaskMapper taskMapper;
 
     @Inject
@@ -60,7 +56,7 @@ public class TaskRepository {
 
             @Override
             public void call(final Subscriber<? super List<Task>> subscriber) {
-                Realm realm = databaseManager.openDatabase();
+                Realm realm = Realm.getDefaultInstance();
                 final RealmResults<DbTask> dbTasks = realm.where(DbTask.class).findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
                 final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
                     if(!subscriber.isUnsubscribed()) {
@@ -74,7 +70,7 @@ public class TaskRepository {
                     if(dbTasks.isValid()) {
                         dbTasks.removeChangeListener(realmChangeListener);
                     }
-                    databaseManager.closeDatabase();
+                    realm.close();
                 }));
                 dbTasks.addChangeListener(realmChangeListener);
                 subscriber.onNext(mapFrom(dbTasks));
@@ -94,7 +90,7 @@ public class TaskRepository {
 
             @Override
             public void call(final Subscriber<? super List<Task>> subscriber) {
-                Realm realm = databaseManager.openDatabase();
+                Realm realm = Realm.getDefaultInstance();
                 final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
                         .equalTo(DbTaskFields.COMPLETED, true)
                         .findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
@@ -110,7 +106,7 @@ public class TaskRepository {
                     if(dbTasks.isValid()) {
                         dbTasks.removeChangeListener(realmChangeListener);
                     }
-                    databaseManager.closeDatabase();
+                    realm.close();
                 }));
                 dbTasks.addChangeListener(realmChangeListener);
                 subscriber.onNext(mapFrom(dbTasks));
@@ -130,7 +126,7 @@ public class TaskRepository {
 
             @Override
             public void call(final Subscriber<? super List<Task>> subscriber) {
-                Realm realm = databaseManager.openDatabase();
+                Realm realm = Realm.getDefaultInstance();
                 final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
                         .equalTo(DbTaskFields.COMPLETED, false)
                         .findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
@@ -146,7 +142,7 @@ public class TaskRepository {
                     if(dbTasks.isValid()) {
                         dbTasks.removeChangeListener(realmChangeListener);
                     }
-                    databaseManager.closeDatabase();
+                    realm.close();
                 }));
                 dbTasks.addChangeListener(realmChangeListener);
                 subscriber.onNext(mapFrom(dbTasks));

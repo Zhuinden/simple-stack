@@ -1,6 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.application;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -46,7 +47,9 @@ public class MainScopeListener extends Fragment {
     @Override
     public void onDestroy() {
         databaseManager.closeDatabase();
-        handlerThread.quit();
+        new Handler().postDelayed(() -> {
+            handlerThread.quit();
+        }, 300);
         super.onDestroy();
     }
 }
