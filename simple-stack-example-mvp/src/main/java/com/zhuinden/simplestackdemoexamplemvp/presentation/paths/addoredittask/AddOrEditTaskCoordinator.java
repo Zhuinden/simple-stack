@@ -3,6 +3,7 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.view.View;
 import android.widget.EditText;
 
 import com.zhuinden.simplestack.Backstack;
@@ -46,6 +47,7 @@ public class AddOrEditTaskCoordinator
     public AddOrEditTaskCoordinator() {
     }
 
+    @Inject
     Backstack backstack;
 
     @OnTextChanged(R.id.add_task_title)
@@ -64,8 +66,6 @@ public class AddOrEditTaskCoordinator
     @BindView(R.id.add_task_description)
     EditText addTaskDescription;
 
-    Unbinder unbinder;
-
     AddOrEditTaskView addOrEditTaskView;
 
     AddOrEditTaskKey addOrEditTaskKey;
@@ -75,10 +75,13 @@ public class AddOrEditTaskCoordinator
     Task task;
 
     @Override
+    protected Unbinder bindViews(View view) {
+        return ButterKnife.bind(this, view);
+    }
+
+    @Override
     public void attachView(AddOrEditTaskView view) {
         this.addOrEditTaskView = view;
-        unbinder = ButterKnife.bind(this, view);
-        backstack = Backstack.get(view.getContext());
         addOrEditTaskKey = Backstack.getKey(view.getContext());
         taskId = addOrEditTaskKey.taskId();
         if(!"".equals(taskId)) {
@@ -98,7 +101,6 @@ public class AddOrEditTaskCoordinator
 
     @Override
     public void detachView(AddOrEditTaskView view) {
-        unbinder.unbind();
     }
 
     public void saveTask() {

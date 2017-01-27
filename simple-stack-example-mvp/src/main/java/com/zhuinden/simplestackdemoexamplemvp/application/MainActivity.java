@@ -24,6 +24,7 @@ import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstKey;
+import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 
 import javax.inject.Inject;
 
@@ -65,6 +66,9 @@ public class MainActivity
     @Inject
     DatabaseManager databaseManager;
 
+    @Inject
+    BackstackHolder backstackHolder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         CustomApplication.get(this).initialize();
@@ -72,6 +76,13 @@ public class MainActivity
         databaseManager.init(this);
 
         super.onCreate(savedInstanceState);
+
+        backstackDelegate = new BackstackDelegate(null /* delayed init */);
+        backstackDelegate.onCreate(savedInstanceState, //
+                getLastCustomNonConfigurationInstance(), //
+                HistoryBuilder.single(FirstKey.create()));
+
+        backstackHolder.setBackstack(backstackDelegate.getBackstack());
 
         MainScopeListener mainScopeListener = (MainScopeListener) getSupportFragmentManager().findFragmentByTag("MAIN_SCOPE_LISTENER");
         if(mainScopeListener == null) {
@@ -97,10 +108,7 @@ public class MainActivity
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        backstackDelegate = new BackstackDelegate(this);
-        backstackDelegate.onCreate(savedInstanceState, //
-                getLastCustomNonConfigurationInstance(), //
-                HistoryBuilder.single(FirstKey.create()));
+        backstackDelegate.setStateChanger(this);
         mainView.onPostCreate();
     }
 

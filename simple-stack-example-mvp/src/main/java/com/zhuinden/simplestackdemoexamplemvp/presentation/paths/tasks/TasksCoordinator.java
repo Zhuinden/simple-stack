@@ -53,6 +53,7 @@ public class TasksCoordinator
     public TasksCoordinator() {
     }
 
+    @Inject
     Backstack backstack;
 
     @OnClick(R.id.noTasksAdd)
@@ -95,8 +96,6 @@ public class TasksCoordinator
 
     Subscription subscription;
 
-    Unbinder unbinder;
-
     TasksAdapter.TaskItemListener taskItemListener = new TasksAdapter.TaskItemListener() {
         @Override
         public void openTask(Task task) {
@@ -129,10 +128,13 @@ public class TasksCoordinator
     }
 
     @Override
+    protected Unbinder bindViews(View view) {
+        return ButterKnife.bind(this, view);
+    }
+
+    @Override
     public void attachView(TasksView view) {
-        backstack = Backstack.get(view.getContext());
         tasksView = view;
-        unbinder = ButterKnife.bind(this, view);
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
@@ -179,7 +181,6 @@ public class TasksCoordinator
     @Override
     public void detachView(TasksView view) {
         subscription.unsubscribe();
-        unbinder.unbind();
         tasksView = null;
     }
 

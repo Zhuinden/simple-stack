@@ -35,6 +35,7 @@ public class TaskDetailCoordinator
     public TaskDetailCoordinator() {
     }
 
+    @Inject
     Backstack backstack;
 
     TaskDetailView taskDetailView;
@@ -43,20 +44,20 @@ public class TaskDetailCoordinator
 
     String taskId;
 
-    Unbinder unbinder;
+    @Override
+    protected Unbinder bindViews(View view) {
+        return ButterKnife.bind(this, view);
+    }
 
     @Override
     public void attachView(TaskDetailView view) {
         this.taskDetailView = view;
-        unbinder = ButterKnife.bind(this, view);
         taskDetailKey = Backstack.getKey(view.getContext());
         this.taskId = taskDetailKey.taskId();
-        this.backstack = Backstack.get(view.getContext());
     }
 
     @Override
     public void detachView(TaskDetailView view) {
-        unbinder.unbind();
         this.taskDetailView = null;
     }
 

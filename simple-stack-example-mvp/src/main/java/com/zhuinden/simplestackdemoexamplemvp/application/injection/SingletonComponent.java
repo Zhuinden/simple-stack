@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplemvp.application.injection;
 
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainScopeListener;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
@@ -11,6 +12,7 @@ import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.Stat
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksView;
+import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder;
 
 import javax.inject.Named;
@@ -23,7 +25,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {SchedulerModule.class})
+@Component(modules = {SchedulerModule.class, NavigationModule.class})
 public interface SingletonComponent {
     TaskMapper taskMapper();
     DatabaseManager databaseManager();
@@ -33,6 +35,10 @@ public interface SingletonComponent {
 
     @Named("WRITE_SCHEDULER")
     SchedulerHolder writeScheduler();
+
+    BackstackHolder backstackHolder();
+
+    Backstack backstack();
 
     AddOrEditTaskCoordinator addOrEditTaskCoordinator();
 

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 
 import com.zhuinden.simplestack.Backstack;
@@ -50,12 +51,17 @@ public class SecondCoordinator
 
     Unbinder unbinder;
 
+    @Inject
     Backstack backstack;
+
+    @Override
+    protected Unbinder bindViews(View view) {
+        return ButterKnife.bind(this, view);
+    }
 
     @Override
     public void attachView(SecondView view) {
         Log.i(TAG, "Attached [" + view + "]");
-        backstack = Backstack.get(view.getContext());
         unbinder = ButterKnife.bind(this, view);
     }
 

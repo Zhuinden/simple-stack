@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack 0.6.1 (2017-01-27)
+---------------------------------
+- It is now allowed to initialize `BackstackDelegate` without a `StateChanger`, in which case `setStateChanger()` must be called before `onPostResume()`.`
+This way it is possible to postpone the initialization state change of the `Backstack`.
+
 -Simple Stack 0.6.0 (2017-01-23)
 ---------------------------------
 - **Simple Stack is now a library!**

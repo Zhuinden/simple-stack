@@ -28,25 +28,31 @@ public class FirstCoordinator
     public FirstCoordinator() {
     }
 
+    @Inject
+    Backstack backstack;
+
     private static final String TAG = "FirstCoordinator";
 
     Unbinder unbinder;
 
     @OnClick(R.id.first_button)
     public void clickButton(View view) {
-        Backstack.get(view.getContext()).goTo(SecondKey.create());
+        backstack.goTo(SecondKey.create());
+    }
+
+    @Override
+    protected Unbinder bindViews(View view) {
+        return ButterKnife.bind(this, view);
     }
 
     @Override
     public void attachView(FirstView view) {
         Log.i(TAG, "Attached [" + view + "]");
-        unbinder = ButterKnife.bind(this, view);
     }
 
     @Override
     public void detachView(FirstView view) {
         Log.i(TAG, "Detached [" + view + "]");
-        unbinder.unbind();
     }
 
     @Override

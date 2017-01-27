@@ -23,9 +23,6 @@ public class BackstackDelegate {
     StateChanger stateChanger;
     
     public BackstackDelegate(StateChanger stateChanger) {
-        if(stateChanger == null) {
-            throw new IllegalArgumentException("State changer cannot be null!");
-        }
         this.stateChanger = stateChanger;
     }
 
@@ -53,9 +50,23 @@ public class BackstackDelegate {
         } else {
             backstack = new Backstack(keys);
         }
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        initializeBackstack(stateChanger);
     }
-    
+
+    public void setStateChanger(StateChanger stateChanger) {
+        if(backstack.hasStateChanger()) {
+            backstack.removeStateChanger();
+        }
+        this.stateChanger = stateChanger;
+        initializeBackstack(stateChanger);
+    }
+
+    private void initializeBackstack(StateChanger stateChanger) {
+        if(stateChanger != null) {
+            backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        }
+    }
+
     public NonConfigurationInstance onRetainCustomNonConfigurationInstance() {
         return new NonConfigurationInstance(backstack);
     }
@@ -70,6 +81,9 @@ public class BackstackDelegate {
     }
     
     public void onPostResume() {
+        if(stateChanger == null) {
+            throw new IllegalStateException("State changer is still not set in `onPostResume`!");
+        }
         if(!backstack.hasStateChanger()) {
             backstack.setStateChanger(stateChanger, Backstack.REATTACH);
         }
