@@ -6,9 +6,11 @@ import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.mapper.TaskMapper;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder;
+import com.zhuinden.simplestackdemoexamplemvp.util.optional.Optional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -190,5 +192,23 @@ public class TaskRepository {
                 });
             }
         }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+    }
+
+    @SuppressWarnings("NewApi")
+    public Single<Optional<Task>> findTask(String taskId) {
+        return Single.fromCallable(new Callable<Optional<Task>>() {
+            @Override
+            public Optional<Task> call()
+                    throws Exception {
+                try(Realm realm = Realm.getDefaultInstance()) {
+                    RealmResults<DbTask> tasks = realm.where(DbTask.class).equalTo(DbTaskFields.ID, taskId).findAll();
+                    if(tasks.size() > 0) {
+                        return Optional.of(taskMapper.fromRealm(tasks.get(0)));
+                    } else {
+                        return Optional.absent();
+                    }
+                }
+            }
+        }).subscribeOn(looperScheduler.getScheduler());
     }
 }

@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
+import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
@@ -33,7 +34,7 @@ public abstract class TaskDetailKey
 
     @Override
     public boolean isFabVisible() {
-        return false;
+        return true;
     }
 
     @Override
@@ -49,11 +50,13 @@ public abstract class TaskDetailKey
     @Override
     public View.OnClickListener fabClickListener(View view) {
         return v -> {
+            TaskDetailCoordinator coordinator = Coordinators.getCoordinator(view);
+            coordinator.editTask();
         };
     }
 
     @Override
     public int fabDrawableIcon() {
-        return 0;
+        return R.drawable.ic_edit;
     }
 }
