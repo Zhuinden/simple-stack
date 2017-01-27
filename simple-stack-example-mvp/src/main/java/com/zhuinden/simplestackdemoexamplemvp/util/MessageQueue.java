@@ -22,8 +22,6 @@ public class MessageQueue {
     }
 
     public interface Receiver {
-        public Key getKey();
-
         public void receiveMessage(Object message);
     }
 
@@ -38,8 +36,8 @@ public class MessageQueue {
         messageQueue.add(message);
     }
 
-    public void requestMessages(Receiver receiver) {
-        Queue<Object> messageQueue = messages.get(receiver.getKey());
+    public void requestMessages(Key receiverKey, Receiver receiver) {
+        Queue<Object> messageQueue = messages.get(receiverKey);
         if(messageQueue != null) {
             Iterator<Object> messages = messageQueue.iterator();
             while(messages.hasNext()) {

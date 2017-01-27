@@ -49,7 +49,7 @@ public class TaskDetailCoordinator
 
     @Override
     public void attachView(TaskDetailView view) {
-        taskDetailKey = Backstack.getKey(view.getContext());
+        taskDetailKey = getKey();
         this.taskId = taskDetailKey.taskId();
     }
 
@@ -66,7 +66,7 @@ public class TaskDetailCoordinator
     }
 
     private void showEditTask(String taskId) {
-        backstack.goTo(AddOrEditTaskKey.createWithTaskId(Backstack.getKey(getView().getContext()), taskId));
+        backstack.goTo(AddOrEditTaskKey.createWithTaskId(getKey(), taskId));
     }
 
     public void showTitle(@NonNull String title) {

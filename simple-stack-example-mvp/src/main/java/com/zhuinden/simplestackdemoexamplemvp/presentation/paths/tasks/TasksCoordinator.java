@@ -18,7 +18,6 @@ import com.jakewharton.rxrelay.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
-import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
@@ -59,7 +58,7 @@ public class TasksCoordinator
 
     @OnClick(R.id.noTasksAdd)
     public void openAddNewTask() {
-        backstack.goTo(AddOrEditTaskKey.create(Backstack.getKey(getView().getContext())));
+        backstack.goTo(AddOrEditTaskKey.create(getKey()));
     }
 
     @BindView(R.id.noTasks)
@@ -159,17 +158,12 @@ public class TasksCoordinator
             }
         });
 
-        messageQueue.requestMessages(this);
+        messageQueue.requestMessages(getKey(), this);
     }
 
     public void hideEmptyViews() {
         mTasksView.setVisibility(View.VISIBLE);
         mNoTasksView.setVisibility(View.GONE);
-    }
-
-    @Override
-    public Key getKey() {
-        return Backstack.getKey(getView().getContext());
     }
 
     @Override

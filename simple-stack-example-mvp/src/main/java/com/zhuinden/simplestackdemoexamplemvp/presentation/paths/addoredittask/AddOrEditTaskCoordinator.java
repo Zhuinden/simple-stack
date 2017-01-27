@@ -79,7 +79,7 @@ public class AddOrEditTaskCoordinator
 
     @Override
     public void attachView(AddOrEditTaskView view) {
-        addOrEditTaskKey = Backstack.getKey(view.getContext());
+        addOrEditTaskKey = getKey();
         taskId = addOrEditTaskKey.taskId();
         if(!"".equals(taskId)) {
             taskRepository.findTask(addOrEditTaskKey.taskId()).observeOn(AndroidSchedulers.mainThread()).subscribe(taskOptional -> {
@@ -106,7 +106,7 @@ public class AddOrEditTaskCoordinator
                     .setTitle(title)
                     .setDescription(description)
                     .build());
-            AddOrEditTaskKey addOrEditTaskKey = Backstack.getKey(getView().getContext());
+            AddOrEditTaskKey addOrEditTaskKey = getKey();
             if(addOrEditTaskKey.parent() instanceof TasksKey) {
                 messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksCoordinator.SavedSuccessfullyMessage());
                 backstack.goBack();

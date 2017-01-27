@@ -3,6 +3,8 @@ package com.zhuinden.simplestackdemoexamplemvp.util;
 import android.view.View;
 
 import com.squareup.coordinators.Coordinator;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 
 import butterknife.Unbinder;
 
@@ -40,5 +42,10 @@ public abstract class BaseCoordinator<V extends View>
 
     public V getView() {
         return view;
+    }
+
+    public <K extends Key> K getKey() {
+        // noinspection unchecked
+        return (K) Backstack.getKey(view.getContext());
     }
 }
