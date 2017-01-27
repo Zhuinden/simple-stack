@@ -15,7 +15,6 @@ import android.widget.RelativeLayout;
 import com.squareup.coordinators.Coordinator;
 import com.squareup.coordinators.CoordinatorProvider;
 import com.squareup.coordinators.Coordinators;
-import com.transitionseverywhere.TransitionManager;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
@@ -172,7 +171,7 @@ public class MainActivity
         }
         mainView.handleStateChange(stateChange, () -> {
         });
-        TransitionManager.beginDelayedTransition(root);
+
         Log.i(TAG, "Persisting view state of [" + root.getChildAt(0) + "]");
         backstackDelegate.persistViewToState(root.getChildAt(0));
         root.removeAllViews();
