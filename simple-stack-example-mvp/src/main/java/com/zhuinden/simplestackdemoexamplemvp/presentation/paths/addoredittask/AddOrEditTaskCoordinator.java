@@ -11,12 +11,12 @@ import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemoexamplemvp.R;
-import com.zhuinden.simplestackdemoexamplemvp.application.MessageQueue;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
+import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
 
 import javax.inject.Inject;
 

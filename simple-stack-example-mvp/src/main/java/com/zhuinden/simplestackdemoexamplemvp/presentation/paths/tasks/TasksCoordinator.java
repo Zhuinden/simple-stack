@@ -19,12 +19,12 @@ import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
-import com.zhuinden.simplestackdemoexamplemvp.application.MessageQueue;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
+import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
 
 import java.util.ArrayList;
 import java.util.List;

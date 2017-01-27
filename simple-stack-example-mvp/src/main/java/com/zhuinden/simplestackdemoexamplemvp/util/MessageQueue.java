@@ -1,4 +1,6 @@
-package com.zhuinden.simplestackdemoexamplemvp.application;
+package com.zhuinden.simplestackdemoexamplemvp.util;
+
+import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 
 import java.util.Iterator;
 import java.util.Map;
