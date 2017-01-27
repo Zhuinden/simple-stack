@@ -10,12 +10,12 @@ import java.util.List;
  * Created by Zhuinden on 2017.01.27..
  */
 
-class TaskDiffCallback
+class TasksDiffCallback
         extends DiffUtil.Callback {
     private List<Task> oldTasks;
     private List<Task> newTasks;
 
-    public TaskDiffCallback(List<Task> oldTasks, List<Task> newTasks) {
+    public TasksDiffCallback(List<Task> oldTasks, List<Task> newTasks) {
         this.oldTasks = oldTasks;
         this.newTasks = newTasks;
     }

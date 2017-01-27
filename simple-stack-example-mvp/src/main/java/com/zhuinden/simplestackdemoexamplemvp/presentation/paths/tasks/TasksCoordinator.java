@@ -133,7 +133,7 @@ public class TasksCoordinator
     }
 
     public Pair<DiffUtil.DiffResult, List<Task>> calculateDiff(List<Task> tasks) {
-        return Pair.with(DiffUtil.calculateDiff(new TaskDiffCallback(tasksAdapter.getData(), tasks)), tasks);
+        return Pair.with(DiffUtil.calculateDiff(new TasksDiffCallback(tasksAdapter.getData(), tasks)), tasks);
     }
 
     public void hideEmptyViews() {
