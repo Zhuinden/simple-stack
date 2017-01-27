@@ -119,10 +119,12 @@ public class TasksCoordinator
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        ((TasksView) getView()).setOnRefreshListener(this::refresh);
     }
 
     @Override
     public void detachView(View view) {
+        ((TasksView) getView()).setOnRefreshListener(null);
     }
 
     @Override
