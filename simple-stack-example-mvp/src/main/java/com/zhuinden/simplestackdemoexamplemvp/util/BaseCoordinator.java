@@ -14,11 +14,14 @@ public abstract class BaseCoordinator<V extends View>
         extends Coordinator {
     Unbinder unbinder;
 
+    V view;
+
     @Override
     protected final void attach(View view) {
-        // noinspection unchecked
         this.unbinder = bindViews(view);
-        attachView((V) view);
+        // noinspection unchecked
+        this.view = (V) view;
+        attachView(this.view);
     }
 
     protected abstract Unbinder bindViews(View view);
@@ -27,9 +30,15 @@ public abstract class BaseCoordinator<V extends View>
 
     @Override
     protected final void detach(View view) {
-        detachView((V) view);
+        detachView(this.view);
         unbinder.unbind();
+        unbinder = null;
+        this.view = null;
     }
 
     public abstract void detachView(V view);
+
+    public V getView() {
+        return view;
+    }
 }

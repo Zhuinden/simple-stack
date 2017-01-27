@@ -1,5 +1,8 @@
 package com.zhuinden.simplestackdemoexamplemvp.application.injection;
 
+import android.content.Context;
+import android.content.res.Resources;
+
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainScopeListener;
@@ -25,7 +28,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {SchedulerModule.class, NavigationModule.class})
+@Component(modules = {SchedulerModule.class, NavigationModule.class, AndroidModule.class})
 public interface SingletonComponent {
     TaskMapper taskMapper();
     DatabaseManager databaseManager();
@@ -39,6 +42,11 @@ public interface SingletonComponent {
     BackstackHolder backstackHolder();
 
     Backstack backstack();
+
+    @Named("applicationContext")
+    Context applicationContext();
+
+    Resources resources();
 
     AddOrEditTaskCoordinator addOrEditTaskCoordinator();
 

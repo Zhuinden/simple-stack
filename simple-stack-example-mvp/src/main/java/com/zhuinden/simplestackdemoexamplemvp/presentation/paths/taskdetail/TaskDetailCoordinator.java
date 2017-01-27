@@ -38,8 +38,6 @@ public class TaskDetailCoordinator
     @Inject
     Backstack backstack;
 
-    TaskDetailView taskDetailView;
-
     TaskDetailKey taskDetailKey;
 
     String taskId;
@@ -51,14 +49,12 @@ public class TaskDetailCoordinator
 
     @Override
     public void attachView(TaskDetailView view) {
-        this.taskDetailView = view;
         taskDetailKey = Backstack.getKey(view.getContext());
         this.taskId = taskDetailKey.taskId();
     }
 
     @Override
     public void detachView(TaskDetailView view) {
-        this.taskDetailView = null;
     }
 
     public void editTask() {
@@ -70,7 +66,7 @@ public class TaskDetailCoordinator
     }
 
     private void showEditTask(String taskId) {
-        backstack.goTo(AddOrEditTaskKey.createWithTaskId(Backstack.getKey(taskDetailView.getContext()), taskId));
+        backstack.goTo(AddOrEditTaskKey.createWithTaskId(Backstack.getKey(getView().getContext()), taskId));
     }
 
     public void showTitle(@NonNull String title) {
@@ -80,6 +76,6 @@ public class TaskDetailCoordinator
 
     public void showMissingTask() {
         mDetailTitle.setText("");
-        mDetailDescription.setText(taskDetailView.getContext().getString(R.string.no_data));
+        mDetailDescription.setText(getView().getContext().getString(R.string.no_data));
     }
 }

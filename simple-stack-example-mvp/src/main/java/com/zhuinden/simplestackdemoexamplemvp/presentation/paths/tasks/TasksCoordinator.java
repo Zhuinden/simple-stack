@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -58,7 +59,7 @@ public class TasksCoordinator
 
     @OnClick(R.id.noTasksAdd)
     public void openAddNewTask() {
-        backstack.goTo(AddOrEditTaskKey.create(Backstack.getKey(tasksView.getContext())));
+        backstack.goTo(AddOrEditTaskKey.create(Backstack.getKey(getView().getContext())));
     }
 
     @BindView(R.id.noTasks)
@@ -88,9 +89,10 @@ public class TasksCoordinator
     @Inject
     MessageQueue messageQueue;
 
-    TasksAdapter tasksAdapter;
+    @Inject
+    Resources resources;
 
-    TasksView tasksView;
+    TasksAdapter tasksAdapter;
 
     BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.create(TasksFilterType.ALL_TASKS);
 
@@ -134,7 +136,6 @@ public class TasksCoordinator
 
     @Override
     public void attachView(TasksView view) {
-        tasksView = view;
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
@@ -168,7 +169,7 @@ public class TasksCoordinator
 
     @Override
     public Key getKey() {
-        return Backstack.getKey(tasksView.getContext());
+        return Backstack.getKey(getView().getContext());
     }
 
     @Override
@@ -181,11 +182,10 @@ public class TasksCoordinator
     @Override
     public void detachView(TasksView view) {
         subscription.unsubscribe();
-        tasksView = null;
     }
 
     public void showFilteringPopupMenu() {
-        PopupMenu popup = new PopupMenu(tasksView.getContext(), MainActivity.get(tasksView.getContext()).findViewById(R.id.menu_filter));
+        PopupMenu popup = new PopupMenu(getView().getContext(), MainActivity.get(getView().getContext()).findViewById(R.id.menu_filter));
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
 
         popup.setOnMenuItemClickListener(item -> {
@@ -217,47 +217,47 @@ public class TasksCoordinator
     }
 
     public void refresh() {
-        tasksView.setRefreshing(true);
+        getView().setRefreshing(true);
     }
 
     public void showNoActiveTasks() {
-        showNoTasksViews(tasksView.getContext().getResources().getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false);
+        showNoTasksViews(resources.getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false);
     }
 
     public void showNoTasks() {
-        showNoTasksViews(tasksView.getContext().getResources().getString(R.string.no_tasks_all),
+        showNoTasksViews(resources.getString(R.string.no_tasks_all),
                 R.drawable.ic_assignment_turned_in_24dp,
                 false);
     }
 
     public void showNoCompletedTasks() {
-        showNoTasksViews(tasksView.getContext().getResources().getString(R.string.no_tasks_completed),
+        showNoTasksViews(resources.getString(R.string.no_tasks_completed),
                 R.drawable.ic_verified_user_24dp,
                 false);
     }
 
     public void showTaskMarkedComplete() {
-        showMessage(tasksView.getContext().getString(R.string.task_marked_complete));
+        showMessage(resources.getString(R.string.task_marked_complete));
     }
 
     public void showTaskMarkedActive() {
-        showMessage(tasksView.getContext().getString(R.string.task_marked_active));
+        showMessage(resources.getString(R.string.task_marked_active));
     }
 
     public void showCompletedTasksCleared() {
-        showMessage(tasksView.getContext().getString(R.string.completed_tasks_cleared));
+        showMessage(resources.getString(R.string.completed_tasks_cleared));
     }
 
     public void showLoadingTasksError() {
-        showMessage(tasksView.getContext().getString(R.string.loading_tasks_error));
+        showMessage(resources.getString(R.string.loading_tasks_error));
     }
 
     public void showSuccessfullySavedMessage() {
-        showMessage(tasksView.getContext().getString(R.string.successfully_saved_task_message));
+        showMessage(resources.getString(R.string.successfully_saved_task_message));
     }
 
     private void showMessage(String message) {
-        Snackbar.make(tasksView, message, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
@@ -265,7 +265,7 @@ public class TasksCoordinator
         mNoTasksView.setVisibility(View.VISIBLE);
 
         mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(tasksView.getContext().getResources().getDrawable(iconRes));
+        mNoTaskIcon.setImageDrawable(resources.getDrawable(iconRes));
         mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 

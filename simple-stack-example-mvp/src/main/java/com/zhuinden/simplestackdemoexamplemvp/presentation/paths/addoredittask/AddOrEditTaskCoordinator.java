@@ -66,8 +66,6 @@ public class AddOrEditTaskCoordinator
     @BindView(R.id.add_task_description)
     EditText addTaskDescription;
 
-    AddOrEditTaskView addOrEditTaskView;
-
     AddOrEditTaskKey addOrEditTaskKey;
 
     String taskId;
@@ -81,7 +79,6 @@ public class AddOrEditTaskCoordinator
 
     @Override
     public void attachView(AddOrEditTaskView view) {
-        this.addOrEditTaskView = view;
         addOrEditTaskKey = Backstack.getKey(view.getContext());
         taskId = addOrEditTaskKey.taskId();
         if(!"".equals(taskId)) {
@@ -109,7 +106,7 @@ public class AddOrEditTaskCoordinator
                     .setTitle(title)
                     .setDescription(description)
                     .build());
-            AddOrEditTaskKey addOrEditTaskKey = Backstack.getKey(addOrEditTaskView.getContext());
+            AddOrEditTaskKey addOrEditTaskKey = Backstack.getKey(getView().getContext());
             if(addOrEditTaskKey.parent() instanceof TasksKey) {
                 messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksCoordinator.SavedSuccessfullyMessage());
                 backstack.goBack();

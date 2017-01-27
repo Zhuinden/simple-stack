@@ -49,8 +49,6 @@ public class SecondCoordinator
         backstack.goTo(TasksKey.create());
     }
 
-    Unbinder unbinder;
-
     @Inject
     Backstack backstack;
 
@@ -62,13 +60,11 @@ public class SecondCoordinator
     @Override
     public void attachView(SecondView view) {
         Log.i(TAG, "Attached [" + view + "]");
-        unbinder = ButterKnife.bind(this, view);
     }
 
     @Override
     public void detachView(SecondView view) {
         Log.i(TAG, "Detached [" + view + "]");
-        unbinder.unbind();
     }
 
     @Override
