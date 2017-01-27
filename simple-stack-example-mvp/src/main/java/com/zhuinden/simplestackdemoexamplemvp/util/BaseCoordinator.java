@@ -14,13 +14,15 @@ import butterknife.Unbinder;
 
 public abstract class BaseCoordinator<C extends BaseCoordinator<C, P>, P extends BasePresenter<C, P>>
         extends Coordinator {
+    public abstract P getPresenter();
+
+    public abstract C getThis();
+
     Unbinder unbinder;
 
     View view;
 
-    public abstract P getPresenter();
-
-    public abstract C getThis();
+    protected abstract Unbinder bindViews(View view);
 
     @Override
     protected final void attach(View view) {
@@ -31,11 +33,6 @@ public abstract class BaseCoordinator<C extends BaseCoordinator<C, P>, P extends
         getPresenter().attachCoordinator(getThis());
     }
 
-    protected abstract Unbinder bindViews(View view);
-
-    public void attachView(View view) {
-    }
-
     @Override
     protected final void detach(View view) {
         getPresenter().detachCoordinator(getThis());
@@ -43,6 +40,9 @@ public abstract class BaseCoordinator<C extends BaseCoordinator<C, P>, P extends
         unbinder.unbind();
         unbinder = null;
         this.view = null;
+    }
+
+    public void attachView(View view) {
     }
 
     public void detachView(View view) {

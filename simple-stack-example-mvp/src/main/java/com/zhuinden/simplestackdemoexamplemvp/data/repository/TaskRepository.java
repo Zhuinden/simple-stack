@@ -211,4 +211,13 @@ public class TaskRepository {
             }
         }).subscribeOn(looperScheduler.getScheduler());
     }
+
+    public void setTaskCompleted(Task task) {
+        insertTask(task.toBuilder().setCompleted(true).build());
+    }
+
+
+    public void setTaskActive(Task task) {
+        insertTask(task.toBuilder().setCompleted(false).build());
+    }
 }

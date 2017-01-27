@@ -78,12 +78,12 @@ public class TasksPresenter
     }
 
     public void completeTask(Task task) {
-        taskRepository.insertTask(task.toBuilder().setCompleted(true).build());
+        taskRepository.setTaskCompleted(task);
         getCoordinator().showTaskMarkedComplete();
     }
 
     public void uncompleteTask(Task task) {
-        taskRepository.insertTask(task.toBuilder().setCompleted(false).build());
+        taskRepository.setTaskActive(task);
         getCoordinator().showTaskMarkedActive();
     }
 

@@ -7,8 +7,10 @@ import android.widget.TextView;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
+import com.zhuinden.simplestackdemoexamplemvp.util.Strings;
 
 import javax.inject.Inject;
 
@@ -69,8 +71,50 @@ public class TaskDetailCoordinator
         mDetailTitle.setText(title);
     }
 
+    public void hideTitle() {
+        mDetailTitle.setVisibility(View.GONE);
+    }
+
+    public void showDescription(@NonNull String description) {
+        mDetailDescription.setVisibility(View.VISIBLE);
+        mDetailDescription.setText(description);
+    }
+
+    public void hideDescription() {
+        mDetailDescription.setVisibility(View.GONE);
+    }
+
     public void showMissingTask() {
         mDetailTitle.setText("");
         mDetailDescription.setText(getView().getContext().getString(R.string.no_data));
+    }
+
+    public void showTask(Task task) {
+        String title = task.title();
+        String description = task.description();
+
+        if(Strings.isNullOrEmpty(title)) {
+            hideTitle();
+        } else {
+            showTitle(title);
+        }
+
+        if(Strings.isNullOrEmpty(description)) {
+            hideDescription();
+        } else {
+            showDescription(description);
+        }
+        showCompletionStatus(task, task.isCompleted());
+    }
+
+    private void showCompletionStatus(Task task, boolean completed) {
+        mDetailCompleteStatus.setChecked(completed);
+        mDetailCompleteStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                getPresenter().completeTask(task);
+            } else {
+                getPresenter().activateTask(task);
+            }
+        });
     }
 }

@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
+import com.zhuinden.simplestackdemoexamplemvp.util.Strings;
 
 import java.util.UUID;
 
@@ -50,7 +51,7 @@ public abstract class Task {
 
     @Nullable
     public String getTitleForList() {
-        if (!(title() == null || "".equals(title()))) {
+        if(!Strings.isNullOrEmpty(title())) {
             return title();
         } else {
             return description();
@@ -66,7 +67,7 @@ public abstract class Task {
     }
 
     public boolean isEmpty() {
-        return (title() == null || "".equals(title())) && (description() == null || "".equals(description()));
+        return Strings.isNullOrEmpty(title()) && Strings.isNullOrEmpty(description());
     }
 
     @AutoValue.Builder

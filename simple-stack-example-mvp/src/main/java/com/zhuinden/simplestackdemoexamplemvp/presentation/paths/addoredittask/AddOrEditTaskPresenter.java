@@ -13,6 +13,7 @@ import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoor
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
+import com.zhuinden.simplestackdemoexamplemvp.util.Strings;
 
 import javax.inject.Inject;
 
@@ -57,7 +58,7 @@ public class AddOrEditTaskPresenter
     protected void onAttach(AddOrEditTaskCoordinator coordinator) {
         AddOrEditTaskKey addOrEditTaskKey = coordinator.getKey();
         taskId = addOrEditTaskKey.taskId();
-        if(!"".equals(taskId)) {
+        if(!Strings.isNullOrEmpty(taskId)) {
             taskRepository.findTask(addOrEditTaskKey.taskId()).observeOn(AndroidSchedulers.mainThread()).subscribe(taskOptional -> {
                 if(taskOptional.isPresent()) {
                     task = taskOptional.get();
@@ -93,7 +94,7 @@ public class AddOrEditTaskPresenter
     }
 
     public void saveTask() {
-        if((title != null && !"".equals(title)) && (description != null && !"".equals(description))) {
+        if(!Strings.isNullOrEmpty(title) && !Strings.isNullOrEmpty(description)) {
             taskRepository.insertTask(task == null ? Task.createNewActiveTask(title, description) : task.toBuilder()
                     .setTitle(title)
                     .setDescription(description)
