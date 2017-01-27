@@ -56,7 +56,7 @@ public class TasksCoordinator
     Resources resources;
 
     @OnClick(R.id.noTasksAdd)
-    public void openAddNewTask() {
+    void openAddNewTask() {
         tasksPresenter.openAddNewTask();
     }
 

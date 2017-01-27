@@ -117,4 +117,8 @@ public class TaskDetailCoordinator
             }
         });
     }
+
+    public void deleteTask() {
+        taskDetailPresenter.deleteTask();
+    }
 }

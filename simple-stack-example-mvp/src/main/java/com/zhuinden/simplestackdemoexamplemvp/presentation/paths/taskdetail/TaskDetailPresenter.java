@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail;
 
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
@@ -22,9 +23,14 @@ public class TaskDetailPresenter
     @Inject
     TaskRepository taskRepository;
 
+    @Inject
+    Backstack backstack;
+
     TaskDetailKey taskDetailKey;
 
     String taskId;
+
+    Task task;
 
     @Override
     protected void onAttach(TaskDetailCoordinator coordinator) {
@@ -32,8 +38,10 @@ public class TaskDetailPresenter
         this.taskId = taskDetailKey.taskId();
         taskRepository.findTask(taskId).observeOn(AndroidSchedulers.mainThread()).subscribe(taskOptional -> {
             if(taskOptional.isPresent()) {
-                coordinator.showTask(taskOptional.get());
+                task = taskOptional.get();
+                coordinator.showTask(task);
             } else {
+                task = null;
                 coordinator.showMissingTask();
             }
         });
@@ -58,5 +66,12 @@ public class TaskDetailPresenter
 
     public void activateTask(Task task) {
         taskRepository.setTaskActive(task);
+    }
+
+    public void deleteTask() {
+        if(task != null) {
+            taskRepository.deleteTask(task);
+            backstack.goBack();
+        }
     }
 }

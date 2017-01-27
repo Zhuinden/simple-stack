@@ -184,12 +184,10 @@ public class TaskRepository {
     public void deleteCompletedTasks() {
         Single.create((Single.OnSubscribe<Void>) singleSubscriber -> {
             try(Realm r = Realm.getDefaultInstance()) {
-                r.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        realm.where(DbTask.class).equalTo(DbTaskFields.COMPLETED, true).findAll().deleteAllFromRealm();
-                    }
-                });
+                r.executeTransaction(realm -> realm.where(DbTask.class)
+                        .equalTo(DbTaskFields.COMPLETED, true)
+                        .findAll()
+                        .deleteAllFromRealm());
             }
         }).subscribeOn(writeScheduler.getScheduler()).subscribe();
     }
@@ -216,8 +214,16 @@ public class TaskRepository {
         insertTask(task.toBuilder().setCompleted(true).build());
     }
 
-
     public void setTaskActive(Task task) {
         insertTask(task.toBuilder().setCompleted(false).build());
+    }
+
+    @SuppressWarnings("NewApi")
+    public void deleteTask(Task task) {
+        Single.create((Single.OnSubscribe<Void>) singleSubscriber -> {
+            try(Realm r = Realm.getDefaultInstance()) {
+                r.executeTransaction(realm -> realm.where(DbTask.class).equalTo(DbTaskFields.ID, task.id()).findAll().deleteAllFromRealm());
+            }
+        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
     }
 }

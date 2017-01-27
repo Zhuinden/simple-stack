@@ -29,7 +29,7 @@ public abstract class TaskDetailKey
 
     @Override
     public int menu() {
-        return R.menu.empty_menu;
+        return R.menu.taskdetail_fragment_menu;
     }
 
     @Override
