@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -119,6 +120,12 @@ public class TasksCoordinator
         tasksAdapter = new TasksAdapter(new ArrayList<>(0), taskItemListener);
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+
+        ((TasksView) getView()).setColorSchemeColors(ContextCompat.getColor(getView().getContext(), R.color.colorPrimary),
+                ContextCompat.getColor(getView().getContext(), R.color.colorAccent),
+                ContextCompat.getColor(getView().getContext(), R.color.colorPrimaryDark));
+        // Set the scrolling view in the custom SwipeRefreshLayout.
+        ((TasksView) getView()).setScrollUpChild(listView);
         ((TasksView) getView()).setOnRefreshListener(this::refresh);
     }
 
