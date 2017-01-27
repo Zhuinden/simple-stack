@@ -9,6 +9,7 @@ import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -17,13 +18,15 @@ import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonCom
 @AutoValue
 public abstract class AddOrEditTaskKey
         implements Key {
+    public abstract TasksKey parent();
+
     @Override
     public Coordinator newCoordinator(SingletonComponent singletonComponent) {
         return singletonComponent.addOrEditTaskCoordinator();
     }
 
-    public static Parcelable create() {
-        return new AutoValue_AddOrEditTaskKey(R.layout.path_addoredittask);
+    public static Parcelable create(TasksKey parent) {
+        return new AutoValue_AddOrEditTaskKey(R.layout.path_addoredittask, parent);
     }
 
     @Override

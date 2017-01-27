@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,7 +17,9 @@ import com.jakewharton.rxrelay.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
+import com.zhuinden.simplestackdemoexamplemvp.application.MessageQueue;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
@@ -42,7 +45,10 @@ import rx.schedulers.Schedulers;
 // UNSCOPED!
 public class TasksCoordinator
         extends BaseCoordinator<TasksView>
-        implements Bundleable {
+        implements Bundleable, MessageQueue.Receiver {
+    public static class SavedSuccessfullyMessage {
+    }
+
     @Inject
     public TasksCoordinator() {
     }
@@ -50,8 +56,8 @@ public class TasksCoordinator
     Backstack backstack;
 
     @OnClick(R.id.noTasksAdd)
-    public void onClickNoTasksAdd() {
-        backstack.goTo(AddOrEditTaskKey.create());
+    public void openAddNewTask() {
+        backstack.goTo(AddOrEditTaskKey.create(Backstack.getKey(tasksView.getContext())));
     }
 
     @BindView(R.id.noTasks)
@@ -77,6 +83,9 @@ public class TasksCoordinator
 
     @Inject
     TaskRepository taskRepository;
+
+    @Inject
+    MessageQueue messageQueue;
 
     TasksAdapter tasksAdapter;
 
@@ -107,10 +116,12 @@ public class TasksCoordinator
 
     private void uncompleteTask(Task task) {
         taskRepository.insertTask(task.toBuilder().setCompleted(false).build());
+        showTaskMarkedActive();
     }
 
     private void completeTask(Task task) {
         taskRepository.insertTask(task.toBuilder().setCompleted(true).build());
+        showTaskMarkedComplete();
     }
 
     private void openTaskDetails(Task clickedTask) {
@@ -144,11 +155,25 @@ public class TasksCoordinator
                 }
             }
         });
+
+        messageQueue.requestMessages(this);
     }
 
     public void hideEmptyViews() {
         mTasksView.setVisibility(View.VISIBLE);
         mNoTasksView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public Key getKey() {
+        return Backstack.getKey(tasksView.getContext());
+    }
+
+    @Override
+    public void receiveMessage(Object message) {
+        if(message instanceof SavedSuccessfullyMessage) {
+            showSuccessfullySavedMessage();
+        }
     }
 
     static class TaskDiffCallback
@@ -217,8 +242,9 @@ public class TasksCoordinator
         this.filterType.call(filterType);
     }
 
-    public void clear() {
+    public void clearCompleteds() {
         // TODO
+        showCompletedTasksCleared();
     }
 
     public void refresh() {
@@ -239,6 +265,30 @@ public class TasksCoordinator
         showNoTasksViews(tasksView.getContext().getResources().getString(R.string.no_tasks_completed),
                 R.drawable.ic_verified_user_24dp,
                 false);
+    }
+
+    public void showTaskMarkedComplete() {
+        showMessage(tasksView.getContext().getString(R.string.task_marked_complete));
+    }
+
+    public void showTaskMarkedActive() {
+        showMessage(tasksView.getContext().getString(R.string.task_marked_active));
+    }
+
+    public void showCompletedTasksCleared() {
+        showMessage(tasksView.getContext().getString(R.string.completed_tasks_cleared));
+    }
+
+    public void showLoadingTasksError() {
+        showMessage(tasksView.getContext().getString(R.string.loading_tasks_error));
+    }
+
+    public void showSuccessfullySavedMessage() {
+        showMessage(tasksView.getContext().getString(R.string.successfully_saved_task_message));
+    }
+
+    private void showMessage(String message) {
+        Snackbar.make(tasksView, message, Snackbar.LENGTH_LONG).show();
     }
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {

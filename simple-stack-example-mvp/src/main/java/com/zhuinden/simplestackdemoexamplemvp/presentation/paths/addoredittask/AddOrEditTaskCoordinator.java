@@ -4,8 +4,10 @@ import android.text.Editable;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.application.MessageQueue;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
 import javax.inject.Inject;
@@ -28,6 +30,9 @@ public class AddOrEditTaskCoordinator
     TaskRepository taskRepository;
 
     @Inject
+    MessageQueue messageQueue;
+
+    @Inject
     public AddOrEditTaskCoordinator() {
     }
 
@@ -45,8 +50,11 @@ public class AddOrEditTaskCoordinator
 
     Unbinder unbinder;
 
+    AddOrEditTaskView addOrEditTaskView;
+
     @Override
     public void attachView(AddOrEditTaskView view) {
+        this.addOrEditTaskView = view;
         unbinder = ButterKnife.bind(this, view);
         backstack = Backstack.get(view.getContext());
     }
@@ -59,6 +67,8 @@ public class AddOrEditTaskCoordinator
     public void fabClicked() {
         if((title != null && !"".equals(title)) && (description != null && !"".equals(description))) {
             taskRepository.insertTask(Task.createNewActiveTask(title, description));
+            AddOrEditTaskKey addOrEditTaskKey = Backstack.getKey(addOrEditTaskView.getContext());
+            messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksCoordinator.SavedSuccessfullyMessage());
             backstack.goBack();
         }
     }

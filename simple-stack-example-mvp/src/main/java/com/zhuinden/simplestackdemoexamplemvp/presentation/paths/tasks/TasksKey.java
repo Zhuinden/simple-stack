@@ -4,11 +4,10 @@ import android.view.View;
 
 import com.google.auto.value.AutoValue;
 import com.squareup.coordinators.Coordinator;
-import com.zhuinden.simplestack.Backstack;
+import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -49,7 +48,8 @@ public abstract class TasksKey
     @Override
     public View.OnClickListener fabClickListener(View view) {
         return v -> {
-            Backstack.get(v.getContext()).goTo(AddOrEditTaskKey.create()); // TODO: call presenter
+            TasksCoordinator coordinator = Coordinators.getCoordinator(view);
+            coordinator.openAddNewTask();
         };
     }
 
