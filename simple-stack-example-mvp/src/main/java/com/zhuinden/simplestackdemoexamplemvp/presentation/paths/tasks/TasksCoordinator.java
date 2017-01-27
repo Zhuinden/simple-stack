@@ -24,6 +24,7 @@ import org.javatuples.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -31,6 +32,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import rx.Single;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -182,6 +184,11 @@ public class TasksCoordinator
 
     public void refresh() {
         ((TasksView) getView()).setRefreshing(true);
+        Single.just("").delay(2500, TimeUnit.MILLISECONDS).subscribe(ignored -> { // TODO: do something useful
+            if(getView() != null) {
+                ((TasksView) getView()).setRefreshing(false);
+            }
+        });
     }
 
     public void showNoActiveTasks() {
