@@ -3,6 +3,7 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
 import com.zhuinden.simplestackdemoexamplemvp.util.Strings;
 
@@ -57,7 +58,7 @@ public class TaskDetailPresenter
             getCoordinator().showMissingTask();
             return;
         }
-        getCoordinator().showEditTask(taskId);
+        backstack.goTo(AddOrEditTaskKey.createWithTaskId(getCoordinator().getKey(), taskId));
     }
 
     public void completeTask(Task task) {

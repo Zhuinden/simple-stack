@@ -7,6 +7,7 @@ import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainScopeListener;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
+import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.mapper.TaskMapper;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstCoordinator;
@@ -14,7 +15,6 @@ import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondCo
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoordinator;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksView;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder;
 
@@ -31,6 +31,7 @@ import dagger.Component;
 @Component(modules = {SchedulerModule.class, NavigationModule.class, AndroidModule.class})
 public interface SingletonComponent {
     TaskMapper taskMapper();
+
     DatabaseManager databaseManager();
 
     @Named("LOOPER_SCHEDULER")
@@ -38,6 +39,8 @@ public interface SingletonComponent {
 
     @Named("WRITE_SCHEDULER")
     SchedulerHolder writeScheduler();
+
+    TaskRepository taskRepository();
 
     BackstackHolder backstackHolder();
 
@@ -63,8 +66,4 @@ public interface SingletonComponent {
     void inject(MainActivity mainActivity);
 
     void inject(MainScopeListener mainScopeListener);
-
-    void inject(AddOrEditTaskCoordinator addOrEditTaskCoordinator);
-
-    void inject(TasksView tasksView);
 }
