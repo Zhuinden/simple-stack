@@ -36,7 +36,7 @@ public class SecondView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            backstack = Backstack.get(context);
+            backstack = BackstackService.get(context);
             secondKey = Backstack.getKey(context);
         }
     }

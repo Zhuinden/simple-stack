@@ -71,7 +71,7 @@ In order to use Simple Stack, you need to add jitpack to your project root gradl
 
 and add the compile dependency to your module level gradle.
 
-    compile 'com.github.Zhuinden:simple-stack:0.6.0'
+    compile 'com.github.Zhuinden:simple-stack:0.7.0'
 
 ## How does it work?
 
@@ -102,6 +102,8 @@ public class MainActivity
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
                 HistoryBuilder.single(new FirstKey()));
+
+        // get reference to Backstack with `backstackDelegate.getBackstack()`
     }
 
     @Override
@@ -133,14 +135,6 @@ public class MainActivity
         super.onSaveInstanceState(outState);
         backstackDelegate.persistViewToState(root.getChildAt(0));
         backstackDelegate.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public Object getSystemService(String name) {
-        if(backstackDelegate != null && backstackDelegate.isSystemService(name)) {
-            return backstackDelegate.getSystemService(name);
-        }
-        return super.getSystemService(name);
     }
 
     // StateChanger implementation

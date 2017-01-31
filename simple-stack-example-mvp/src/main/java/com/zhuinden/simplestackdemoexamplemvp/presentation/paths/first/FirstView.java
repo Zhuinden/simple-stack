@@ -10,6 +10,10 @@ import android.widget.RelativeLayout;
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestackdemoexamplemvp.application.CustomApplication;
+
+import javax.inject.Inject;
+
 /**
  * Created by Owner on 2017. 01. 12..
  */
@@ -40,13 +44,14 @@ public class FirstView
         init(context);
     }
 
+    @Inject
     Backstack backstack;
 
     FirstKey firstKey;
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            backstack = Backstack.get(context);
+            CustomApplication.get().getComponent().inject(this);
             firstKey = Backstack.getKey(context);
         }
     }

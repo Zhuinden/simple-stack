@@ -6,12 +6,15 @@ import android.content.res.Resources;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainScopeListener;
+import com.zhuinden.simplestackdemoexamplemvp.application.MainView;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.mapper.TaskMapper;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstCoordinator;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstView;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondCoordinator;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondView;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoordinator;
@@ -66,4 +69,10 @@ public interface SingletonComponent {
     void inject(MainActivity mainActivity);
 
     void inject(MainScopeListener mainScopeListener);
+
+    void inject(MainView mainView);
+
+    void inject(FirstView firstView);
+
+    void inject(SecondView secondView);
 }

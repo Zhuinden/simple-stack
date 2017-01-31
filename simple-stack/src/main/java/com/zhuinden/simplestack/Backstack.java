@@ -18,13 +18,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 
 public class Backstack {
-    static final String BACKSTACK = "simplestack.BACKSTACK";
-
-    public static Backstack get(Context context) {
-        // noinspection ResourceType
-        return (Backstack)context.getSystemService(BACKSTACK);
-    }
-
     public static <T extends Parcelable> T getKey(Context context) {
         return KeyContextWrapper.getKey(context);
     }

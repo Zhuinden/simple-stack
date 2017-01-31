@@ -16,7 +16,8 @@ import java.util.Map;
  */
 
 public class BackstackDelegate {
-    private static final String STATES = Backstack.BACKSTACK + "_STATES";
+    private static final String HISTORY = "simplestack.HISTORY";
+    private static final String STATES = HISTORY + "_STATES";
     
     Backstack backstack;
     
@@ -34,7 +35,7 @@ public class BackstackDelegate {
         }
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
-            keys = savedInstanceState.getParcelableArrayList(Backstack.BACKSTACK);
+            keys = savedInstanceState.getParcelableArrayList(HISTORY);
             List<SavedState> savedStates = savedInstanceState.getParcelableArrayList(STATES);
             if(savedStates != null) {
                 for(SavedState savedState : savedStates) {
@@ -76,7 +77,7 @@ public class BackstackDelegate {
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(Backstack.BACKSTACK, HistoryBuilder.from(backstack.getHistory()).build());
+        outState.putParcelableArrayList(HISTORY, HistoryBuilder.from(backstack.getHistory()).build());
         outState.putParcelableArrayList(STATES, new ArrayList<>(keyStateMap.values()));
     }
     
@@ -93,17 +94,6 @@ public class BackstackDelegate {
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
         }
-    }
-
-    public boolean isSystemService(String name) {
-        return Backstack.BACKSTACK.equals(name);
-    }
-    
-    public Backstack getSystemService(String name) {
-        if(isSystemService(name)) {
-            return backstack;
-        }
-        return null;
     }
 
     // ----- get backstack

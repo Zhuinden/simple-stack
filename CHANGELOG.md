@@ -1,5 +1,35 @@
 # Change log
 
+-Simple Stack 0.7.0 (2017-01-31)
+---------------------------------
+- BREAKING CHANGE: Removed `Backstack.get(Context)`, `BackstackDelegate.isSystemService(String)` and `BackstackDelegate.getSystemService(Context)`.
+
+These can be easily done manually with the following setup:
+
+``` java
+    public static Backstack get(Context context) {
+        // noinspection ResourceType
+        return (Backstack)context.getSystemService(BACKSTACK);
+    }
+```
+
+and
+
+``` java
+    @Override
+    public Object getSystemService(String name) {
+        if(name.equals(BACKSTACK)) {
+            return backstackDelegate.getBackstack();
+        }
+        return super.getSystemService(name);
+    }
+```
+
+Therefore the preferred solution is to provide the `Backstack` instance via `@Inject` instead of `Backstack.get(Context)`.
+
+Example for `Backstack.get(Context)` was moved to `simple-stack-example` as `BackstackService`.
+Example for `@Inject Backstack backstack;` is seen in `simple-stack-example-mvp`.
+
 -Simple Stack 0.6.1 (2017-01-27)
 ---------------------------------
 - It is now allowed to initialize `BackstackDelegate` without a `StateChanger`, in which case `setStateChanger()` must be called before `onPostResume()`.`

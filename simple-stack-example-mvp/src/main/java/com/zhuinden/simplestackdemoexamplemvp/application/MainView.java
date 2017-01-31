@@ -22,6 +22,8 @@ import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsKey;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -45,6 +47,9 @@ public class MainView
 
     @BindView(R.id.fab_add_task)
     FloatingActionButton fabAddTask;
+
+    @Inject
+    Backstack backstack;
 
     private void setCheckedItem(int navigationItemId) {
         Menu menu = navigationView.getMenu();
@@ -83,10 +88,10 @@ public class MainView
     private final NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) item -> {
         switch(item.getItemId()) {
             case R.id.list_navigation_menu_item:
-                Backstack.get(getContext()).goTo(TasksKey.create());
+                backstack.goTo(TasksKey.create());
                 break;
             case R.id.statistics_navigation_menu_item:
-                Backstack.get(getContext()).goTo(StatisticsKey.create());
+                backstack.goTo(StatisticsKey.create());
             default:
                 break;
         }
@@ -98,14 +103,23 @@ public class MainView
 
     public MainView(Context context) {
         super(context);
+        init(context);
     }
 
     public MainView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(context);
     }
 
     public MainView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        init(context);
+    }
+
+    private void init(Context context) {
+        if(!isInEditMode()) {
+            CustomApplication.get(context).getComponent().inject(this);
+        }
     }
 
     @Override
@@ -161,7 +175,7 @@ public class MainView
         drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Backstack.get(getContext()).goBack();
+                backstack.goBack();
             }
         });
         actionBar.setDisplayHomeAsUpEnabled(false);

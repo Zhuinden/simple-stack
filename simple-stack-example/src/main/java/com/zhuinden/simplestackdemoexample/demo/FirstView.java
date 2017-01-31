@@ -51,7 +51,7 @@ public class FirstView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            backstack = Backstack.get(context);
+            backstack = BackstackService.get(context);
             firstKey = Backstack.getKey(context);
         }
     }

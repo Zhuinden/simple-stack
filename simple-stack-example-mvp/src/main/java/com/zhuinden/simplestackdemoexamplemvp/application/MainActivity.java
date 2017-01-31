@@ -156,9 +156,6 @@ public class MainActivity
         if(TAG.equals(name)) {
             return this;
         }
-        if(backstackDelegate != null && backstackDelegate.isSystemService(name)) {
-            return backstackDelegate.getSystemService(name);
-        }
         return super.getSystemService(name);
     }
 

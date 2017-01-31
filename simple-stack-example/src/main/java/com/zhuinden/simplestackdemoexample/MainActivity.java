@@ -11,6 +11,7 @@ import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestackdemoexample.demo.BackstackService;
 import com.zhuinden.simplestackdemoexample.demo.FirstKey;
 import com.zhuinden.simplestackdemoexample.demo.Key;
 
@@ -70,8 +71,8 @@ public class MainActivity
 
     @Override
     public Object getSystemService(String name) {
-        if(backstackDelegate != null && backstackDelegate.isSystemService(name)) {
-            return backstackDelegate.getSystemService(name);
+        if(name.equals(BackstackService.TAG)) {
+            return backstackDelegate.getBackstack();
         }
         return super.getSystemService(name);
     }
