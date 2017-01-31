@@ -83,8 +83,6 @@ public class TasksCoordinator
 
     TasksAdapter tasksAdapter;
 
-    private boolean isFirstLoad = true;
-
     TasksAdapter.TaskItemListener taskItemListener = new TasksAdapter.TaskItemListener() {
         @Override
         public void openTask(Task task) {
@@ -158,12 +156,11 @@ public class TasksCoordinator
             List<Task> tasks = pairOfDiffResultAndTasks.getValue1();
             tasksAdapter.setData(tasks);
             diffResult.dispatchUpdatesTo(tasksAdapter);
-            if(!isFirstLoad && tasks.isEmpty()) {
+            if(tasks.isEmpty()) {
                 filterType.showEmptyViews(this);
             } else {
                 hideEmptyViews();
             }
-            isFirstLoad = false;
         }
     }
 
