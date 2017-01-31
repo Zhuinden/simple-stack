@@ -5,10 +5,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.util.Strings;
 
@@ -38,9 +36,6 @@ public class TaskDetailCoordinator
     }
 
     @Inject
-    Backstack backstack;
-
-    @Inject
     TaskDetailPresenter taskDetailPresenter;
 
     @Override
@@ -60,10 +55,6 @@ public class TaskDetailCoordinator
 
     public void editTask() {
         taskDetailPresenter.editTask();
-    }
-
-    public void showEditTask(String taskId) {
-        backstack.goTo(AddOrEditTaskKey.createWithTaskId(getKey(), taskId));
     }
 
     public void showTitle(@NonNull String title) {
