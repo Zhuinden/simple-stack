@@ -1,1 +1,1 @@
-include ':simple-stack', ':simple-stack-example', ':simple-stack-example-mvp'
+include ':simple-stack', ':simple-stack-example', ':simple-stack-example-mvp', ':simple-stack-example-fragments'
