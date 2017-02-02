@@ -1,5 +1,19 @@
 # Change log
 
+-Simple Stack 0.8.1 (2017-02-02)
+---------------------------------
+- BREAKING(?) CHANGE: Renamed `HistoryBuilder.peek()` to `HistoryBuilder.getLast()`
+- ENHANCEMENT: Added the following new methods to `HistoryBuilder`:
+    `HistoryBuilder.get(index)`,
+    `HistoryBuilder.contains(key)`,
+    `HistoryBuilder.containsAll(keys)`,
+    `HistoryBuilder.add(key, index)`,
+    `HistoryBuilder.size()`,
+    `HistoryBuilder.removeAt(index)`,
+    `HistoryBuilder.remove(key)`,
+    `HistoryBuilder.clear()`,
+    `HistoryBuilder.retainAll(keys)`
+
 -Simple Stack 0.8.0 (2017-02-02)
 ---------------------------------
 - BREAKING CHANGE: Removed `StateChange.Direction`, it is now an `int` annotated with `@IntDef`.

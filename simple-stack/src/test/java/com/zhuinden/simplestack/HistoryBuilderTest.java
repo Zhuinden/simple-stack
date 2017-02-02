@@ -46,8 +46,8 @@ public class HistoryBuilderTest {
     }
 
     @Test
-    public void peekReturnsNullIfEmpty() {
-        assertThat(HistoryBuilder.newBuilder().peek()).isNull();
+    public void getLastReturnsNullIfEmpty() {
+        assertThat(HistoryBuilder.newBuilder().getLast()).isNull();
     }
 
     @Test
@@ -70,12 +70,12 @@ public class HistoryBuilderTest {
     }
 
     @Test
-    public void peekReturnsLastIfNotEmpty() {
+    public void getLastReturnsLastIfNotEmpty() {
         TestKey hi = new TestKey("hi");
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
         HistoryBuilder historyBuilder = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye);
-        assertThat(historyBuilder.peek()).isEqualTo(bye);
+        assertThat(historyBuilder.getLast()).isEqualTo(bye);
         assertThat(historyBuilder.build().get(historyBuilder.build().size()-1)).isEqualTo(bye);
     }
 

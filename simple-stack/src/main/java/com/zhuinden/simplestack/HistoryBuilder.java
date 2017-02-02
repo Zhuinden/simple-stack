@@ -3,6 +3,7 @@ package com.zhuinden.simplestack;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,6 +40,46 @@ public class HistoryBuilder {
         return this;
     }
 
+    public HistoryBuilder addAllAt(List<? extends Parcelable> collection, int index) {
+        if(collection == null) {
+            throw new IllegalArgumentException("Provided collection cannot be null");
+        }
+        this.list.addAll(index, collection);
+        return this;
+    }
+
+    public HistoryBuilder clear() {
+        list.clear();
+        return this;
+    }
+
+    public boolean contains(Parcelable key) {
+        return list.contains(key);
+    }
+
+    public boolean containsAll(Collection<Parcelable> keys) {
+        return list.containsAll(keys);
+    }
+
+    public int size() {
+        return list.size();
+    }
+
+    public HistoryBuilder remove(Parcelable key) {
+        list.remove(key);
+        return this;
+    }
+
+    public HistoryBuilder removeAt(int index) {
+        list.remove(index);
+        return this;
+    }
+
+    public HistoryBuilder retainAll(Collection<Parcelable> keys) {
+        list.retainAll(keys);
+        return this;
+    }
+
     public HistoryBuilder removeLast() {
         if(list.isEmpty()) {
             throw new IllegalStateException("Cannot remove element from empty list");
@@ -51,7 +92,7 @@ public class HistoryBuilder {
         if(key == null) {
             throw new IllegalArgumentException("History key cannot be null");
         }
-        while(!list.isEmpty() && !peek().equals(key)) {
+        while(!list.isEmpty() && !getLast().equals(key)) {
             removeLast();
         }
         if(list.isEmpty()) {
@@ -60,7 +101,12 @@ public class HistoryBuilder {
         return this;
     }
 
-    public <T extends Parcelable> T peek() {
+    public <T extends Parcelable> T get(int index) {
+        // noinspection unchecked
+        return (T) list.get(index);
+    }
+
+    public <T extends Parcelable> T getLast() {
         // noinspection unchecked
         return (T)(list.isEmpty() ? null : list.get(list.size() - 1));
     }
@@ -73,8 +119,15 @@ public class HistoryBuilder {
         return this;
     }
 
+    public HistoryBuilder add(Parcelable key, int index) {
+        if(key == null) {
+            throw new IllegalArgumentException("History key cannot be null");
+        }
+        list.add(index, key);
+        return this;
+    }
+
     public ArrayList<Parcelable> build() {
-        ArrayList<Parcelable> list = new ArrayList<>(this.list);
-        return list;
+        return new ArrayList<>(this.list);
     }
 }
