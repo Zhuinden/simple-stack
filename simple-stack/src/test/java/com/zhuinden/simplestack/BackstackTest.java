@@ -61,7 +61,7 @@ public class BackstackTest {
     public void newHistoryShouldNotBeNull() {
         try {
             Backstack backstack = new Backstack(new TestKey("Hi"));
-            backstack.setHistory(null, StateChange.Direction.FORWARD);
+            backstack.setHistory(null, StateChange.FORWARD);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // good!
@@ -157,7 +157,7 @@ public class BackstackTest {
 
     @Test
     public void pendingStateChangeCannotGoBackwards() {
-        PendingStateChange pendingStateChange = new PendingStateChange(null, null, false);
+        PendingStateChange pendingStateChange = new PendingStateChange(null, StateChange.REPLACE, false);
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
         try {
             pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
@@ -169,7 +169,7 @@ public class BackstackTest {
 
     @Test
     public void pendingStateChangeStatusShouldNotBeNull() {
-        PendingStateChange pendingStateChange = new PendingStateChange(null, null, false);
+        PendingStateChange pendingStateChange = new PendingStateChange(null, StateChange.REPLACE, false);
         try {
             pendingStateChange.setStatus(null);
             Assert.fail();

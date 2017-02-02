@@ -21,7 +21,7 @@ public class FourthFragment extends Fragment {
     @OnClick(R.id.fourth_button)
     public void goToSecond() {
         BackstackService.getBackstack(getContext()).setHistory(HistoryBuilder.newBuilder().add(FirstKey.create()).add(SecondKey.create()).build(),
-                StateChange.Direction.BACKWARD);
+                StateChange.BACKWARD);
     }
 
     @Nullable

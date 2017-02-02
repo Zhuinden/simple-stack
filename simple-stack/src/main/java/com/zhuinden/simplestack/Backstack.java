@@ -25,7 +25,7 @@ public class Backstack {
     //
     @Retention(SOURCE)
     @IntDef({INITIALIZE, REATTACH})
-    public @interface StateChangerRegisterMode {
+    private @interface StateChangerRegisterMode {
     }
 
     public static final int INITIALIZE = 0;
@@ -72,7 +72,7 @@ public class Backstack {
                 ArrayList<Parcelable> newHistory = new ArrayList<>();
                 newHistory.addAll(selectActiveHistory());
                 stack = initialParameters;
-                enqueueStateChange(newHistory, StateChange.Direction.REPLACE, true);
+                enqueueStateChange(newHistory, StateChange.REPLACE, true);
             }
             return;
         }
@@ -95,12 +95,12 @@ public class Backstack {
                 break;
             }
         }
-        StateChange.Direction direction;
+        int direction;
         if(isNewKey) {
             newHistory.add(newKey);
-            direction = StateChange.Direction.FORWARD;
+            direction = StateChange.FORWARD;
         } else {
-            direction = StateChange.Direction.BACKWARD;
+            direction = StateChange.BACKWARD;
         }
         enqueueStateChange(newHistory, direction, false);
     }
@@ -119,11 +119,11 @@ public class Backstack {
         for(int i = 0; i < activeHistory.size() - 1; i++) {
             newHistory.add(activeHistory.get(i));
         }
-        enqueueStateChange(newHistory, StateChange.Direction.BACKWARD, false);
+        enqueueStateChange(newHistory, StateChange.BACKWARD, false);
         return true;
     }
 
-    public void setHistory(List<Parcelable> newHistory, StateChange.Direction direction) {
+    public void setHistory(List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
         enqueueStateChange(newHistory, direction, false);
     }
@@ -134,7 +134,7 @@ public class Backstack {
         return Collections.unmodifiableList(copy);
     }
 
-    private void enqueueStateChange(List<Parcelable> newHistory, StateChange.Direction direction, boolean initialization) {
+    private void enqueueStateChange(List<Parcelable> newHistory, int direction, boolean initialization) {
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
@@ -165,7 +165,7 @@ public class Backstack {
     private void changeState(final PendingStateChange pendingStateChange) {
         boolean initialization = pendingStateChange.initialization;
         List<Parcelable> newHistory = pendingStateChange.newHistory;
-        StateChange.Direction direction = pendingStateChange.direction;
+        int direction = pendingStateChange.direction;
 
         List<Parcelable> previousState;
         if(initialization) {

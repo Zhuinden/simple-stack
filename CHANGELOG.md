@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 0.8.0 (2017-02-02)
+---------------------------------
+- BREAKING CHANGE: Removed `StateChange.Direction`, it is now an `int` annotated with `@IntDef`.
+This means that `StateChange.Direction.FORWARD` is now `StateChange.FORWARD`, same for `BACKWARD` and `REPLACE`.
+- Fix: `@StateChangerRegisterMode` shouldn't have been public
+
 -Simple Stack 0.7.0 (2017-01-31)
 ---------------------------------
 - BREAKING CHANGE: Removed `Backstack.get(Context)`, `BackstackDelegate.isSystemService(String)` and `BackstackDelegate.getSystemService(Context)`.

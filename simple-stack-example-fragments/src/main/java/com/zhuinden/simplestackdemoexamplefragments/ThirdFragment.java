@@ -41,7 +41,7 @@ public class ThirdFragment
 
     @OnClick(R.id.third_button_clear)
     public void clearToFourth() {
-        BackstackService.getBackstack(getContext()).setHistory(HistoryBuilder.single(FourthKey.create()), StateChange.Direction.FORWARD);
+        BackstackService.getBackstack(getContext()).setHistory(HistoryBuilder.single(FourthKey.create()), StateChange.FORWARD);
     }
 
     @Nullable

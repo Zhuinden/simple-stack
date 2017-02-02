@@ -304,7 +304,7 @@ public class ExampleUnitTest {
         newHistory.add(new C());
         newHistory.add(new B());
         newHistory.add(new D());
-        backstack.setHistory(newHistory, StateChange.Direction.FORWARD);
+        backstack.setHistory(newHistory, StateChange.FORWARD);
 
         assertThat(testStateChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
         assertThat(testStateChanger.newState).containsExactly(new C(), new B(), new D());

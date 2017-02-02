@@ -13,8 +13,6 @@ import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
-import java.util.LinkedHashMap;
-
 /**
  * Created by Zhuinden on 2017.02.01..
  */
@@ -25,8 +23,6 @@ public class MainActivity
     private static final String TAG = "MainActivity";
 
     BackstackDelegate backstackDelegate;
-
-    LinkedHashMap<Key, Fragment> activeFragments = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,9 +84,9 @@ public class MainActivity
         }
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().disallowAddToBackStack();
-        if(stateChange.getDirection() == StateChange.Direction.FORWARD) {
+        if(stateChange.getDirection() == StateChange.FORWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
-        } else if(stateChange.getDirection() == StateChange.Direction.BACKWARD) {
+        } else if(stateChange.getDirection() == StateChange.BACKWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
@@ -117,7 +113,6 @@ public class MainActivity
                         fragmentTransaction.attach(fragment);
                     } else {
                         Log.i(TAG, "New key is top state but already attached: probably config change for [" + newKey + "]");
-                        // configuration change.
                     }
                 } else {
                     Log.i(TAG, "New fragment does not exist yet, adding [" + newKey + "]");
@@ -134,7 +129,6 @@ public class MainActivity
             }
         }
         fragmentTransaction.commitNow();
-        // end destroyNotIn
         completionCallback.stateChangeComplete();
     }
 }

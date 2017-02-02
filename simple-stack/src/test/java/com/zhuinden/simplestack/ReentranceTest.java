@@ -80,11 +80,11 @@ public class ReentranceTest {
                         flow.goTo(new Error());
                     } else if(next instanceof Error) {
                         loading = false;
-                        flow.setHistory(HistoryBuilder.from(flow.getHistory()).removeLast().build(), StateChange.Direction.BACKWARD);
+                        flow.setHistory(HistoryBuilder.from(flow.getHistory()).removeLast().build(), StateChange.BACKWARD);
                     }
                 } else {
                     if(next instanceof Loading) {
-                        flow.setHistory(HistoryBuilder.from(flow.getHistory()).removeLast().build(), StateChange.Direction.BACKWARD);
+                        flow.setHistory(HistoryBuilder.from(flow.getHistory()).removeLast().build(), StateChange.BACKWARD);
                     }
                 }
                 onComplete.stateChangeComplete();
@@ -110,7 +110,7 @@ public class ReentranceTest {
                                     .add(new Detail()) //
                                     .add(new Loading())  //
                                     .build(), //
-                            StateChange.Direction.FORWARD);
+                            StateChange.FORWARD);
                 } else if(next instanceof Loading) {
                     ReentranceTest.this.flow.goTo(new Error());
                 }

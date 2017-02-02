@@ -2,22 +2,30 @@ package com.zhuinden.simplestack;
 
 import android.content.Context;
 import android.os.Parcelable;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.lang.annotation.Retention;
 import java.util.List;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 /**
  * Created by Owner on 2017. 01. 12..
  */
 
 public class StateChange {
-    public enum Direction {
-        FORWARD,
-        BACKWARD,
-        REPLACE
+    @Retention(SOURCE)
+    @IntDef({FORWARD, BACKWARD, REPLACE})
+    @interface StateChangeDirection {
     }
 
-    StateChange(List<Parcelable> previousState, List<Parcelable> newState, Direction direction) {
+    public static final int REPLACE = 0;
+    public static final int BACKWARD = -1;
+    public static final int FORWARD = 1;
+
+    StateChange(List<Parcelable> previousState, List<Parcelable> newState, @StateChangeDirection int direction) {
         this.previousState = previousState;
         this.newState = newState;
         this.direction = direction;
@@ -25,7 +33,7 @@ public class StateChange {
 
     List<Parcelable> previousState;
     List<Parcelable> newState;
-    Direction direction;
+    int direction;
 
     public List<Parcelable> getPreviousState() {
         return previousState;
@@ -35,7 +43,7 @@ public class StateChange {
         return newState;
     }
 
-    public Direction getDirection() {
+    public int getDirection() {
         return direction;
     }
 

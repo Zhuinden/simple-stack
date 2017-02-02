@@ -16,12 +16,14 @@ class PendingStateChange {
     }
 
     final List<Parcelable> newHistory;
-    final StateChange.Direction direction;
+    final
+    @StateChange.StateChangeDirection
+    int direction;
     final boolean initialization;
 
     private Status status = Status.ENQUEUED;
 
-    PendingStateChange(List<Parcelable> newHistory, StateChange.Direction direction, boolean initialization) {
+    PendingStateChange(List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
         this.newHistory = newHistory;
         this.direction = direction;
         this.initialization = initialization;
