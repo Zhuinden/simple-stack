@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Convenience class for creating `ArrayList<Parcelable>` for backstack history.
+ * Convenience class for creating `ArrayList of Parcelable` for backstack history.
  *
  * Created by Owner on 2017. 01. 16..
  */
