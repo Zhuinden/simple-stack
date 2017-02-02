@@ -19,7 +19,7 @@ public abstract class ThirdKey implements Key {
 
     @Override
     public String getFragmentTag() {
-        return "ThirdKey";
+        return "ThirdKey[" + text() + "]";
     }
 
     @Override

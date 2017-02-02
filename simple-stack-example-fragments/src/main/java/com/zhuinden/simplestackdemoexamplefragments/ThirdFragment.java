@@ -34,8 +34,13 @@ public class ThirdFragment
     @BindView(R.id.third_textview)
     TextView textView;
 
-    @OnClick(R.id.third_button)
+    @OnClick(R.id.third_button_go)
     public void goToFourth() {
+        BackstackService.getBackstack(getContext()).goTo(FourthKey.create());
+    }
+
+    @OnClick(R.id.third_button_clear)
+    public void clearToFourth() {
         BackstackService.getBackstack(getContext()).setHistory(HistoryBuilder.single(FourthKey.create()), StateChange.Direction.FORWARD);
     }
 
