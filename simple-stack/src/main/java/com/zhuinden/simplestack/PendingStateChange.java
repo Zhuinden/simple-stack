@@ -16,9 +16,7 @@ class PendingStateChange {
     }
 
     final List<Parcelable> newHistory;
-    final
-    @StateChange.StateChangeDirection
-    int direction;
+    final int direction;
     final boolean initialization;
 
     private Status status = Status.ENQUEUED;

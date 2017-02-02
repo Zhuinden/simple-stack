@@ -165,7 +165,7 @@ public class Backstack {
     private void changeState(final PendingStateChange pendingStateChange) {
         boolean initialization = pendingStateChange.initialization;
         List<Parcelable> newHistory = pendingStateChange.newHistory;
-        int direction = pendingStateChange.direction;
+        @StateChange.StateChangeDirection int direction = pendingStateChange.direction;
 
         List<Parcelable> previousState;
         if(initialization) {

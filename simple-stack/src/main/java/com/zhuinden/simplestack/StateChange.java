@@ -43,7 +43,7 @@ public class StateChange {
         return newState;
     }
 
-    public int getDirection() {
+    public @StateChangeDirection int getDirection() {
         return direction;
     }
 
