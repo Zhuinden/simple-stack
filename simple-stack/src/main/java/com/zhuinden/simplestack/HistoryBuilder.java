@@ -101,6 +101,10 @@ public class HistoryBuilder {
         return this;
     }
 
+    public int indexOf(Parcelable key) {
+        return list.indexOf(key);
+    }
+
     public <T extends Parcelable> T get(int index) {
         // noinspection unchecked
         return (T) list.get(index);

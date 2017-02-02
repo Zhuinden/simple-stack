@@ -12,7 +12,8 @@
     `HistoryBuilder.removeAt(index)`,
     `HistoryBuilder.remove(key)`,
     `HistoryBuilder.clear()`,
-    `HistoryBuilder.retainAll(keys)`
+    `HistoryBuilder.retainAll(keys)`,
+    `HistoryBuilder.indexOf(key)`,
 
 -Simple Stack 0.8.0 (2017-02-02)
 ---------------------------------
