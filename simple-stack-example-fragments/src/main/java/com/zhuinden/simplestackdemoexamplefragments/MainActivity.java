@@ -13,6 +13,7 @@ import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 /**
@@ -93,6 +94,7 @@ public class MainActivity
         } else if(stateChange.getDirection() == StateChange.Direction.BACKWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
+
         for(Parcelable _oldKey : stateChange.getPreviousState()) {
             Key oldKey = (Key) _oldKey;
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(oldKey.getFragmentTag());
@@ -128,7 +130,7 @@ public class MainActivity
                     Log.i(TAG, "New fragment is not active fragment. It should be detached: [" + newKey + "]");
                     fragmentTransaction.detach(fragment);
                 } else {
-                    Log.i(TAG, "New fragment is already detached or doesn't exist as expected: [" + newKey + "]");
+                    Log.i(TAG, "New fragment is already detached or doesn't exist, as expected: [" + newKey + "]");
                 }
             }
         }
