@@ -10,9 +10,11 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class ThirdKey implements Key {
+    public abstract String text();
+
     @Override
     public Fragment createFragment() {
-        return new ThirdFragment();
+        return ThirdFragment.create(text());
     }
 
     @Override
@@ -26,6 +28,10 @@ public abstract class ThirdKey implements Key {
     }
 
     public static ThirdKey create() {
-        return new AutoValue_ThirdKey();
+        return create("");
+    }
+
+    public static ThirdKey create(String text) {
+        return new AutoValue_ThirdKey(text);
     }
 }

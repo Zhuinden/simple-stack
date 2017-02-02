@@ -13,7 +13,6 @@ import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 /**
@@ -88,7 +87,7 @@ public class MainActivity
             return;
         }
 
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().disallowAddToBackStack();
         if(stateChange.getDirection() == StateChange.Direction.FORWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
         } else if(stateChange.getDirection() == StateChange.Direction.BACKWARD) {

@@ -6,9 +6,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
-import com.zhuinden.simplestack.Backstack;
-
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -17,9 +17,12 @@ import butterknife.OnClick;
  */
 
 public class SecondFragment extends Fragment {
+    @BindView(R.id.second_edittext)
+    EditText editText;
+
     @OnClick(R.id.second_go_to_third)
     public void goToThird() {
-        BackstackService.getBackstack(getContext()).goTo(ThirdKey.create());
+        BackstackService.getBackstack(getContext()).goTo(ThirdKey.create(editText.getText().toString()));
     }
 
     @Nullable
