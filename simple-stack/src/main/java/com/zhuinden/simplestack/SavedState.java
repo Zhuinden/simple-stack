@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import android.util.SparseArray;
 
 /**
- * Created by Owner on 2017. 01. 20..
+ * A container for the view hierarchy state and an optional Bundle. Made to use with `BackstackDelegate`'s view state persistence.
+ *
+ * Created by Zhuinden on 2017. 01. 20..
  */
 
 public class SavedState

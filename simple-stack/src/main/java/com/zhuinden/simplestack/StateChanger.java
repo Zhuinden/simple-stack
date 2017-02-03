@@ -1,7 +1,9 @@
 package com.zhuinden.simplestack;
 
 /**
- * Created by Owner on 2017. 01. 12..
+ * The interface that is responsible for handling when the state in the backstack changes.
+ *
+ * Created by Zhuinden on 2017. 01. 12..
  */
 public interface StateChanger {
     interface Callback {

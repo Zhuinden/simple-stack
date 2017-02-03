@@ -5,7 +5,9 @@ import android.os.Parcelable;
 import java.util.List;
 
 /**
- * Created by Owner on 2017. 01. 16..
+ * Represents the state that will be available once state change is complete.
+ *
+ * Created by Zhuinden on 2017. 01. 16..
  */
 
 class PendingStateChange {

@@ -17,8 +17,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplefragments.R;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics.StatisticsKey;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey;
@@ -33,8 +31,7 @@ import butterknife.ButterKnife;
  */
 
 public class MainView
-        extends DrawerLayout
-        implements MainActivity.OptionsItemSelectedListener, StateChanger {
+        extends DrawerLayout {
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -131,20 +128,6 @@ public class MainView
         drawerLayout = this;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(root != null && root.getChildAt(0) != null) {
-            boolean handled = false;
-            if(root.getChildAt(0) instanceof MainActivity.OptionsItemSelectedListener) {
-                handled = ((MainActivity.OptionsItemSelectedListener) (root.getChildAt(0))).onOptionsItemSelected(item);
-            }
-            if(handled) {
-                return handled;
-            }
-        }
-        return false;
-    }
-
     public void onCreate() {
         navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
 
@@ -184,13 +167,5 @@ public class MainView
             return true;
         }
         return false;
-    }
-
-    public void handleStateChange(StateChange stateChange, StateChanger.Callback callback) {
-        if(root != null && root.getChildAt(0) != null) {
-            if(root.getChildAt(0) instanceof StateChanger) {
-                ((StateChanger) root.getChildAt(0)).handleStateChange(stateChange, callback);
-            }
-        }
     }
 }

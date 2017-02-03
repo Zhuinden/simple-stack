@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Owner on 2017. 01. 22..
+ * A delegate class that manages Activity lifecycle integration, and view-state persistence for custom viewgroups.
+ *
+ * Created by Zhuinden on 2017. 01. 22..
  */
 
 public class BackstackDelegate {

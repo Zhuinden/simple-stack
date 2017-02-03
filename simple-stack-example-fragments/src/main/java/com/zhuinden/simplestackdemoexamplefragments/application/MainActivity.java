@@ -141,8 +141,6 @@ public class MainActivity
             completionCallback.stateChangeComplete();
             return;
         }
-        mainView.handleStateChange(stateChange, () -> {
-        });
 
         fragmentStateChanger.handleStateChange(stateChange);
 

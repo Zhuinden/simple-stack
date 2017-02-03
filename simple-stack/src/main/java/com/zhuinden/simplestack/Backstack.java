@@ -14,7 +14,9 @@ import java.util.List;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Created by Owner on 2017. 01. 12..
+ * The class that manages the active state record of the application.
+ *
+ * Created by Zhuinden on 2017. 01. 12..
  */
 
 public class Backstack {

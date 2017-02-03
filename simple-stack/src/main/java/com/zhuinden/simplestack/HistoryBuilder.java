@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Convenience class for creating `ArrayList of Parcelable` for backstack history.
  *
- * Created by Owner on 2017. 01. 16..
+ * Created by Zhuinden on 2017. 01. 16..
  */
 public class HistoryBuilder {
     private ArrayList<Parcelable> list = new ArrayList<>();

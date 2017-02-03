@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 0.8.2 (2017-02-03)
+---------------------------------
+- Made `KeyContextWrapper` public again.
+
 -Simple Stack 0.8.1 (2017-02-02)
 ---------------------------------
 - BREAKING(?) CHANGE: Renamed `HistoryBuilder.peek()` to `HistoryBuilder.getLast()`

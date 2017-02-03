@@ -12,9 +12,10 @@ import java.util.List;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Created by Owner on 2017. 01. 12..
+ * Provides the previous and the new state when the state changes within the backstack.
+ *
+ * Created by Zhuinden on 2017. 01. 12..
  */
-
 public class StateChange {
     @Retention(SOURCE)
     @IntDef({FORWARD, BACKWARD, REPLACE})
@@ -64,7 +65,7 @@ public class StateChange {
     }
 
     @NonNull
-    public KeyContextWrapper createContext(Context base, Parcelable key) {
+    public Context createContext(Context base, Parcelable key) {
         return new KeyContextWrapper(base, key);
     }
 }

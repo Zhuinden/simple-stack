@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 /**
- * Created by Owner on 2017. 01. 23..
+ * An interface that specifies that the custom viewgroup that implements this also places its persisted state into a Bundle.
+ *
+ * Created by Zhuinden on 2017. 01. 23..
  */
 
 public interface Bundleable {

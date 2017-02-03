@@ -6,12 +6,13 @@ import android.os.Parcelable;
 import android.view.LayoutInflater;
 
 /**
+ * Context Wrapper for inflating views, containing the key inside it, making it accessible via `Backstack.getKey(Context)`.
+ *
  * Created by Zhuinden on 2017.01.14..
  */
-
-class KeyContextWrapper
+public class KeyContextWrapper
         extends ContextWrapper {
-    static final String KEY = "Backstack.KEY";
+    public static final String TAG = "Backstack.KEY";
 
     LayoutInflater layoutInflater;
 
@@ -29,7 +30,7 @@ class KeyContextWrapper
                 layoutInflater = LayoutInflater.from(getBaseContext()).cloneInContext(this);
             }
             return layoutInflater;
-        } else if(KEY.equals(name)) {
+        } else if(TAG.equals(name)) {
             return key;
         }
         return super.getSystemService(name);
@@ -38,7 +39,7 @@ class KeyContextWrapper
 
     public static <T extends Parcelable> T getKey(Context context) {
         // noinspection ResourceType
-        Object key = context.getSystemService(KEY);
+        Object key = context.getSystemService(TAG);
         // noinspection unchecked
         return (T) key;
     }
