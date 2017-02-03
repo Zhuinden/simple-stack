@@ -2,7 +2,8 @@
 
 -Simple Stack 0.8.2 (2017-02-03)
 ---------------------------------
-- Made `KeyContextWrapper` public again.
+- CHANGE: `KeyContextWrapper` is public again
+- ENHANCEMENT: Created `fragments` example based on `mvp` example.
 
 -Simple Stack 0.8.1 (2017-02-02)
 ---------------------------------
