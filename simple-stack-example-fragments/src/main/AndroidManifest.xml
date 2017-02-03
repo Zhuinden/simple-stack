@@ -3,12 +3,14 @@
     package="com.zhuinden.simplestackdemoexamplefragments">
 
     <application
+        android:name=".application.CustomApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.zhuinden.simplestackdemoexamplefragments.MainActivity">
+        <activity android:name="com.zhuinden.demo.DemoActivity"></activity>
+        <activity android:name="com.zhuinden.simplestackdemoexamplefragments.application.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
@@ -39,8 +40,8 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
 
-    compile 'com.jakewharton:butterknife:8.4.0'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.jakewharton:butterknife:8.5.1'
+    apt 'com.jakewharton:butterknife-compiler:8.5.1'
 
     apt 'frankiesardo:auto-parcel:1.0.3'
 
@@ -53,7 +54,7 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
     compile 'com.jakewharton.rxrelay:rxrelay:1.2.0'
 
-    //apt 'dk.ilios:realmfieldnameshelper:1.1.0'
+    apt 'dk.ilios:realmfieldnameshelper:1.1.0'
 
     compile "com.andkulikov:transitionseverywhere:1.7.0"
 
