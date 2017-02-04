@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 0.8.3 (2017-02-04)
+---------------------------------
+- ENHANCEMENT: Added `BackstackDelegate.setPersistenceTag(String)` for support of multiple backstacks. It must be called before `BackstackDelegate.onCreate()`.
+
 -Simple Stack 0.8.2 (2017-02-03)
 ---------------------------------
 - CHANGE: `KeyContextWrapper` is public again

@@ -18,8 +18,34 @@ import java.util.Map;
  */
 
 public class BackstackDelegate {
+    private static final String UNINITIALIZED = "";
+    private String persistenceTag = UNINITIALIZED;
+
     private static final String HISTORY = "simplestack.HISTORY";
     private static final String STATES = HISTORY + "_STATES";
+
+    @SuppressWarnings("StringEquality")
+    public void setPersistenceTag(String persistenceTag) {
+        if(backstack != null) {
+            throw new IllegalStateException("Persistence tag should be set before calling `onCreate()`");
+        }
+        if(persistenceTag == null) {
+            throw new IllegalArgumentException("Null persistence tag is not allowed!");
+        }
+        if(this.persistenceTag == UNINITIALIZED) {
+            this.persistenceTag = persistenceTag;
+        } else if(!this.persistenceTag.equals(persistenceTag)) {
+            throw new IllegalStateException("The persistence tag cannot be set to a new value once it's already set!");
+        }
+    }
+
+    private String getHistoryTag() {
+        return "".equals(persistenceTag) ? HISTORY : HISTORY + persistenceTag;
+    }
+
+    private String getStateTag() {
+        return "".equals(persistenceTag) ? STATES : STATES + persistenceTag;
+    }
     
     Backstack backstack;
     
@@ -37,8 +63,8 @@ public class BackstackDelegate {
         }
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
-            keys = savedInstanceState.getParcelableArrayList(HISTORY);
-            List<SavedState> savedStates = savedInstanceState.getParcelableArrayList(STATES);
+            keys = savedInstanceState.getParcelableArrayList(getHistoryTag());
+            List<SavedState> savedStates = savedInstanceState.getParcelableArrayList(getStateTag());
             if(savedStates != null) {
                 for(SavedState savedState : savedStates) {
                     keyStateMap.put(savedState.getKey(), savedState);
@@ -79,8 +105,8 @@ public class BackstackDelegate {
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(HISTORY, HistoryBuilder.from(backstack.getHistory()).build());
-        outState.putParcelableArrayList(STATES, new ArrayList<>(keyStateMap.values()));
+        outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack.getHistory()).build());
+        outState.putParcelableArrayList(getStateTag(), new ArrayList<>(keyStateMap.values()));
     }
     
     public void onPostResume() {
