@@ -54,11 +54,16 @@ public class SimpleStateChanger
 
     @Override
     public void handleStateChange(final StateChange stateChange, final StateChanger.Callback callback) {
+        if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
+            callback.stateChangeComplete();
+            return;
+        }
+
         Parcelable newKey = stateChange.topNewState();
-        View newView;
         Context context = stateChange.createContext(baseContext, newKey);
+
         int layout = getLayout(newKey);
-        newView = LayoutInflater.from(context).inflate(layout, root, false);
+        View newView = LayoutInflater.from(context).inflate(layout, root, false);
 
         View previousView = null;
         if(stateChange.topPreviousState() != null) {

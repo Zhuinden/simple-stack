@@ -161,7 +161,7 @@ public final class Paths {
     public abstract static class Friend
             extends FriendPath {
         public static Parcelable create(int position) {
-            return new AutoValue_Paths_Friend(position); // TODO?
+            return new AutoValue_Paths_Friend(position);
         }
 
         @Override
