@@ -35,8 +35,6 @@ import com.zhuinden.simplestack.StateChanger;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static android.R.attr.direction;
-
 /**
  * Provides basic right-to-left transitions. Saves and restores view state.
  */
@@ -69,7 +67,7 @@ public class SimpleStateChanger
         }
         backstackDelegate.restoreViewFromState(newView);
 
-        if(previousView == null || direction == StateChange.REPLACE) {
+        if(previousView == null || stateChange.getDirection() == StateChange.REPLACE) {
             root.removeAllViews();
             root.addView(newView);
             callback.stateChangeComplete();
@@ -79,7 +77,7 @@ public class SimpleStateChanger
             Utils.waitForMeasure(newView, new Utils.OnMeasuredCallback() {
                 @Override
                 public void onMeasured(View view, int width, int height) {
-                    runAnimation(root, finalPreviousView, view, direction, new StateChanger.Callback() {
+                    runAnimation(root, finalPreviousView, view, stateChange.getDirection(), new StateChanger.Callback() {
                         @Override
                         public void stateChangeComplete() {
                             root.removeView(finalPreviousView);
