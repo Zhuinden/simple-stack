@@ -7,4 +7,4 @@ This used to be the exact same flow-sample as what was originally in the square/
 
 On 2017.02.07, this repository was converted to use Simple-Stack, Dagger2, and ButterKnife 8.x. 
 
-The original Flow sample is still available among the releases.
+You can read more about this sample [here](https://medium.com/@Zhuinden/master-detail-revisited-converting-flows-sample-to-simple-stack-a6cfcb60c42f#.mzzu7evxj).
