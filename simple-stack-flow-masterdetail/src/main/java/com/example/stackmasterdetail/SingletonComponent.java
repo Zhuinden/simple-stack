@@ -23,37 +23,30 @@ import com.example.stackmasterdetail.view.ConversationView;
 import com.example.stackmasterdetail.view.FriendListView;
 import com.example.stackmasterdetail.view.FriendView;
 import com.example.stackmasterdetail.view.MessageView;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
+import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
-import flow.StateParceler;
 import java.util.List;
 import javax.inject.Singleton;
 
-@Module(
-    injects = {
-        ConversationView.class, //
-        ConversationListView.class, //
-        FriendView.class, //
-        FriendListView.class, //
-        MessageView.class,
-    },
-    library = true)
-public class DaggerConfig {
-  @Provides List<Conversation> provideConversations() {
-    return SampleData.CONVERSATIONS;
-  }
+@Component(modules = {SingletonComponent.ComponentModule.class})
+@Singleton
+public interface SingletonComponent {
+  void inject(ConversationView conversationView);
+  void inject(ConversationListView conversationListView);
+  void inject(FriendView friendView);
+  void inject(FriendListView friendListView);
+  void inject(MessageView messageView);
 
-  @Provides List<User> provideFriends() {
-    return SampleData.FRIENDS;
-  }
+  @Module
+  public static class ComponentModule {
+    @Provides List<Conversation> provideConversations() {
+      return SampleData.CONVERSATIONS;
+    }
 
-  @Provides @Singleton Gson provideGson() {
-    return new GsonBuilder().create();
-  }
-
-  @Provides @Singleton StateParceler provideParcer(Gson gson) {
-    return new GsonParceler(gson);
+    @Provides List<User> provideFriends() {
+      return SampleData.FRIENDS;
+    }
   }
 }

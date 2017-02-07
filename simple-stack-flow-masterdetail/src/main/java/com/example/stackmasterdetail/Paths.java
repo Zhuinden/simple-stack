@@ -16,149 +16,160 @@
 
 package com.example.stackmasterdetail;
 
+import android.os.Parcelable;
+
 import com.example.stackmasterdetail.pathview.Layout;
-import flow.path.Path;
+import com.google.auto.value.AutoValue;
 
 public final class Paths {
+    public abstract static class Path implements Parcelable {
+        public abstract String getTitle();
+    }
+    
+    @Layout(R.layout.no_details)
+    @AutoValue
+    public abstract static class NoDetails
+            extends Path {
+        public static Parcelable create() {
+            return new AutoValue_Paths_NoDetails();
+        }
 
-  @Layout(R.layout.no_details)
-  public static class NoDetails extends Path {
-  }
+        @Override
+        public String getTitle() {
+            return "No Details";
+        }
+    }
 
-  /**
-   * Identifies screens in a master / detail relationship. Both master and detail screens
-   * extend this class.
-   * <p>
-   * Not a lot of thought has been put into making a decent master / detail modeling here. Rather
-   * this is an excuse to show off using Flow to build a responsive layout. See {@link
-   * com.example.stackmasterdetail.view.TabletMasterDetailRoot}.
-   */
-  public abstract static class MasterDetailPath extends Path {
     /**
-     * Returns the screen that shows the master list for this type of screen.
-     * If this screen is the master, returns self.
+     * Identifies screens in a master / detail relationship. Both master and detail screens
+     * extend this class.
      * <p>
-     * For example, the {@link Conversation} and {@link Message} screens are both
-     * "under" the master {@link ConversationList} screen. All three of these
-     * screens return a {@link Conversation} from this method.
+     * Not a lot of thought has been put into making a decent master / detail modeling here. Rather
+     * this is an excuse to show off using Flow to build a responsive layout. See {@link
+     * com.example.stackmasterdetail.view.TabletMasterDetailRoot}.
      */
-    public abstract MasterDetailPath getMaster();
+    public abstract static class MasterDetailPath
+            extends Path {
+        /**
+         * Returns the screen that shows the master list for this type of screen.
+         * If this screen is the master, returns self.
+         * <p>
+         * For example, the {@link Conversation} and {@link Message} screens are both
+         * "under" the master {@link ConversationList} screen. All three of these
+         * screens return a {@link Conversation} from this method.
+         */
+        public abstract MasterDetailPath getMaster();
 
-    public final boolean isMaster() {
-      return equals(getMaster());
-    }
-  }
-
-  public abstract static class ConversationPath extends MasterDetailPath {
-    public final int conversationIndex;
-
-    protected ConversationPath(int conversationIndex) {
-      this.conversationIndex = conversationIndex;
-    }
-
-    @Override public MasterDetailPath getMaster() {
-      return new ConversationList();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-
-      ConversationPath that = (ConversationPath) o;
-
-      return conversationIndex == that.conversationIndex;
+        public final boolean isMaster() {
+            return equals(getMaster());
+        }
     }
 
-    @Override
-    public int hashCode() {
-      return conversationIndex;
-    }
-  }
+    public abstract static class ConversationPath
+            extends MasterDetailPath {
+        public abstract int conversationIndex();
 
-  @Layout(R.layout.conversation_list_view) //
-  public static class ConversationList extends ConversationPath {
-    public ConversationList() {
-      super(-1);
-    }
-  }
-
-  @Layout(R.layout.conversation_view) //
-  public static class Conversation extends ConversationPath {
-    public Conversation(int conversationIndex) {
-      super(conversationIndex);
-    }
-  }
-
-  @Layout(R.layout.message_view) //
-  public static class Message extends ConversationPath {
-    public final int messageId;
-
-    public Message(int conversationIndex, int messageId) {
-      super(conversationIndex);
-      this.messageId = messageId;
+        @Override
+        public MasterDetailPath getMaster() {
+            return new AutoValue_Paths_ConversationList();
+        }
     }
 
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      if (!super.equals(o)) return false;
+    @Layout(R.layout.conversation_list_view) //
+    @AutoValue
+    public abstract static class ConversationList
+            extends ConversationPath {
+        public ConversationList() {
+        }
 
-      Message message = (Message) o;
+        @Override
+        public int conversationIndex() {
+            return -1;
+        }
 
-      return messageId == message.messageId;
+        public static Parcelable create() {
+            return new AutoValue_Paths_ConversationList();
+        }
+
+        @Override
+        public String getTitle() {
+            return "Conversation List";
+        }
     }
 
-    @Override
-    public int hashCode() {
-      int result = super.hashCode();
-      result = 31 * result + messageId;
-      return result;
-    }
-  }
+    @Layout(R.layout.conversation_view) //
+    @AutoValue
+    public abstract static class Conversation
+            extends ConversationPath {
+        public static Parcelable create(int conversationIndex) {
+            return new AutoValue_Paths_Conversation(conversationIndex);
+        }
 
-  public abstract static class FriendPath extends MasterDetailPath {
-    public final int index;
-
-    public FriendPath(int index) {
-      this.index = index;
-    }
-
-    @Override public MasterDetailPath getMaster() {
-      return new FriendList();
+        @Override
+        public String getTitle() {
+            return "Conversation";
+        }
     }
 
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+    @Layout(R.layout.message_view) //
+    @AutoValue
+    public abstract static class Message
+            extends ConversationPath {
+        public abstract int messageId();
 
-      FriendPath that = (FriendPath) o;
+        public static Parcelable create(int messageIndex, int position) {
+            return new AutoValue_Paths_Message(messageIndex, position);
+        }
 
-      return index == that.index;
+        @Override
+        public String getTitle() {
+            return "Message";
+        }
     }
 
-    @Override
-    public int hashCode() {
-      return index;
-    }
-  }
+    public abstract static class FriendPath
+            extends MasterDetailPath {
+        public abstract int index();
 
-  @Layout(R.layout.friend_list_view) //
-  public static class FriendList extends FriendPath {
-    public FriendList() {
-      super(-1);
+        @Override
+        public MasterDetailPath getMaster() {
+            return new AutoValue_Paths_FriendList();
+        }
     }
-  }
 
-  @Layout(R.layout.friend_view) //
-  public static class Friend extends FriendPath {
-    public Friend(int index) {
-      super(index);
+    @Layout(R.layout.friend_list_view) //
+    @AutoValue
+    public abstract static class FriendList
+            extends FriendPath {
+        @Override
+        public int index() {
+            return -1;
+        }
+
+        public static Parcelable create() {
+            return new AutoValue_Paths_FriendList();
+        }
+
+        @Override
+        public String getTitle() {
+            return "Friend List";
+        }
     }
-  }
 
-  private Paths() {
-  }
+    @Layout(R.layout.friend_view) //
+    @AutoValue
+    public abstract static class Friend
+            extends FriendPath {
+        public static Parcelable create(int position) {
+            return new AutoValue_Paths_Friend(position); // TODO?
+        }
+
+        @Override
+        public String getTitle() {
+            return "Friend";
+        }
+    }
+
+    private Paths() {
+    }
 }

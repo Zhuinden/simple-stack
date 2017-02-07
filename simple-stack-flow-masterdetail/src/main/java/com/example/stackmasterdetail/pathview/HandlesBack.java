@@ -27,9 +27,9 @@ package com.example.stackmasterdetail.pathview;
  * child views to give them first say.
  */
 public interface HandlesBack {
-  /**
-   * Returns <code>true</code> if back event was handled, <code>false</code> if someone higher in
-   * the chain should.
-   */
-  boolean onBackPressed();
+    /**
+     * Returns <code>true</code> if back event was handled, <code>false</code> if someone higher in
+     * the chain should.
+     */
+    boolean onBackPressed();
 }

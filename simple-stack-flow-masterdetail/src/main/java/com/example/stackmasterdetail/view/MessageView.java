@@ -20,50 +20,63 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnClick;
+
 import com.example.stackmasterdetail.Paths;
 import com.example.stackmasterdetail.R;
 import com.example.stackmasterdetail.model.Conversation;
 import com.example.stackmasterdetail.model.User;
+import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.Utils;
-import flow.Flow;
-import flow.path.Path;
+import com.zhuinden.simplestack.Backstack;
+
 import java.util.List;
+
 import javax.inject.Inject;
 
-public class MessageView extends LinearLayout {
-  @Inject List<Conversation> conversations;
-  @Inject List<User> friendList;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-  private Conversation.Item message;
+public class MessageView
+        extends LinearLayout {
+    @Inject
+    List<Conversation> conversations;
 
-  @InjectView(R.id.user) TextView userView;
-  @InjectView(R.id.message) TextView messageView;
+    @Inject
+    List<User> friendList;
 
-  public MessageView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    setOrientation(VERTICAL);
-    Utils.inject(context, this);
+    private Conversation.Item message;
 
-    Paths.Message screen = Path.get(context);
-    message = conversations.get(screen.conversationIndex).items.get(screen.messageId);
-  }
+    @BindView(R.id.user)
+    TextView userView;
 
-  @Override protected void onFinishInflate() {
-    super.onFinishInflate();
+    @BindView(R.id.message)
+    TextView messageView;
 
-    ButterKnife.inject(this);
+    public MessageView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        setOrientation(VERTICAL);
+        Utils.getComponent(context).inject(this);
 
-    userView.setText(String.valueOf(message.from));
-    messageView.setText(String.valueOf(message.message));
-  }
-
-  @OnClick(R.id.user) void userClicked() {
-    int position = friendList.indexOf(message.from);
-    if (position != -1) {
-      Flow.get(getContext()).set(new Paths.Friend(position));
+        Paths.Message screen = Backstack.getKey(context);
+        message = conversations.get(screen.conversationIndex()).items.get(screen.messageId());
     }
-  }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+
+        ButterKnife.bind(this);
+
+        userView.setText(String.valueOf(message.from));
+        messageView.setText(String.valueOf(message.message));
+    }
+
+    @OnClick(R.id.user)
+    void userClicked() {
+        int position = friendList.indexOf(message.from);
+        if(position != -1) {
+            BackstackService.get(getContext()).goTo(Paths.Friend.create(position));
+        }
+    }
 }

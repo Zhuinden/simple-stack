@@ -1,47 +1,56 @@
 package com.example.stackmasterdetail.pathview;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.util.AttributeSet;
-import com.example.stackmasterdetail.R;
-import flow.Flow;
-import flow.path.Path;
-import flow.path.PathContextFactory;
+import android.view.ViewGroup;
+
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 
 import static com.example.stackmasterdetail.Paths.MasterDetailPath;
 
-public class MasterPathContainerView extends FramePathContainerView {
+public class MasterPathContainerView
+        extends FramePathContainerView {
+    public MasterPathContainerView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
-  public MasterPathContainerView(Context context, AttributeSet attrs) {
-    super(context, attrs, new MasterPathContainer(R.id.screen_switcher_tag, Path.contextFactory()));
-  }
+    @Override
+    public void handleStateChange(StateChange stateChange, final StateChanger.Callback callback) {
+        Parcelable previousKey = stateChange.topPreviousState();
+        MasterDetailPath currentMaster = previousKey != null ? ((MasterDetailPath) previousKey).getMaster() : null;
 
-  @Override public void dispatch(Flow.Traversal traversal, final Flow.TraversalCallback callback) {
+        MasterDetailPath newMaster = ((MasterDetailPath) stateChange.topNewState()).getMaster();
 
-    MasterDetailPath currentMaster = ((MasterDetailPath) traversal.origin.top()).getMaster();
-
-    MasterDetailPath newMaster = ((MasterDetailPath) traversal.destination.top()).getMaster();
-
-    // Short circuit if the new screen has the same master.
-    if (getCurrentChild() != null && newMaster.equals(currentMaster)) {
-      callback.onTraversalCompleted();
-    } else {
-      super.dispatch(traversal, new Flow.TraversalCallback() {
-        @Override public void onTraversalCompleted() {
-          callback.onTraversalCompleted();
+        // Short circuit if the new screen has the same master.
+        if(getCurrentChild() != null && newMaster.equals(currentMaster)) {
+            callback.stateChangeComplete();
+        } else {
+            super.handleStateChange(stateChange, new StateChanger.Callback() {
+                @Override
+                public void stateChangeComplete() {
+                    callback.stateChangeComplete();
+                }
+            });
         }
-      });
-    }
-  }
-
-  static class MasterPathContainer extends SimplePathContainer {
-
-    MasterPathContainer(int tagKey, PathContextFactory contextFactory) {
-      super(tagKey, contextFactory);
     }
 
-    @Override protected int getLayout(Path path) {
-      MasterDetailPath mdPath = (MasterDetailPath) path;
-      return super.getLayout(mdPath.getMaster());
+    @Override
+    public StateChanger createContainer() {
+        return new MasterPathContainer(this);
     }
-  }
+
+    static class MasterPathContainer
+            extends SimpleStateChanger {
+        public MasterPathContainer(ViewGroup root) {
+            super(root);
+        }
+
+        @Override
+        protected int getLayout(Parcelable path) {
+            MasterDetailPath mdPath = (MasterDetailPath) path;
+            return super.getLayout(mdPath.getMaster());
+        }
+    }
 }

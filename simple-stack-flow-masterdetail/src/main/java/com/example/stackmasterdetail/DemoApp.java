@@ -17,18 +17,17 @@
 package com.example.stackmasterdetail;
 
 import android.app.Application;
-import dagger.ObjectGraph;
 
 public class DemoApp extends Application {
-  private ObjectGraph globalGraph;
+  private SingletonComponent singletonComponent;
 
   @Override public void onCreate() {
     super.onCreate();
 
-    globalGraph = ObjectGraph.create(new DaggerConfig());
+    singletonComponent = DaggerSingletonComponent.create();
   }
 
-  public ObjectGraph getGlobalGraph() {
-    return globalGraph;
+  public SingletonComponent getGlobalGraph() {
+    return singletonComponent;
   }
 }

@@ -16,6 +16,7 @@
 
 package com.example.stackmasterdetail.pathview;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -31,7 +32,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * public class ConversationScreen { ... }
  * </code></pre>
  */
-@Retention(RUNTIME) @Target(TYPE)
+@Retention(RUNTIME)
+@Target(TYPE)
+@Inherited
 public @interface Layout {
-  int value();
+    int value();
 }

@@ -17,22 +17,22 @@
 package com.example.stackmasterdetail.pathview;
 
 import android.view.View;
-import flow.Flow;
+
+import com.example.stackmasterdetail.util.BackstackService;
 
 /**
  * Support for {@link HandlesBack}.
  */
 public class BackSupport {
-
-  public static boolean onBackPressed(View childView) {
-    if (childView instanceof HandlesBack) {
-      if (((HandlesBack) childView).onBackPressed()) {
-        return true;
-      }
+    public static boolean onBackPressed(View childView) {
+        if(childView instanceof HandlesBack) {
+            if(((HandlesBack) childView).onBackPressed()) {
+                return true;
+            }
+        }
+        return BackstackService.get(childView.getContext()).goBack();
     }
-    return Flow.get(childView).goBack();
-  }
 
-  private BackSupport() {
-  }
+    private BackSupport() {
+    }
 }

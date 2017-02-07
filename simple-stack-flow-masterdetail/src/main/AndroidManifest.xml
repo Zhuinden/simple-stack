@@ -24,12 +24,12 @@
       android:allowBackup="true"
       android:icon="@drawable/flow_icon"
       android:name="com.example.stackmasterdetail.DemoApp"
+      android:theme="@style/AppTheme"
       >
     <activity
         android:label="Flow"
         android:name="com.example.stackmasterdetail.MainActivity"
         android:launchMode="singleTop"
-        android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
         >
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>

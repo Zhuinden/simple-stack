@@ -16,65 +16,90 @@
 
 package com.example.stackmasterdetail.pathview;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import com.example.stackmasterdetail.R;
-import flow.path.Path;
-import flow.path.PathContainer;
-import flow.path.PathContainerView;
-import flow.Flow;
 
+import com.example.stackmasterdetail.util.Container;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 
-/** A FrameLayout that can show screens for a {@link flow.Flow}. */
-public class FramePathContainerView extends FrameLayout
-    implements HandlesBack, PathContainerView {
-  private final PathContainer container;
-  private boolean disabled;
+public class FramePathContainerView
+        extends FrameLayout
+        implements HandlesBack, StateChanger, Container {
+    private boolean disabled;
 
-  @SuppressWarnings("UnusedDeclaration") // Used by layout inflation, of course!
-  public FramePathContainerView(Context context, AttributeSet attrs) {
-    this(context, attrs, new SimplePathContainer(R.id.screen_switcher_tag, Path.contextFactory()));
-  }
+    public FramePathContainerView(Context context) {
+        super(context);
+        init();
+    }
 
-  /**
-   * Allows subclasses to use custom {@link flow.path.PathContainer} implementations. Allows the use
-   * of more sophisticated transition schemes, and customized context wrappers.
-   */
-  protected FramePathContainerView(Context context, AttributeSet attrs, PathContainer container) {
-    super(context, attrs);
-    this.container = container;
-  }
+    public FramePathContainerView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
 
-  @Override public boolean dispatchTouchEvent(MotionEvent ev) {
-    return !disabled && super.dispatchTouchEvent(ev);
-  }
+    public FramePathContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
 
-  @Override public ViewGroup getContainerView() {
-    return this;
-  }
+    @TargetApi(21)
+    public FramePathContainerView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init();
+    }
 
-  @Override protected void onFinishInflate() {
-    super.onFinishInflate();
-  }
+    private void init() {
+        if(!isInEditMode()) {
+            container = createContainer();
+        }
+    }
 
-  @Override public void dispatch(Flow.Traversal traversal, final Flow.TraversalCallback callback) {
-    disabled = true;
-    container.executeTraversal(this, traversal, new Flow.TraversalCallback() {
-      @Override public void onTraversalCompleted() {
-        callback.onTraversalCompleted();
-        disabled = false;
-      }
-    });
-  }
+    StateChanger container;
 
-  @Override public boolean onBackPressed() {
-    return BackSupport.onBackPressed(getCurrentChild());
-  }
+    @Override
+    public StateChanger createContainer() {
+        return new SimpleStateChanger(this);
+    }
 
-  @Override public ViewGroup getCurrentChild() {
-    return (ViewGroup) getContainerView().getChildAt(0);
-  }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return !disabled && super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public ViewGroup getContainerView() {
+        return this;
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+    }
+
+    @Override
+    public void handleStateChange(StateChange traversal, final StateChanger.Callback callback) {
+        disabled = true;
+        container.handleStateChange(traversal, new StateChanger.Callback() {
+            @Override
+            public void stateChangeComplete() {
+                callback.stateChangeComplete();
+                disabled = false;
+            }
+        });
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return BackSupport.onBackPressed(getCurrentChild());
+    }
+
+    @Override
+    public ViewGroup getCurrentChild() {
+        return (ViewGroup) getContainerView().getChildAt(0);
+    }
 }

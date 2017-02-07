@@ -22,39 +22,48 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.example.stackmasterdetail.Paths;
 import com.example.stackmasterdetail.model.Conversation;
+import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.Utils;
-import flow.Flow;
+
 import java.util.List;
+
 import javax.inject.Inject;
 
-public class ConversationListView extends ListView implements IsMasterView {
-  @Inject List<Conversation> conversations;
+public class ConversationListView
+        extends ListView
+        implements IsMasterView {
+    @Inject
+    List<Conversation> conversations;
 
-  public ConversationListView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    Utils.inject(context, this);
+    public ConversationListView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        Utils.getComponent(context).inject(this);
 
-    Adapter adapter = new Adapter(getContext(), conversations);
+        Adapter adapter = new Adapter(getContext(), conversations);
 
-    setAdapter(adapter);
-    setOnItemClickListener(new OnItemClickListener() {
-      @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Flow.get(getContext()).set(new Paths.Conversation(position));
-      }
-    });
-  }
-
-  @Override public void updateSelection(Paths.MasterDetailPath newPath) {
-    Paths.ConversationPath path = (Paths.ConversationPath) newPath;
-    setItemChecked(path.conversationIndex, true);
-    invalidate();
-  }
-
-  private static class Adapter extends ArrayAdapter<Conversation> {
-    public Adapter(Context context, List<Conversation> objects) {
-      super(context, android.R.layout.simple_list_item_activated_1, objects);
+        setAdapter(adapter);
+        setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BackstackService.get(getContext()).goTo(Paths.Conversation.create(position));
+            }
+        });
     }
-  }
+
+    @Override
+    public void updateSelection(Paths.MasterDetailPath newPath) {
+        Paths.ConversationPath path = (Paths.ConversationPath) newPath;
+        setItemChecked(path.conversationIndex(), true);
+        invalidate();
+    }
+
+    private static class Adapter
+            extends ArrayAdapter<Conversation> {
+        public Adapter(Context context, List<Conversation> objects) {
+            super(context, android.R.layout.simple_list_item_activated_1, objects);
+        }
+    }
 }

@@ -7,6 +7,7 @@
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example/simple-stack-example.iml" filepath="$PROJECT_DIR$/simple-stack-example/simple-stack-example.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-fragments/simple-stack-example-fragments.iml" filepath="$PROJECT_DIR$/simple-stack-example-fragments/simple-stack-example-fragments.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-mvp/simple-stack-example-mvp.iml" filepath="$PROJECT_DIR$/simple-stack-example-mvp/simple-stack-example-mvp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/simple-stack-flow-masterdetail/simple-stack-flow-masterdetail.iml" filepath="$PROJECT_DIR$/simple-stack-flow-masterdetail/simple-stack-flow-masterdetail.iml" />
     </modules>
   </component>
 </project>

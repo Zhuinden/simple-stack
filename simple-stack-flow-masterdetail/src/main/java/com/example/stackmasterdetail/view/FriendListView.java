@@ -22,45 +22,54 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.example.stackmasterdetail.Paths;
 import com.example.stackmasterdetail.model.User;
+import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.Utils;
-import flow.Flow;
+
 import java.util.List;
+
 import javax.inject.Inject;
 
-public class FriendListView extends ListView implements IsMasterView {
-  @Inject List<User> friends;
+public class FriendListView
+        extends ListView
+        implements IsMasterView {
+    @Inject
+    List<User> friends;
 
-  public FriendListView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    Utils.inject(context, this);
+    public FriendListView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        Utils.getComponent(context).inject(this);
 
-    setFriends(friends);
+        setFriends(friends);
 
-    setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-  }
-
-  public void setFriends(List<User> friends) {
-    Adapter adapter = new Adapter(getContext(), friends);
-
-    setAdapter(adapter);
-    setOnItemClickListener(new OnItemClickListener() {
-      @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Flow.get(getContext()).set(new Paths.Friend(position));
-      }
-    });
-  }
-
-  @Override public void updateSelection(Paths.MasterDetailPath newPath) {
-    Paths.FriendPath screen = (Paths.FriendPath) newPath;
-    setItemChecked(screen.index, true);
-    invalidate();
-  }
-
-  private static class Adapter extends ArrayAdapter<User> {
-    public Adapter(Context context, List<User> objects) {
-      super(context, android.R.layout.simple_list_item_activated_1, objects);
+        setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     }
-  }
+
+    public void setFriends(List<User> friends) {
+        Adapter adapter = new Adapter(getContext(), friends);
+
+        setAdapter(adapter);
+        setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BackstackService.get(getContext()).goTo(Paths.Friend.create(position));
+            }
+        });
+    }
+
+    @Override
+    public void updateSelection(Paths.MasterDetailPath newPath) {
+        Paths.FriendPath screen = (Paths.FriendPath) newPath;
+        setItemChecked(screen.index(), true);
+        invalidate();
+    }
+
+    private static class Adapter
+            extends ArrayAdapter<User> {
+        public Adapter(Context context, List<User> objects) {
+            super(context, android.R.layout.simple_list_item_activated_1, objects);
+        }
+    }
 }

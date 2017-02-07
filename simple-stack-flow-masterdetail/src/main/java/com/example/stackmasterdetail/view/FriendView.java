@@ -20,34 +20,42 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import butterknife.ButterKnife;
-import butterknife.InjectView;
+
 import com.example.stackmasterdetail.Paths;
 import com.example.stackmasterdetail.R;
 import com.example.stackmasterdetail.model.User;
 import com.example.stackmasterdetail.util.Utils;
-import flow.path.Path;
+import com.zhuinden.simplestack.Backstack;
+
 import java.util.List;
+
 import javax.inject.Inject;
 
-public class FriendView extends LinearLayout {
-  @Inject List<User> friends;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-  private final User friend;
+public class FriendView
+        extends LinearLayout {
+    @Inject
+    List<User> friends;
 
-  @InjectView(R.id.friend_info) TextView friendInfo;
+    private final User friend;
 
-  public FriendView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    Utils.inject(context, this);
+    @BindView(R.id.friend_info)
+    TextView friendInfo;
 
-    Paths.Friend screen = Path.get(context);
-    friend = friends.get(screen.index);
-  }
+    public FriendView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        Utils.getComponent(context).inject(this);
 
-  @Override protected void onFinishInflate() {
-    super.onFinishInflate();
-    ButterKnife.inject(this);
-    friendInfo.setText("Name: " + friend.name);
-  }
+        Paths.Friend screen = Backstack.getKey(context);
+        friend = friends.get(screen.index());
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        ButterKnife.bind(this);
+        friendInfo.setText("Name: " + friend.name);
+    }
 }

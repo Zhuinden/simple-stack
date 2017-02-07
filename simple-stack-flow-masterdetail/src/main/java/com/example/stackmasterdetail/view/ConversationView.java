@@ -22,40 +22,47 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.example.stackmasterdetail.Paths;
 import com.example.stackmasterdetail.model.Conversation;
+import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.Utils;
-import flow.Flow;
-import flow.path.Path;
+import com.zhuinden.simplestack.Backstack;
+
 import java.util.List;
+
 import javax.inject.Inject;
 
-public class ConversationView extends ListView {
-  @Inject List<Conversation> conversationList;
+public class ConversationView
+        extends ListView {
+    @Inject
+    List<Conversation> conversationList;
 
-  public ConversationView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    Utils.inject(context, this);
+    public ConversationView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        Utils.getComponent(context).inject(this);
 
-    Paths.Conversation screen = Path.get(context);
-    setConversation(conversationList.get(screen.conversationIndex));
-  }
-
-  private void setConversation(final Conversation conversation) {
-    Adapter adapter = new Adapter(getContext(), conversation.items);
-
-    setAdapter(adapter);
-    setOnItemClickListener(new OnItemClickListener() {
-      @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        int messageIndex = conversationList.indexOf(conversation);
-        Flow.get(getContext()).set(new Paths.Message(messageIndex, position));
-      }
-    });
-  }
-
-  private static class Adapter extends ArrayAdapter<Conversation.Item> {
-    public Adapter(Context context, List<Conversation.Item> objects) {
-      super(context, android.R.layout.simple_list_item_1, objects);
+        Paths.Conversation screen = Backstack.getKey(context);
+        setConversation(conversationList.get(screen.conversationIndex()));
     }
-  }
+
+    private void setConversation(final Conversation conversation) {
+        Adapter adapter = new Adapter(getContext(), conversation.items);
+
+        setAdapter(adapter);
+        setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int messageIndex = conversationList.indexOf(conversation);
+                BackstackService.get(getContext()).goTo(Paths.Message.create(messageIndex, position));
+            }
+        });
+    }
+
+    private static class Adapter
+            extends ArrayAdapter<Conversation.Item> {
+        public Adapter(Context context, List<Conversation.Item> objects) {
+            super(context, android.R.layout.simple_list_item_1, objects);
+        }
+    }
 }

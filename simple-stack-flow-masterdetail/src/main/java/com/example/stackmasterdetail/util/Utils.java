@@ -20,10 +20,11 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import com.example.stackmasterdetail.DemoApp;
+import com.example.stackmasterdetail.SingletonComponent;
 
 public final class Utils {
-  public static void inject(Context context, Object thing) {
-    ((DemoApp) context.getApplicationContext()).getGlobalGraph().inject(thing);
+  public static SingletonComponent getComponent(Context context) {
+    return ((DemoApp) context.getApplicationContext()).getGlobalGraph();
   }
 
   public interface OnMeasuredCallback {
