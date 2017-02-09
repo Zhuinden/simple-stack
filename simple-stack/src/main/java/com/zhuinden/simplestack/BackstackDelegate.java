@@ -189,9 +189,9 @@ public class BackstackDelegate
     }
 
     @Override
-    public void stateChangeCompleted(List<Parcelable> history, boolean isPending) {
+    public void stateChangeCompleted(StateChange stateChange, boolean isPending) {
         if(!isPending) {
-            clearStatesNotIn(history);
+            clearStatesNotIn(stateChange.getNewState());
         }
     }
 

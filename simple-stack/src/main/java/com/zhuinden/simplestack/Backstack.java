@@ -198,13 +198,13 @@ public class Backstack {
 
         PendingStateChange pendingStateChange = queuedStateChanges.remove(0);
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
-        notifyCompletionListeners();
+        notifyCompletionListeners(stateChange);
         beginStateChangeIfPossible();
     }
 
     // completion listeners
     public interface CompletionListener {
-        void stateChangeCompleted(List<Parcelable> history, boolean isPending);
+        void stateChangeCompleted(StateChange stateChange, boolean isPending);
     }
 
     private LinkedList<CompletionListener> completionListeners = new LinkedList<>();
@@ -217,11 +217,10 @@ public class Backstack {
         completionListeners.remove(completionListener);
     }
 
-    private void notifyCompletionListeners() {
-        List<Parcelable> finalHistory = getHistory();
+    private void notifyCompletionListeners(StateChange stateChange) {
         boolean isPending = !queuedStateChanges.isEmpty();
         for(CompletionListener completionListener : completionListeners) {
-            completionListener.stateChangeCompleted(finalHistory, isPending);
+            completionListener.stateChangeCompleted(stateChange, isPending);
         }
     }
 
