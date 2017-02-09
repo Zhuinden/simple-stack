@@ -70,6 +70,12 @@ public class MainActivity
     }
 
     @Override
+    protected void onDestroy() {
+        backstackDelegate.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public Object getSystemService(String name) {
         if(name.equals(BackstackService.TAG)) {
             return backstackDelegate.getBackstack();
@@ -91,7 +97,6 @@ public class MainActivity
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
         backstackDelegate.restoreViewFromState(view);
         root.addView(view);
-        backstackDelegate.clearStatesNotIn(stateChange.getNewState());
         completionCallback.stateChangeComplete();
     }
 }

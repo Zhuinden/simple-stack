@@ -127,6 +127,12 @@ public class MainActivity
     }
 
     @Override
+    protected void onDestroy() {
+        backstackDelegate.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public Object getSystemService(String name) {
         if(TAG.equals(name)) {
             return this;

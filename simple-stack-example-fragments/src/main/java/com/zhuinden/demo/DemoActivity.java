@@ -70,6 +70,12 @@ public class DemoActivity
     }
 
     @Override
+    protected void onDestroy() {
+        backstackDelegate.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public Object getSystemService(String name) {
         if(BackstackService.TAG.equals(name)) {
             return backstackDelegate.getBackstack();

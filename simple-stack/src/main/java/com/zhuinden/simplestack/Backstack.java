@@ -18,7 +18,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  *
  * Created by Zhuinden on 2017. 01. 12..
  */
-
 public class Backstack {
     public static <T extends Parcelable> T getKey(Context context) {
         return KeyContextWrapper.getKey(context);
@@ -199,7 +198,31 @@ public class Backstack {
 
         PendingStateChange pendingStateChange = queuedStateChanges.remove(0);
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
-        beginStateChangeIfPossible();
+        if(!beginStateChangeIfPossible()) {
+            notifyCompletionListeners();
+        }
+    }
+
+    // completion listeners
+    public interface CompletionListener {
+        void stateChangeCompleted(List<Parcelable> history, boolean isPending);
+    }
+
+    private LinkedList<CompletionListener> completionListeners = new LinkedList<>();
+
+    public void addCompletionListener(CompletionListener completionListener) {
+        completionListeners.add(completionListener);
+    }
+
+    public void removeCompletionListener(CompletionListener completionListener) {
+        completionListeners.remove(completionListener);
+    }
+
+    private void notifyCompletionListeners() {
+        List<Parcelable> finalHistory = getHistory();
+        for(CompletionListener completionListener : completionListeners) {
+            completionListener.stateChangeCompleted(finalHistory, !queuedStateChanges.isEmpty());
+        }
     }
 
     // argument checks

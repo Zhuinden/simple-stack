@@ -17,7 +17,8 @@ import java.util.Map;
  * Created by Zhuinden on 2017. 01. 22..
  */
 
-public class BackstackDelegate {
+public class BackstackDelegate
+        implements Backstack.CompletionListener {
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
 
@@ -46,20 +47,21 @@ public class BackstackDelegate {
     private String getStateTag() {
         return "".equals(persistenceTag) ? STATES : STATES + persistenceTag;
     }
-    
+
     Backstack backstack;
-    
+
     StateChanger stateChanger;
-    
+
     public BackstackDelegate(StateChanger stateChanger) {
         this.stateChanger = stateChanger;
     }
 
     Map<Parcelable, SavedState> keyStateMap = new HashMap<>();
-    
+
     public void onCreate(Bundle savedInstanceState, Object nonConfigurationInstance, ArrayList<Parcelable> initialKeys) {
         if(nonConfigurationInstance != null && !(nonConfigurationInstance instanceof NonConfigurationInstance)) {
-            throw new IllegalArgumentException("The provided non configuration instance must be of type BackstackDelegate.NonConfigurationInstance!");
+            throw new IllegalArgumentException(
+                    "The provided non configuration instance must be of type BackstackDelegate.NonConfigurationInstance!");
         }
         ArrayList<Parcelable> keys;
         if(savedInstanceState != null) {
@@ -73,13 +75,18 @@ public class BackstackDelegate {
         } else {
             keys = initialKeys;
         }
-        NonConfigurationInstance nonConfig = (NonConfigurationInstance)nonConfigurationInstance;
+        NonConfigurationInstance nonConfig = (NonConfigurationInstance) nonConfigurationInstance;
         if(nonConfig != null) {
             backstack = nonConfig.getBackstack();
         } else {
             backstack = new Backstack(keys);
         }
+        registerAsCompletionListener();
         initializeBackstack(stateChanger);
+    }
+
+    protected void registerAsCompletionListener() {
+        backstack.addCompletionListener(this);
     }
 
     public void setStateChanger(StateChanger stateChanger) {
@@ -99,7 +106,7 @@ public class BackstackDelegate {
     public NonConfigurationInstance onRetainCustomNonConfigurationInstance() {
         return new NonConfigurationInstance(backstack);
     }
-    
+
     public boolean onBackPressed() {
         return backstack.goBack();
     }
@@ -108,7 +115,7 @@ public class BackstackDelegate {
         outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack.getHistory()).build());
         outState.putParcelableArrayList(getStateTag(), new ArrayList<>(keyStateMap.values()));
     }
-    
+
     public void onPostResume() {
         if(stateChanger == null) {
             throw new IllegalStateException("State changer is still not set in `onPostResume`!");
@@ -117,11 +124,15 @@ public class BackstackDelegate {
             backstack.setStateChanger(stateChanger, Backstack.REATTACH);
         }
     }
-    
+
     public void onPause() {
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
         }
+    }
+
+    public void onDestroy() {
+        backstack.removeCompletionListener(this);
     }
 
     // ----- get backstack
@@ -145,7 +156,7 @@ public class BackstackDelegate {
             view.saveHierarchyState(viewHierarchyState);
             Bundle bundle = null;
             if(view instanceof Bundleable) {
-                bundle = ((Bundleable)view).toBundle();
+                bundle = ((Bundleable) view).toBundle();
             }
             SavedState previousSavedState = SavedState.builder() //
                     .setKey(key) //
@@ -161,7 +172,7 @@ public class BackstackDelegate {
         SavedState savedState = getSavedState(newKey);
         view.restoreHierarchyState(savedState.getViewHierarchyState());
         if(view instanceof Bundleable) {
-            ((Bundleable)view).fromBundle(savedState.getBundle());
+            ((Bundleable) view).fromBundle(savedState.getBundle());
         }
     }
 
@@ -173,17 +184,22 @@ public class BackstackDelegate {
         return keyStateMap.get(key);
     }
 
-    public void clearStatesNotIn(List<Parcelable> keys) {
+    protected void clearStatesNotIn(List<Parcelable> keys) {
         keyStateMap.keySet().retainAll(keys);
+    }
+
+    @Override
+    public void stateChangeCompleted(List<Parcelable> history, boolean isPending) {
+        clearStatesNotIn(history);
     }
 
     public static class NonConfigurationInstance {
         private Backstack backstack;
-        
+
         private NonConfigurationInstance(Backstack backstack) {
             this.backstack = backstack;
         }
-        
+
         Backstack getBackstack() {
             return backstack;
         }

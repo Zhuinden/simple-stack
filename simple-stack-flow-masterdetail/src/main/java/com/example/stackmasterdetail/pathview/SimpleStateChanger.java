@@ -75,7 +75,6 @@ public class SimpleStateChanger
         if(previousView == null || stateChange.getDirection() == StateChange.REPLACE) {
             root.removeAllViews();
             root.addView(newView);
-            backstackDelegate.clearStatesNotIn(stateChange.getNewState());
             callback.stateChangeComplete();
         } else {
             root.addView(newView);
@@ -87,7 +86,6 @@ public class SimpleStateChanger
                         @Override
                         public void stateChangeComplete() {
                             root.removeView(finalPreviousView);
-                            backstackDelegate.clearStatesNotIn(stateChange.getNewState());
                             callback.stateChangeComplete();
                         }
                     });

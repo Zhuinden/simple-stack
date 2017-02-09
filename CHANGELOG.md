@@ -1,5 +1,22 @@
 # Change log
 
+-Simple Stack 0.9.0 (2017-02-09)
+---------------------------------
+- BREAKING CHANGE(!): `BackstackDelegate` has a new method which **must be called**: `backstackDelegate.onDestroy()`
+    Not calling `backstackDelegate.onDestroy()` will most likely result in memory leak, so please make sure you call it paired with `onCreate()`.
+
+- BREAKING CHANGE: `BackstackDelegate.clearStatesNotIn()` is no longer public, because it is automatically managed on state change completion.
+
+- ENHANCEMENT: Added `Backstack.CompletionListener` which listens to when backstack could not begin a new state change.
+    This assumes you only need the *latest* state at all times.
+    Added `Backstack.addCompletionListener()` and `Backstack.removeCompletionListener()` methods.
+    The backstack keeps a strong reference to your completion listener, so make sure you remove your change listener when no longer needed.
+
+- ENHANCEMENT: It is no longer the responsibility of the `StateChanger` to call `backstackDelegate.clearStatesNotIn()`.
+    The `BackstackDelegate` registers itself as a `CompletionListener`, and therefore it can call `clearStatesNotIn()` automatically.
+
+- ENHANCEMENT: Added `flow-sample` changed to use Simple-Stack, as name `simple-stack-flow-masterdetail`.
+
 -Simple Stack 0.8.3 (2017-02-04)
 ---------------------------------
 - ENHANCEMENT: Added `BackstackDelegate.setPersistenceTag(String)` for support of multiple backstacks. It must be called before `BackstackDelegate.onCreate()`.

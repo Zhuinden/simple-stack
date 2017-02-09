@@ -17,7 +17,6 @@
 package com.example.stackmasterdetail;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -84,6 +83,12 @@ public class MainActivity
     protected void onPause() {
         backstackDelegate.onPause();
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        backstackDelegate.onDestroy();
+        super.onDestroy();
     }
 
     @Override

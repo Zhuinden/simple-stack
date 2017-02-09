@@ -152,6 +152,12 @@ public class MainActivity
     }
 
     @Override
+    protected void onDestroy() {
+        backstackDelegate.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public Object getSystemService(String name) {
         if(TAG.equals(name)) {
             return this;
@@ -179,7 +185,6 @@ public class MainActivity
         root.addView(view);
         Log.i(TAG, "Restoring view state of [" + view + "]");
         backstackDelegate.restoreViewFromState(view);
-        backstackDelegate.clearStatesNotIn(stateChange.getNewState());
 
         mainView.setupViewsForKey(newKey, view);
         completionCallback.stateChangeComplete();
