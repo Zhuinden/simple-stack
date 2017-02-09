@@ -7,8 +7,7 @@
 
 - BREAKING CHANGE: `BackstackDelegate.clearStatesNotIn()` is no longer public, because it is automatically managed on state change completion.
 
-- ENHANCEMENT: Added `Backstack.CompletionListener` which listens to when backstack could not begin a new state change.
-    This assumes you only need the *latest* state at all times.
+- ENHANCEMENT: Added `Backstack.CompletionListener` which listens to when backstack has completed a state change.
     Added `Backstack.addCompletionListener()` and `Backstack.removeCompletionListener()` methods.
     The backstack keeps a strong reference to your completion listener, so make sure you remove your change listener when no longer needed.
 

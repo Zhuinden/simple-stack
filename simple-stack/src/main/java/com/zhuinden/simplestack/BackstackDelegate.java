@@ -190,7 +190,9 @@ public class BackstackDelegate
 
     @Override
     public void stateChangeCompleted(List<Parcelable> history, boolean isPending) {
-        clearStatesNotIn(history);
+        if(!isPending) {
+            clearStatesNotIn(history);
+        }
     }
 
     public static class NonConfigurationInstance {
