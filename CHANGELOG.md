@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 0.9.0 (2017-02-09)
+-Simple Stack 0.9.1 (2017-02-09)
 ---------------------------------
 - BREAKING CHANGE(!): `BackstackDelegate` has a new method which **must be called**: `backstackDelegate.onDestroy()`
     Not calling `backstackDelegate.onDestroy()` will most likely result in memory leak, so please make sure you call it paired with `onCreate()`.
