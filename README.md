@@ -2,30 +2,13 @@
 
 This is a simple backstack implementation.
 
-It is theoretically based on Flow 0.9, mixed with some aspects taken from Flow 1.0-alpha; but written from scratch.
+Similarly to Square's Flow, it allows you to represent your application state in a list of immutable (and parcelable) objects.
 
-The core concept was simplicity: maybe it should try to do less. In fact, even less than less.
+The library also provides you with the means of persisting the backstack easily through a delegate class, which handles both configuration change and process death.
 
-## What is it?
+Additionally, the delegate also allows you to persist state of custom viewgroups that are associated with a given UI state into a Bundle.
 
-Currently it's the following files:
-
-- [Backstack](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java): exposes operators for manipulating the backstack, and stores current history.
-- [StateChanger](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java): interface for a class that listens to changes inside the Backstack.
-- [StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): represents a state change inside the backstack, providing previous state, new state, and the direction of the change.
-
-- [StateChange.Direction](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): represents the direction of the change.
-- [StateChanger.Callback](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): the callback that signals to the backstack that the state change is complete.
-
-- [PendingStateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/PendingStateChange.java): represents a change that will occur when possible.
-
-- [HistoryBuilder](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/HistoryBuilder.java): Convenience class for building `ArrayList<Parcelable>`.
-
-- [SavedState](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/SavedState.java): contains the key, the view state and an optional Bundle. It is used for view state persistence.
-
-- [KeyContextWrapper](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/KeyContextWrapper.java): enables the ability to use `KeyContextWrapper.getKey(context)` to obtain key parameter in custom viewgroup.
-
-- [BackstackDelegate](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java): delegate class to hide Activity lifecycle integration.
+This way, you can easily create a single-Activity application using either views, fragments, or whatevers.
 
 ## Operators
 
@@ -33,7 +16,7 @@ The Backstack provides 3 convenient operators for manipulating state.
 
 - `goTo()`: if state does not previously exist in the backstack, then adds it to the stack. Otherwise navigate back to given state.
 - `goBack()`: returns boolean if state change is in progress, or if there are more than 1 entries in history (and handled the back press). Otherwise, return false.
-- `setHistory()`: sets the state to the provided elements.
+- `setHistory()`: sets the state to the provided elements, with the direction that is specified.
 
 ## What does it do?
 
@@ -71,11 +54,17 @@ and add the compile dependency to your module level gradle.
 
 The backstack must be initialized with at least one initial state, and a state changer must be set when it is able to handle the state change.
 
+The `BackstackDelegate` is provided as a convenience class to hide the Activity lifecycle integration and state persistence.
+
+The `StateChanger` can be set immediately for the delegate, or later (but before `onPostResume()`). For example, you can initialize the backstack before `super.onCreate()`, but set the state changer in `onPostCreate()`.
+
 Setting a state changer begins an `initialization` (in Flow terms, a bootstrap traversal), which provides a state change in form of `{[], [{...}, {...}]}`.
+
+This allows you to initialize your views according to your current state.
 
 Afterwards, the backstack operators allow changing between states.
 
-But `BackstackDelegate` is provided as a convenience class to hide the Activity lifecycle integration and state persistence.
+## Example code
 
 ``` java
 public class MainActivity
@@ -98,6 +87,7 @@ public class MainActivity
                 HistoryBuilder.single(new FirstKey()));
 
         // get reference to Backstack with `backstackDelegate.getBackstack()`
+        // you can also share it with `BackstackService.getContext()` or with lazy-initialized Dagger module, check examples
     }
 
     @Override
@@ -127,13 +117,13 @@ public class MainActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        backstackDelegate.persistViewToState(root.getChildAt(0));
-        backstackDelegate.onSaveInstanceState(outState);
+        backstackDelegate.persistViewToState(root.getChildAt(0)); // <-- persisting view state
+        backstackDelegate.onSaveInstanceState(outState); // <-- persisting backstack + view states
     }
 
     @Override
     protected void onDestroy() {
-        backstackDelegate.onDestroy(); // very important!
+        backstackDelegate.onDestroy(); // <-- very important!
         super.onDestroy();
     }
 
@@ -141,7 +131,6 @@ public class MainActivity
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
-            // no-op
             completionCallback.stateChangeComplete();
             return;
         }
@@ -157,3 +146,24 @@ public class MainActivity
 }
 ```
 
+## Structure
+
+- [Backstack](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java): exposes operators for manipulating the backstack, and stores current history.
+
+- [StateChanger](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java): interface for a class that listens to changes inside the Backstack.
+
+- [StateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): represents a state change inside the backstack, providing previous state, new state, and the direction of the change.
+
+- [StateChanger.Callback](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java): the callback that signals to the backstack that the state change is complete.
+
+- [PendingStateChange](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/PendingStateChange.java): represents a change that will occur when possible.
+
+- [HistoryBuilder](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/HistoryBuilder.java): Convenience class for building `ArrayList<Parcelable>`.
+
+- [SavedState](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/SavedState.java): contains the key, the view state and an optional Bundle. It is used for view state persistence.
+
+- [KeyContextWrapper](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/KeyContextWrapper.java): enables the ability to use `KeyContextWrapper.getKey(context)` or `Backstack.getKey(context)` to obtain key parameter in custom viewgroup.
+
+- [BackstackDelegate](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java): delegate class to hide Activity lifecycle integration, and provide view state persistence.
+
+- [Bundleable](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Bundleable.java): interface that allows you to persist state directly from a custom View into a Bundle, using the delegate.
