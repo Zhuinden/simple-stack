@@ -167,3 +167,21 @@ public class MainActivity
 - [BackstackDelegate](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java): delegate class to hide Activity lifecycle integration, and provide view state persistence.
 
 - [Bundleable](https://github.com/Zhuinden/simple-stack-demo/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Bundleable.java): interface that allows you to persist state directly from a custom View into a Bundle, using the delegate.
+
+
+
+## License
+
+    Copyright 2017 Gabor Varadi
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
