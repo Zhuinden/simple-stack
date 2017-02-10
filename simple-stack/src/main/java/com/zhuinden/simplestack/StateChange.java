@@ -51,11 +51,15 @@ public class StateChange {
     List<Parcelable> newState;
     int direction;
 
-    public List<Parcelable> getPreviousState() {
+    public
+    @NonNull
+    List<Parcelable> getPreviousState() {
         return previousState;
     }
 
-    public List<Parcelable> getNewState() {
+    public
+    @NonNull
+    List<Parcelable> getNewState() {
         return newState;
     }
 

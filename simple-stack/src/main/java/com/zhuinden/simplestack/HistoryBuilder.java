@@ -16,6 +16,7 @@
 package com.zhuinden.simplestack;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +33,7 @@ public class HistoryBuilder {
     private HistoryBuilder() { // use newBuilder()
     }
 
-    public static HistoryBuilder from(List<? extends Parcelable> collection) {
+    public static HistoryBuilder from(@NonNull List<? extends Parcelable> collection) {
         return newBuilder()
                 .addAll(collection);
     }
@@ -41,13 +42,13 @@ public class HistoryBuilder {
         return new HistoryBuilder();
     }
 
-    public static ArrayList<Parcelable> single(Parcelable key) {
+    public static ArrayList<Parcelable> single(@NonNull Parcelable key) {
         return newBuilder()
                 .add(key)
                 .build();
     }
 
-    public HistoryBuilder addAll(List<? extends Parcelable> collection) {
+    public HistoryBuilder addAll(@NonNull List<? extends Parcelable> collection) {
         if(collection == null) {
             throw new IllegalArgumentException("Provided collection cannot be null");
         }
@@ -55,7 +56,7 @@ public class HistoryBuilder {
         return this;
     }
 
-    public HistoryBuilder addAllAt(List<? extends Parcelable> collection, int index) {
+    public HistoryBuilder addAllAt(@NonNull List<? extends Parcelable> collection, int index) {
         if(collection == null) {
             throw new IllegalArgumentException("Provided collection cannot be null");
         }
@@ -68,11 +69,15 @@ public class HistoryBuilder {
         return this;
     }
 
-    public boolean contains(Parcelable key) {
+    public boolean contains(@NonNull Parcelable key) {
+        checkKey(key);
         return list.contains(key);
     }
 
-    public boolean containsAll(Collection<Parcelable> keys) {
+    public boolean containsAll(@NonNull Collection<Parcelable> keys) {
+        if(keys == null) {
+            throw new IllegalArgumentException("Keys cannot be null!");
+        }
         return list.containsAll(keys);
     }
 
@@ -80,7 +85,8 @@ public class HistoryBuilder {
         return list.size();
     }
 
-    public HistoryBuilder remove(Parcelable key) {
+    public HistoryBuilder remove(@NonNull Parcelable key) {
+        checkKey(key);
         list.remove(key);
         return this;
     }
@@ -90,7 +96,8 @@ public class HistoryBuilder {
         return this;
     }
 
-    public HistoryBuilder retainAll(Collection<Parcelable> keys) {
+    public HistoryBuilder retainAll(@NonNull Collection<Parcelable> keys) {
+        checkKeys(keys);
         list.retainAll(keys);
         return this;
     }
@@ -104,9 +111,7 @@ public class HistoryBuilder {
     }
 
     public HistoryBuilder removeUntil(Parcelable key) {
-        if(key == null) {
-            throw new IllegalArgumentException("History key cannot be null");
-        }
+        checkKey(key);
         while(!list.isEmpty() && !getLast().equals(key)) {
             removeLast();
         }
@@ -117,6 +122,7 @@ public class HistoryBuilder {
     }
 
     public int indexOf(Parcelable key) {
+        checkKey(key);
         return list.indexOf(key);
     }
 
@@ -131,22 +137,31 @@ public class HistoryBuilder {
     }
 
     public HistoryBuilder add(Parcelable key) {
-        if(key == null) {
-            throw new IllegalArgumentException("History key cannot be null");
-        }
+        checkKey(key);
         list.add(key);
         return this;
     }
 
     public HistoryBuilder add(Parcelable key, int index) {
-        if(key == null) {
-            throw new IllegalArgumentException("History key cannot be null");
-        }
+        checkKey(key);
         list.add(index, key);
         return this;
     }
 
     public ArrayList<Parcelable> build() {
         return new ArrayList<>(this.list);
+    }
+
+    // validations
+    private void checkKey(Parcelable key) {
+        if(key == null) {
+            throw new IllegalArgumentException("History key cannot be null!");
+        }
+    }
+
+    private void checkKeys(Collection<Parcelable> keys) {
+        if(keys == null) {
+            throw new IllegalArgumentException("Keys cannot be null!");
+        }
     }
 }

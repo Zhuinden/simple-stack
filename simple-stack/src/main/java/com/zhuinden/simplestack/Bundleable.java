@@ -16,6 +16,7 @@
 package com.zhuinden.simplestack;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
@@ -25,6 +26,7 @@ import android.support.annotation.Nullable;
  */
 
 public interface Bundleable {
+    @NonNull
     Bundle toBundle();
 
     void fromBundle(@Nullable Bundle bundle);

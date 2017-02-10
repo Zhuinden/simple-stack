@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -41,7 +42,7 @@ public class BackstackDelegate
     private static final String STATES = HISTORY + "_STATES";
 
     @SuppressWarnings("StringEquality")
-    public void setPersistenceTag(String persistenceTag) {
+    public void setPersistenceTag(@NonNull String persistenceTag) {
         if(backstack != null) {
             throw new IllegalStateException("Persistence tag should be set before calling `onCreate()`");
         }
@@ -67,13 +68,13 @@ public class BackstackDelegate
 
     StateChanger stateChanger;
 
-    public BackstackDelegate(StateChanger stateChanger) {
+    public BackstackDelegate(@Nullable StateChanger stateChanger) {
         this.stateChanger = stateChanger;
     }
 
     Map<Parcelable, SavedState> keyStateMap = new HashMap<>();
 
-    public void onCreate(Bundle savedInstanceState, Object nonConfigurationInstance, ArrayList<Parcelable> initialKeys) {
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull ArrayList<Parcelable> initialKeys) {
         if(nonConfigurationInstance != null && !(nonConfigurationInstance instanceof NonConfigurationInstance)) {
             throw new IllegalArgumentException(
                     "The provided non configuration instance must be of type BackstackDelegate.NonConfigurationInstance!");
@@ -104,7 +105,7 @@ public class BackstackDelegate
         backstack.addCompletionListener(this);
     }
 
-    public void setStateChanger(StateChanger stateChanger) {
+    public void setStateChanger(@Nullable StateChanger stateChanger) {
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
         }
@@ -126,7 +127,7 @@ public class BackstackDelegate
         return backstack.goBack();
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack.getHistory()).build());
         outState.putParcelableArrayList(getStateTag(), new ArrayList<>(keyStateMap.values()));
     }
@@ -152,6 +153,7 @@ public class BackstackDelegate
 
     // ----- get backstack
 
+    @NonNull
     public Backstack getBackstack() {
         if(backstack == null) {
             throw new IllegalStateException("The backstack within the delegate must be initialized by `onCreate()`");
@@ -161,7 +163,7 @@ public class BackstackDelegate
 
     // ----- viewstate persistence
 
-    public void persistViewToState(View view) {
+    public void persistViewToState(@Nullable View view) {
         if(view != null) {
             Parcelable key = KeyContextWrapper.getKey(view.getContext());
             if(key == null) {
@@ -182,7 +184,10 @@ public class BackstackDelegate
         }
     }
 
-    public void restoreViewFromState(View view) {
+    public void restoreViewFromState(@NonNull View view) {
+        if(view == null) {
+            throw new IllegalArgumentException("You cannot restore state into null view!");
+        }
         Parcelable newKey = KeyContextWrapper.getKey(view.getContext());
         SavedState savedState = getSavedState(newKey);
         view.restoreHierarchyState(savedState.getViewHierarchyState());
@@ -192,19 +197,22 @@ public class BackstackDelegate
     }
 
     @NonNull
-    public SavedState getSavedState(Parcelable key) {
+    public SavedState getSavedState(@NonNull Parcelable key) {
+        if(key == null) {
+            throw new IllegalArgumentException("Key cannot be null!");
+        }
         if(!keyStateMap.containsKey(key)) {
             keyStateMap.put(key, SavedState.builder().setKey(key).build());
         }
         return keyStateMap.get(key);
     }
 
-    protected void clearStatesNotIn(List<Parcelable> keys) {
+    protected void clearStatesNotIn(@NonNull List<Parcelable> keys) {
         keyStateMap.keySet().retainAll(keys);
     }
 
     @Override
-    public void stateChangeCompleted(StateChange stateChange, boolean isPending) {
+    public void stateChangeCompleted(@NonNull StateChange stateChange, boolean isPending) {
         if(!isPending) {
             clearStatesNotIn(stateChange.getNewState());
         }

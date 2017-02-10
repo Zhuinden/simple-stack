@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 
 /**
@@ -33,8 +34,11 @@ public class KeyContextWrapper
 
     final Parcelable key;
 
-    public KeyContextWrapper(Context base, Parcelable key) {
+    public KeyContextWrapper(Context base, @NonNull Parcelable key) {
         super(base);
+        if(key == null) {
+            throw new IllegalArgumentException("Key cannot be null!");
+        }
         this.key = key;
     }
 

@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -57,14 +58,14 @@ public class Backstack {
 
     private StateChanger stateChanger;
 
-    public Backstack(Parcelable... initialKeys) {
+    public Backstack(@NonNull Parcelable... initialKeys) {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
         initialParameters = Collections.unmodifiableList(new ArrayList<>(Arrays.asList(initialKeys)));
     }
 
-    public Backstack(List<Parcelable> initialKeys) {
+    public Backstack(@NonNull List<Parcelable> initialKeys) {
         if(initialKeys == null) {
             throw new NullPointerException("Initial key list should not be null");
         }
@@ -78,7 +79,7 @@ public class Backstack {
         return stateChanger != null;
     }
 
-    public void setStateChanger(StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
+    public void setStateChanger(@NonNull StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
         if(stateChanger == null) {
             throw new NullPointerException("New state changer cannot be null");
         }
@@ -99,7 +100,7 @@ public class Backstack {
         this.stateChanger = null;
     }
 
-    public void goTo(Parcelable newKey) {
+    public void goTo(@NonNull Parcelable newKey) {
         checkNewKey(newKey);
 
         ArrayList<Parcelable> newHistory = new ArrayList<>();
@@ -139,7 +140,7 @@ public class Backstack {
         return true;
     }
 
-    public void setHistory(List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction) {
+    public void setHistory(@NonNull List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
         enqueueStateChange(newHistory, direction, false);
     }
@@ -219,16 +220,22 @@ public class Backstack {
 
     // completion listeners
     public interface CompletionListener {
-        void stateChangeCompleted(StateChange stateChange, boolean isPending);
+        void stateChangeCompleted(@NonNull StateChange stateChange, boolean isPending);
     }
 
     private LinkedList<CompletionListener> completionListeners = new LinkedList<>();
 
-    public void addCompletionListener(CompletionListener completionListener) {
+    public void addCompletionListener(@NonNull CompletionListener completionListener) {
+        if(completionListener == null) {
+            throw new IllegalArgumentException("Null completion listener cannot be added!");
+        }
         completionListeners.add(completionListener);
     }
 
-    public void removeCompletionListener(CompletionListener completionListener) {
+    public void removeCompletionListener(@NonNull CompletionListener completionListener) {
+        if(completionListener == null) {
+            throw new IllegalArgumentException("Null completion listener cannot be removed!");
+        }
         completionListeners.remove(completionListener);
     }
 

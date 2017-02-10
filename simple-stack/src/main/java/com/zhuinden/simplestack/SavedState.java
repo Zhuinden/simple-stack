@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 /**
@@ -67,7 +68,7 @@ public class SavedState
         Builder() {
         }
 
-        public Builder setKey(Parcelable key) {
+        public Builder setKey(@NonNull Parcelable key) {
             if(key == null) {
                 throw new IllegalArgumentException("Key cannot be null");
             }
@@ -75,7 +76,7 @@ public class SavedState
             return this;
         }
 
-        public Builder setViewHierarchyState(SparseArray<Parcelable> viewHierarchyState) {
+        public Builder setViewHierarchyState(@NonNull SparseArray<Parcelable> viewHierarchyState) {
             if(viewHierarchyState == null) {
                 throw new IllegalArgumentException("Provided sparse array for view hierarchy state cannot be null");
             }
