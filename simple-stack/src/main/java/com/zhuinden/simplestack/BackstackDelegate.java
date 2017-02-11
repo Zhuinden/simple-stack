@@ -212,8 +212,8 @@ public class BackstackDelegate
     }
 
     @Override
-    public void stateChangeCompleted(@NonNull StateChange stateChange, boolean isPending) {
-        if(!isPending) {
+    public void stateChangeCompleted(@NonNull StateChange stateChange) {
+        if(!backstack.isStateChangePending()) {
             clearStatesNotIn(stateChange.getNewState());
         }
     }

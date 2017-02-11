@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 0.9.2 (2017-02-11)
+---------------------------------
+- BREAKING CHANGE(?): `CompletionListener` no longer receives `isPending` parameter.
+
+- ADDED: `Backstack.isStateChangePending()` to replace `isPending`.
+
+- ENHANCEMENT: Added some missing `@NonNull` and `@Nullable` annotations.
+
+- ADDED: Apache license notes, and improved the README.
+
 -Simple Stack 0.9.1 (2017-02-09)
 ---------------------------------
 - BREAKING CHANGE(!): `BackstackDelegate` has a new method which **must be called**: `backstackDelegate.onDestroy()`

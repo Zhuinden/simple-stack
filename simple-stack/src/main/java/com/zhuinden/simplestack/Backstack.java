@@ -123,7 +123,7 @@ public class Backstack {
     }
 
     public boolean goBack() {
-        if(!queuedStateChanges.isEmpty() && queuedStateChanges.get(0).getStatus() != PendingStateChange.Status.COMPLETED) {
+        if(isStateChangePending()) {
             return true;
         }
         if(stack.size() <= 1) {
@@ -151,6 +151,10 @@ public class Backstack {
         return Collections.unmodifiableList(copy);
     }
 
+    public boolean isStateChangePending() {
+        return !queuedStateChanges.isEmpty();
+    }
+
     private void enqueueStateChange(List<Parcelable> newHistory, int direction, boolean initialization) {
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
@@ -168,7 +172,7 @@ public class Backstack {
     }
 
     private boolean beginStateChangeIfPossible() {
-        if(hasStateChanger() && !queuedStateChanges.isEmpty()) {
+        if(hasStateChanger() && isStateChangePending()) {
             PendingStateChange pendingStateChange = queuedStateChanges.get(0);
             if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
                 pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
@@ -220,7 +224,7 @@ public class Backstack {
 
     // completion listeners
     public interface CompletionListener {
-        void stateChangeCompleted(@NonNull StateChange stateChange, boolean isPending);
+        void stateChangeCompleted(@NonNull StateChange stateChange);
     }
 
     private LinkedList<CompletionListener> completionListeners = new LinkedList<>();
@@ -240,9 +244,8 @@ public class Backstack {
     }
 
     private void notifyCompletionListeners(StateChange stateChange) {
-        boolean isPending = !queuedStateChanges.isEmpty();
         for(CompletionListener completionListener : completionListeners) {
-            completionListener.stateChangeCompleted(stateChange, isPending);
+            completionListener.stateChangeCompleted(stateChange);
         }
     }
 
