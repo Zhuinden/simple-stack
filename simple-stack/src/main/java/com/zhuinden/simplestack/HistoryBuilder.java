@@ -110,7 +110,7 @@ public class HistoryBuilder {
         return this;
     }
 
-    public HistoryBuilder removeUntil(Parcelable key) {
+    public HistoryBuilder removeUntil(@NonNull Parcelable key) {
         checkKey(key);
         while(!list.isEmpty() && !getLast().equals(key)) {
             removeLast();
@@ -121,7 +121,7 @@ public class HistoryBuilder {
         return this;
     }
 
-    public int indexOf(Parcelable key) {
+    public int indexOf(@NonNull Parcelable key) {
         checkKey(key);
         return list.indexOf(key);
     }
@@ -136,13 +136,13 @@ public class HistoryBuilder {
         return (T)(list.isEmpty() ? null : list.get(list.size() - 1));
     }
 
-    public HistoryBuilder add(Parcelable key) {
+    public HistoryBuilder add(@NonNull Parcelable key) {
         checkKey(key);
         list.add(key);
         return this;
     }
 
-    public HistoryBuilder add(Parcelable key, int index) {
+    public HistoryBuilder add(@NonNull Parcelable key, int index) {
         checkKey(key);
         list.add(index, key);
         return this;
