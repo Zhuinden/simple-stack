@@ -5,16 +5,13 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.example.stackmasterdetailfrag.MasterDetailFragmentStateChanger;
 import com.example.stackmasterdetailfrag.Paths;
 import com.example.stackmasterdetailfrag.R;
 import com.example.stackmasterdetailfrag.util.FragmentManagerService;
-import com.zhuinden.simplestack.Backstack;
+import com.example.stackmasterdetailfrag.view.IsMasterView;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
@@ -57,6 +54,11 @@ public class TabletMasterDetailRoot
     @Override
     public void handleStateChange(final StateChange stateChange, StateChanger.Callback callback) {
         masterDetailFragmentStateChanger.handleStateChange(stateChange);
+        FragmentManager fragmentManager = FragmentManagerService.get(getContext());
+        Fragment fragment = fragmentManager.findFragmentById(R.id.master);
+        if(fragment != null && fragment.getView() != null && fragment.getView() instanceof IsMasterView) {
+            ((IsMasterView) fragment.getView()).updateSelection(stateChange.<Paths.MasterDetailPath>topNewState());
+        }
         callback.stateChangeComplete();
     }
 
