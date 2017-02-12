@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/simple-stack-example-mvp" />
             <option value="$PROJECT_DIR$/simple-stack-example-rx" />
             <option value="$PROJECT_DIR$/simple-stack-flow-masterdetail" />
+            <option value="$PROJECT_DIR$/simple-stack-flow-masterdetail-fragments" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
