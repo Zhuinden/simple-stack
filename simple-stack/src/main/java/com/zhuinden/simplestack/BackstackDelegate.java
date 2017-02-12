@@ -148,6 +148,7 @@ public class BackstackDelegate
     }
 
     public void onDestroy() {
+        backstack.executePendingStateChange();
         backstack.removeCompletionListener(this);
     }
 

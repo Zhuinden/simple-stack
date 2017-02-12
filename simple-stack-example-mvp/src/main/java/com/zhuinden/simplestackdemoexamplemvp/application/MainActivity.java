@@ -1,11 +1,14 @@
 package com.zhuinden.simplestackdemoexamplemvp.application;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +27,7 @@ import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
+import com.zhuinden.simplestackdemoexamplemvp.util.ViewUtils;
 
 import javax.inject.Inject;
 
@@ -97,7 +101,6 @@ public class MainActivity
             @Nullable
             @Override
             public Coordinator provideCoordinator(View view) {
-                Log.i(TAG, "Providing coordinator for [" + view + "]");
                 Key key = Backstack.getKey(view.getContext());
                 return key.newCoordinator(CustomApplication.get(view.getContext()).getComponent());
             }
@@ -168,25 +171,58 @@ public class MainActivity
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
-            // no-op
             completionCallback.stateChangeComplete();
             return;
         }
         mainView.handleStateChange(stateChange, () -> {
         });
 
-        Log.i(TAG, "Persisting view state of [" + root.getChildAt(0) + "]");
-        backstackDelegate.persistViewToState(root.getChildAt(0));
-        root.removeAllViews();
+        final View previousView = root.getChildAt(0);
+        backstackDelegate.persistViewToState(previousView);
+
         Key newKey = stateChange.topNewState();
         Context newContext = stateChange.createContext(this, newKey);
-        View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        Log.i(TAG, "Adding view [" + view + "]");
-        root.addView(view);
-        Log.i(TAG, "Restoring view state of [" + view + "]");
-        backstackDelegate.restoreViewFromState(view);
+        View newView = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
 
-        mainView.setupViewsForKey(newKey, view);
+        if(stateChange.getDirection() == StateChange.REPLACE) {
+            root.addView(newView);
+            backstackDelegate.restoreViewFromState(newView);
+            finishStateChange(previousView, newView, completionCallback);
+        } else {
+            root.addView(newView);
+            backstackDelegate.restoreViewFromState(newView);
+            ViewUtils.waitForMeasure(newView, (view, width, height) -> {
+                runAnimation(previousView, newView, stateChange.getDirection(), new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        finishStateChange(previousView, newView, completionCallback);
+                    }
+                });
+            });
+        }
+    }
+
+    private void finishStateChange(View previousView, View newView, Callback completionCallback) {
+        root.removeView(previousView);
+        mainView.setupViewsForKey(Backstack.getKey(newView.getContext()), newView);
         completionCallback.stateChangeComplete();
+    }
+
+    // animation
+    private void runAnimation(final View previousView, final View newView, int direction, AnimatorListenerAdapter animatorListenerAdapter) {
+        Animator animator = createSegue(previousView, newView, direction);
+        animator.addListener(animatorListenerAdapter);
+        animator.start();
+    }
+
+    private Animator createSegue(View from, View to, int direction) {
+        boolean backward = direction == StateChange.BACKWARD;
+        int fromTranslation = backward ? from.getWidth() : -from.getWidth();
+        int toTranslation = backward ? -to.getWidth() : to.getWidth();
+
+        AnimatorSet set = new AnimatorSet();
+        set.play(ObjectAnimator.ofFloat(from, View.TRANSLATION_X, fromTranslation));
+        set.play(ObjectAnimator.ofFloat(to, View.TRANSLATION_X, toTranslation, 0));
+        return set;
     }
 }

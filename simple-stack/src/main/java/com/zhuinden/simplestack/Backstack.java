@@ -173,7 +173,7 @@ public class Backstack {
 
     private boolean beginStateChangeIfPossible() {
         if(hasStateChanger() && isStateChangePending()) {
-            PendingStateChange pendingStateChange = queuedStateChanges.get(0);
+            PendingStateChange pendingStateChange = queuedStateChanges.getFirst();
             if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
                 pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
                 changeState(pendingStateChange);
@@ -198,15 +198,19 @@ public class Backstack {
         final StateChange stateChange = new StateChange(Collections.unmodifiableList(previousState),
                 Collections.unmodifiableList(newHistory),
                 direction);
-        stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
+        StateChanger.Callback completionCallback = new StateChanger.Callback() {
             @Override
             public void stateChangeComplete() {
-                if(pendingStateChange.getStatus() == PendingStateChange.Status.COMPLETED) {
-                    throw new IllegalStateException("State change completion cannot be called multiple times!");
+                if(!pendingStateChange.didForceExecute) {
+                    if(pendingStateChange.getStatus() == PendingStateChange.Status.COMPLETED) {
+                        throw new IllegalStateException("State change completion cannot be called multiple times!");
+                    }
+                    completeStateChange(stateChange);
                 }
-                completeStateChange(stateChange);
             }
-        });
+        };
+        pendingStateChange.completionCallback = completionCallback;
+        stateChanger.handleStateChange(stateChange, completionCallback);
     }
 
     private void completeStateChange(StateChange stateChange) {
@@ -216,7 +220,7 @@ public class Backstack {
         stack.clear();
         stack.addAll(stateChange.newState);
 
-        PendingStateChange pendingStateChange = queuedStateChanges.remove(0);
+        PendingStateChange pendingStateChange = queuedStateChanges.removeFirst();
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
         notifyCompletionListeners(stateChange);
         beginStateChangeIfPossible();
@@ -246,6 +250,17 @@ public class Backstack {
     private void notifyCompletionListeners(StateChange stateChange) {
         for(CompletionListener completionListener : completionListeners) {
             completionListener.stateChangeCompleted(stateChange);
+        }
+    }
+
+    // force execute
+    public void executePendingStateChange() {
+        if(isStateChangePending()) {
+            PendingStateChange pendingStateChange = queuedStateChanges.getFirst();
+            if(pendingStateChange.getStatus() == PendingStateChange.Status.IN_PROGRESS) {
+                pendingStateChange.completionCallback.stateChangeComplete();
+                pendingStateChange.didForceExecute = true;
+            }
         }
     }
 

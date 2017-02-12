@@ -1,5 +1,13 @@
 # Change log
 
+-Simple Stack 0.9.3 (2017-02-12)
+---------------------------------
+- ENHANCEMENT: Added ability to force execute pending state changes with `Backstack.executePendingStateChange()`.
+
+- INTERNAL CHANGE: `BackstackDelegate.onDestroy()` calls `backstack.executePendingStateChange()` to prevent hanging state changes.
+
+- ADDED: `ObjectAnimator`-based segue animation to MVP example.
+
 -Simple Stack 0.9.2 (2017-02-11)
 ---------------------------------
 - BREAKING CHANGE(?): `CompletionListener` no longer receives `isPending` parameter.

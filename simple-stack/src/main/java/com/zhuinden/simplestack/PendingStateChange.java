@@ -38,6 +38,9 @@ class PendingStateChange {
 
     private Status status = Status.ENQUEUED;
 
+    StateChanger.Callback completionCallback;
+    boolean didForceExecute = false;
+
     PendingStateChange(List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
         this.newHistory = newHistory;
         this.direction = direction;
