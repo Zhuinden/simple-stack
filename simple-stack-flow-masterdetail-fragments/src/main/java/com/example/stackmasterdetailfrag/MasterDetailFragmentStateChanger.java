@@ -22,38 +22,61 @@ public class MasterDetailFragmentStateChanger {
         this.masterContainerId = masterContainerId;
         this.detailContainerId = detailContainerId;
     }
-    
-    public void handleStateChange(StateChange stateChange) {
-        FragmentTransaction fragmentTransaction = beginFragmentTransaction(stateChange);
-        
-        for(Parcelable _previousKey : stateChange.getPreviousState()) {
-            Paths.Path previousKey = (Paths.Path)_previousKey;
-            if(!stateChange.getNewState().contains(_previousKey)) {
-                Fragment previousFragment = fragmentManager.findFragmentByTag(previousKey.getFragmentTag());
-                if(previousFragment != null) {
-                    fragmentTransaction.remove(previousFragment);
-                }
-            }
-        }
 
+    public void handleStateChange(StateChange stateChange) {
         Paths.MasterDetailPath topKey = stateChange.topNewState();
-        
         Paths.Path masterKey;
         Paths.Path detailKey = Paths.NoDetails.create();
         if(!topKey.isMaster()) {
-            Fragment noDetailsFragment = fragmentManager.findFragmentByTag(detailKey.getFragmentTag());
-            if(noDetailsFragment != null) {
-                fragmentTransaction.remove(noDetailsFragment);
-            }
             detailKey = topKey;
             masterKey = topKey.getMaster();
         } else {
             masterKey = topKey;
         }
-        
+        Fragment masterFragment = removeToDetachFragment(stateChange, masterKey);
+        Fragment detailFragment = removeToDetachFragment(stateChange, detailKey);
+
+        FragmentTransaction fragmentTransaction = beginFragmentTransaction(stateChange);
+
+        if(!topKey.isMaster()) {
+            Fragment noDetailsFragment = fragmentManager.findFragmentByTag(Paths.NoDetails.create().getFragmentTag());
+            if(noDetailsFragment != null) {
+                fragmentTransaction.remove(noDetailsFragment);
+            }
+        }
+
+        for(Parcelable _previousKey : stateChange.getPreviousState()) {
+            Paths.Path previousKey = (Paths.Path) _previousKey;
+            if(!stateChange.getNewState().contains(_previousKey)) {
+                Fragment previousFragment = fragmentManager.findFragmentByTag(previousKey.getFragmentTag());
+                if(previousFragment != null) {
+                    fragmentTransaction.remove(previousFragment);
+                }
+            } else {
+                if(!previousKey.equals(masterKey) && !previousKey.equals(detailKey)) {
+                    Fragment previousFragment = fragmentManager.findFragmentByTag(previousKey.getFragmentTag());
+                    if(previousFragment != null) {
+                        fragmentTransaction.detach(previousFragment);
+                    }
+                }
+            }
+        }
+
+        Paths.Path previousTop = stateChange.topPreviousState(); // remove outlying master
+        if(previousTop != null && (previousTop instanceof Paths.MasterDetailPath)) {
+            Paths.MasterDetailPath previousMasterDetailTop = (Paths.MasterDetailPath) previousTop;
+            if(!previousMasterDetailTop.isMaster() && !stateChange.getNewState()
+                    .contains(previousMasterDetailTop) && !stateChange.getNewState().contains(previousMasterDetailTop.getMaster())) {
+                Fragment previousMaster = fragmentManager.findFragmentByTag(previousMasterDetailTop.getMaster().getFragmentTag());
+                if(previousMaster != null) {
+                    fragmentTransaction.remove(previousMaster);
+                }
+            }
+        }
+
         for(Parcelable _newKey : stateChange.getNewState()) {
-            Paths.Path newKey = (Paths.Path)_newKey;
-            Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag()); 
+            Paths.Path newKey = (Paths.Path) _newKey;
+            Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(!newKey.equals(masterKey) && !newKey.equals(detailKey)) {
                 if(fragment != null) {
                     fragmentTransaction.detach(fragment);
@@ -61,33 +84,31 @@ public class MasterDetailFragmentStateChanger {
             }
         }
 
-        fragmentTransaction.commitNow();
+        reattachRemovedFragment(masterFragment, fragmentTransaction, masterKey, masterContainerId);
+        reattachRemovedFragment(detailFragment, fragmentTransaction, detailKey, detailContainerId);
 
-        reattachFragmentForKey(stateChange, masterKey, masterContainerId);
-        reattachFragmentForKey(stateChange, detailKey, detailContainerId);
+        fragmentTransaction.commitNow();
     }
 
-    private void reattachFragmentForKey(StateChange stateChange, Paths.Path key, int containerId) {
-        FragmentTransaction fragmentTransaction;
-        Fragment masterFragment = fragmentManager.findFragmentByTag(key.getFragmentTag());
-        if(masterFragment == null) {
-            fragmentTransaction = beginFragmentTransaction(stateChange);
-            masterFragment = key.createFragment();
-            fragmentTransaction.add(containerId, masterFragment, key.getFragmentTag());
-            fragmentTransaction.commitNow();
-        } else {
-            if(masterFragment.isDetached() || masterFragment.getView() == null) {
-                fragmentTransaction = beginFragmentTransaction(stateChange);
-                Fragment.SavedState savedState = fragmentManager.saveFragmentInstanceState(masterFragment);
-                fragmentTransaction.remove(masterFragment);
-                fragmentTransaction.commitNow();
-                fragmentTransaction = beginFragmentTransaction(stateChange);
-                masterFragment.setInitialSavedState(savedState);
-                fragmentTransaction.add(containerId, masterFragment, key.getFragmentTag());
-                fragmentTransaction.commitNow();
-                //fragmentTransaction.attach(masterFragment); // does not work with config change
-            }
+    private void reattachRemovedFragment(Fragment fragment, FragmentTransaction fragmentTransaction, Paths.Path key, int containerId) {
+        if(fragment == null) {
+            fragment = key.createFragment();
         }
+        if(!fragment.isAdded() || (fragment.isDetached() || fragment.getView() == null)) {
+            fragmentTransaction.add(containerId, fragment, key.getFragmentTag());
+        }
+    }
+
+    private Fragment removeToDetachFragment(StateChange stateChange, Paths.Path key) {
+        Fragment fragment = fragmentManager.findFragmentByTag(key.getFragmentTag());
+        if(fragment != null && (fragment.isDetached() || fragment.getView() == null)) {
+            FragmentTransaction fragmentTransaction = beginFragmentTransaction(stateChange);
+            Fragment.SavedState savedState = fragmentManager.saveFragmentInstanceState(fragment);
+            fragmentTransaction.remove(fragment);
+            fragmentTransaction.commitNow();
+            fragment.setInitialSavedState(savedState);
+        }
+        return fragment;
     }
 
     @NonNull

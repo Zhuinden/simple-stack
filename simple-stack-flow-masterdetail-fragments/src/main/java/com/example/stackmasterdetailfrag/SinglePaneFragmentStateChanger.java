@@ -24,20 +24,23 @@ public class SinglePaneFragmentStateChanger {
     public void handleStateChange(StateChange stateChange) {
         FragmentTransaction fragmentTransaction = beginFragmentTransaction(stateChange);
 
+        Paths.Path noDetailKey = Paths.NoDetails.create();
+        Fragment noDetailsFragment = fragmentManager.findFragmentByTag(noDetailKey.getFragmentTag());
+        if(noDetailsFragment != null) {
+            fragmentTransaction.remove(noDetailsFragment);
+        }
+
+
         for(Parcelable _oldPath : stateChange.getPreviousState()) {
             Paths.Path oldPath = (Paths.Path ) _oldPath;
             Fragment fragment = fragmentManager.findFragmentByTag(oldPath.getFragmentTag());
             if(fragment != null) {
                 if(!stateChange.getNewState().contains(oldPath)) {
                     fragmentTransaction.remove(fragment);
+                } else if(!oldPath.equals(stateChange.topNewState())) {
+                    fragmentTransaction.detach(fragment);
                 }
             }
-        }
-
-        Paths.Path noDetailKey = Paths.NoDetails.create();
-        Fragment noDetailsFragment = fragmentManager.findFragmentByTag(noDetailKey.getFragmentTag());
-        if(noDetailsFragment != null) {
-            fragmentTransaction.remove(noDetailsFragment);
         }
 
         for(Parcelable _newPath : stateChange.getNewState()) {
