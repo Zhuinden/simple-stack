@@ -19,6 +19,7 @@ import android.os.Parcelable;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 
 public class BackstackTest {
+    StateChanger.Callback callback = null;
+    StateChange stateChange = null;
+
     @Test
     public void initialKeysShouldNotBeEmpty() {
         try {
@@ -93,8 +97,6 @@ public class BackstackTest {
             // good!
         }
     }
-
-    StateChanger.Callback callback = null;
 
     @Test
     public void goBackShouldReturnTrueDuringActiveStateChange() {
@@ -191,5 +193,93 @@ public class BackstackTest {
         } catch(NullPointerException e) {
             // Good!
         }
+    }
+
+    @Test
+    public void forceExecuteShouldExecuteAndSecondCallbackIsSwallowed() {
+        TestKey initial = new TestKey("hello");
+        Backstack backstack = new Backstack(initial);
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.executePendingStateChange();
+
+        assertThat(backstack.isStateChangePending()).isFalse();
+        callback.stateChangeComplete();
+        // no exception thrown
+    }
+
+    @Test
+    public void nullChangeListenerAddShouldThrow() {
+        TestKey initial = new TestKey("hello");
+        Backstack backstack = new Backstack(initial);
+        try {
+            backstack.addCompletionListener(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void nullChangeListenerRemoveShouldThrow() {
+        TestKey initial = new TestKey("hello");
+        Backstack backstack = new Backstack(initial);
+        try {
+            backstack.removeCompletionListener(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void completionListenerShouldBeCalled() {
+        TestKey initial = new TestKey("hello");
+        Backstack backstack = new Backstack(initial);
+
+        Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(StateChange _stateChange, Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.addCompletionListener(completionListener);
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+
+        callback.stateChangeComplete();
+
+        assertThat(backstack.isStateChangePending()).isFalse();
+        Mockito.verify(completionListener, Mockito.only()).stateChangeCompleted(stateChange);
+    }
+
+    @Test
+    public void removedCompletionListenerShouldNotBeCalled() {
+        TestKey initial = new TestKey("hello");
+        Backstack backstack = new Backstack(initial);
+
+        Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(StateChange _stateChange, Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.addCompletionListener(completionListener);
+        backstack.removeCompletionListener(completionListener);
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+
+        callback.stateChangeComplete();
+
+        assertThat(backstack.isStateChangePending()).isFalse();
+        Mockito.verify(completionListener, Mockito.never()).stateChangeCompleted(stateChange);
     }
 }

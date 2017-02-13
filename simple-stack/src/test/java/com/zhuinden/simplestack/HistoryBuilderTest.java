@@ -104,4 +104,19 @@ public class HistoryBuilderTest {
             // Good!
         }
     }
+
+    @Test
+    public void historyBuilderWorksAsIterable() {
+        HistoryBuilder historyBuilder = HistoryBuilder.newBuilder().add(new TestKey("hello")).add(new TestKey("bye"));
+        int i = 0;
+        for(Parcelable _key : historyBuilder) {
+            TestKey key = (TestKey) _key;
+            if(i == 0) {
+                assertThat(key.name).isEqualTo("hello");
+            } else if(i == 1) {
+                assertThat(key.name).isEqualTo("bye");
+            }
+            i++;
+        }
+    }
 }

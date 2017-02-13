@@ -1,10 +1,12 @@
 # Change log
 
--Simple Stack 0.9.4 (2017-02-13)
+-Simple Stack 0.9.5 (2017-02-13)
 ---------------------------------
 - INTERNAL CHANGE: `clearStatesNotIn()` now receives both `keyStateMap` and `StateChange`, instead of just the new state.
 
 - ENHANCEMENT: Added `HistoryBuilder.from(Backstack)` and `HistoryBuilder.from(BackstackDelegate)` convenience methods.
+
+- ENHANCEMENT: Added `HistoryBuilder.isEmpty()` method, and implements `Iterable<Parcelable>`.
 
 - ADDED: `flow-masterdetail-fragments` example.
 

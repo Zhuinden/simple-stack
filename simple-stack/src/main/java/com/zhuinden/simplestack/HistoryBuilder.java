@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,7 +28,8 @@ import java.util.List;
  *
  * Created by Zhuinden on 2017. 01. 16..
  */
-public class HistoryBuilder {
+public class HistoryBuilder
+        implements Iterable<Parcelable> {
     private ArrayList<Parcelable> list = new ArrayList<>();
 
     private HistoryBuilder() { // use newBuilder()
@@ -116,6 +118,10 @@ public class HistoryBuilder {
         return this;
     }
 
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
+
     public HistoryBuilder removeLast() {
         if(list.isEmpty()) {
             throw new IllegalStateException("Cannot remove element from empty list");
@@ -160,6 +166,11 @@ public class HistoryBuilder {
         checkKey(key);
         list.add(index, key);
         return this;
+    }
+
+    @Override
+    public Iterator<Parcelable> iterator() {
+        return list.iterator();
     }
 
     public ArrayList<Parcelable> build() {
