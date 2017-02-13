@@ -96,16 +96,6 @@ public class HistoryBuilderTest {
     }
 
     @Test
-    public void collectionCannotBeNull() {
-        try {
-            HistoryBuilder.from(null);
-            Assert.fail();
-        } catch(IllegalArgumentException e) {
-            // Good!
-        }
-    }
-
-    @Test
     public void keyCannotBeNull() {
         try {
             HistoryBuilder.single(null);

@@ -30,7 +30,6 @@ public class SinglePaneFragmentStateChanger {
             fragmentTransaction.remove(noDetailsFragment);
         }
 
-
         for(Parcelable _oldPath : stateChange.getPreviousState()) {
             Paths.Path oldPath = (Paths.Path ) _oldPath;
             Fragment fragment = fragmentManager.findFragmentByTag(oldPath.getFragmentTag());

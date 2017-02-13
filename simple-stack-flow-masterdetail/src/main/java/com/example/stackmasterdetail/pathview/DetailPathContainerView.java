@@ -1,7 +1,6 @@
 package com.example.stackmasterdetail.pathview;
 
 import android.content.Context;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
@@ -10,21 +9,21 @@ import com.zhuinden.simplestack.StateChanger;
 
 import static com.example.stackmasterdetail.Paths.MasterDetailPath;
 
-public class DetailContainerView
+public class DetailPathContainerView
         extends FramePathContainerView {
-    public DetailContainerView(Context context) {
+    public DetailPathContainerView(Context context) {
         super(context);
     }
 
-    public DetailContainerView(Context context, AttributeSet attrs) {
+    public DetailPathContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public DetailContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public DetailPathContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public DetailContainerView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public DetailPathContainerView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
@@ -40,9 +39,9 @@ public class DetailContainerView
         }
 
         @Override
-        protected int getLayout(Parcelable path) {
+        protected Paths.Path getActiveKey(Paths.Path path) {
             MasterDetailPath mdPath = (MasterDetailPath) path;
-            return super.getLayout(mdPath.isMaster() ? Paths.NoDetails.create() : mdPath);
+            return mdPath.isMaster() ? Paths.NoDetails.create() : mdPath;
         }
     }
 }

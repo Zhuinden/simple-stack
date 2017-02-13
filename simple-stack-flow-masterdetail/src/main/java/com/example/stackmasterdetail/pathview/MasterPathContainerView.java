@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
+import com.example.stackmasterdetail.Paths;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
@@ -48,9 +49,9 @@ public class MasterPathContainerView
         }
 
         @Override
-        protected int getLayout(Parcelable path) {
+        protected Paths.Path getActiveKey(Paths.Path path) {
             MasterDetailPath mdPath = (MasterDetailPath) path;
-            return super.getLayout(mdPath.getMaster());
+            return mdPath.getMaster();
         }
     }
 }

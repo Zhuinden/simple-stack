@@ -21,27 +21,22 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.stackmasterdetail.Paths;
 import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.Utils;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Provides basic right-to-left transitions. Saves and restores view state.
  */
 public class SimpleStateChanger
         implements StateChanger {
-    private static final Map<Class, Integer> PATH_LAYOUT_CACHE = new LinkedHashMap<>();
-
     private ViewGroup root;
     private BackstackDelegate backstackDelegate;
     private Context baseContext;
@@ -59,11 +54,11 @@ public class SimpleStateChanger
             return;
         }
 
-        Parcelable newKey = stateChange.topNewState();
-        Context context = stateChange.createContext(baseContext, newKey);
+        Paths.Path newKey = stateChange.topNewState();
+        newKey = getActiveKey(newKey);
 
-        int layout = getLayout(newKey);
-        View newView = LayoutInflater.from(context).inflate(layout, root, false);
+        Context context = stateChange.createContext(baseContext, newKey);
+        View newView = LayoutInflater.from(context).inflate(newKey.layout(), root, false);
 
         View previousView = null;
         if(stateChange.topPreviousState() != null) {
@@ -94,20 +89,8 @@ public class SimpleStateChanger
         }
     }
 
-    protected int getLayout(Parcelable path) {
-        Class pathType = path.getClass();
-        Integer layoutResId = PATH_LAYOUT_CACHE.get(pathType);
-        if(layoutResId == null) {
-            Layout layout = (Layout) pathType.getAnnotation(Layout.class);
-            if(layout == null) {
-                throw new IllegalArgumentException(String.format("@%s annotation not found on class %s",
-                        Layout.class.getSimpleName(),
-                        pathType.getName()));
-            }
-            layoutResId = layout.value();
-            PATH_LAYOUT_CACHE.put(pathType, layoutResId);
-        }
-        return layoutResId;
+    protected Paths.Path getActiveKey(Paths.Path path) {
+        return path;
     }
 
     private void runAnimation(final ViewGroup container, final View from, final View to, int direction, final StateChanger.Callback callback) {

@@ -66,13 +66,13 @@ public class BackstackDelegate
 
     Backstack backstack;
 
+    Map<Parcelable, SavedState> keyStateMap = new HashMap<>();
+
     StateChanger stateChanger;
 
     public BackstackDelegate(@Nullable StateChanger stateChanger) {
         this.stateChanger = stateChanger;
     }
-
-    Map<Parcelable, SavedState> keyStateMap = new HashMap<>();
 
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull ArrayList<Parcelable> initialKeys) {
         if(nonConfigurationInstance != null && !(nonConfigurationInstance instanceof NonConfigurationInstance)) {
@@ -105,6 +105,10 @@ public class BackstackDelegate
         backstack.addCompletionListener(this);
     }
 
+    protected void unregisterAsCompletionListener() {
+        backstack.removeCompletionListener(this);
+    }
+
     public void setStateChanger(@Nullable StateChanger stateChanger) {
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
@@ -128,7 +132,7 @@ public class BackstackDelegate
     }
 
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack.getHistory()).build());
+        outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack).build());
         outState.putParcelableArrayList(getStateTag(), new ArrayList<>(keyStateMap.values()));
     }
 
@@ -149,7 +153,7 @@ public class BackstackDelegate
 
     public void onDestroy() {
         backstack.executePendingStateChange();
-        backstack.removeCompletionListener(this);
+        unregisterAsCompletionListener();
     }
 
     // ----- get backstack
@@ -208,14 +212,14 @@ public class BackstackDelegate
         return keyStateMap.get(key);
     }
 
-    protected void clearStatesNotIn(@NonNull List<Parcelable> keys) {
-        keyStateMap.keySet().retainAll(keys);
+    protected void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
+        keyStateMap.keySet().retainAll(stateChange.getNewState());
     }
 
     @Override
     public void stateChangeCompleted(@NonNull StateChange stateChange) {
         if(!backstack.isStateChangePending()) {
-            clearStatesNotIn(stateChange.getNewState());
+            clearStatesNotIn(keyStateMap, stateChange);
         }
     }
 

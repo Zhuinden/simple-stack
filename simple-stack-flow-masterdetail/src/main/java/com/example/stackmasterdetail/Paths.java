@@ -17,26 +17,33 @@
 package com.example.stackmasterdetail;
 
 import android.os.Parcelable;
+import android.support.annotation.LayoutRes;
 
-import com.example.stackmasterdetail.pathview.Layout;
 import com.google.auto.value.AutoValue;
 
 public final class Paths {
     public abstract static class Path implements Parcelable {
         public abstract String getTitle();
+
+        @LayoutRes
+        public abstract int layout();
     }
-    
-    @Layout(R.layout.no_details)
+
     @AutoValue
     public abstract static class NoDetails
             extends Path {
-        public static Parcelable create() {
+        public static NoDetails create() {
             return new AutoValue_Paths_NoDetails();
         }
 
         @Override
         public String getTitle() {
             return "No Details";
+        }
+
+        @Override
+        public int layout() {
+            return R.layout.no_details;
         }
     }
 
@@ -75,7 +82,6 @@ public final class Paths {
         }
     }
 
-    @Layout(R.layout.conversation_list_view) //
     @AutoValue
     public abstract static class ConversationList
             extends ConversationPath {
@@ -87,7 +93,7 @@ public final class Paths {
             return -1;
         }
 
-        public static Parcelable create() {
+        public static ConversationList create() {
             return new AutoValue_Paths_ConversationList();
         }
 
@@ -95,13 +101,17 @@ public final class Paths {
         public String getTitle() {
             return "Conversation List";
         }
+
+        @Override
+        public int layout() {
+            return R.layout.conversation_list_view;
+        }
     }
 
-    @Layout(R.layout.conversation_view) //
     @AutoValue
     public abstract static class Conversation
             extends ConversationPath {
-        public static Parcelable create(int conversationIndex) {
+        public static Conversation create(int conversationIndex) {
             return new AutoValue_Paths_Conversation(conversationIndex);
         }
 
@@ -109,21 +119,30 @@ public final class Paths {
         public String getTitle() {
             return "Conversation";
         }
+
+        @Override
+        public int layout() {
+            return R.layout.conversation_view;
+        }
     }
 
-    @Layout(R.layout.message_view) //
     @AutoValue
     public abstract static class Message
             extends ConversationPath {
         public abstract int messageId();
 
-        public static Parcelable create(int messageIndex, int position) {
+        public static Message create(int messageIndex, int position) {
             return new AutoValue_Paths_Message(messageIndex, position);
         }
 
         @Override
         public String getTitle() {
             return "Message";
+        }
+
+        @Override
+        public int layout() {
+            return R.layout.message_view;
         }
     }
 
@@ -137,7 +156,6 @@ public final class Paths {
         }
     }
 
-    @Layout(R.layout.friend_list_view) //
     @AutoValue
     public abstract static class FriendList
             extends FriendPath {
@@ -146,7 +164,7 @@ public final class Paths {
             return -1;
         }
 
-        public static Parcelable create() {
+        public static FriendList create() {
             return new AutoValue_Paths_FriendList();
         }
 
@@ -154,19 +172,28 @@ public final class Paths {
         public String getTitle() {
             return "Friend List";
         }
+
+        @Override
+        public int layout() {
+            return R.layout.friend_list_view;
+        }
     }
 
-    @Layout(R.layout.friend_view) //
     @AutoValue
     public abstract static class Friend
             extends FriendPath {
-        public static Parcelable create(int position) {
+        public static Friend create(int position) {
             return new AutoValue_Paths_Friend(position);
         }
 
         @Override
         public String getTitle() {
             return "Friend";
+        }
+
+        @Override
+        public int layout() {
+            return R.layout.friend_view;
         }
     }
 

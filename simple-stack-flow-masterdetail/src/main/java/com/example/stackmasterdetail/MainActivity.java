@@ -24,6 +24,7 @@ import android.view.MenuItem;
 
 import com.example.stackmasterdetail.pathview.HandlesBack;
 import com.example.stackmasterdetail.util.BackstackService;
+import com.example.stackmasterdetail.util.MasterDetailBackstackDelegate;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
@@ -63,7 +64,7 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = new MasterDetailBackstackDelegate(null);
         backstackDelegate.onCreate(savedInstanceState,
                 getLastCustomNonConfigurationInstance(),
                 HistoryBuilder.single(Paths.ConversationList.create()));

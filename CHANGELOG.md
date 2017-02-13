@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 0.9.4 (2017-02-13)
+---------------------------------
+- INTERNAL CHANGE: `clearStatesNotIn()` now receives both `keyStateMap` and `StateChange`, instead of just the new state.
+
+- ENHANCEMENT: Added `HistoryBuilder.from(Backstack)` and `HistoryBuilder.from(BackstackDelegate)` convenience methods.
+
+- ADDED: `flow-masterdetail-fragments` example.
+
+- FIX: A bug in `flow-masterdetail` sample that prevented Master's state from being persisted if detail directly opens a detail.
+
 -Simple Stack 0.9.3 (2017-02-12)
 ---------------------------------
 - ENHANCEMENT: Added ability to force execute pending state changes with `Backstack.executePendingStateChange()`.

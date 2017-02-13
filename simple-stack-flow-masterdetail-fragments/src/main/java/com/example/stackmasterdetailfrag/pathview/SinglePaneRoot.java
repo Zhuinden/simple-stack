@@ -7,13 +7,13 @@ import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import com.example.stackmasterdetailfrag.Paths;
 import com.example.stackmasterdetailfrag.R;
 import com.example.stackmasterdetailfrag.SinglePaneFragmentStateChanger;
 import com.example.stackmasterdetailfrag.util.FragmentManagerService;
+import com.example.stackmasterdetailfrag.view.IsMasterView;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
-
-import butterknife.BindView;
 
 /**
  * Created by Zhuinden on 2017.02.12..
@@ -62,6 +62,11 @@ public class SinglePaneRoot extends FrameLayout implements HandlesBack, StateCha
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
         singlePaneFragmentStateChanger.handleStateChange(stateChange);
+        FragmentManager fragmentManager = FragmentManagerService.get(getContext());
+        Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
+        if(fragment != null && fragment.getView() != null && fragment.getView() instanceof IsMasterView) {
+            ((IsMasterView) fragment.getView()).updateSelection(stateChange.<Paths.MasterDetailPath>topNewState());
+        }
         completionCallback.stateChangeComplete();
     }
 }

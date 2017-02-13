@@ -13,7 +13,8 @@
       android:layout_width="0dp"
       android:layout_height="match_parent"
       />
-  <com.example.stackmasterdetail.pathview.DetailContainerView
+
+  <com.example.stackmasterdetail.pathview.DetailPathContainerView
       android:id="@+id/detail"
       android:layout_weight="80"
       android:layout_width="0dp"

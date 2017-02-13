@@ -108,7 +108,7 @@ public class AddOrEditTaskPresenter
             messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksCoordinator.SavedSuccessfullyMessage());
             backstack.goBack();
         } else {
-            backstack.setHistory(HistoryBuilder.from(backstack.getHistory()).removeUntil(TasksKey.create()).build(), StateChange.BACKWARD);
+            backstack.setHistory(HistoryBuilder.from(backstack).removeUntil(TasksKey.create()).build(), StateChange.BACKWARD);
         }
     }
 }

@@ -26,6 +26,7 @@ import com.example.stackmasterdetailfrag.pathview.HandlesBack;
 import com.example.stackmasterdetailfrag.pathview.TabletMasterDetailRoot;
 import com.example.stackmasterdetailfrag.util.BackstackService;
 import com.example.stackmasterdetailfrag.util.FragmentManagerService;
+import com.example.stackmasterdetailfrag.util.MasterDetailBackstackDelegate;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
@@ -49,7 +50,7 @@ public class MainActivity
      * <p>
      * Notice that the app has two root_layout files. The main one, in {@code res/layout} is used by
      * mobile devices and by tablets in portrait orientation. It holds a generic {@link
-     * com.example.stackmasterdetailfrag.pathview.FramePathContainerView}.
+     * com.example.stackmasterdetailfrag.pathview.SinglePaneRoot}.
      * <p>
      * The interesting one, loaded by tablets in landscape mode, is {@code res/layout-sw600dp-land}.
      * It loads a {@link TabletMasterDetailRoot}, with a master list on the
@@ -65,7 +66,7 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = new MasterDetailBackstackDelegate(null);
         backstackDelegate.onCreate(savedInstanceState,
                 getLastCustomNonConfigurationInstance(),
                 HistoryBuilder.single(Paths.ConversationList.create()));

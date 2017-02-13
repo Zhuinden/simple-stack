@@ -312,7 +312,7 @@ public class FlowTest {
         flow.setStateChanger(new FlowDispatcher(), Backstack.INITIALIZE);
         assertThat(history.size()).isEqualTo(3);
 
-        flow.setHistory(HistoryBuilder.from(flow.getHistory()).removeLast().add(delta).build(), StateChange.REPLACE);
+        flow.setHistory(HistoryBuilder.from(flow).removeLast().add(delta).build(), StateChange.REPLACE);
         assertThat(lastStack.get(lastStack.size() - 1)).isEqualTo(new TestKey("Delta"));
         assertThat(lastStack.get(lastStack.size() - 1) == delta).isTrue();
         assertThat(lastStack.get(lastStack.size() - 1)).isSameAs(delta);

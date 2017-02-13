@@ -39,25 +39,16 @@ public class MasterDetailFragmentStateChanger {
         FragmentTransaction fragmentTransaction = beginFragmentTransaction(stateChange);
 
         if(!topKey.isMaster()) {
-            Fragment noDetailsFragment = fragmentManager.findFragmentByTag(Paths.NoDetails.create().getFragmentTag());
-            if(noDetailsFragment != null) {
-                fragmentTransaction.remove(noDetailsFragment);
-            }
+            removeFragment(fragmentTransaction, Paths.NoDetails.create());
         }
 
         for(Parcelable _previousKey : stateChange.getPreviousState()) {
             Paths.Path previousKey = (Paths.Path) _previousKey;
             if(!stateChange.getNewState().contains(_previousKey)) {
-                Fragment previousFragment = fragmentManager.findFragmentByTag(previousKey.getFragmentTag());
-                if(previousFragment != null) {
-                    fragmentTransaction.remove(previousFragment);
-                }
+                removeFragment(fragmentTransaction, previousKey);
             } else {
                 if(!previousKey.equals(masterKey) && !previousKey.equals(detailKey)) {
-                    Fragment previousFragment = fragmentManager.findFragmentByTag(previousKey.getFragmentTag());
-                    if(previousFragment != null) {
-                        fragmentTransaction.detach(previousFragment);
-                    }
+                    detachFragment(fragmentTransaction, previousKey);
                 }
             }
         }
@@ -78,11 +69,8 @@ public class MasterDetailFragmentStateChanger {
 
         for(Parcelable _newKey : stateChange.getNewState()) {
             Paths.Path newKey = (Paths.Path) _newKey;
-            Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(!newKey.equals(masterKey) && !newKey.equals(detailKey)) {
-                if(fragment != null) {
-                    fragmentTransaction.detach(fragment);
-                }
+                detachFragment(fragmentTransaction, newKey);
             }
         }
 
@@ -90,6 +78,20 @@ public class MasterDetailFragmentStateChanger {
         reattachRemovedFragment(detailFragment, fragmentTransaction, detailKey, detailContainerId);
 
         fragmentTransaction.commitNow();
+    }
+
+    private void detachFragment(FragmentTransaction fragmentTransaction, Paths.Path key) {
+        Fragment fragment = fragmentManager.findFragmentByTag(key.getFragmentTag());
+        if(fragment != null) {
+            fragmentTransaction.detach(fragment);
+        }
+    }
+
+    private void removeFragment(FragmentTransaction fragmentTransaction, Paths.Path path) {
+        Fragment fragment = fragmentManager.findFragmentByTag(path.getFragmentTag());
+        if(fragment != null) {
+            fragmentTransaction.remove(fragment);
+        }
     }
 
     private void reattachRemovedFragment(Fragment fragment, FragmentTransaction fragmentTransaction, Paths.Path key, int containerId) {

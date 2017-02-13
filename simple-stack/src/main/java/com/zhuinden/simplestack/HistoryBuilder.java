@@ -33,6 +33,20 @@ public class HistoryBuilder {
     private HistoryBuilder() { // use newBuilder()
     }
 
+    public static HistoryBuilder from(@NonNull Backstack backstack) {
+        if(backstack == null) {
+            throw new IllegalArgumentException("Backstack cannot be null!");
+        }
+        return from(backstack.getHistory());
+    }
+
+    public static HistoryBuilder from(@NonNull BackstackDelegate backstackDelegate) {
+        if(backstackDelegate == null) {
+            throw new IllegalArgumentException("BackstackDelegate cannot be null!");
+        }
+        return from(backstackDelegate.getBackstack());
+    }
+
     public static HistoryBuilder from(@NonNull List<? extends Parcelable> collection) {
         return newBuilder()
                 .addAll(collection);
