@@ -66,7 +66,9 @@ public class MasterDetailFragmentStateChanger {
         if(previousTop != null && (previousTop instanceof Paths.MasterDetailPath)) {
             Paths.MasterDetailPath previousMasterDetailTop = (Paths.MasterDetailPath) previousTop;
             if(!previousMasterDetailTop.isMaster() && !stateChange.getNewState()
-                    .contains(previousMasterDetailTop) && !stateChange.getNewState().contains(previousMasterDetailTop.getMaster())) {
+                    .contains(previousMasterDetailTop) && !stateChange.getNewState()
+                    .contains(previousMasterDetailTop.getMaster()) && !stateChange.<Paths.MasterDetailPath>topNewState().getMaster()
+                    .equals(previousMasterDetailTop.getMaster())) {
                 Fragment previousMaster = fragmentManager.findFragmentByTag(previousMasterDetailTop.getMaster().getFragmentTag());
                 if(previousMaster != null) {
                     fragmentTransaction.remove(previousMaster);
