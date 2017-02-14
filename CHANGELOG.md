@@ -1,8 +1,8 @@
 # Change log
 
--Simple Stack 0.9.6 (2017-02-xx)
+-Simple Stack 0.9.6 (2017-02-14)
 ---------------------------------
-- CHANGE: Hidden `stateChangeComplete()` from public API of `BackstackDelegate`, it shouldn't have been public.
+- INTERNAL CHANGE: Hidden `stateChangeComplete()` from public API of `BackstackDelegate`, it shouldn't have been public.
 
 -Simple Stack 0.9.5 (2017-02-13)
 ---------------------------------
