@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 0.9.6 (2017-02-xx)
+---------------------------------
+- CHANGE: Hidden `stateChangeComplete()` from public API of `BackstackDelegate`, it shouldn't have been public.
+
 -Simple Stack 0.9.5 (2017-02-13)
 ---------------------------------
 - INTERNAL CHANGE: `clearStatesNotIn()` now receives both `keyStateMap` and `StateChange`, instead of just the new state.

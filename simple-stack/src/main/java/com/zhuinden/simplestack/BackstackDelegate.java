@@ -33,8 +33,14 @@ import java.util.Map;
  * Created by Zhuinden on 2017. 01. 22..
  */
 
-public class BackstackDelegate
-        implements Backstack.CompletionListener {
+public class BackstackDelegate {
+    private final Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
+        @Override
+        public void stateChangeCompleted(@NonNull StateChange stateChange) {
+            BackstackDelegate.this.stateChangeCompleted(stateChange);
+        }
+    };
+
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
 
@@ -102,11 +108,11 @@ public class BackstackDelegate
     }
 
     protected void registerAsCompletionListener() {
-        backstack.addCompletionListener(this);
+        backstack.addCompletionListener(completionListener);
     }
 
     protected void unregisterAsCompletionListener() {
-        backstack.removeCompletionListener(this);
+        backstack.removeCompletionListener(completionListener);
     }
 
     public void setStateChanger(@Nullable StateChanger stateChanger) {
@@ -212,15 +218,14 @@ public class BackstackDelegate
         return keyStateMap.get(key);
     }
 
-    protected void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
-        keyStateMap.keySet().retainAll(stateChange.getNewState());
-    }
-
-    @Override
-    public void stateChangeCompleted(@NonNull StateChange stateChange) {
+    protected void stateChangeCompleted(StateChange stateChange) {
         if(!backstack.isStateChangePending()) {
             clearStatesNotIn(keyStateMap, stateChange);
         }
+    }
+
+    protected void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
+        keyStateMap.keySet().retainAll(stateChange.getNewState());
     }
 
     public static class NonConfigurationInstance {
