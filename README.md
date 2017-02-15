@@ -10,19 +10,19 @@ This way, you can easily create a single-Activity application using either views
 
 ## Operators
 
-The [Backstack][Backstack.java] provides 3 convenient operators for manipulating state.
+The [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java) provides 3 convenient operators for manipulating state.
 
 - `goTo()`: if state does not previously exist in the backstack, then adds it to the stack. Otherwise navigate back to given state.
-- `goBack()`: returns boolean if [StateChange][StateChange.java] is in progress, or if there are more than 1 entries in history (and handled the back press). Otherwise, return false.
+- `goBack()`: returns boolean if [StateChange](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java) is in progress, or if there are more than 1 entries in history (and handled the back press). Otherwise, return false.
 - `setHistory()`: sets the state to the provided elements, with the direction that is specified.
 
 ## What does it do?
 
-The [Backstack][Backstack.java] stores the screens, and the [BackstackDelegate][BackstackDelegate.java] persists them across configuration change / process death.
+The [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java) stores the screens, and the [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java) persists them across configuration change / process death.
 
-The [Backstack][Backstack.java] also allows navigation between the states, and enables handling this state change using the [StateChanger][StateChanger.java].
+The [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java) also allows navigation between the states, and enables handling this state change using the [StateChanger](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java).
 
-The [BackstackDelegate][BackstackDelegate.java] provides Activity lifecycle integration, and manages view state persistence for custom views associated with a key.
+The [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java) provides Activity lifecycle integration, and manages view state persistence for custom views associated with a key.
 
 ## Using Simple Stack
 
@@ -50,17 +50,17 @@ and add the compile dependency to your module level gradle.
 
 ## How does it work?
 
-The [Backstack][Backstack.java] must be initialized with at least one initial state, and a [StateChanger][StateChanger.java] must be set when it is able to handle the state change.
+The [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java) must be initialized with at least one initial state, and a [StateChanger](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java) must be set when it is able to handle the state change.
 
-The [BackstackDelegate][BackstackDelegate.java] is provided to handle Activity lifecycle integration and view state persistence for custom views.
+The [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java) is provided to handle Activity lifecycle integration and view state persistence for custom views.
 
-The [StateChanger][StateChanger.java] can be set immediately for the [BackstackDelegate][BackstackDelegate.java], or later (but before `onPostResume()`). For example, you can initialize the [Backstack][Backstack.java] before `super.onCreate()`, but set the [StateChanger][StateChanger.java] in `onPostCreate()`.
+The [StateChanger](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java) can be set immediately for the [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java), or later (but before `onPostResume()`). For example, you can initialize the [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java) before `super.onCreate()`, but set the [StateChanger](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java) in `onPostCreate()`.
 
-Setting a [StateChanger][StateChanger.java] begins an `initialization` (in Flow terms, a bootstrap traversal), which provides a [StateChange][StateChange.java] in form of `{[], [{...}, {...}]}` (meaning the previous state is empty, the new state is the initial keys).
+Setting a [StateChanger](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java) begins an `initialization` (in Flow terms, a bootstrap traversal), which provides a [StateChange](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java) in form of `{[], [{...}, {...}]}` (meaning the previous state is empty, the new state is the initial keys).
 
 This allows you to initialize your views according to your current state.
 
-Afterwards, the [Backstack][Backstack.java] operators allow changing between states.
+Afterwards, the [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java) operators allow changing between states.
 
 ## Example code
 
@@ -186,15 +186,3 @@ public class MainActivity
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
-
-[Backstack.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java)
-[StateChanger.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java)
-[StateChange.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java)
-[Callback.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java)
-[PendingStateChange.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/PendingStateChange.java)
-[HistoryBuilder.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/HistoryBuilder.java)
-[SavedState.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/SavedState.java)
-[KeyContextWrapper.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/KeyContextWrapper.java)
-[BackstackDelegate.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java)
-[Bundleable.java]: (https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Bundleable.java)
