@@ -98,7 +98,6 @@ public class StateChange {
     /**
      * Provides the top of the new state.
      *
-     * @param <T>
      * @return the last element in new state.
      */
     @NonNull

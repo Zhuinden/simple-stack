@@ -89,6 +89,8 @@ public class Backstack {
 
     /**
      * Indicates whether a {@link StateChanger} is set.
+     *
+     * @return true if a {@link StateChanger} is set, false otherwise.
      */
     public boolean hasStateChanger() {
         return stateChanger != null;

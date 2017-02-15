@@ -48,7 +48,7 @@ public class HistoryBuilder
     }
 
     /**
-     * Creates a new history builder based on the {@link BackstackDelegate)}'s managed backstack history.
+     * Creates a new history builder based on the {@link BackstackDelegate}'s managed backstack history.
      *
      * @param backstackDelegate the {@link BackstackDelegate}.
      * @return the newly created {@link HistoryBuilder}.
