@@ -21,10 +21,7 @@ import java.util.List;
 
 /**
  * Represents the state that will be available once state change is complete.
- *
- * Created by Zhuinden on 2017. 01. 16..
  */
-
 class PendingStateChange {
     enum Status {
         ENQUEUED,

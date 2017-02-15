@@ -23,11 +23,11 @@ import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 /**
- * A container for the view hierarchy state and an optional Bundle. Made to use with `BackstackDelegate`'s view state persistence.
+ * A container for the view hierarchy state and an optional Bundle.
+ * Made to be used with {@link BackstackDelegate}'s view state persistence.
  *
- * Created by Zhuinden on 2017. 01. 20..
+ * A {@link SavedState} represents the state of the view that is bound to a given key.
  */
-
 public class SavedState
         implements Parcelable {
     private Parcelable key;
@@ -61,6 +61,11 @@ public class SavedState
         return new Builder();
     }
 
+    /**
+     * A builder class that allows creating SavedState instances.
+     *
+     * Keys are not optional.
+     */
     public static class Builder {
         private Parcelable key;
         private SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();

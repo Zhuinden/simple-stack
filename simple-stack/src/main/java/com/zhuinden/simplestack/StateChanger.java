@@ -16,14 +16,24 @@
 package com.zhuinden.simplestack;
 
 /**
- * The interface that is responsible for handling when the state in the backstack changes.
+ * The StateChanger handles the {@link StateChange}s that occur within the {@link Backstack}.
  *
- * Created by Zhuinden on 2017. 01. 12..
+ * {@link StateChange} cannot be cancelled, a {@link StateChange} set during an active {@link StateChange} gets enqueued.
  */
 public interface StateChanger {
+    /**
+     * When the {@link StateChange} is complete, then the callback must be called.
+     */
     interface Callback {
         void stateChangeComplete();
     }
 
+    /**
+     * This is called when a {@link StateChange} occurs.
+     * When the {@link StateChange} is handled, {@link Callback#stateChangeComplete()} must be called.
+     *
+     * @param stateChange        the currently active state change in progress.
+     * @param completionCallback the callback that must be called to signal that the state change is completed.
+     */
     void handleStateChange(StateChange stateChange, Callback completionCallback);
 }

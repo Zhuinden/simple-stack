@@ -18,13 +18,13 @@ package com.zhuinden.simplestack;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 /**
- * An interface that specifies that the custom viewgroup that implements this also places its persisted state into a Bundle.
+ * Specifies that the custom view that implements this also places its persisted state into a Bundle.
  *
- * Created by Zhuinden on 2017. 01. 23..
+ * This is used by {@link BackstackDelegate#persistViewToState(View)} and {@link BackstackDelegate#restoreViewFromState(View)}.
  */
-
 public interface Bundleable {
     @NonNull
     Bundle toBundle();

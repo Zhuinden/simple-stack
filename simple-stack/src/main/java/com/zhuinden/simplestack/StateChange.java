@@ -27,9 +27,7 @@ import java.util.List;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Provides the previous and the new state when the state changes within the backstack.
- *
- * Created by Zhuinden on 2017. 01. 12..
+ * Contains the previous and the new state that represents the change in state.
  */
 public class StateChange {
     @Retention(SOURCE)
@@ -51,36 +49,71 @@ public class StateChange {
     List<Parcelable> newState;
     int direction;
 
+    /**
+     * The previous state from before the new keys were set.
+     * If empty, then this is an initialize {@link StateChange}.
+     *
+     * @return the previous state.
+     */
     @NonNull
     public List<Parcelable> getPreviousState() {
         return previousState;
     }
 
+    /**
+     * The new state after the state change is complete.
+     *
+     * @return the new state.
+     */
     @NonNull
     public List<Parcelable> getNewState() {
         return newState;
     }
 
-    public @StateChangeDirection int getDirection() {
+    /**
+     * The direction of the state change.
+     *
+     * @return the direction: FORWARD, BACKWARD or REPLACE.
+     */
+    @StateChangeDirection
+    public int getDirection() {
         return direction;
     }
 
+    /**
+     * Provides the top of the previous state.
+     *
+     * @return the last element in previous state, or null if empty.
+     */
     @Nullable
     public <T extends Parcelable> T topPreviousState() {
         if(previousState.size() > 0) {
             // noinspection unchecked
-            return (T)previousState.get(previousState.size()-1);
+            return (T) previousState.get(previousState.size() - 1);
         } else {
             return null;
         }
     }
 
+    /**
+     * Provides the top of the new state.
+     *
+     * @param <T>
+     * @return the last element in new state.
+     */
     @NonNull
     public <T extends Parcelable> T topNewState() {
         // noinspection unchecked
-        return (T)newState.get(newState.size()-1);
+        return (T) newState.get(newState.size() - 1);
     }
 
+    /**
+     * Creates a {@link KeyContextWrapper} using the provided key.
+     *
+     * @param base the context used as base for the new context wrapper.
+     * @param key  the key this context is associated with.
+     * @return the context to use used with LayoutInflater.from().
+     */
     @NonNull
     public Context createContext(Context base, Parcelable key) {
         return new KeyContextWrapper(base, key);

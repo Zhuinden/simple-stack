@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 1.0.0 (2017-02-15)
+--------------------------------
+- RELEASE: 1.0.0!
+
+- ENHANCEMENT: Javadoc for all public classes and methods.
+
 -Simple Stack 0.9.6 (2017-02-14)
 ---------------------------------
 - INTERNAL CHANGE: Hidden `stateChangeComplete()` from public API of `BackstackDelegate`, it shouldn't have been public.

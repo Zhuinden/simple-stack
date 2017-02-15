@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A delegate class that manages Activity lifecycle integration, and view-state persistence for custom viewgroups.
+ * A delegate class that manages the {@link Backstack}'s Activity lifecycle integration,
+ * and provides view-state persistence for custom views that are associated with a key using {@link KeyContextWrapper}.
  *
- * Created by Zhuinden on 2017. 01. 22..
+ * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
-
 public class BackstackDelegate {
     private final Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
         @Override
@@ -47,6 +47,14 @@ public class BackstackDelegate {
     private static final String HISTORY = "simplestack.HISTORY";
     private static final String STATES = HISTORY + "_STATES";
 
+    /**
+     * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
+     * This is required to make sure that the {@link Backstack} states do not overwrite each other in the saved instance state bundle.
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * A persistence tag can only be set once on a given BackstackDelegate instance.
+     *
+     * @param persistenceTag a non-null persistence tag that uniquely identifies this {@link BackstackDelegate} inside the Activity.
+     */
     @SuppressWarnings("StringEquality")
     public void setPersistenceTag(@NonNull String persistenceTag) {
         if(backstack != null) {
@@ -76,10 +84,28 @@ public class BackstackDelegate {
 
     StateChanger stateChanger;
 
+    /**
+     * Creates the {@link BackstackDelegate}.
+     * If {@link StateChanger} is null, then the initialize {@link StateChange} is postponed until it is explicitly set.
+     * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
+     *
+     * @param stateChanger The {@link StateChanger} to be set. Allowed to be null at initialization.
+     */
     public BackstackDelegate(@Nullable StateChanger stateChanger) {
         this.stateChanger = stateChanger;
     }
 
+    /**
+     * The onCreate() delegate for the Activity.
+     * It initializes the backstack from either the non-configuration instance, the saved state, or creates a new one.
+     * Restores the {@link SavedState} that belongs to persisted view state.
+     * Begins an initialize {@link StateChange} if the {@link StateChanger} is set.
+     * Also registers a {@link Backstack.CompletionListener} that must be unregistered with {@link BackstackDelegate#onDestroy()}.
+     *
+     * @param savedInstanceState       The Activity saved instance state bundle.
+     * @param nonConfigurationInstance The {@link NonConfigurationInstance} that is typically obtained with getLastCustomNonConfigurationInstance().
+     * @param initialKeys              A list of the keys that are used to set as initial history of the backstack.
+     */
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull ArrayList<Parcelable> initialKeys) {
         if(nonConfigurationInstance != null && !(nonConfigurationInstance instanceof NonConfigurationInstance)) {
             throw new IllegalArgumentException(
@@ -115,6 +141,12 @@ public class BackstackDelegate {
         backstack.removeCompletionListener(completionListener);
     }
 
+    /**
+     * Sets the {@link StateChanger} to the {@link Backstack}. Removes the previous one if it there was already one set.
+     * This call begins an initialize {@link StateChange}.
+     *
+     * @param stateChanger The {@link StateChanger} to be set.
+     */
     public void setStateChanger(@Nullable StateChanger stateChanger) {
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
@@ -123,25 +155,48 @@ public class BackstackDelegate {
         initializeBackstack(stateChanger);
     }
 
-    private void initializeBackstack(StateChanger stateChanger) {
+    protected void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
             backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
         }
     }
 
+    /**
+     * The onRetainCustomNonConfigurationInstance() delegate for the Activity.
+     * This is required to make sure that the Backstack survives configuration change.
+     *
+     * @return a {@link NonConfigurationInstance} that contains the internal backstack instance.
+     */
     public NonConfigurationInstance onRetainCustomNonConfigurationInstance() {
         return new NonConfigurationInstance(backstack);
     }
 
+    /**
+     * The onBackPressed() delegate for the Activity.
+     * The call is delegated to {@link Backstack#goBack()}'.
+     *
+     * @return true if the {@link Backstack} handled the back press
+     */
     public boolean onBackPressed() {
         return backstack.goBack();
     }
 
+    /**
+     * The onSaveInstanceState() delegate for the Activity.
+     * This is required in order to save the {@link Backstack} and the {@link SavedState} persisted with {@link BackstackDelegate#persistViewToState(View)}
+     * into the Activity saved instance state bundle.
+     *
+     * @param outState the Bundle into which the backstack history and view states are saved.
+     */
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack).build());
         outState.putParcelableArrayList(getStateTag(), new ArrayList<>(keyStateMap.values()));
     }
 
+    /**
+     * The onPostResume() delegate for the Activity.
+     * It re-attaches the {@link StateChanger} if it is not already set.
+     */
     public void onPostResume() {
         if(stateChanger == null) {
             throw new IllegalStateException("State changer is still not set in `onPostResume`!");
@@ -151,12 +206,21 @@ public class BackstackDelegate {
         }
     }
 
+    /**
+     * The onPause() delegate for the Activity.
+     * It removes the {@link StateChanger} if it is set.
+     */
     public void onPause() {
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
         }
     }
 
+    /**
+     * The onDestroy() delegate for the Activity.
+     * Forces any pending state change to execute with {@link Backstack#executePendingStateChange()},
+     * and unregisters the delegate's {@link Backstack.CompletionListener} that was registered in {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     */
     public void onDestroy() {
         backstack.executePendingStateChange();
         unregisterAsCompletionListener();
@@ -164,6 +228,12 @@ public class BackstackDelegate {
 
     // ----- get backstack
 
+    /**
+     * Returns the {@link Backstack} that belongs to this delegate.
+     * This method can only be invoked after {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)} has been called.
+     *
+     * @return the {@link Backstack} managed by this delegate.
+     */
     @NonNull
     public Backstack getBackstack() {
         if(backstack == null) {
@@ -174,6 +244,11 @@ public class BackstackDelegate {
 
     // ----- viewstate persistence
 
+    /**
+     * Provides the means to save the provided view's hierarchy state, and its optional bundle via {@link Bundleable} into a {@link SavedState}.
+     *
+     * @param view the view that belongs to a certain key
+     */
     public void persistViewToState(@Nullable View view) {
         if(view != null) {
             Parcelable key = KeyContextWrapper.getKey(view.getContext());
@@ -195,6 +270,11 @@ public class BackstackDelegate {
         }
     }
 
+    /**
+     * Restores the state of the view based on the currently stored {@link SavedState}, according to the view's key.
+     *
+     * @param view the view that belongs to a certain key
+     */
     public void restoreViewFromState(@NonNull View view) {
         if(view == null) {
             throw new IllegalArgumentException("You cannot restore state into null view!");
@@ -207,6 +287,13 @@ public class BackstackDelegate {
         }
     }
 
+    /**
+     * Returns a {@link SavedState} instance for the given key.
+     * If the state does not exist, then a new associated state is created.
+     *
+     * @param key The key to which the {@link SavedState} belongs.
+     * @return the saved state that belongs to the given key.
+     */
     @NonNull
     public SavedState getSavedState(@NonNull Parcelable key) {
         if(key == null) {
@@ -228,6 +315,9 @@ public class BackstackDelegate {
         keyStateMap.keySet().retainAll(stateChange.getNewState());
     }
 
+    /**
+     * The class which stores the {@link Backstack} for surviving configuration change.
+     */
     public static class NonConfigurationInstance {
         private Backstack backstack;
 

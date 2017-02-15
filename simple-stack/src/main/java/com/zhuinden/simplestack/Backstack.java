@@ -30,9 +30,11 @@ import java.util.List;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * The class that manages the active state record of the application.
- *
- * Created by Zhuinden on 2017. 01. 12..
+ * The {@link Backstack} holds the current state, in the form of a list of Parcelables.
+ * It queues up {@link StateChange}s while a {@link StateChanger} is not available.
+ * When a {@link StateChanger} is available, it attempts to execute the queued {@link StateChange}s.
+ * A {@link StateChanger} can be either set to initialize, or to reattach.
+ * Initialize begins an initializing {@link StateChange} to set up initial state, reattach does not.
  */
 public class Backstack {
     public static <T extends Parcelable> T getKey(Context context) {
@@ -58,6 +60,11 @@ public class Backstack {
 
     private StateChanger stateChanger;
 
+    /**
+     * Creates the Backstack with the provided initial keys.
+     *
+     * @param initialKeys
+     */
     public Backstack(@NonNull Parcelable... initialKeys) {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
@@ -65,6 +72,11 @@ public class Backstack {
         initialParameters = Collections.unmodifiableList(new ArrayList<>(Arrays.asList(initialKeys)));
     }
 
+    /**
+     * Creates the Backstack with the provided initial keys.
+     *
+     * @param initialKeys
+     */
     public Backstack(@NonNull List<Parcelable> initialKeys) {
         if(initialKeys == null) {
             throw new NullPointerException("Initial key list should not be null");
@@ -75,10 +87,19 @@ public class Backstack {
         initialParameters = Collections.unmodifiableList(new ArrayList<>(initialKeys));
     }
 
+    /**
+     * Indicates whether a {@link StateChanger} is set.
+     */
     public boolean hasStateChanger() {
         return stateChanger != null;
     }
 
+    /**
+     * Sets a {@link StateChanger}.
+     *
+     * @param stateChanger the new {@link StateChanger}, which cannot be null.
+     * @param registerMode indicates whether the {@link StateChanger} is to be initialized, or is just reattached.
+     */
     public void setStateChanger(@NonNull StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
         if(stateChanger == null) {
             throw new NullPointerException("New state changer cannot be null");
@@ -96,10 +117,20 @@ public class Backstack {
         beginStateChangeIfPossible();
     }
 
+    /**
+     * Removes the {@link StateChanger}.
+     */
     public void removeStateChanger() {
         this.stateChanger = null;
     }
 
+    /**
+     * Goes to the new key.
+     * If the key is found, then it goes backward to the existing key.
+     * If the key is not found, then it goes forward to the newly added key.
+     *
+     * @param newKey the target state.
+     */
     public void goTo(@NonNull Parcelable newKey) {
         checkNewKey(newKey);
 
@@ -122,6 +153,13 @@ public class Backstack {
         enqueueStateChange(newHistory, direction, false);
     }
 
+    /**
+     * Goes back in the history.
+     * If the key is found, then it goes backward to the existing key.
+     * If the key is not found, then it goes forward to the newly added key.
+     *
+     * @return true if a state change is pending or is handled with a state change, false if there is only one state left.
+     */
     public boolean goBack() {
         if(isStateChangePending()) {
             return true;
@@ -140,17 +178,33 @@ public class Backstack {
         return true;
     }
 
+    /**
+     * Sets the provided state list as the new active history.
+     *
+     * @param newHistory the new active history.
+     * @param direction  The direction of the state change: BACKWARD, FORWARD or REPLACE.
+     */
     public void setHistory(@NonNull List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
         enqueueStateChange(newHistory, direction, false);
     }
 
+    /**
+     * Returns an unmodifiable copy of the current history.
+     *
+     * @return the unmodifiable copy of history.
+     */
     public List<Parcelable> getHistory() {
         List<Parcelable> copy = new ArrayList<>();
         copy.addAll(stack);
         return Collections.unmodifiableList(copy);
     }
 
+    /**
+     * Returns whether there is at least one queued {@link StateChange}.
+     *
+     * @return true if there is at least one enqueued {@link StateChange}.
+     */
     public boolean isStateChangePending() {
         return !queuedStateChanges.isEmpty();
     }
@@ -227,12 +281,28 @@ public class Backstack {
     }
 
     // completion listeners
+
+    /**
+     * CompletionListener allows you to listen to when a StateChange has been completed.
+     * They are registered to the backstack with {@link Backstack#addCompletionListener(CompletionListener)}.
+     * They are unregistered from the backstack with {@link Backstack#removeCompletionListener(CompletionListener)} methods.
+     */
     public interface CompletionListener {
+        /**
+         * Callback method that is called when a {@link StateChange} is complete.
+         *
+         * @param stateChange the state change that has been completed.
+         */
         void stateChangeCompleted(@NonNull StateChange stateChange);
     }
 
     private LinkedList<CompletionListener> completionListeners = new LinkedList<>();
 
+    /**
+     * Registers the {@link Backstack.CompletionListener}.
+     *
+     * @param completionListener The non-null completion listener to be registered.
+     */
     public void addCompletionListener(@NonNull CompletionListener completionListener) {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be added!");
@@ -240,6 +310,11 @@ public class Backstack {
         completionListeners.add(completionListener);
     }
 
+    /**
+     * Unregisters the {@link Backstack.CompletionListener}.
+     *
+     * @param completionListener The non-null completion listener to be unregistered.
+     */
     public void removeCompletionListener(@NonNull CompletionListener completionListener) {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be removed!");
@@ -254,6 +329,11 @@ public class Backstack {
     }
 
     // force execute
+
+    /**
+     * If there is a state change in progress, then calling this method will force it to be completed immediately.
+     * Any future calls to {@link StateChanger.Callback#stateChangeComplete()} for that given state change are ignored.
+     */
     public void executePendingStateChange() {
         if(isStateChangePending()) {
             PendingStateChange pendingStateChange = queuedStateChanges.getFirst();

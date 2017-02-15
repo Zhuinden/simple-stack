@@ -22,9 +22,8 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 
 /**
- * Context Wrapper for inflating views, containing the key inside it, making it accessible via `Backstack.getKey(Context)`.
- *
- * Created by Zhuinden on 2017.01.14..
+ * ContextWrapper for inflating views, containing the key inside it.
+ * The key is accessible via {@link Backstack#getKey(Context)} or {@link KeyContextWrapper#getKey(Context)}.
  */
 public class KeyContextWrapper
         extends ContextWrapper {
@@ -55,7 +54,12 @@ public class KeyContextWrapper
         return super.getSystemService(name);
     }
 
-
+    /**
+     * Returns the key found inside the provided context.
+     *
+     * @param context the key context wrapper in which the key can be found.
+     * @return the key.
+     */
     public static <T extends Parcelable> T getKey(Context context) {
         // noinspection ResourceType
         Object key = context.getSystemService(TAG);
