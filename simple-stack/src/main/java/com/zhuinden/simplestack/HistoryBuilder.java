@@ -38,7 +38,7 @@ public class HistoryBuilder
      * Creates a new history builder based on the {@link Backstack}'s history.
      *
      * @param backstack the {@link Backstack}.
-     * @return the newly created HistoryBuilder.
+     * @return the newly created {@link HistoryBuilder}.
      */
     public static HistoryBuilder from(@NonNull Backstack backstack) {
         if(backstack == null) {
@@ -51,7 +51,7 @@ public class HistoryBuilder
      * Creates a new history builder based on the {@link BackstackDelegate)}'s managed backstack history.
      *
      * @param backstackDelegate the {@link BackstackDelegate}.
-     * @return the newly created HistoryBuilder.
+     * @return the newly created {@link HistoryBuilder}.
      */
     public static HistoryBuilder from(@NonNull BackstackDelegate backstackDelegate) {
         if(backstackDelegate == null) {
@@ -64,12 +64,17 @@ public class HistoryBuilder
      * Creates a new history builder from the provided ordered collection.
      *
      * @param keys
-     * @return the newly created HistoryBuilder.
+     * @return the newly created {@link HistoryBuilder}.
      */
     public static HistoryBuilder from(@NonNull List<? extends Parcelable> keys) {
         return newBuilder().addAll(keys);
     }
 
+    /**
+     * Creates a new empty history builder.
+     *
+     * @return the newly created {@link HistoryBuilder}.
+     */
     public static HistoryBuilder newBuilder() {
         return new HistoryBuilder();
     }
@@ -238,7 +243,7 @@ public class HistoryBuilder
      * Returns the index of the provided key.
      *
      * @param key
-     * @return the index. -1 if not found.
+     * @return the index, -1 if not found.
      */
     public int indexOf(@NonNull Parcelable key) {
         checkKey(key);
@@ -249,7 +254,7 @@ public class HistoryBuilder
      * Returns the key at the given index.
      *
      * @param index
-     * @return the key
+     * @return the key at the given index
      */
     public <T extends Parcelable> T get(int index) {
         // noinspection unchecked
