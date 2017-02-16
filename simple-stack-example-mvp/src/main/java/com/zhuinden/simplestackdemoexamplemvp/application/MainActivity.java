@@ -184,13 +184,12 @@ public class MainActivity
         Context newContext = stateChange.createContext(this, newKey);
         View newView = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
 
+        root.addView(newView);
+        backstackDelegate.restoreViewFromState(newView);
+
         if(stateChange.getDirection() == StateChange.REPLACE) {
-            root.addView(newView);
-            backstackDelegate.restoreViewFromState(newView);
             finishStateChange(previousView, newView, completionCallback);
         } else {
-            root.addView(newView);
-            backstackDelegate.restoreViewFromState(newView);
             ViewUtils.waitForMeasure(newView, (view, width, height) -> {
                 runAnimation(previousView, newView, stateChange.getDirection(), new AnimatorListenerAdapter() {
                     @Override
