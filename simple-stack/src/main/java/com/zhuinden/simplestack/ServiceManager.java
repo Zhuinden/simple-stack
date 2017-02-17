@@ -15,6 +15,8 @@ package com.zhuinden.simplestack;
  * limitations under the License.
  */
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -27,44 +29,51 @@ import java.util.List;
 import java.util.Map;
 
 class ServiceManager {
-    // TODO: ROOT_KEY must be Parcelable in order to bind state to it
-    static final Object ROOT_KEY = new Object() {
+    static class RootKey implements Parcelable {
+        private RootKey() {
+        }
+
+        protected RootKey(Parcel in) {
+        }
+
+        public static final Creator<RootKey> CREATOR = new Creator<RootKey>() {
+            @Override
+            public RootKey createFromParcel(Parcel in) {
+                return new RootKey(in);
+            }
+
+            @Override
+            public RootKey[] newArray(int size) {
+                return new RootKey[size];
+            }
+        };
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+        }
+    }
+
+    static final Parcelable ROOT_KEY = new RootKey() {
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+
+        }
+
         @Override
         public String toString() {
             return "Services.ROOT_KEY";
         }
     };
-
-    public static Builder configure() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        Builder() {
-        }
-
-        Map<String, Object> rootServices = new LinkedHashMap<>();
-        List<ServiceFactory> servicesFactories = new LinkedList<>();
-
-        public Builder addServiceFactory(ServiceFactory serviceFactory) {
-            this.servicesFactories.add(serviceFactory);
-            return this;
-        }
-
-        public Builder addServiceFactories(List<? extends ServiceFactory> servicesFactories) {
-            this.servicesFactories.addAll(servicesFactories);
-            return this;
-        }
-
-        public Builder withService(String serviceTag, Object rootService) {
-            rootServices.put(serviceTag, rootService);
-            return this;
-        }
-
-        public ServiceManager build() {
-            return new ServiceManager(new ArrayList<>(servicesFactories), new LinkedHashMap<>(rootServices));
-        }
-    }
 
     private final Services rootServices;
     private final Map<Object, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
