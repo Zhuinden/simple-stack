@@ -181,7 +181,7 @@ class ServiceManager {
         if(savedState != null && savedState.getBundle() != null) {
             Bundle bundle = savedState.getBundle().getBundle("___SERVICE_STATES");
             if(bundle != null) {
-                Log.i("ServiceManager", "<<< RESTORE [" + key + "] >>>");
+                //Log.i("ServiceManager", "<<< RESTORE [" + key + "] >>>");
                 for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
                     if(serviceEntry.getValue() instanceof Bundleable) {
                         Bundle serviceBundle = bundle.getBundle(serviceEntry.getKey());

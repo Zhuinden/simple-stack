@@ -2,7 +2,6 @@ package com.zhuinden.simpleservicesexample.application;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,8 +18,6 @@ import com.zhuinden.simplestack.ServiceFactory;
 import com.zhuinden.simplestack.Services;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
-
-import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,6 +41,7 @@ public class MainActivity
         backstackDelegate = BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
             @Override
             public void bindServices(@NonNull Services.Builder builder) {
+                Log.i("ServiceManager", "<[Build Services :: " + builder.getKey() + "]>");
                 Key key = builder.getKey();
                 key.bindServices(builder);
             }
