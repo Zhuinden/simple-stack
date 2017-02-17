@@ -49,15 +49,19 @@ public class SavedState
         this.viewHierarchyState = viewHierarchyState;
     }
 
-    public Bundle getBundle() {
+    Bundle getBundle() {
         return bundle;
     }
 
-    public void setBundle(Bundle bundle) {
-        this.bundle = bundle;
+    public Bundle getViewBundle() {
+        return bundle.getBundle("___BUNDLE");
     }
 
-    public static Builder builder() {
+    public void setViewBundle(Bundle bundle) {
+        this.bundle.putBundle("___BUNDLE", bundle);
+    }
+
+    static Builder builder() {
         return new Builder();
     }
 
@@ -69,9 +73,10 @@ public class SavedState
     public static class Builder {
         private Parcelable key;
         private SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-        private Bundle bundle;
+        private Bundle bundle = new Bundle();
 
         Builder() {
+            bundle.putString("___EXISTENCE_HOOK", "___EXISTENCE_HOOK");
         }
 
         public Builder setKey(@NonNull Parcelable key) {
@@ -79,19 +84,6 @@ public class SavedState
                 throw new IllegalArgumentException("Key cannot be null");
             }
             this.key = key;
-            return this;
-        }
-
-        public Builder setViewHierarchyState(@NonNull SparseArray<Parcelable> viewHierarchyState) {
-            if(viewHierarchyState == null) {
-                throw new IllegalArgumentException("Provided sparse array for view hierarchy state cannot be null");
-            }
-            this.viewHierarchyState = viewHierarchyState;
-            return this;
-        }
-
-        public Builder setBundle(@Nullable Bundle bundle) {
-            this.bundle = bundle;
             return this;
         }
 
@@ -111,10 +103,7 @@ public class SavedState
         key = in.readParcelable(getClass().getClassLoader());
         // noinspection unchecked
         viewHierarchyState = in.readSparseArray(getClass().getClassLoader());
-        boolean hasBundle = in.readByte() > 0;
-        if(hasBundle) {
-            bundle = in.readBundle(getClass().getClassLoader());
-        }
+        bundle = in.readBundle(getClass().getClassLoader());
     }
 
     public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
@@ -140,10 +129,7 @@ public class SavedState
         // noinspection unchecked
         SparseArray<Object> sparseArray = (SparseArray)viewHierarchyState;
         dest.writeSparseArray(sparseArray);
-        dest.writeByte(bundle != null ? (byte)0x01 : 0x00);
-        if(bundle != null) {
-            dest.writeBundle(bundle);
-        }
+        dest.writeBundle(bundle);
     }
 
     @Override

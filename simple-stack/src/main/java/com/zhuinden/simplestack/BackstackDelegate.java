@@ -57,20 +57,17 @@ public class BackstackDelegate {
             boolean isInitializeStateChange = stateChange.getPreviousState().isEmpty();
             boolean servicesUninitialized = (isInitializeStateChange && !serviceManager.hasServices(topNewKey));
             if(servicesUninitialized || !isInitializeStateChange) {
-                serviceManager.setUp(topNewKey);
-                // TODO: RESTORE CHILD HIERARCHY (with setUp?)
+                serviceManager.setUp(BackstackDelegate.this, stateChange, topNewKey);
             }
             for(int i = stateChange.getPreviousState().size() - 1; i >= 0; i--) {
                 Parcelable previousKey = stateChange.getPreviousState().get(i);
                 if(serviceManager.hasServices(previousKey) && !stateChange.getNewState().contains(previousKey)) {
-                    serviceManager.tearDown(previousKey);
-                    // TODO: DESTROY
+                    serviceManager.tearDown(BackstackDelegate.this, stateChange, previousKey);
                 }
             }
             Parcelable topPreviousKey = stateChange.topPreviousState();
             if(topPreviousKey != null && stateChange.getNewState().contains(topPreviousKey)) {
-                // TODO: PERSIST CHILD HIERARCHY (with tearDown?)
-                serviceManager.tearDown(topPreviousKey);
+                serviceManager.tearDown(BackstackDelegate.this, stateChange, topPreviousKey);
             }
             serviceManager.dumpLogData(); // TODO: REMOVE
             stateChanger.handleStateChange(stateChange, completionCallback);
@@ -351,6 +348,7 @@ public class BackstackDelegate {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack).build());
         outState.putParcelableArrayList(getStateTag(), new ArrayList<>(keyStateMap.values()));
+        // TODO: persist ROOT_SERVICES state!
     }
 
     /**
@@ -421,11 +419,9 @@ public class BackstackDelegate {
             if(view instanceof Bundleable) {
                 bundle = ((Bundleable) view).toBundle();
             }
-            SavedState previousSavedState = SavedState.builder() //
-                    .setKey(key) //
-                    .setViewHierarchyState(viewHierarchyState) //
-                    .setBundle(bundle) //
-                    .build();
+            SavedState previousSavedState = getSavedState(key);
+            previousSavedState.setViewHierarchyState(viewHierarchyState);
+            previousSavedState.setViewBundle(bundle);
             keyStateMap.put(key, previousSavedState);
         }
     }
@@ -443,7 +439,7 @@ public class BackstackDelegate {
         SavedState savedState = getSavedState(newKey);
         view.restoreHierarchyState(savedState.getViewHierarchyState());
         if(view instanceof Bundleable) {
-            ((Bundleable) view).fromBundle(savedState.getBundle());
+            ((Bundleable) view).fromBundle(savedState.getViewBundle());
         }
     }
 

@@ -16,6 +16,8 @@ To support subclasses of `BackstackDelegate`, `configure().setDelegateProvider(M
 
 It is recommended that in order to create nested views, the `BackstackDelegate` is shared via `context.getSystemService()`, to make it accessible via any view through its context.
 
+- BREAKING CHANGE (?): `SavedState.Builder` is no longer public.
+
 - **ENHANCEMENT: SCOPED SERVICES INTEGRATION.**
 
 You are now able to create SCOPED SERVICES that are created when a given Key is set, and they are torn down when the Key is no longer active.

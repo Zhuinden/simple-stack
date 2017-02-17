@@ -61,7 +61,7 @@ public class Services {
     private final Object key;
     @Nullable
     private final Services parentServices;
-    private final Map<String, Object> ownedServices = new LinkedHashMap<>();
+    final Map<String, Object> ownedServices = new LinkedHashMap<>();
 
     Services(Object key, @Nullable Services parentServices, Map<String, Object> boundServices) {
         this.key = key;
