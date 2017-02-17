@@ -18,6 +18,8 @@ It is recommended that in order to create nested views, the `BackstackDelegate` 
 
 - BREAKING CHANGE (?): `SavedState.Builder` is no longer public.
 
+- BREAKING CHANGE (?): `clearStatesNotIn()` is now private instead of protected; replaced by `getAdditionalRetainedKeys()`.
+
 - **ENHANCEMENT: SCOPED SERVICES INTEGRATION.**
 
 You are now able to create SCOPED SERVICES that are created when a given Key is set, and they are torn down when the Key is no longer active.
@@ -52,7 +54,7 @@ When a given root key is set, their parents' services and all of their composite
 
 Previous services are destroyed when no longer active TODO:, but if the Service implements `Bundleable`, then their state is preserved within `SavedState` along with the view's saved state.
 
-TODO: `BackstackDelegate.clearStatesNotIn()` honors `Services.Child` and `Services.Component`, and you're able to store state that belongs to nested views directly.
+`BackstackDelegate.clearStatesNotIn()` honors `Services.Child` and `Services.Component`, and you're able to store state that belongs to nested views directly.
 
 - ADDED: `simple-stack-example-services`.
 

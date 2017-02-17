@@ -6,12 +6,12 @@ import android.support.annotation.Nullable;
 
 import com.example.stackmasterdetailfrag.Paths;
 import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.ServiceFactory;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,23 +27,13 @@ public class MasterDetailBackstackDelegate
     }
 
     @Override
-    protected void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
-        Set<Parcelable> keys = keyStateMap.keySet();
-        Iterator<Parcelable> keyIterator = keys.iterator();
-        while(keyIterator.hasNext()) {
-            Parcelable key = keyIterator.next();
-            boolean isMasterOf = false;
-            for(Parcelable newKey : stateChange.getNewState()) {
-                if(newKey instanceof Paths.MasterDetailPath) {
-                    if(key.equals(((Paths.MasterDetailPath) newKey).getMaster())) {
-                        isMasterOf = true;
-                        break;
-                    }
-                }
-            }
-            if(!stateChange.getNewState().contains(key) && !isMasterOf) {
-                keyIterator.remove();
+    protected Collection<? extends Parcelable> getAdditionalRetainedKeys(@NonNull StateChange stateChange) {
+        Set<Parcelable> keys = new HashSet<>();
+        for(Parcelable key : stateChange.getNewState()) {
+            if(key instanceof Paths.MasterDetailPath) {
+                keys.add(((Paths.MasterDetailPath) key).getMaster());
             }
         }
+        return keys;
     }
 }

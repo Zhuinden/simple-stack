@@ -312,7 +312,7 @@ public class BackstackDelegate {
         initializeBackstack(stateChanger);
     }
 
-    protected void initializeBackstack(StateChanger stateChanger) {
+    private void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
             backstack.setStateChanger(managedStateChanger, Backstack.INITIALIZE);
         }
@@ -463,19 +463,24 @@ public class BackstackDelegate {
         return keyStateMap.get(key);
     }
 
-    protected void stateChangeCompleted(StateChange stateChange) {
+    private void stateChangeCompleted(StateChange stateChange) {
         if(!backstack.isStateChangePending()) {
             clearStatesNotIn(keyStateMap, stateChange);
         }
     }
 
-    protected void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
+    private void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
         Set<Parcelable> retainedKeys = new LinkedHashSet<>();
         retainedKeys.add(ServiceManager.ROOT_KEY);
         for(Parcelable key : stateChange.getNewState()) {
             buildKeysToKeep(key, retainedKeys);
         }
+        retainedKeys.addAll(getAdditionalRetainedKeys(stateChange));
         keyStateMap.keySet().retainAll(retainedKeys);
+    }
+
+    protected Collection<? extends Parcelable> getAdditionalRetainedKeys(@NonNull StateChange stateChange) {
+        return Collections.emptySet();
     }
 
     private void buildKeysToKeep(Parcelable key, Set<Parcelable> retainedKeys) {
