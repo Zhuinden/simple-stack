@@ -15,6 +15,7 @@ package com.zhuinden.simplestack;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -25,11 +26,11 @@ import java.util.Map;
 
 public class Services {
     public interface Child {
-        Object parent();
+        Parcelable parent();
     }
 
     public interface Composite {
-        List<?> keys();
+        List<? extends Parcelable> keys();
     }
 
     public static final class Builder

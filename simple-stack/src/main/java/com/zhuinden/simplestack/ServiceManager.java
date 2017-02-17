@@ -76,7 +76,7 @@ class ServiceManager {
     };
 
     private final Services rootServices;
-    private final Map<Object, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
+    private final Map<Parcelable, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
     private final List<ServiceFactory> servicesFactories = new ArrayList<>();
 
     ServiceManager(List<ServiceFactory> servicesFactories) {
@@ -89,11 +89,11 @@ class ServiceManager {
         keyToManagedServicesMap.put(ROOT_KEY, new ReferenceCountedServices(this.rootServices));
     }
 
-    public boolean hasServices(Object key) {
+    public boolean hasServices(Parcelable key) {
         return keyToManagedServicesMap.containsKey(key);
     }
 
-    public Services findServices(Object key) {
+    public Services findServices(Parcelable key) {
         final ReferenceCountedServices managed = keyToManagedServicesMap.get(key);
         if(managed == null) {
             throw new IllegalStateException("No services currently exists for key " + key);
@@ -101,10 +101,10 @@ class ServiceManager {
         return managed.services;
     }
 
-    public void setUp(Object key) {
+    public void setUp(Parcelable key) {
         Services parent = keyToManagedServicesMap.get(ROOT_KEY).services;
         if(key instanceof Services.Child) {
-            final Object parentKey = ((Services.Child)key).parent();
+            final Parcelable parentKey = ((Services.Child)key).parent();
             setUp(parentKey);
             parent = keyToManagedServicesMap.get(parentKey).services;
         }
@@ -115,11 +115,11 @@ class ServiceManager {
         }
     }
 
-    private void buildComposite(Object key, Services parent) {
+    private void buildComposite(Parcelable key, Services parent) {
         Services.Composite composite = (Services.Composite) key;
-        List<?> children = composite.keys();
+        List<? extends Parcelable> children = composite.keys();
         for(int i = 0; i < children.size(); i++) {
-            Object child = children.get(i);
+            Parcelable child = children.get(i);
             ReferenceCountedServices managedServices = createNonExistentManagedServicesAndIncrementUsageCount(parent, child);
             if(child instanceof Services.Composite) {
                 buildComposite(child, managedServices.services);
@@ -127,14 +127,14 @@ class ServiceManager {
         }
     }
 
-    public void tearDown(Object key) {
+    public void tearDown(Parcelable key) {
         tearDown(key, false);
     }
 
-    private void tearDown(Object key, boolean isFromComposite) {
+    private void tearDown(Parcelable key, boolean isFromComposite) {
         if(key instanceof Services.Composite) {
             Services.Composite composite = (Services.Composite) key;
-            List<?> children = composite.keys();
+            List<? extends Parcelable> children = composite.keys();
             for(int i = children.size() - 1; i >= 0; i--) {
                 tearDown(children.get(i), true);
             }
@@ -146,7 +146,7 @@ class ServiceManager {
     }
 
     @NonNull
-    private ReferenceCountedServices createNonExistentManagedServicesAndIncrementUsageCount(@Nullable Services parentServices, Object key) {
+    private ReferenceCountedServices createNonExistentManagedServicesAndIncrementUsageCount(@Nullable Services parentServices, Parcelable key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         if(node == null) {
             // @formatter:off
@@ -166,7 +166,7 @@ class ServiceManager {
         return node;
     }
 
-    private boolean decrementAndMaybeRemoveKey(Object key) {
+    private boolean decrementAndMaybeRemoveKey(Parcelable key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         if(node == null) {
             throw new IllegalStateException("Cannot remove a node that doesn't exist or has already been removed!");
@@ -195,7 +195,7 @@ class ServiceManager {
 
     public void dumpLogData() {
         Log.i("ServiceManager", "Services: ");
-        for(Map.Entry<Object, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
+        for(Map.Entry<Parcelable, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
             Log.i("ServiceManager", "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
         }
     }

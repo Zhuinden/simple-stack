@@ -1,5 +1,7 @@
 package com.zhuinden.simpleservicesexample.presentation.paths.j;
 
+import android.os.Parcelable;
+
 import com.google.auto.value.AutoValue;
 import com.zhuinden.simpleservicesexample.R;
 import com.zhuinden.simpleservicesexample.application.Key;
@@ -21,7 +23,7 @@ public abstract class J
     public abstract Key parent();
 
     @Override
-    public List<?> keys() {
+    public List<Key> keys() {
         return Arrays.asList(L.create(), M.create(), N.create());
     }
 

@@ -1,5 +1,7 @@
 package com.zhuinden.simplestack;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestack.ServiceFactory;
@@ -15,9 +17,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 public class ServicesTest {
+    static class ChildKey extends TestKey implements Parcelable, Services.Child {
+        Parcelable parent;
+
+        ChildKey(String name, Parcelable parent) {
+            super(name);
+            this.parent = parent;
+        }
+
+        protected ChildKey(Parcel in) {
+            super(in);
+        }
+
+        @Override
+        public Parcelable parent() {
+            return parent;
+        }
+    }
+
     @Test
     public void serviceFactoryBindsServices() {
-        Object key = new Object();
+        Parcelable key = new TestKey("test");
         final Object service = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -34,7 +54,7 @@ public class ServicesTest {
 
     @Test
     public void unbindingServiceMakesItInaccessible() {
-        Object key = new Object();
+        Parcelable key = new TestKey("test");
         final Object service = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -57,13 +77,8 @@ public class ServicesTest {
 
     @Test
     public void bindingChildCreatesServiceOfParent() {
-        final Object parentKey = new Object();
-        Services.Child childKey = new Services.Child() {
-            @Override
-            public Object parent() {
-                return parentKey;
-            }
-        };
+        final Parcelable parentKey = new TestKey("parent");
+        ChildKey childKey = new ChildKey("child", parentKey);
         final Object parentService = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -82,13 +97,8 @@ public class ServicesTest {
 
     @Test
     public void unbindingChildMakesParentServiceInaccessible() {
-        final Object parentKey = new Object();
-        Services.Child childKey = new Services.Child() {
-            @Override
-            public Object parent() {
-                return parentKey;
-            }
-        };
+        final Parcelable parentKey = new TestKey("parent");
+        ChildKey childKey = new ChildKey("child", parentKey);
         final Object parentService = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -113,13 +123,8 @@ public class ServicesTest {
 
     @Test
     public void childCanInheritParentServices() {
-        final Object parentKey = new Object();
-        Services.Child childKey = new Services.Child() {
-            @Override
-            public Object parent() {
-                return parentKey;
-            }
-        };
+        final Parcelable parentKey = new TestKey("parent");
+        ChildKey childKey = new ChildKey("child", parentKey);
         final Object parentService = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -141,13 +146,8 @@ public class ServicesTest {
 
     @Test
     public void serviceNotFoundReturnsNull() {
-        final Object parentKey = new Object();
-        Services.Child childKey = new Services.Child() {
-            @Override
-            public Object parent() {
-                return parentKey;
-            }
-        };
+        final Parcelable parentKey = new TestKey("parent");
+        ChildKey childKey = new ChildKey("child", parentKey);
         final Object parentService = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -167,7 +167,7 @@ public class ServicesTest {
 
     @Test
     public void tearingDownKeyMultipleTimesThrowsException() {
-        final Object key = new Object();
+        final Parcelable key = new TestKey("test");
         final Object parentService = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -196,23 +196,44 @@ public class ServicesTest {
 
     @Test
     public void compositeChildrenHaveServicesCreated() {
-        class ChildWithParentField
-                implements Services.Child {
-            Services.Composite parent;
+        class CompositeKey extends TestKey implements Services.Composite {
+            List<? extends Parcelable> keys;
+
+            CompositeKey(String name, List<? extends Parcelable> keys) {
+                super(name);
+                this.keys = keys;
+            }
+
+            protected CompositeKey(Parcel in) {
+                super(in);
+            }
 
             @Override
-            public Object parent() {
+            public List<? extends Parcelable> keys() {
+                return keys;
+            }
+        }
+
+        class ChildWithParentField
+                extends TestKey implements Services.Child {
+            CompositeKey parent;
+
+            ChildWithParentField(String name) {
+                super(name);
+            }
+
+            protected ChildWithParentField(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public Parcelable parent() {
                 return parent;
             }
         }
-        final ChildWithParentField childA = new ChildWithParentField();
-        final ChildWithParentField childB = new ChildWithParentField();
-        final Services.Composite composite = new Services.Composite() {
-            @Override
-            public List<ChildWithParentField> keys() {
-                return Arrays.asList(childA, childB);
-            }
-        };
+        final ChildWithParentField childA = new ChildWithParentField("childA");
+        final ChildWithParentField childB = new ChildWithParentField("childB");
+        final CompositeKey composite = new CompositeKey("composite", Arrays.asList(childA, childB));
         childA.parent = composite;
         childB.parent = composite;
 
@@ -244,23 +265,45 @@ public class ServicesTest {
 
     @Test
     public void compositeChildrenHaveServicesTornDownWithParent() {
-        class ChildWithParentField
-                implements Services.Child {
-            Services.Composite parent;
+        class CompositeKey extends TestKey implements Services.Composite {
+            List<? extends Parcelable> keys;
+
+            CompositeKey(String name, List<? extends Parcelable> keys) {
+                super(name);
+                this.keys = keys;
+            }
+
+            protected CompositeKey(Parcel in) {
+                super(in);
+            }
 
             @Override
-            public Object parent() {
+            public List<? extends Parcelable> keys() {
+                return keys;
+            }
+        }
+
+        class ChildWithParentField
+                extends TestKey implements Services.Child {
+            CompositeKey parent;
+
+            ChildWithParentField(String name) {
+                super(name);
+            }
+
+            protected ChildWithParentField(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public Parcelable parent() {
                 return parent;
             }
         }
-        final ChildWithParentField childA = new ChildWithParentField();
-        final ChildWithParentField childB = new ChildWithParentField();
-        final Services.Composite composite = new Services.Composite() {
-            @Override
-            public List<ChildWithParentField> keys() {
-                return Arrays.asList(childA, childB);
-            }
-        };
+
+        final ChildWithParentField childA = new ChildWithParentField("childA");
+        final ChildWithParentField childB = new ChildWithParentField("childB");
+        final CompositeKey composite = new CompositeKey("composite", Arrays.asList(childA, childB));
         childA.parent = composite;
         childB.parent = composite;
 
@@ -327,58 +370,61 @@ public class ServicesTest {
 
     @Test
     public void compositeNestedServicesWork() {
-        class CompositeChild
+        class CompositeChild extends TestKey
                 implements Services.Child, Services.Composite {
-            private Object parent;
-            private List<?> children;
+            private Parcelable parent;
+            private List<? extends Parcelable> children;
 
-            private CompositeChild(List<?> children) {
-                this(null, children);
+            private CompositeChild(String name, List<? extends Parcelable> children) {
+                this(name, null, children);
             }
 
-            public CompositeChild(Object parent, List<?> children) {
+            public CompositeChild(String name, Parcelable parent, List<? extends Parcelable> children) {
+                super(name);
                 this.parent = parent;
                 this.children = children;
             }
 
             @Override
-            public Object parent() {
+            public Parcelable parent() {
                 return parent;
             }
 
             @Override
-            public List<?> keys() {
+            public List<? extends Parcelable> keys() {
                 return children;
             }
         }
 
-        class Child
+        class Child extends TestKey
                 implements Services.Child {
-            private Object parent;
+            private Parcelable parent;
 
-            private Child() {
+            private Child(String name) {
+                super(name);
             }
 
-            public Child(Object parent) {
+            public Child(String name, Parcelable parent) {
+                super(name);
                 this.parent = parent;
             }
 
             @Override
-            public Object parent() {
+            public Parcelable parent() {
                 return parent;
             }
         }
 
-        final Object _A = new Object();
+        final TestKey _A = new TestKey("A");
 
-        final Child _C = new Child();
-        final Child _E = new Child();
-        final Child _F = new Child();
-        final Child _G = new Child();
+        final Child _C = new Child("C");
+        final Child _E = new Child("E");
+        final Child _F = new Child("F");
+        final Child _G = new Child("G");
 
-        final CompositeChild _D = new CompositeChild(Arrays.asList(_F, _G));
+        final CompositeChild _D = new CompositeChild("D", Arrays.asList(_F, _G));
 
-        final CompositeChild _B = new CompositeChild(Arrays.asList(_C, _D, _E));
+        final CompositeChild _B = new CompositeChild("B", Arrays.asList(_C, _D, _E));
 
         _B.parent = _A;
         _C.parent = _B;
@@ -634,68 +680,72 @@ public class ServicesTest {
 
     @Test
     public void compositeUnidirectionalServicesWork() {
-        class CompositeChild
+        class CompositeChild extends TestKey
                 implements Services.Composite, Services.Child {
-            private Object parent;
-            private List<?> children;
+            private Parcelable parent;
+            private List<? extends Parcelable> children;
 
-            public CompositeChild(Object parent, List<?> children) {
+            public CompositeChild(String name, Parcelable parent, List<? extends Parcelable> children) {
+                super(name);
                 this.parent = parent;
                 this.children = children;
             }
 
             @Override
-            public List<?> keys() {
+            public List<? extends Parcelable> keys() {
                 return children;
             }
 
             @Override
-            public Object parent() {
+            public Parcelable parent() {
                 return parent;
             }
         }
 
-        class Composite
+        class Composite extends TestKey
                 implements Services.Composite {
-            private List<?> children;
+            private List<? extends Parcelable> children;
 
-            public Composite(List<?> children) {
+            public Composite(String name, List<? extends Parcelable> children) {
+                super(name);
                 this.children = children;
             }
 
             @Override
-            public List<?> keys() {
+            public List<? extends Parcelable> keys() {
                 return children;
             }
         }
 
-        class Child
+        class Child extends TestKey
                 implements Services.Child {
-            private Object parent;
+            private Parcelable parent;
 
-            private Child() {
+            private Child(String name) {
+                super(name);
             }
 
-            public Child(Object parent) {
+            public Child(String name, Parcelable parent) {
+                super(name);
                 this.parent = parent;
             }
 
             @Override
-            public Object parent() {
+            public Parcelable parent() {
                 return parent;
             }
         }
 
-        final Object _A = new Object();
+        final TestKey _A = new TestKey("A");
 
-        final Child _C = new Child();
-        final Child _E = new Child();
-        final Child _F = new Child();
-        final Child _G = new Child();
+        final Child _C = new Child("C");
+        final Child _E = new Child("E");
+        final Child _F = new Child("F");
+        final Child _G = new Child("G");
 
-        final Composite _D = new Composite(Arrays.asList(_F, _G));
+        final Composite _D = new Composite("D", Arrays.asList(_F, _G));
 
-        final CompositeChild _B = new CompositeChild(_A, Arrays.asList(_C, _D, _E));
+        final CompositeChild _B = new CompositeChild("B", _A, Arrays.asList(_C, _D, _E));
 
         _C.parent = _B;
         //_D.parent = _B;
