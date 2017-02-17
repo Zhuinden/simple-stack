@@ -50,9 +50,7 @@ When a given root key is set, their parents' services and all of their composite
 
 Previous services are destroyed when no longer active TODO:, but if the Service implements `Bundleable`, then their state is preserved within `SavedState` along with the view's saved state.
 
-TODO: - ENHANCEMENT: You are now allowed to save state of child views associated with child keys directly, instead of having to manually save their states into the root key's `Bundle`.
-
-TODO: Meaning, `BackstackDelegate.clearStatesNotIn()` honors `Services.Child` and `Services.Component`, and you're able to store state that belongs to nested views immediately.
+TODO: `BackstackDelegate.clearStatesNotIn()` honors `Services.Child` and `Services.Component`, and you're able to store state that belongs to nested views directly.
 
 - ADDED: `simple-stack-example-services`.
 
