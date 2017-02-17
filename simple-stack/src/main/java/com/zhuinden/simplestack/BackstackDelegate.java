@@ -30,9 +30,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A delegate class that manages the {@link Backstack}'s Activity lifecycle integration,
@@ -57,17 +59,17 @@ public class BackstackDelegate {
             boolean isInitializeStateChange = stateChange.getPreviousState().isEmpty();
             boolean servicesUninitialized = (isInitializeStateChange && !serviceManager.hasServices(topNewKey));
             if(servicesUninitialized || !isInitializeStateChange) {
-                serviceManager.setUp(BackstackDelegate.this, stateChange, topNewKey);
+                serviceManager.setUp(BackstackDelegate.this, topNewKey);
             }
             for(int i = stateChange.getPreviousState().size() - 1; i >= 0; i--) {
                 Parcelable previousKey = stateChange.getPreviousState().get(i);
                 if(serviceManager.hasServices(previousKey) && !stateChange.getNewState().contains(previousKey)) {
-                    serviceManager.tearDown(BackstackDelegate.this, stateChange, previousKey);
+                    serviceManager.tearDown(BackstackDelegate.this, false, previousKey);
                 }
             }
             Parcelable topPreviousKey = stateChange.topPreviousState();
             if(topPreviousKey != null && stateChange.getNewState().contains(topPreviousKey)) {
-                serviceManager.tearDown(BackstackDelegate.this, stateChange, topPreviousKey);
+                serviceManager.tearDown(BackstackDelegate.this, true, topPreviousKey);
             }
             serviceManager.dumpLogData(); // TODO: REMOVE
             stateChanger.handleStateChange(stateChange, completionCallback);
@@ -284,7 +286,7 @@ public class BackstackDelegate {
         } else {
             backstack = new Backstack(keys);
             serviceManager = new ServiceManager(servicesFactories, rootServices);
-            // TODO: attempt to restore root services state if exists
+            serviceManager.restoreServicesForKey(this, ServiceManager.ROOT_KEY);
         }
         registerAsCompletionListener();
         initializeBackstack(stateChanger);
@@ -347,8 +349,10 @@ public class BackstackDelegate {
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelableArrayList(getHistoryTag(), HistoryBuilder.from(backstack).build());
+        List<Parcelable> history = backstack.getHistory();
+        serviceManager.persistServicesForKey(this, ServiceManager.ROOT_KEY);
+        serviceManager.persistServicesForKeyHierarchy(this, history.get(history.size() - 1));
         outState.putParcelableArrayList(getStateTag(), new ArrayList<>(keyStateMap.values()));
-        // TODO: persist ROOT_SERVICES state!
     }
 
     /**
@@ -468,7 +472,22 @@ public class BackstackDelegate {
     }
 
     protected void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
-        keyStateMap.keySet().retainAll(stateChange.getNewState());
+        Set<Parcelable> retainedKeys = new LinkedHashSet<>();
+        retainedKeys.add(ServiceManager.ROOT_KEY);
+        for(Parcelable key : stateChange.getNewState()) {
+            buildKeysToKeep(key, retainedKeys);
+        }
+        keyStateMap.keySet().retainAll(retainedKeys);
+    }
+
+    private void buildKeysToKeep(Parcelable key, Set<Parcelable> retainedKeys) {
+        retainedKeys.add(key);
+        if(key instanceof Services.Composite) {
+            List<? extends Parcelable> children = ((Services.Composite) key).keys();
+            for(Parcelable childKey : children) {
+                buildKeysToKeep(childKey, retainedKeys);
+            }
+        }
     }
 
     // Context sharing

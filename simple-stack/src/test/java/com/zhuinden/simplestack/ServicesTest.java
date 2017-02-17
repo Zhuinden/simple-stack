@@ -67,7 +67,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, key);
+        serviceManager.setUp(backstackDelegate, key);
 
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isSameAs(service);
     }
@@ -84,8 +84,8 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, key);
-        serviceManager.tearDown(backstackDelegate, stateChange, key);
+        serviceManager.setUp(backstackDelegate, key);
+        serviceManager.tearDown(backstackDelegate, true, key);
 
         try {
             serviceManager.findServices(key).getService("HELLO");
@@ -110,7 +110,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, childKey);
+        serviceManager.setUp(backstackDelegate, childKey);
 
         assertThat(serviceManager.findServices(parentKey).<Object>getService("HELLO")).isSameAs(parentService);
     }
@@ -130,8 +130,8 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, childKey);
-        serviceManager.tearDown(backstackDelegate, stateChange, childKey);
+        serviceManager.setUp(backstackDelegate, childKey);
+        serviceManager.tearDown(backstackDelegate, true, childKey);
 
         try {
             serviceManager.findServices(parentKey).getService("HELLO");
@@ -156,7 +156,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, childKey);
+        serviceManager.setUp(backstackDelegate, childKey);
 
         assertThat(serviceManager.findServices(parentKey).<Object>getService("HELLO")).isEqualTo(parentService);
         assertThat(serviceManager.findServices(childKey).<Object>getService("HELLO")).isEqualTo(parentService);
@@ -179,7 +179,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, childKey);
+        serviceManager.setUp(backstackDelegate, childKey);
 
         assertThat(serviceManager.findServices(childKey).<Object>getService("WORLD")).isNull();
     }
@@ -199,15 +199,15 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, key);
+        serviceManager.setUp(backstackDelegate, key);
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isEqualTo(parentService);
-        serviceManager.setUp(backstackDelegate, stateChange, key);
+        serviceManager.setUp(backstackDelegate, key);
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isEqualTo(parentService);
-        serviceManager.tearDown(backstackDelegate, stateChange, key);
+        serviceManager.tearDown(backstackDelegate, true, key);
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isEqualTo(parentService);
-        serviceManager.tearDown(backstackDelegate, stateChange, key);
+        serviceManager.tearDown(backstackDelegate, true, key);
         try {
-            serviceManager.tearDown(backstackDelegate, stateChange, key);
+            serviceManager.tearDown(backstackDelegate, true, key);
             fail();
         } catch(IllegalStateException e) {
             // OK!
@@ -274,7 +274,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, composite);
+        serviceManager.setUp(backstackDelegate, composite);
 
         assertThat(serviceManager.findServices(composite).<Object>getService("HELLO")).isSameAs(parentService);
         assertThat(serviceManager.findServices(childA).<Object>getService("WORLD")).isSameAs(childAService);
@@ -344,14 +344,14 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, composite);
+        serviceManager.setUp(backstackDelegate, composite);
         assertThat(serviceManager.findServices(composite).<Object>getService("HELLO")).isSameAs(parentService);
         assertThat(serviceManager.findServices(childA).<Object>getService("WORLD")).isSameAs(childAService);
         assertThat(serviceManager.findServices(childB).<Object>getService("CROCODILES")).isSameAs(childBService);
         assertThat(serviceManager.findServices(childA).<Object>getService("HELLO")).isSameAs(parentService);
         assertThat(serviceManager.findServices(childB).<Object>getService("HELLO")).isSameAs(parentService);
 
-        serviceManager.tearDown(backstackDelegate, stateChange, composite);
+        serviceManager.tearDown(backstackDelegate, true, composite);
         try {
             assertThat(serviceManager.findServices(composite).<Object>getService("HELLO")).isSameAs(parentService);
             fail();
@@ -475,7 +475,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, _B);
+        serviceManager.setUp(backstackDelegate, _B);
 
         /**
          *
@@ -508,7 +508,7 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.tearDown(backstackDelegate, stateChange, _B);
+        serviceManager.tearDown(backstackDelegate, true, _B);
 
         try {
             assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
@@ -593,7 +593,7 @@ public class ServicesTest {
 
 
         /////
-        serviceManager.setUp(backstackDelegate, stateChange, _D);
+        serviceManager.setUp(backstackDelegate, _D);
 
         assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
         assertThat(serviceManager.findServices(_B).<String>getService("A")).isEqualTo("A");
@@ -616,8 +616,8 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.setUp(backstackDelegate, stateChange, _A);
-        serviceManager.tearDown(backstackDelegate, stateChange, _D);
+        serviceManager.setUp(backstackDelegate, _A);
+        serviceManager.tearDown(backstackDelegate, true, _D);
 
         assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
         try {
@@ -795,7 +795,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, stateChange, _B);
+        serviceManager.setUp(backstackDelegate, _B);
 
         /**
          *
@@ -828,7 +828,7 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.tearDown(backstackDelegate, stateChange, _B);
+        serviceManager.tearDown(backstackDelegate, true, _B);
 
         try {
             assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
@@ -913,7 +913,7 @@ public class ServicesTest {
 
 
         /////
-        serviceManager.setUp(backstackDelegate, stateChange, _D);
+        serviceManager.setUp(backstackDelegate, _D);
 
         //assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
         //assertThat(serviceManager.findServices(_B).<String>getService("A")).isEqualTo("A");
@@ -936,7 +936,7 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.tearDown(backstackDelegate, stateChange, _D);
+        serviceManager.tearDown(backstackDelegate, true, _D);
 
         try {
             assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
