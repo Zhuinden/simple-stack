@@ -20,12 +20,10 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,8 +51,8 @@ public class BackstackDelegate {
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public final void handleStateChange(StateChange stateChange, Callback completionCallback) {
-            Log.i("ServiceManager", Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState().toArray())); // TODO: REMOVE
-            serviceManager.dumpLogData(); // TODO: REMOVE
+            //Log.i("ServiceManager", Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState().toArray())); //
+            //serviceManager.dumpLogData(); //
             Parcelable topNewKey = stateChange.topNewState();
             boolean isInitializeStateChange = stateChange.getPreviousState().isEmpty();
             boolean servicesUninitialized = (isInitializeStateChange && !serviceManager.hasServices(topNewKey));
@@ -71,7 +69,7 @@ public class BackstackDelegate {
             if(topPreviousKey != null && stateChange.getNewState().contains(topPreviousKey)) {
                 serviceManager.tearDown(BackstackDelegate.this, true, topPreviousKey);
             }
-            serviceManager.dumpLogData(); // TODO: REMOVE
+            //serviceManager.dumpLogData(); //
             stateChanger.handleStateChange(stateChange, completionCallback);
         }
     };

@@ -193,7 +193,7 @@ class ServiceManager {
     }
 
     void persistServicesForKey(BackstackDelegate backstackDelegate, Parcelable key) {
-        Log.i("ServiceManager", "<<< PERSIST [" + key + "] >>>");
+        //Log.i("ServiceManager", "<<< PERSIST [" + key + "] >>>");
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
         if(savedState != null) {
