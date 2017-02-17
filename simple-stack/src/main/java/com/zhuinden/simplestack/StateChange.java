@@ -105,16 +105,4 @@ public class StateChange {
         // noinspection unchecked
         return (T) newState.get(newState.size() - 1);
     }
-
-    /**
-     * Creates a {@link KeyContextWrapper} using the provided key.
-     *
-     * @param base the context used as base for the new context wrapper.
-     * @param key  the key this context is associated with.
-     * @return the context to use used with LayoutInflater.from().
-     */
-    @NonNull
-    public Context createContext(Context base, Parcelable key) {
-        return new KeyContextWrapper(base, key);
-    }
 }

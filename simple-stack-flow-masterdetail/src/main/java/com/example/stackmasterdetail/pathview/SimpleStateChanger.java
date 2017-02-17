@@ -57,7 +57,7 @@ public class SimpleStateChanger
         Paths.Path newKey = stateChange.topNewState();
         newKey = getActiveKey(newKey);
 
-        Context context = stateChange.createContext(baseContext, newKey);
+        Context context = backstackDelegate.createContext(baseContext, newKey);
         View newView = LayoutInflater.from(context).inflate(newKey.layout(), root, false);
 
         View previousView = null;

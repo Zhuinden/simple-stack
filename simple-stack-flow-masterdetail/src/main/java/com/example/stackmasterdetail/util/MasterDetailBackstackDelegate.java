@@ -7,10 +7,12 @@ import android.support.annotation.Nullable;
 import com.example.stackmasterdetail.Paths;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.SavedState;
+import com.zhuinden.simplestack.ServiceFactory;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,8 +22,8 @@ import java.util.Set;
 
 public class MasterDetailBackstackDelegate
         extends BackstackDelegate {
-    public MasterDetailBackstackDelegate(@Nullable StateChanger stateChanger) {
-        super(stateChanger);
+    public MasterDetailBackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices) {
+        super(stateChanger, servicesFactories, rootServices);
     }
 
     @Override

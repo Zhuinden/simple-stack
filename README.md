@@ -75,7 +75,7 @@ public class MainActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = BackstackDelegate.create();
         backstackDelegate.onCreate(savedInstanceState, //
                         getLastCustomNonConfigurationInstance(), //
                         HistoryBuilder.single(new FirstKey()));

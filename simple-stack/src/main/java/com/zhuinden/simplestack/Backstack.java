@@ -38,7 +38,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 public class Backstack {
     public static <T extends Parcelable> T getKey(Context context) {
-        return KeyContextWrapper.getKey(context);
+        return ManagedContextWrapper.getKey(context);
     }
 
     //

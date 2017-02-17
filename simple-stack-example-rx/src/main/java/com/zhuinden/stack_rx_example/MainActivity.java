@@ -29,7 +29,7 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = BackstackDelegate.create();
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
                 HistoryBuilder.single(FirstKey.create()));
@@ -37,7 +37,7 @@ public class MainActivity
             backstackDelegate.persistViewToState(root.getChildAt(0));
             root.removeAllViews();
             Key newKey = stateChange.topNewState();
-            Context newContext = stateChange.createContext(MainActivity.this, newKey);
+            Context newContext = backstackDelegate.createContext(MainActivity.this, newKey);
             View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
             backstackDelegate.restoreViewFromState(view);
             root.addView(view);

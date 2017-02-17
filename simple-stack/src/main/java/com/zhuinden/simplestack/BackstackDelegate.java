@@ -15,21 +15,28 @@
  */
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A delegate class that manages the {@link Backstack}'s Activity lifecycle integration,
- * and provides view-state persistence for custom views that are associated with a key using {@link KeyContextWrapper}.
+ * and provides view-state persistence for custom views that are associated with a key using {@link ManagedContextWrapper}.
  *
  * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
@@ -38,6 +45,35 @@ public class BackstackDelegate {
         @Override
         public void stateChangeCompleted(@NonNull StateChange stateChange) {
             BackstackDelegate.this.stateChangeCompleted(stateChange);
+        }
+    };
+
+    private final StateChanger managedStateChanger = new StateChanger() {
+        @Override
+        public final void handleStateChange(StateChange stateChange, Callback completionCallback) {
+            Log.i("ServiceManager", Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState().toArray())); // TODO: REMOVE
+            serviceManager.dumpLogData(); // TODO: REMOVE
+            Parcelable topNewKey = stateChange.topNewState();
+            boolean isInitializeStateChange = stateChange.getPreviousState().isEmpty();
+            boolean servicesUninitialized = (isInitializeStateChange && !serviceManager.hasServices(topNewKey));
+            if(servicesUninitialized || !isInitializeStateChange) {
+                serviceManager.setUp(topNewKey);
+                // TODO: RESTORE CHILD HIERARCHY (with setUp?)
+            }
+            for(int i = stateChange.getPreviousState().size() - 1; i >= 0; i--) {
+                Parcelable previousKey = stateChange.getPreviousState().get(i);
+                if(serviceManager.hasServices(previousKey) && !stateChange.getNewState().contains(previousKey)) {
+                    serviceManager.tearDown(previousKey);
+                    // TODO: DESTROY
+                }
+            }
+            Parcelable topPreviousKey = stateChange.topPreviousState();
+            if(topPreviousKey != null && stateChange.getNewState().contains(topPreviousKey)) {
+                // TODO: PERSIST CHILD HIERARCHY (with tearDown?)
+                serviceManager.tearDown(topPreviousKey);
+            }
+            serviceManager.dumpLogData(); // TODO: REMOVE
+            stateChanger.handleStateChange(stateChange, completionCallback);
         }
     };
 
@@ -84,15 +120,136 @@ public class BackstackDelegate {
 
     StateChanger stateChanger;
 
-    /**
-     * Creates the {@link BackstackDelegate}.
-     * If {@link StateChanger} is null, then the initialize {@link StateChange} is postponed until it is explicitly set.
-     * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
-     *
-     * @param stateChanger The {@link StateChanger} to be set. Allowed to be null at initialization.
-     */
-    public BackstackDelegate(@Nullable StateChanger stateChanger) {
+    List<ServiceFactory> servicesFactories;
+    Map<String, Object> rootServices;
+    ServiceManager serviceManager;
+
+    protected BackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices) {
         this.stateChanger = stateChanger;
+        this.servicesFactories = servicesFactories;
+        this.rootServices = rootServices;
+    }
+
+    /**
+     * Obtain a {@link Builder} that allows setting initial state changer, and service factories for scoped services.
+     *
+     * @return the builder that configures the initial state changer, and services.
+     */
+    public static Builder configure() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a {@link BackstackDelegate} that has no initial state changer, and no service factories.
+     * The initialize {@link StateChange} is postponed until {@link Backstack#setStateChanger(StateChanger, int)} is called.
+     * The {@link StateChanger} must be set before {@link BackstackDelegate#onPostResume()}.
+     *
+     * @return {@link BackstackDelegate} with default configuration.
+     */
+    public static BackstackDelegate create() {
+        return new BackstackDelegate(null, Collections.<ServiceFactory>emptyList(), Collections.<String, Object>emptyMap());
+    }
+
+    /**
+     * Allows the configuration of the initial state changer, the scoped service factories, and the root services.
+     */
+    public static class Builder {
+        public interface DelegateProvider {
+            BackstackDelegate create(StateChanger stateChanger, List<ServiceFactory> serviceFactories, Map<String, Object> rootServices);
+        }
+
+        DelegateProvider delegateProvider = new DelegateProvider() {
+            @Override
+            public BackstackDelegate create(StateChanger stateChanger, List<ServiceFactory> serviceFactories, Map<String, Object> rootServices) {
+                return new BackstackDelegate(stateChanger, serviceFactories, rootServices);
+            }
+        };
+
+        List<ServiceFactory> servicesFactories = new LinkedList<>();
+        Map<String, Object> rootServices = new LinkedHashMap<>();
+        StateChanger stateChanger;
+
+        private Builder() {
+        }
+
+        /**
+         * Sets the {@link StateChanger}.
+         * If {@link StateChanger} is null, then the initialize {@link StateChange} is postponed until it is explicitly set.
+         * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
+         *
+         * @param stateChanger The {@link StateChanger} to be set. Allowed to be null at initialization.
+         * @return the builder.
+         */
+        public Builder setStateChanger(@Nullable StateChanger stateChanger) {
+            this.stateChanger = stateChanger;
+            return this;
+        }
+
+        /**
+         * Adds the {@link ServiceFactory}.
+         * When a new key is set up, then the added {@link ServiceFactory}s bind the specified services into the given key's scope.
+         *
+         * @param serviceFactory The {@link ServiceFactory} that creates or destroys services.
+         * @return the builder.
+         */
+        public Builder addServiceFactory(@NonNull ServiceFactory serviceFactory) {
+            if(serviceFactory == null) {
+                throw new IllegalArgumentException("Service factory cannot be null!");
+            }
+            this.servicesFactories.add(serviceFactory);
+            return this;
+        }
+
+        /**
+         * Adds the {@link ServiceFactory}s.
+         * When a new key is set up, then the added {@link ServiceFactory}s bind the specified services into the given key's scope.
+         *
+         * @param serviceFactories The {@link ServiceFactory}s that create or destroy services.
+         * @return the builder.
+         */
+        public Builder addServiceFactories(@NonNull Collection<? extends ServiceFactory> serviceFactories) {
+            if(serviceFactories == null) {
+                throw new IllegalArgumentException("Service factories cannot be null!");
+            }
+            this.servicesFactories.addAll(serviceFactories);
+            return this;
+        }
+
+        /**
+         * Binds a root service that is visible for all child scopes.
+         *
+         * @param serviceTag the tag that identifies the service within its scope.
+         * @param service
+         * @return
+         */
+        public Builder withRootService(@NonNull String serviceTag, @NonNull Object service) {
+            if(serviceTag == null) {
+                throw new IllegalArgumentException("Service tag cannot be null!");
+            }
+            if(service == null) {
+                throw new IllegalArgumentException("Service cannot be null!");
+            }
+            this.rootServices.put(serviceTag, service);
+            return this;
+        }
+
+        /**
+         * Provides a hook to replace the BackstackDelegate implementation if necessary.
+         *
+         * @param delegateProvider The provider that instantiates the BackstackDelegate.
+         * @return the builder.
+         */
+        public Builder setDelegateProvider(@NonNull DelegateProvider delegateProvider) {
+            if(delegateProvider == null) {
+                throw new IllegalArgumentException("If specified, then the delegate provider must not be null!");
+            }
+            this.delegateProvider = delegateProvider;
+            return this;
+        }
+
+        public BackstackDelegate build() {
+            return delegateProvider.create(stateChanger, servicesFactories, rootServices);
+        }
     }
 
     /**
@@ -126,8 +283,11 @@ public class BackstackDelegate {
         NonConfigurationInstance nonConfig = (NonConfigurationInstance) nonConfigurationInstance;
         if(nonConfig != null) {
             backstack = nonConfig.getBackstack();
+            serviceManager = nonConfig.getServiceManager();
         } else {
             backstack = new Backstack(keys);
+            serviceManager = new ServiceManager(servicesFactories, rootServices);
+            // TODO: attempt to restore root services state if exists
         }
         registerAsCompletionListener();
         initializeBackstack(stateChanger);
@@ -157,7 +317,7 @@ public class BackstackDelegate {
 
     protected void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
-            backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+            backstack.setStateChanger(managedStateChanger, Backstack.INITIALIZE);
         }
     }
 
@@ -168,7 +328,7 @@ public class BackstackDelegate {
      * @return a {@link NonConfigurationInstance} that contains the internal backstack instance.
      */
     public NonConfigurationInstance onRetainCustomNonConfigurationInstance() {
-        return new NonConfigurationInstance(backstack);
+        return new NonConfigurationInstance(backstack, serviceManager);
     }
 
     /**
@@ -202,7 +362,7 @@ public class BackstackDelegate {
             throw new IllegalStateException("State changer is still not set in `onPostResume`!");
         }
         if(!backstack.hasStateChanger()) {
-            backstack.setStateChanger(stateChanger, Backstack.REATTACH);
+            backstack.setStateChanger(managedStateChanger, Backstack.REATTACH);
         }
     }
 
@@ -251,7 +411,7 @@ public class BackstackDelegate {
      */
     public void persistViewToState(@Nullable View view) {
         if(view != null) {
-            Parcelable key = KeyContextWrapper.getKey(view.getContext());
+            Parcelable key = ManagedContextWrapper.getKey(view.getContext());
             if(key == null) {
                 throw new IllegalArgumentException("The view [" + view + "] contained no key!");
             }
@@ -279,7 +439,7 @@ public class BackstackDelegate {
         if(view == null) {
             throw new IllegalArgumentException("You cannot restore state into null view!");
         }
-        Parcelable newKey = KeyContextWrapper.getKey(view.getContext());
+        Parcelable newKey = ManagedContextWrapper.getKey(view.getContext());
         SavedState savedState = getSavedState(newKey);
         view.restoreHierarchyState(savedState.getViewHierarchyState());
         if(view instanceof Bundleable) {
@@ -315,18 +475,38 @@ public class BackstackDelegate {
         keyStateMap.keySet().retainAll(stateChange.getNewState());
     }
 
+    // Context sharing
+
+    /**
+     * Creates a {@link ManagedContextWrapper} using the provided key.
+     *
+     * @param base the context used as base for the new context wrapper.
+     * @param key  the key this context is associated with.
+     * @return the context to use used with LayoutInflater.from().
+     */
+    @NonNull
+    public Context createContext(Context base, Parcelable key) {
+        return new ManagedContextWrapper(base, key);
+    }
+
     /**
      * The class which stores the {@link Backstack} for surviving configuration change.
      */
     public static class NonConfigurationInstance {
-        private Backstack backstack;
+        private final Backstack backstack;
+        private final ServiceManager serviceManager;
 
-        private NonConfigurationInstance(Backstack backstack) {
+        private NonConfigurationInstance(Backstack backstack, ServiceManager serviceManager) {
             this.backstack = backstack;
+            this.serviceManager = serviceManager;
         }
 
         Backstack getBackstack() {
             return backstack;
+        }
+
+        ServiceManager getServiceManager() {
+            return serviceManager;
         }
     }
 }

@@ -23,9 +23,9 @@ import android.view.LayoutInflater;
 
 /**
  * ContextWrapper for inflating views, containing the key inside it.
- * The key is accessible via {@link Backstack#getKey(Context)} or {@link KeyContextWrapper#getKey(Context)}.
+ * The key is accessible via {@link Backstack#getKey(Context)} or {@link ManagedContextWrapper#getKey(Context)}.
  */
-public class KeyContextWrapper
+class ManagedContextWrapper
         extends ContextWrapper {
     public static final String TAG = "Backstack.KEY";
 
@@ -33,7 +33,7 @@ public class KeyContextWrapper
 
     final Parcelable key;
 
-    public KeyContextWrapper(Context base, @NonNull Parcelable key) {
+    public ManagedContextWrapper(Context base, @NonNull Parcelable key) {
         super(base);
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");

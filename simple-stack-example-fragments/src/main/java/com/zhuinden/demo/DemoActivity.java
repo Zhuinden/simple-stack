@@ -29,7 +29,7 @@ public class DemoActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.demo_activity);
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = BackstackDelegate.create();
         backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), HistoryBuilder.single(FirstKey.create()));
     }
 

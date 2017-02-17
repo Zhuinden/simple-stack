@@ -1,5 +1,61 @@
 # Change log
 
+-Simple Stack 2.0.0-RC1 (2017-02-XX)
+--------------------------------
+- BREAKING CHANGE: `new BackstackDelegate(null)` is replaced with `BackstackDelegate.create()`.
+
+Additionally, `new BackstackDelegate(stateChanger)` is replaced with `BackstackDelegate.configure().setStateChanger(stateChanger).build()`.
+
+To support subclasses of `BackstackDelegate`, `configure().setDelegateProvider(MyDelegate::new)` can be used - but typically this is not needed.
+
+- BREAKING CHANGE: `KeyContextWrapper` constructor is no longer public, and is renamed to `ManagedContextWrapper`.
+
+- BREAKING CHANGE: `ManagedContextWrapper` is no longer public.
+
+- BREAKING CHANGE: `StateChange.createContext()` is removed, and moved to `BackstackDelegate.createContext()`.
+
+It is recommended that in order to create nested views, the `BackstackDelegate` is shared via `context.getSystemService()`, to make it accessible via any view through its context.
+
+- **ENHANCEMENT: SCOPED SERVICES INTEGRATION.**
+
+You are now able to create SCOPED SERVICES that are created when a given Key is set, and they are torn down when the Key is no longer active.
+
+The services are created and torn down by `ServiceFactory`, which can be added to the backstack delegate via `BackstackDelegate.configure().addServiceFactory()`.
+
+Every registered service factory is executed when a particular key is set.
+
+An example implementation would be the following:
+
+    BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
+        @Override
+        public void bindServices(@NonNull Services.Builder builder) {
+            Key key = builder.getKey();
+            key.bindServices(builder);
+        }
+
+        @Override
+        public void tearDownServices(@NonNull Services services) {
+            Key key = services.getKey();
+            key.tearDownServices(services);
+        }
+    }).build();
+
+Hierarchies can be defined between keys using `Services.Child` and `Services.Composite`.
+
+`Services.Child` allows you to create a link between two root keys (the ones explicitly found in the `Backstack`).
+
+`Services.Composite` allows you to specify nested keys that belong to a given key.
+
+When a given root key is set, their parents' services and all of their composite childrens' services are created.
+
+Previous services are destroyed when no longer active TODO:, but if the Service implements `Bundleable`, then their state is preserved within `SavedState` along with the view's saved state.
+
+TODO: - ENHANCEMENT: You are now allowed to save state of child views associated with child keys directly, instead of having to manually save their states into the root key's `Bundle`.
+
+TODO: Meaning, `BackstackDelegate.clearStatesNotIn()` honors `Services.Child` and `Services.Component`, and you're able to store state that belongs to nested views immediately.
+
+- ADDED: `simple-stack-example-services`.
+
 -Simple Stack 1.0.0 (2017-02-15)
 --------------------------------
 - RELEASE: 1.0.0!

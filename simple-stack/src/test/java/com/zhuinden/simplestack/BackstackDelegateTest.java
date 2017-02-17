@@ -32,7 +32,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setNullPersistenceTagShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
         try {
             backstackDelegate.setPersistenceTag(null);
             fail();
@@ -43,7 +43,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setSamePersistenceTagTwiceShouldBeOk() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
         backstackDelegate.setPersistenceTag(new String("hello"));
         backstackDelegate.setPersistenceTag(new String("hello"));
         // no exceptions thrown
@@ -51,7 +51,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setTwoDifferentPersistenceTagsShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
         backstackDelegate.setPersistenceTag(new String("hello"));
         try {
             backstackDelegate.setPersistenceTag(new String("world"));
@@ -63,7 +63,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setPersistenceTagAfterOnCreateShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
         backstackDelegate.onCreate(null, null, new ArrayList<Parcelable>() {{
             add(new TestKey("hello"));
         }});

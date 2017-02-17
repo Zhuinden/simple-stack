@@ -26,6 +26,13 @@ import butterknife.ButterKnife;
 public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
+    private static final String DELEGATE = "mainActivity.BackstackDelegate";
+
+    public static BackstackDelegate getDelegate(Context context) {
+        //noinspection ResourceType
+        return (BackstackDelegate)context.getSystemService(DELEGATE);
+    }
+
     @BindView(R.id.drawer_layout)
     MainView mainView;
 
@@ -57,8 +64,7 @@ public class MainActivity
         CustomApplication.get(this).initialize();
         CustomApplication.get(this).getComponent().inject(this);
         databaseManager.init(this);
-
-        backstackDelegate = new BackstackDelegate(null /* delayed init */);
+        backstackDelegate = BackstackDelegate.create();
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
                 HistoryBuilder.single(TasksKey.create()));
@@ -136,6 +142,9 @@ public class MainActivity
     public Object getSystemService(String name) {
         if(TAG.equals(name)) {
             return this;
+        }
+        if(DELEGATE.equals(name)) {
+            return backstackDelegate;
         }
         return super.getSystemService(name);
     }

@@ -9,8 +9,8 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zhuinden.simplestack.KeyContextWrapper;
 import com.zhuinden.simplestackdemoexamplefragments.application.Key;
+import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity;
 
 import butterknife.Unbinder;
 
@@ -59,7 +59,7 @@ public abstract class BaseFragment<C extends BaseFragment<C, P>, P extends BaseP
         if(key == null) {
             throw new IllegalStateException("The fragment was initialized without a KEY argument!");
         }
-        View view = LayoutInflater.from(new KeyContextWrapper(inflater.getContext(), key)).inflate(key.layout(), container, false);
+        View view = LayoutInflater.from(MainActivity.getDelegate(getContext()).createContext(inflater.getContext(), key)).inflate(key.layout(), container, false);
         unbinder = bindViews(view);
         return view;
     }

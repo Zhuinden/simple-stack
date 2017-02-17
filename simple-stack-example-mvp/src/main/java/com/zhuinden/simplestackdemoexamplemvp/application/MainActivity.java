@@ -80,7 +80,7 @@ public class MainActivity
 
         super.onCreate(savedInstanceState);
 
-        backstackDelegate = new BackstackDelegate(null /* delayed init */);
+        backstackDelegate = BackstackDelegate.create();
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
                 HistoryBuilder.single(TasksKey.create()));
@@ -181,7 +181,7 @@ public class MainActivity
         backstackDelegate.persistViewToState(previousView);
 
         Key newKey = stateChange.topNewState();
-        Context newContext = stateChange.createContext(this, newKey);
+        Context newContext = backstackDelegate.createContext(this, newKey);
         View newView = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
 
         root.addView(newView);

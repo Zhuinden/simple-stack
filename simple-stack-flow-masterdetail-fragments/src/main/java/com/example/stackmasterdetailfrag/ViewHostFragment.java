@@ -4,14 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zhuinden.simplestack.KeyContextWrapper;
-
-import butterknife.Unbinder;
+import com.example.stackmasterdetailfrag.util.BackstackService;
 
 /**
  * Created by Zhuinden on 2017.02.12..
@@ -31,7 +27,8 @@ public class ViewHostFragment
             throw new IllegalStateException("The fragment was initialized without a KEY argument!");
         }
 
-        View view = LayoutInflater.from(new KeyContextWrapper(inflater.getContext(), key)).inflate(key.layout(), container, false);
+        View view = LayoutInflater.from(BackstackService.getDelegate(getContext()).createContext(inflater.getContext(), key))
+                .inflate(key.layout(), container, false);
         return view;
     }
 

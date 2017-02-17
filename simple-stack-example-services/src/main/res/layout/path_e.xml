@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhuinden.simpleservicesexample.presentation.paths.b.e.EView xmlns:android="http://schemas.android.com/apk/res/android"
+                                   android:orientation="vertical"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="match_parent">
+
+    <TextView
+        android:text="E"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"/>
+
+    <Button
+        android:id="@+id/e_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Go to H" />
+</com.zhuinden.simpleservicesexample.presentation.paths.b.e.EView>
