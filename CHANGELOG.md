@@ -52,7 +52,7 @@ Hierarchies can be defined between keys using `Services.Child` and `Services.Com
 
 When a given root key is set, their parents' services and all of their composite childrens' services are created.
 
-Previous services are destroyed when no longer active TODO:, but if the Service implements `Bundleable`, then their state is preserved within `SavedState` along with the view's saved state.
+Previous services are destroyed when no longer active, but if the Service implements `Bundleable`, then their state is preserved within `SavedState` along with the view's saved state.
 
 `BackstackDelegate.clearStatesNotIn()` honors `Services.Child` and `Services.Component`, and you're able to store state that belongs to nested views directly.
 
