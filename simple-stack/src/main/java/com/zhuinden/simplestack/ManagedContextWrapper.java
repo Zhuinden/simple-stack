@@ -32,13 +32,15 @@ class ManagedContextWrapper
     LayoutInflater layoutInflater;
 
     final Parcelable key;
+    final Services services;
 
-    public ManagedContextWrapper(Context base, @NonNull Parcelable key) {
+    public ManagedContextWrapper(Context base, @NonNull Parcelable key, @NonNull Services services) {
         super(base);
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
         }
         this.key = key;
+        this.services = services;
     }
 
     @Override
@@ -50,6 +52,11 @@ class ManagedContextWrapper
             return layoutInflater;
         } else if(TAG.equals(name)) {
             return key;
+        } else {
+            Object service = services.getService(name);
+            if(service != null) {
+                return service;
+            }
         }
         return super.getSystemService(name);
     }

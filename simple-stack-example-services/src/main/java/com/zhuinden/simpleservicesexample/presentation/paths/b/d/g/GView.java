@@ -5,9 +5,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
-import com.zhuinden.simpleservicesexample.application.MainActivity;
 import com.zhuinden.simpleservicesexample.utils.Preconditions;
-import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simpleservicesexample.utils.ServiceLocator;
 
 /**
  * Created by Zhuinden on 2017.02.14..
@@ -35,13 +34,9 @@ public class GView
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-//        Preconditions.checkNotNull(MainActivity.getServices(getContext()).findServices(Backstack.getKey(getContext())).getService("A"),
-//                "Service should not be null");
-//        Preconditions.checkNotNull(MainActivity.getServices(getContext()).findServices(Backstack.getKey(getContext())).getService("B"),
-//                "Service should not be null");
-//        Preconditions.checkNotNull(MainActivity.getServices(getContext()).findServices(Backstack.getKey(getContext())).getService("D"),
-//                "Service should not be null");
-//        Preconditions.checkNotNull(MainActivity.getServices(getContext()).findServices(Backstack.getKey(getContext())).getService("G"),
-//                "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "B"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "D"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "G"), "Service should not be null");
     }
 }

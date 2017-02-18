@@ -504,7 +504,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public Context createContext(Context base, Parcelable key) {
-        return new ManagedContextWrapper(base, key);
+        return new ManagedContextWrapper(base, key, serviceManager.findServices(key));
     }
 
     /**

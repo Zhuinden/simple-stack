@@ -8,6 +8,8 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simpleservicesexample.R;
 import com.zhuinden.simpleservicesexample.presentation.paths.i.I;
+import com.zhuinden.simpleservicesexample.utils.Preconditions;
+import com.zhuinden.simpleservicesexample.utils.ServiceLocator;
 import com.zhuinden.simpleservicesexample.utils.StackService;
 import com.zhuinden.simplestack.Backstack;
 
@@ -46,5 +48,6 @@ public class HView
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "H"), "Service should not be null");
     }
 }

@@ -7,11 +7,10 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simpleservicesexample.R;
-import com.zhuinden.simpleservicesexample.application.MainActivity;
 import com.zhuinden.simpleservicesexample.presentation.paths.h.H;
 import com.zhuinden.simpleservicesexample.utils.Preconditions;
+import com.zhuinden.simpleservicesexample.utils.ServiceLocator;
 import com.zhuinden.simpleservicesexample.utils.StackService;
-import com.zhuinden.simplestack.Backstack;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -48,11 +47,8 @@ public class EView
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
-//        Preconditions.checkNotNull(MainActivity.getServices(getContext()).findServices(Backstack.getKey(getContext())).getService("A"),
-//                "Service should not be null");
-//        Preconditions.checkNotNull(MainActivity.getServices(getContext()).findServices(Backstack.getKey(getContext())).getService("B"),
-//                "Service should not be null");
-//        Preconditions.checkNotNull(MainActivity.getServices(getContext()).findServices(Backstack.getKey(getContext())).getService("E"),
-//                "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "B"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "E"), "Service should not be null");
     }
 }
