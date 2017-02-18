@@ -15,7 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -25,11 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Convenience class for creating ArrayList of Parcelables, for backstack history.
+ * Convenience class for creating ArrayList of Objects, for backstack history.
  */
 public class HistoryBuilder
-        implements Iterable<Parcelable> {
-    private ArrayList<Parcelable> list = new ArrayList<>();
+        implements Iterable<Object> {
+    private ArrayList<Object> list = new ArrayList<>();
 
     private HistoryBuilder() { // use newBuilder()
     }
@@ -66,7 +65,7 @@ public class HistoryBuilder
      * @param keys
      * @return the newly created {@link HistoryBuilder}.
      */
-    public static HistoryBuilder from(@NonNull List<? extends Parcelable> keys) {
+    public static HistoryBuilder from(@NonNull List<?> keys) {
         return newBuilder().addAll(keys);
     }
 
@@ -80,12 +79,12 @@ public class HistoryBuilder
     }
 
     /**
-     * Creates a new array list of parcelable that contains only the provided key.
+     * Creates a new array list of Object that contains only the provided key.
      *
      * @param key
-     * @return an array list of parcelable that contains the key.
+     * @return an array list of Object that contains the key.
      */
-    public static ArrayList<Parcelable> single(@NonNull Parcelable key) {
+    public static ArrayList<Object> single(@NonNull Object key) {
         return newBuilder()
                 .add(key)
                 .build();
@@ -97,7 +96,7 @@ public class HistoryBuilder
      * @param keys
      * @return the current builder.
      */
-    public HistoryBuilder addAll(@NonNull List<? extends Parcelable> keys) {
+    public HistoryBuilder addAll(@NonNull List<?> keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Provided collection cannot be null");
         }
@@ -112,7 +111,7 @@ public class HistoryBuilder
      * @param index
      * @return the current builder.
      */
-    public HistoryBuilder addAllAt(@NonNull List<? extends Parcelable> keys, int index) {
+    public HistoryBuilder addAllAt(@NonNull List<?> keys, int index) {
         if(keys == null) {
             throw new IllegalArgumentException("Provided collection cannot be null");
         }
@@ -136,7 +135,7 @@ public class HistoryBuilder
      * @param key
      * @return true if the builder contains the given key.
      */
-    public boolean contains(@NonNull Parcelable key) {
+    public boolean contains(@NonNull Object key) {
         checkKey(key);
         return list.contains(key);
     }
@@ -147,7 +146,7 @@ public class HistoryBuilder
      * @param keys
      * @return true if the builder contains all keys.
      */
-    public boolean containsAll(@NonNull Collection<Parcelable> keys) {
+    public boolean containsAll(@NonNull Collection<Object> keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Keys cannot be null!");
         }
@@ -169,7 +168,7 @@ public class HistoryBuilder
      * @param key
      * @return the current builder.
      */
-    public HistoryBuilder remove(@NonNull Parcelable key) {
+    public HistoryBuilder remove(@NonNull Object key) {
         checkKey(key);
         list.remove(key);
         return this;
@@ -192,7 +191,7 @@ public class HistoryBuilder
      * @param keys
      * @return the current builder.
      */
-    public HistoryBuilder retainAll(@NonNull Collection<Parcelable> keys) {
+    public HistoryBuilder retainAll(@NonNull Collection<Object> keys) {
         checkKeys(keys);
         list.retainAll(keys);
         return this;
@@ -228,7 +227,7 @@ public class HistoryBuilder
      * @param key
      * @return the current builder.
      */
-    public HistoryBuilder removeUntil(@NonNull Parcelable key) {
+    public HistoryBuilder removeUntil(@NonNull Object key) {
         checkKey(key);
         while(!list.isEmpty() && !getLast().equals(key)) {
             removeLast();
@@ -245,7 +244,7 @@ public class HistoryBuilder
      * @param key
      * @return the index, -1 if not found.
      */
-    public int indexOf(@NonNull Parcelable key) {
+    public int indexOf(@NonNull Object key) {
         checkKey(key);
         return list.indexOf(key);
     }
@@ -256,7 +255,7 @@ public class HistoryBuilder
      * @param index
      * @return the key at the given index
      */
-    public <T extends Parcelable> T get(int index) {
+    public <T extends Object> T get(int index) {
         // noinspection unchecked
         return (T) list.get(index);
     }
@@ -268,7 +267,7 @@ public class HistoryBuilder
      * @return the key at the last index
      */
     @Nullable
-    public <T extends Parcelable> T getLast() {
+    public <T extends Object> T getLast() {
         // noinspection unchecked
         return (T)(list.isEmpty() ? null : list.get(list.size() - 1));
     }
@@ -279,7 +278,7 @@ public class HistoryBuilder
      * @param key
      * @return the current builder.
      */
-    public HistoryBuilder add(@NonNull Parcelable key) {
+    public HistoryBuilder add(@NonNull Object key) {
         checkKey(key);
         list.add(key);
         return this;
@@ -292,7 +291,7 @@ public class HistoryBuilder
      * @param index
      * @return the current builder.
      */
-    public HistoryBuilder add(@NonNull Parcelable key, int index) {
+    public HistoryBuilder add(@NonNull Object key, int index) {
         checkKey(key);
         list.add(index, key);
         return this;
@@ -304,7 +303,7 @@ public class HistoryBuilder
      * @return the iterator
      */
     @Override
-    public Iterator<Parcelable> iterator() {
+    public Iterator<Object> iterator() {
         return list.iterator();
     }
 
@@ -313,18 +312,18 @@ public class HistoryBuilder
      *
      * @return the built history.
      */
-    public ArrayList<Parcelable> build() {
+    public ArrayList<Object> build() {
         return new ArrayList<>(this.list);
     }
 
     // validations
-    private void checkKey(Parcelable key) {
+    private void checkKey(Object key) {
         if(key == null) {
             throw new IllegalArgumentException("History key cannot be null!");
         }
     }
 
-    private void checkKeys(Collection<Parcelable> keys) {
+    private void checkKeys(Collection<Object> keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Keys cannot be null!");
         }

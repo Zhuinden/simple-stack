@@ -34,8 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StateChangerTest {
     private static class TestStateChanger
             implements StateChanger {
-        private List<Parcelable> originalState;
-        private List<Parcelable> newState;
+        private List<Object> originalState;
+        private List<Object> newState;
 
         @Override
         public void handleStateChange(StateChange stateChange, Callback completionCallback) {
@@ -315,7 +315,7 @@ public class StateChangerTest {
 
     @Test
     public void setHistoryGoesToSetHistory() {
-        ArrayList<Parcelable> newHistory = new ArrayList<>();
+        ArrayList<Object> newHistory = new ArrayList<>();
         newHistory.add(new C());
         newHistory.add(new B());
         newHistory.add(new D());

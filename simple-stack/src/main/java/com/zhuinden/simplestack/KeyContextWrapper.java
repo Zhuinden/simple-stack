@@ -17,7 +17,6 @@ package com.zhuinden.simplestack;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 
@@ -31,9 +30,9 @@ public class KeyContextWrapper
 
     LayoutInflater layoutInflater;
 
-    final Parcelable key;
+    final Object key;
 
-    public KeyContextWrapper(Context base, @NonNull Parcelable key) {
+    public KeyContextWrapper(Context base, @NonNull Object key) {
         super(base);
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
@@ -60,7 +59,7 @@ public class KeyContextWrapper
      * @param context the key context wrapper in which the key can be found.
      * @return the key.
      */
-    public static <T extends Parcelable> T getKey(Context context) {
+    public static <T> T getKey(Context context) {
         // noinspection ResourceType
         Object key = context.getSystemService(TAG);
         // noinspection unchecked

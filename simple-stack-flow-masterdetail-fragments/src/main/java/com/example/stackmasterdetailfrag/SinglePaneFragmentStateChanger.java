@@ -1,6 +1,5 @@
 package com.example.stackmasterdetailfrag;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,7 +29,7 @@ public class SinglePaneFragmentStateChanger {
             fragmentTransaction.remove(noDetailsFragment);
         }
 
-        for(Parcelable _oldPath : stateChange.getPreviousState()) {
+        for(Object _oldPath : stateChange.getPreviousState()) {
             Paths.Path oldPath = (Paths.Path ) _oldPath;
             Fragment fragment = fragmentManager.findFragmentByTag(oldPath.getFragmentTag());
             if(fragment != null) {
@@ -42,7 +41,7 @@ public class SinglePaneFragmentStateChanger {
             }
         }
 
-        for(Parcelable _newPath : stateChange.getNewState()) {
+        for(Object _newPath : stateChange.getNewState()) {
             Paths.Path  newPath = (Paths.Path ) _newPath;
             Fragment fragment = fragmentManager.findFragmentByTag(newPath.getFragmentTag());
             if(!newPath.equals(stateChange.topNewState())) {

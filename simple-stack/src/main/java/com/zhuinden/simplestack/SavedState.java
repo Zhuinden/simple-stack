@@ -16,7 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.os.Bundle;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,16 +27,15 @@ import android.util.SparseArray;
  *
  * A {@link SavedState} represents the state of the view that is bound to a given key.
  */
-public class SavedState
-        implements Parcelable {
-    private Parcelable key;
+public class SavedState {
+    private Object key;
     private SparseArray<Parcelable> viewHierarchyState;
     private Bundle bundle;
 
     private SavedState() {
     }
 
-    public Parcelable getKey() {
+    public Object getKey() {
         return key;
     }
 
@@ -67,14 +65,14 @@ public class SavedState
      * Keys are not optional.
      */
     public static class Builder {
-        private Parcelable key;
+        private Object key;
         private SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
         private Bundle bundle;
 
         Builder() {
         }
 
-        public Builder setKey(@NonNull Parcelable key) {
+        public Builder setKey(@NonNull Object key) {
             if(key == null) {
                 throw new IllegalArgumentException("Key cannot be null");
             }
@@ -104,45 +102,6 @@ public class SavedState
             savedState.viewHierarchyState = viewHierarchyState;
             savedState.bundle = bundle;
             return savedState;
-        }
-    }
-
-    protected SavedState(Parcel in) {
-        key = in.readParcelable(getClass().getClassLoader());
-        // noinspection unchecked
-        viewHierarchyState = in.readSparseArray(getClass().getClassLoader());
-        boolean hasBundle = in.readByte() > 0;
-        if(hasBundle) {
-            bundle = in.readBundle(getClass().getClassLoader());
-        }
-    }
-
-    public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
-        @Override
-        public SavedState createFromParcel(Parcel in) {
-            return new SavedState(in);
-        }
-
-        @Override
-        public SavedState[] newArray(int size) {
-            return new SavedState[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(key, flags);
-        // noinspection unchecked
-        SparseArray<Object> sparseArray = (SparseArray)viewHierarchyState;
-        dest.writeSparseArray(sparseArray);
-        dest.writeByte(bundle != null ? (byte)0x01 : 0x00);
-        if(bundle != null) {
-            dest.writeBundle(bundle);
         }
     }
 

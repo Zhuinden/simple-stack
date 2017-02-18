@@ -16,8 +16,6 @@
 
 package com.zhuinden.simplestack;
 
-import android.os.Parcelable;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,7 +55,7 @@ public class HistoryBuilderTest {
         TestKey hi = new TestKey("hi");
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
-        ArrayList<Parcelable> history = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye).removeUntil(hi).build();
+        ArrayList<Object> history = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye).removeUntil(hi).build();
         assertThat(history).containsExactly(hi);
     }
 
@@ -81,7 +79,7 @@ public class HistoryBuilderTest {
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
         HistoryBuilder builder = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye);
-        List<Parcelable> history = builder.removeLast().build();
+        List<Object> history = builder.removeLast().build();
         assertThat(history).containsExactly(hi, hello);
     }
 
@@ -109,7 +107,7 @@ public class HistoryBuilderTest {
     public void historyBuilderWorksAsIterable() {
         HistoryBuilder historyBuilder = HistoryBuilder.newBuilder().add(new TestKey("hello")).add(new TestKey("bye"));
         int i = 0;
-        for(Parcelable _key : historyBuilder) {
+        for(Object _key : historyBuilder) {
             TestKey key = (TestKey) _key;
             if(i == 0) {
                 assertThat(key.name).isEqualTo("hello");

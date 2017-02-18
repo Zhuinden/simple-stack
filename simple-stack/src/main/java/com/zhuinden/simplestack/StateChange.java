@@ -16,7 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.content.Context;
-import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,14 +38,14 @@ public class StateChange {
     public static final int BACKWARD = -1;
     public static final int FORWARD = 1;
 
-    StateChange(List<Parcelable> previousState, List<Parcelable> newState, @StateChangeDirection int direction) {
+    StateChange(List<Object> previousState, List<Object> newState, @StateChangeDirection int direction) {
         this.previousState = previousState;
         this.newState = newState;
         this.direction = direction;
     }
 
-    List<Parcelable> previousState;
-    List<Parcelable> newState;
+    List<Object> previousState;
+    List<Object> newState;
     int direction;
 
     /**
@@ -56,7 +55,7 @@ public class StateChange {
      * @return the previous state.
      */
     @NonNull
-    public List<Parcelable> getPreviousState() {
+    public List<Object> getPreviousState() {
         return previousState;
     }
 
@@ -66,7 +65,7 @@ public class StateChange {
      * @return the new state.
      */
     @NonNull
-    public List<Parcelable> getNewState() {
+    public List<Object> getNewState() {
         return newState;
     }
 
@@ -86,7 +85,7 @@ public class StateChange {
      * @return the last element in previous state, or null if empty.
      */
     @Nullable
-    public <T extends Parcelable> T topPreviousState() {
+    public <T extends Object> T topPreviousState() {
         if(previousState.size() > 0) {
             // noinspection unchecked
             return (T) previousState.get(previousState.size() - 1);
@@ -101,7 +100,7 @@ public class StateChange {
      * @return the last element in new state.
      */
     @NonNull
-    public <T extends Parcelable> T topNewState() {
+    public <T extends Object> T topNewState() {
         // noinspection unchecked
         return (T) newState.get(newState.size() - 1);
     }
@@ -114,7 +113,7 @@ public class StateChange {
      * @return the context to use used with LayoutInflater.from().
      */
     @NonNull
-    public Context createContext(Context base, Parcelable key) {
+    public Context createContext(Context base, Object key) {
         return new KeyContextWrapper(base, key);
     }
 }
