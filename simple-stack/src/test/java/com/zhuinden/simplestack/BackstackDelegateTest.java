@@ -15,8 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.os.Parcelable;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -64,7 +62,7 @@ public class BackstackDelegateTest {
     @Test
     public void setPersistenceTagAfterOnCreateShouldThrow() {
         BackstackDelegate backstackDelegate = new BackstackDelegate(null);
-        backstackDelegate.onCreate(null, null, new ArrayList<Parcelable>() {{
+        backstackDelegate.onCreate(null, null, new ArrayList<Object>() {{
             add(new TestKey("hello"));
         }});
         try {

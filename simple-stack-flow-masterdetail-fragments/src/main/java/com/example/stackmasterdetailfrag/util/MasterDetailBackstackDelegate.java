@@ -1,6 +1,5 @@
 package com.example.stackmasterdetailfrag.util;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -25,13 +24,13 @@ public class MasterDetailBackstackDelegate
     }
 
     @Override
-    protected void clearStatesNotIn(@NonNull Map<Parcelable, SavedState> keyStateMap, @NonNull StateChange stateChange) {
-        Set<Parcelable> keys = keyStateMap.keySet();
-        Iterator<Parcelable> keyIterator = keys.iterator();
+    protected void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange) {
+        Set<Object> keys = keyStateMap.keySet();
+        Iterator<Object> keyIterator = keys.iterator();
         while(keyIterator.hasNext()) {
-            Parcelable key = keyIterator.next();
+            Object key = keyIterator.next();
             boolean isMasterOf = false;
-            for(Parcelable newKey : stateChange.getNewState()) {
+            for(Object newKey : stateChange.getNewState()) {
                 if(newKey instanceof Paths.MasterDetailPath) {
                     if(key.equals(((Paths.MasterDetailPath) newKey).getMaster())) {
                         isMasterOf = true;

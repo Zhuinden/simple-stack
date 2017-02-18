@@ -1,6 +1,5 @@
 package com.example.stackmasterdetailfrag;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -42,7 +41,7 @@ public class MasterDetailFragmentStateChanger {
             removeFragment(fragmentTransaction, Paths.NoDetails.create());
         }
 
-        for(Parcelable _previousKey : stateChange.getPreviousState()) {
+        for(Object _previousKey : stateChange.getPreviousState()) {
             Paths.Path previousKey = (Paths.Path) _previousKey;
             if(!stateChange.getNewState().contains(_previousKey)) {
                 removeFragment(fragmentTransaction, previousKey);
@@ -67,7 +66,7 @@ public class MasterDetailFragmentStateChanger {
             }
         }
 
-        for(Parcelable _newKey : stateChange.getNewState()) {
+        for(Object _newKey : stateChange.getNewState()) {
             Paths.Path newKey = (Paths.Path) _newKey;
             if(!newKey.equals(masterKey) && !newKey.equals(detailKey)) {
                 detachFragment(fragmentTransaction, newKey);
