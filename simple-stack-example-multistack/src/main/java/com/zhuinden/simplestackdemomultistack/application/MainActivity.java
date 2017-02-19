@@ -10,6 +10,7 @@ import android.support.annotation.IdRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -55,6 +56,8 @@ public class MainActivity
     BottomNavigation bottomNavigation;
 
     Multistack multistack;
+
+    private boolean isAnimating; // unfortunately, we must manually ensure that you can't navigate while you're animating.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,15 +156,22 @@ public class MainActivity
         if(direction == StateChange.REPLACE) {
             finishStateChange(previousView);
         } else {
+            isAnimating = true;
             ViewUtils.waitForMeasure(newView, (view, width, height) -> {
                 runAnimation(previousView, newView, direction, new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
+                        isAnimating = false;
                         finishStateChange(previousView);
                     }
                 });
             });
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return !isAnimating && super.dispatchTouchEvent(ev); // unfortunately, we must manually make sure you can't navigate while you're animating.
     }
 
     @Override
