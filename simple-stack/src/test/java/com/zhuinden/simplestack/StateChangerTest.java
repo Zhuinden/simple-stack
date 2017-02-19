@@ -268,7 +268,7 @@ public class StateChangerTest {
     public void before() {
         backstack = new Backstack(new A(), new B(), new C(), new D());
         testStateChanger = new TestStateChanger();
-        backstack.setStateChanger(testStateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(testStateChanger);
     }
 
 
@@ -308,7 +308,7 @@ public class StateChangerTest {
     @Test
     public void goBackOneElementReturnsFalse() {
         backstack = new Backstack(new A());
-        backstack.setStateChanger(testStateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(testStateChanger);
         boolean didGoBack = backstack.goBack();
         assertThat(didGoBack).isFalse();
     }

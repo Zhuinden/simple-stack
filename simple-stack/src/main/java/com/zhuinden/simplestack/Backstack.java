@@ -96,6 +96,15 @@ public class Backstack {
     }
 
     /**
+     * Sets a {@link StateChanger} with {@link Backstack#INITIALIZE} register mode.
+     *
+     * @param stateChanger the new {@link StateChanger}, which cannot be null.
+     */
+    public void setStateChanger(@NonNull StateChanger stateChanger) {
+        setStateChanger(stateChanger, INITIALIZE);
+    }
+
+    /**
      * Sets a {@link StateChanger}.
      *
      * @param stateChanger the new {@link StateChanger}, which cannot be null.

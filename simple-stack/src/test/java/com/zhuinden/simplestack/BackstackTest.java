@@ -69,7 +69,7 @@ public class BackstackTest {
     public void stateChangerShouldNotBeNull() {
         try {
             Backstack backstack = new Backstack(new TestKey("Hi"));
-            backstack.setStateChanger(null, Backstack.INITIALIZE);
+            backstack.setStateChanger(null);
             Assert.fail();
         } catch(NullPointerException e) {
             // good!
@@ -108,7 +108,7 @@ public class BackstackTest {
             public void handleStateChange(StateChange stateChange, Callback completionCallback) {
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
 
@@ -127,7 +127,7 @@ public class BackstackTest {
             public void handleStateChange(StateChange stateChange, Callback completionCallback) {
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
         assertThat(backstack.goBack()).isFalse();
@@ -145,7 +145,7 @@ public class BackstackTest {
                 assertThat(stateChange.topPreviousState()).isNull();
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
     }
@@ -164,7 +164,7 @@ public class BackstackTest {
                 }
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
 
@@ -206,7 +206,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         backstack.executePendingStateChange();
 
         assertThat(backstack.isStateChangePending()).isFalse();
@@ -252,7 +252,7 @@ public class BackstackTest {
             }
         };
         backstack.addCompletionListener(completionListener);
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
 
         callback.stateChangeComplete();
 
@@ -275,7 +275,7 @@ public class BackstackTest {
         };
         backstack.addCompletionListener(completionListener);
         backstack.removeCompletionListener(completionListener);
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
 
         callback.stateChangeComplete();
 

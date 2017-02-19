@@ -402,7 +402,7 @@ public class BackstackDelegate {
 
     private void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
-            backstack.setStateChanger(managedStateChanger, Backstack.INITIALIZE);
+            backstack.setStateChanger(managedStateChanger);
         }
     }
 
