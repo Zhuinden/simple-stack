@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemomultistack.presentation.paths.main.first;
+package com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -12,8 +12,6 @@ import android.widget.RelativeLayout;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemomultistack.R;
-import com.zhuinden.simplestackdemomultistack.util.BackstackService;
-import com.zhuinden.simplestackdemomultistack.presentation.paths.main.second.SecondKey;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -21,46 +19,42 @@ import butterknife.OnClick;
  * Created by Owner on 2017. 01. 12..
  */
 
-public class FirstView
+public class CloudSyncView
         extends RelativeLayout
         implements Bundleable {
     private static final String TAG = "FirstView";
 
-    public FirstView(Context context) {
+    public CloudSyncView(Context context) {
         super(context);
         init(context);
     }
 
-    public FirstView(Context context, AttributeSet attrs) {
+    public CloudSyncView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public FirstView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CloudSyncView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
     @TargetApi(21)
-    public FirstView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public CloudSyncView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context);
     }
 
-    Backstack backstack;
-
-    FirstKey firstKey;
+    CloudSyncKey cloudSyncKey;
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            backstack = BackstackService.get(context);
-            firstKey = Backstack.getKey(context);
+            cloudSyncKey = Backstack.getKey(context);
         }
     }
 
     @OnClick(R.id.first_button)
     public void clickButton(View view) {
-        backstack.goTo(SecondKey.create());
     }
 
     @Override
