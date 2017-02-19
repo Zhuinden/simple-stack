@@ -18,7 +18,6 @@ package com.zhuinden.simplestack;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 
 /**
@@ -34,7 +33,7 @@ class ManagedContextWrapper
     final Object key;
     final Services services;
 
-    public ManagedContextWrapper(Context base, @NonNull Object key, @Nullable Services services) {
+    public ManagedContextWrapper(Context base, @NonNull Object key, @NonNull Services services) {
         super(base);
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
@@ -52,7 +51,7 @@ class ManagedContextWrapper
             return layoutInflater;
         } else if(TAG.equals(name)) {
             return key;
-        } else if(services != null) {
+        } else {
             Object service = services.getService(name);
             if(service != null) {
                 return service;

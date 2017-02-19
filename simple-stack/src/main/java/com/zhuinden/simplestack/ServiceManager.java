@@ -102,8 +102,7 @@ class ServiceManager {
     public Services findServices(Object key) {
         final ReferenceCountedServices managed = keyToManagedServicesMap.get(key);
         if(managed == null) {
-            //throw new IllegalStateException("No services currently exists for key " + key); // FIXME `Paths.NoDetails` has no service registered because it is not linked to the state of any path: breaking change!
-            return null;
+            throw new IllegalStateException("No services currently exists for key " + key);
         }
         return managed.services;
     }

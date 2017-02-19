@@ -20,9 +20,14 @@ import android.os.Parcelable;
 import android.support.annotation.LayoutRes;
 
 import com.google.auto.value.AutoValue;
+import com.zhuinden.simplestack.Services;
+
+import java.util.Collections;
+import java.util.List;
 
 public final class Paths {
-    public abstract static class Path implements Parcelable {
+    public abstract static class Path
+            implements Parcelable {
         public abstract String getTitle();
 
         @LayoutRes
@@ -56,7 +61,8 @@ public final class Paths {
      * com.example.stackmasterdetail.view.TabletMasterDetailRoot}.
      */
     public abstract static class MasterDetailPath
-            extends Path {
+            extends Path
+            implements Services.Composite {
         /**
          * Returns the screen that shows the master list for this type of screen.
          * If this screen is the master, returns self.
@@ -69,6 +75,11 @@ public final class Paths {
 
         public final boolean isMaster() {
             return equals(getMaster());
+        }
+
+        @Override
+        public List<? extends Parcelable> keys() {
+            return Collections.singletonList(NoDetails.create());
         }
     }
 
@@ -110,7 +121,8 @@ public final class Paths {
 
     @AutoValue
     public abstract static class Conversation
-            extends ConversationPath {
+            extends ConversationPath
+            implements Services.Child {
         public static Conversation create(int conversationIndex) {
             return new AutoValue_Paths_Conversation(conversationIndex);
         }
@@ -124,11 +136,17 @@ public final class Paths {
         public int layout() {
             return R.layout.conversation_view;
         }
+
+        @Override
+        public Parcelable parent() {
+            return getMaster();
+        }
     }
 
     @AutoValue
     public abstract static class Message
-            extends ConversationPath {
+            extends ConversationPath
+            implements Services.Child {
         public abstract int messageId();
 
         public static Message create(int messageIndex, int position) {
@@ -143,6 +161,11 @@ public final class Paths {
         @Override
         public int layout() {
             return R.layout.message_view;
+        }
+
+        @Override
+        public Parcelable parent() {
+            return getMaster();
         }
     }
 
@@ -181,7 +204,8 @@ public final class Paths {
 
     @AutoValue
     public abstract static class Friend
-            extends FriendPath {
+            extends FriendPath
+            implements Services.Child {
         public static Friend create(int position) {
             return new AutoValue_Paths_Friend(position);
         }
@@ -194,6 +218,11 @@ public final class Paths {
         @Override
         public int layout() {
             return R.layout.friend_view;
+        }
+
+        @Override
+        public Parcelable parent() {
+            return getMaster();
         }
     }
 
