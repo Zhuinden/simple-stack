@@ -353,6 +353,9 @@ public class BackstackDelegate {
                     keys.add(keyParceler.fromParcelable(parcelledKey));
                 }
             }
+            if(keys.isEmpty()) {
+                keys = initialKeys;
+            }
             List<ParcelledState> savedStates = savedInstanceState.getParcelableArrayList(getStateTag());
             if(savedStates != null) {
                 for(ParcelledState parcelledState : savedStates) {
