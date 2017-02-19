@@ -1,15 +1,19 @@
 package com.zhuinden.simplestackdemomultistack.application;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.KeyContextWrapper;
 import com.zhuinden.simplestack.StateChange;
@@ -20,6 +24,7 @@ import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.list.ListKey;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.mail.MailKey;
 import com.zhuinden.simplestackdemomultistack.util.Multistack;
+import com.zhuinden.simplestackdemomultistack.util.ViewUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -77,7 +82,6 @@ public class MainActivity
         bottomNavigation.setOnMenuItemClickListener(new BottomNavigation.OnMenuItemSelectionListener() {
             @Override
             public void onMenuItemSelect(@IdRes int menuItemId, int itemIndex, boolean b) {
-                Log.i("MainActivity", "Selected index: [" + menuItemId + "] at [" + itemIndex + "]");
                 multistack.setSelectedStack(StackType.values()[itemIndex].name());
             }
 
@@ -137,14 +141,27 @@ public class MainActivity
         return super.getSystemService(name);
     }
 
-    private void exchangeViewForKey(Key newKey) {
+    private void exchangeViewForKey(Key newKey, int direction) {
         multistack.persistViewToState(root.getChildAt(0));
-        root.removeAllViews();
         multistack.setSelectedStack(newKey.stackIdentifier());
         Context newContext = new KeyContextWrapper(this, newKey);
-        View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        multistack.restoreViewFromState(view);
-        root.addView(view);
+        View previousView = root.getChildAt(0);
+        View newView = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
+        multistack.restoreViewFromState(newView);
+        root.addView(newView);
+
+        if(direction == StateChange.REPLACE) {
+            finishStateChange(previousView);
+        } else {
+            ViewUtils.waitForMeasure(newView, (view, width, height) -> {
+                runAnimation(previousView, newView, direction, new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        finishStateChange(previousView);
+                    }
+                });
+            });
+        }
     }
 
     @Override
@@ -154,7 +171,36 @@ public class MainActivity
             completionCallback.stateChangeComplete();
             return;
         }
-        exchangeViewForKey(stateChange.topNewState());
+        int direction = StateChange.REPLACE;
+        if(root.getChildAt(0) != null) {
+            Key previousKey = Backstack.getKey(root.getChildAt(0).getContext());
+            StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
+            StackType newStack = StackType.valueOf(((Key) stateChange.topNewState()).stackIdentifier());
+            direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
+        }
+        exchangeViewForKey(stateChange.topNewState(), direction);
         completionCallback.stateChangeComplete();
+    }
+
+    private void finishStateChange(View previousView) {
+        root.removeView(previousView);
+    }
+
+    // animation
+    private void runAnimation(final View previousView, final View newView, int direction, AnimatorListenerAdapter animatorListenerAdapter) {
+        Animator animator = createSegue(previousView, newView, direction);
+        animator.addListener(animatorListenerAdapter);
+        animator.start();
+    }
+
+    private Animator createSegue(View from, View to, int direction) {
+        boolean backward = direction == StateChange.BACKWARD;
+        int fromTranslation = backward ? from.getWidth() : -from.getWidth();
+        int toTranslation = backward ? -to.getWidth() : to.getWidth();
+
+        AnimatorSet set = new AnimatorSet();
+        set.play(ObjectAnimator.ofFloat(from, View.TRANSLATION_X, fromTranslation));
+        set.play(ObjectAnimator.ofFloat(to, View.TRANSLATION_X, toTranslation, 0));
+        return set;
     }
 }
