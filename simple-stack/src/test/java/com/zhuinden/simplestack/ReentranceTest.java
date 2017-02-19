@@ -35,7 +35,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class ReentranceTest {
 
     Backstack flow;
-    List<Parcelable> lastStack;
+    List<Object> lastStack;
     StateChanger.Callback lastCallback;
 
     @Before
@@ -358,8 +358,8 @@ public class ReentranceTest {
         }
     }
 
-    private void verifyHistory(List<Parcelable> history, Parcelable... keys) {
-        List<Parcelable> copy = new ArrayList<>(history);
+    private void verifyHistory(List<Object> history, Parcelable... keys) {
+        List<Object> copy = new ArrayList<>(history);
         Collections.reverse(copy);
         assertThat(copy).containsExactly(keys);
     }

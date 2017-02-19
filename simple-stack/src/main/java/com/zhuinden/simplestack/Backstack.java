@@ -16,7 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.content.Context;
-import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
@@ -30,14 +29,14 @@ import java.util.List;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * The {@link Backstack} holds the current state, in the form of a list of Parcelables.
+ * The {@link Backstack} holds the current state, in the form of a list of Objects.
  * It queues up {@link StateChange}s while a {@link StateChanger} is not available.
  * When a {@link StateChanger} is available, it attempts to execute the queued {@link StateChange}s.
  * A {@link StateChanger} can be either set to initialize, or to reattach.
  * Initialize begins an initializing {@link StateChange} to set up initial state, reattach does not.
  */
 public class Backstack {
-    public static <T extends Parcelable> T getKey(Context context) {
+    public static <T extends Object> T getKey(Context context) {
         return ManagedContextWrapper.getKey(context);
     }
 
@@ -51,10 +50,10 @@ public class Backstack {
     public static final int REATTACH = 1;
     //
 
-    private final List<Parcelable> originalStack = new ArrayList<>();
+    private final List<Object> originalStack = new ArrayList<>();
 
-    private final List<Parcelable> initialParameters;
-    private List<Parcelable> stack = originalStack;
+    private final List<Object> initialParameters;
+    private List<Object> stack = originalStack;
 
     private LinkedList<PendingStateChange> queuedStateChanges = new LinkedList<>();
 
@@ -65,7 +64,7 @@ public class Backstack {
      *
      * @param initialKeys
      */
-    public Backstack(@NonNull Parcelable... initialKeys) {
+    public Backstack(@NonNull Object... initialKeys) {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
@@ -77,7 +76,7 @@ public class Backstack {
      *
      * @param initialKeys
      */
-    public Backstack(@NonNull List<Parcelable> initialKeys) {
+    public Backstack(@NonNull List<?> initialKeys) {
         if(initialKeys == null) {
             throw new NullPointerException("Initial key list should not be null");
         }
@@ -109,7 +108,7 @@ public class Backstack {
         this.stateChanger = stateChanger;
         if(registerMode == INITIALIZE && (queuedStateChanges.size() <= 1 || stack.isEmpty())) {
             if(!beginStateChangeIfPossible()) {
-                ArrayList<Parcelable> newHistory = new ArrayList<>();
+                ArrayList<Object> newHistory = new ArrayList<>();
                 newHistory.addAll(selectActiveHistory());
                 stack = initialParameters;
                 enqueueStateChange(newHistory, StateChange.REPLACE, true);
@@ -133,12 +132,12 @@ public class Backstack {
      *
      * @param newKey the target state.
      */
-    public void goTo(@NonNull Parcelable newKey) {
+    public void goTo(@NonNull Object newKey) {
         checkNewKey(newKey);
 
-        ArrayList<Parcelable> newHistory = new ArrayList<>();
+        ArrayList<Object> newHistory = new ArrayList<>();
         boolean isNewKey = true;
-        for(Parcelable key : selectActiveHistory()) {
+        for(Object key : selectActiveHistory()) {
             newHistory.add(key);
             if(key.equals(newKey)) {
                 isNewKey = false;
@@ -170,9 +169,9 @@ public class Backstack {
             stack.clear();
             return false;
         }
-        ArrayList<Parcelable> newHistory = new ArrayList<>();
+        ArrayList<Object> newHistory = new ArrayList<>();
 
-        List<Parcelable> activeHistory = selectActiveHistory();
+        List<Object> activeHistory = selectActiveHistory();
         for(int i = 0; i < activeHistory.size() - 1; i++) {
             newHistory.add(activeHistory.get(i));
         }
@@ -186,7 +185,7 @@ public class Backstack {
      * @param newHistory the new active history.
      * @param direction  The direction of the state change: BACKWARD, FORWARD or REPLACE.
      */
-    public void setHistory(@NonNull List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction) {
+    public void setHistory(@NonNull List<Object> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
         enqueueStateChange(newHistory, direction, false);
     }
@@ -196,8 +195,8 @@ public class Backstack {
      *
      * @return the unmodifiable copy of history.
      */
-    public List<Parcelable> getHistory() {
-        List<Parcelable> copy = new ArrayList<>();
+    public List<Object> getHistory() {
+        List<Object> copy = new ArrayList<>();
         copy.addAll(stack);
         return Collections.unmodifiableList(copy);
     }
@@ -211,13 +210,13 @@ public class Backstack {
         return !queuedStateChanges.isEmpty();
     }
 
-    private void enqueueStateChange(List<Parcelable> newHistory, int direction, boolean initialization) {
+    private void enqueueStateChange(List<Object> newHistory, int direction, boolean initialization) {
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
     }
 
-    private List<Parcelable> selectActiveHistory() {
+    private List<Object> selectActiveHistory() {
         if(stack.isEmpty() && queuedStateChanges.size() <= 0) {
             return initialParameters;
         } else if(queuedStateChanges.size() <= 0) {
@@ -241,10 +240,10 @@ public class Backstack {
 
     private void changeState(final PendingStateChange pendingStateChange) {
         boolean initialization = pendingStateChange.initialization;
-        List<Parcelable> newHistory = pendingStateChange.newHistory;
+        List<Object> newHistory = pendingStateChange.newHistory;
         @StateChange.StateChangeDirection int direction = pendingStateChange.direction;
 
-        List<Parcelable> previousState;
+        List<Object> previousState;
         if(initialization) {
             previousState = Collections.emptyList();
         } else {
@@ -347,13 +346,13 @@ public class Backstack {
     }
 
     // argument checks
-    private void checkNewHistory(List<Parcelable> newHistory) {
+    private void checkNewHistory(List<Object> newHistory) {
         if(newHistory == null || newHistory.isEmpty()) {
             throw new IllegalArgumentException("New history cannot be null or empty");
         }
     }
 
-    private void checkNewKey(Parcelable newKey) {
+    private void checkNewKey(Object newKey) {
         if(newKey == null) {
             throw new IllegalArgumentException("Key cannot be null");
         }

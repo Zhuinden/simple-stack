@@ -58,6 +58,13 @@ Previous services are destroyed when no longer active, but if the Service implem
 
 - ADDED: `simple-stack-example-services`.
 
+
+-Simple Stack 1.1.0 (2017-02-18)
+--------------------------------
+- BREAKING CHANGE: `Backstack`'s APIs return `Object` instead of `Parcelable` (that includes `StateChange`, initial keys, `HistoryBuilder`, etc.)
+
+- ENHANCEMENT: Added `KeyParceler` interface to allow defining custom strategy in order to turn keys into `Parcelable` (for example, using `Parceler` library instead)
+
 -Simple Stack 1.0.0 (2017-02-15)
 --------------------------------
 - RELEASE: 1.0.0!

@@ -1,6 +1,5 @@
 package com.zhuinden.simplestackdemoexamplefragments.util;
 
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -30,7 +29,7 @@ public class FragmentStateChanger {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        for(Parcelable _oldKey : stateChange.getPreviousState()) {
+        for(Object _oldKey : stateChange.getPreviousState()) {
             Key oldKey = (Key) _oldKey;
             Fragment fragment = fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
@@ -41,7 +40,7 @@ public class FragmentStateChanger {
                 }
             }
         }
-        for(Parcelable _newKey : stateChange.getNewState()) {
+        for(Object _newKey : stateChange.getNewState()) {
             Key newKey = (Key) _newKey;
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {

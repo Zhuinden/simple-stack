@@ -15,8 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.os.Parcelable;
-
 import java.util.List;
 
 /**
@@ -29,7 +27,7 @@ class PendingStateChange {
         COMPLETED
     }
 
-    final List<Parcelable> newHistory;
+    final List<Object> newHistory;
     final int direction;
     final boolean initialization;
 
@@ -38,7 +36,7 @@ class PendingStateChange {
     StateChanger.Callback completionCallback;
     boolean didForceExecute = false;
 
-    PendingStateChange(List<Parcelable> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
+    PendingStateChange(List<Object> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
         this.newHistory = newHistory;
         this.direction = direction;
         this.initialization = initialization;

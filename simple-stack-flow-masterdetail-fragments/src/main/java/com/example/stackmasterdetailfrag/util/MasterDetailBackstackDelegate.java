@@ -29,7 +29,7 @@ public class MasterDetailBackstackDelegate
     @Override
     protected Collection<? extends Parcelable> getAdditionalRetainedKeys(@NonNull StateChange stateChange) {
         Set<Parcelable> keys = new HashSet<>();
-        for(Parcelable key : stateChange.getNewState()) {
+        for(Object key : stateChange.getNewState()) {
             if(key instanceof Paths.MasterDetailPath) {
                 keys.add(((Paths.MasterDetailPath) key).getMaster());
             }

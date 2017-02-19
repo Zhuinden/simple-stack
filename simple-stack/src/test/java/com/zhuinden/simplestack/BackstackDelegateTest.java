@@ -15,8 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.os.Parcelable;
-
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -64,7 +62,7 @@ public class BackstackDelegateTest {
     @Ignore // TODO: Bundle.putString is not mocked.
     public void setPersistenceTagAfterOnCreateShouldThrow() {
         BackstackDelegate backstackDelegate = BackstackDelegate.create();
-        backstackDelegate.onCreate(null, null, new ArrayList<Parcelable>() {{
+        backstackDelegate.onCreate(null, null, new ArrayList<Object>() {{
             add(new TestKey("hello"));
         }});
         try {

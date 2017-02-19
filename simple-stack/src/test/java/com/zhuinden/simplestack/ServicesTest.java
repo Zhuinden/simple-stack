@@ -32,8 +32,8 @@ public class ServicesTest {
 
     @Before
     public void before() {
-        Mockito.when(stateChange.getNewState()).thenReturn(Collections.<Parcelable>emptyList());
-        Mockito.when(stateChange.getPreviousState()).thenReturn(Collections.<Parcelable>emptyList());
+        Mockito.when(stateChange.getNewState()).thenReturn(Collections.<Object>emptyList());
+        Mockito.when(stateChange.getPreviousState()).thenReturn(Collections.<Object>emptyList());
         Mockito.when(stateChange.getDirection()).thenReturn(StateChange.REPLACE);
     }
 

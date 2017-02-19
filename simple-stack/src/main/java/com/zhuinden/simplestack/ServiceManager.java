@@ -79,10 +79,10 @@ class ServiceManager {
         }
     }
 
-    static final Parcelable ROOT_KEY = new RootKey();
+    static final Object ROOT_KEY = new RootKey();
 
     private final Services rootServices;
-    private final Map<Parcelable, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
+    private final Map<Object, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
     private final List<ServiceFactory> servicesFactories = new ArrayList<>();
 
     ServiceManager(List<ServiceFactory> servicesFactories) {
@@ -95,22 +95,23 @@ class ServiceManager {
         keyToManagedServicesMap.put(ROOT_KEY, new ReferenceCountedServices(this.rootServices));
     }
 
-    public boolean hasServices(Parcelable key) {
+    public boolean hasServices(Object key) {
         return keyToManagedServicesMap.containsKey(key);
     }
 
-    public Services findServices(Parcelable key) {
+    public Services findServices(Object key) {
         final ReferenceCountedServices managed = keyToManagedServicesMap.get(key);
         if(managed == null) {
-            throw new IllegalStateException("No services currently exists for key " + key);
+            //throw new IllegalStateException("No services currently exists for key " + key); // FIXME `Paths.NoDetails` has no service registered because it is not linked to the state of any path: breaking change!
+            return null;
         }
         return managed.services;
     }
 
-    void setUp(BackstackDelegate backstackDelegate, Parcelable key) {
+    void setUp(BackstackDelegate backstackDelegate, Object key) {
         Services parent = keyToManagedServicesMap.get(ROOT_KEY).services;
         if(key instanceof Services.Child) {
-            final Parcelable parentKey = ((Services.Child)key).parent();
+            final Object parentKey = ((Services.Child) key).parent();
             setUp(backstackDelegate, parentKey);
             parent = keyToManagedServicesMap.get(parentKey).services;
         }
@@ -121,11 +122,11 @@ class ServiceManager {
         }
     }
 
-    private void buildComposite(BackstackDelegate backstackDelegate, Parcelable key, Services parent) {
+    private void buildComposite(BackstackDelegate backstackDelegate, Object key, Services parent) {
         Services.Composite composite = (Services.Composite) key;
-        List<? extends Parcelable> children = composite.keys();
+        List<? extends Object> children = composite.keys();
         for(int i = 0; i < children.size(); i++) {
-            Parcelable child = children.get(i);
+            Object child = children.get(i);
             ReferenceCountedServices managedServices = createNonExistentManagedServicesAndIncrementUsageCount(backstackDelegate,
                     parent,
                     child);
@@ -135,14 +136,14 @@ class ServiceManager {
         }
     }
 
-    void tearDown(BackstackDelegate backstackDelegate, boolean shouldPersist, Parcelable key) {
+    void tearDown(BackstackDelegate backstackDelegate, boolean shouldPersist, Object key) {
         tearDown(backstackDelegate, shouldPersist, key, false);
     }
 
-    private void tearDown(BackstackDelegate backstackDelegate, boolean shouldPersist, Parcelable key, boolean isFromComposite) {
+    private void tearDown(BackstackDelegate backstackDelegate, boolean shouldPersist, Object key, boolean isFromComposite) {
         if(key instanceof Services.Composite) {
             Services.Composite composite = (Services.Composite) key;
-            List<? extends Parcelable> children = composite.keys();
+            List<? extends Object> children = composite.keys();
             for(int i = children.size() - 1; i >= 0; i--) {
                 tearDown(backstackDelegate, shouldPersist, children.get(i), true);
             }
@@ -154,7 +155,7 @@ class ServiceManager {
     }
 
     @NonNull
-    private ReferenceCountedServices createNonExistentManagedServicesAndIncrementUsageCount(BackstackDelegate backstackDelegate, @Nullable Services parentServices, Parcelable key) {
+    private ReferenceCountedServices createNonExistentManagedServicesAndIncrementUsageCount(BackstackDelegate backstackDelegate, @Nullable Services parentServices, Object key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         if(node == null) {
             // @formatter:off
@@ -175,7 +176,7 @@ class ServiceManager {
         return node;
     }
 
-    void restoreServicesForKey(BackstackDelegate backstackDelegate, Parcelable key) {
+    void restoreServicesForKey(BackstackDelegate backstackDelegate, Object key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
         if(savedState != null && savedState.getBundle() != null) {
@@ -192,7 +193,7 @@ class ServiceManager {
         }
     }
 
-    void persistServicesForKey(BackstackDelegate backstackDelegate, Parcelable key) {
+    void persistServicesForKey(BackstackDelegate backstackDelegate, Object key) {
         //Log.i("ServiceManager", "<<< PERSIST [" + key + "] >>>");
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
@@ -207,7 +208,7 @@ class ServiceManager {
         }
     }
 
-    void persistServicesForKeyHierarchy(BackstackDelegate backstackDelegate, Parcelable key) {
+    void persistServicesForKeyHierarchy(BackstackDelegate backstackDelegate, Object key) {
         if(key instanceof Services.Child) {
             persistServicesForKeyHierarchy(backstackDelegate, ((Services.Child) key).parent());
         }
@@ -217,11 +218,11 @@ class ServiceManager {
         }
     }
 
-    private void persistComposite(BackstackDelegate backstackDelegate, Parcelable key) {
+    private void persistComposite(BackstackDelegate backstackDelegate, Object key) {
         Services.Composite composite = (Services.Composite) key;
-        List<? extends Parcelable> children = composite.keys();
+        List<? extends Object> children = composite.keys();
         for(int i = 0; i < children.size(); i++) {
-            Parcelable child = children.get(i);
+            Object child = children.get(i);
             persistServicesForKey(backstackDelegate, child);
             if(child instanceof Services.Composite) {
                 persistComposite(backstackDelegate, child);
@@ -229,7 +230,7 @@ class ServiceManager {
         }
     }
 
-    private boolean decrementAndMaybeRemoveKey(BackstackDelegate backstackDelegate, boolean shouldPersist, Parcelable key) {
+    private boolean decrementAndMaybeRemoveKey(BackstackDelegate backstackDelegate, boolean shouldPersist, Object key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         if(node == null) {
             throw new IllegalStateException("Cannot remove a node that doesn't exist or has already been removed!");
@@ -261,7 +262,7 @@ class ServiceManager {
 
     public void dumpLogData() {
         Log.i("ServiceManager", "Services: ");
-        for(Map.Entry<Parcelable, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
+        for(Map.Entry<Object, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
             Log.i("ServiceManager", "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
         }
     }

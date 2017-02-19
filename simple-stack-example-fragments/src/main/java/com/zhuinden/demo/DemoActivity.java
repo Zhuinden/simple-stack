@@ -1,7 +1,6 @@
 package com.zhuinden.demo;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -97,7 +96,7 @@ public class DemoActivity
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        for(Parcelable _oldKey : stateChange.getPreviousState()) {
+        for(Object _oldKey : stateChange.getPreviousState()) {
             Key oldKey = (Key) _oldKey;
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
@@ -110,7 +109,7 @@ public class DemoActivity
                 }
             }
         }
-        for(Parcelable _newKey : stateChange.getNewState()) {
+        for(Object _newKey : stateChange.getNewState()) {
             Key newKey = (Key) _newKey;
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
