@@ -12,6 +12,8 @@ import android.widget.RelativeLayout;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemomultistack.R;
+import com.zhuinden.simplestackdemomultistack.application.Key;
+import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.another.AnotherKey;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -55,6 +57,8 @@ public class CloudSyncView
 
     @OnClick(R.id.first_button)
     public void clickButton(View view) {
+        Key key = Backstack.getKey(getContext());
+        key.selectDelegate(getContext()).getBackstack().goTo(AnotherKey.create());
     }
 
     @Override

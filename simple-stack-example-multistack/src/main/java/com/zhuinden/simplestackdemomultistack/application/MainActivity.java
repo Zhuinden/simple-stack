@@ -20,7 +20,6 @@ import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.list.ListKey;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.mail.MailKey;
 import com.zhuinden.simplestackdemomultistack.util.Multistack;
-import com.zhuinden.simplestackdemomultistack.util.ServiceLocator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,10 +34,10 @@ public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
     public enum StackType {
-        CHROMECAST,
         CLOUDSYNC,
-        LIST,
-        MAIL;
+        CHROMECAST,
+        MAIL,
+        LIST;
     }
 
     @BindView(R.id.root)
@@ -50,34 +49,28 @@ public class MainActivity
     @BindView(R.id.bottom_navigation)
     BottomNavigation bottomNavigation;
 
-    BackstackDelegate chromeCastStack;
-    BackstackDelegate cloudSyncStack;
-    BackstackDelegate listStack;
-    BackstackDelegate mailStack;
-
     Multistack multistack;
-
-    String currentStack = CHROMECAST.name();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         this.multistack = new Multistack();
 
-        chromeCastStack = multistack.add(CHROMECAST.name(), new BackstackDelegate(null));
-        cloudSyncStack = multistack.add(CLOUDSYNC.name(), new BackstackDelegate(null));
-        listStack = multistack.add(LIST.name(), new BackstackDelegate(null));
-        mailStack = multistack.add(MAIL.name(), new BackstackDelegate(null));
+        multistack.add(CLOUDSYNC.name(), new BackstackDelegate(null));
+        multistack.add(CHROMECAST.name(), new BackstackDelegate(null));
+        multistack.add(MAIL.name(), new BackstackDelegate(null));
+        multistack.add(LIST.name(), new BackstackDelegate(null));
 
-        if(savedInstanceState != null) {
-            currentStack = savedInstanceState.getString("currentStack", CHROMECAST.name());
-        }
         Multistack.NonConfigurationInstance nonConfigurationInstance = (Multistack.NonConfigurationInstance) getLastCustomNonConfigurationInstance();
 
-        multistack.onCreate(CHROMECAST.name(), savedInstanceState, nonConfigurationInstance, ChromeCastKey.create());
+        multistack.onCreate(savedInstanceState);
+
         multistack.onCreate(CLOUDSYNC.name(), savedInstanceState, nonConfigurationInstance, CloudSyncKey.create());
-        multistack.onCreate(LIST.name(), savedInstanceState, nonConfigurationInstance, ListKey.create());
+        multistack.onCreate(CHROMECAST.name(), savedInstanceState, nonConfigurationInstance, ChromeCastKey.create());
         multistack.onCreate(MAIL.name(), savedInstanceState, nonConfigurationInstance, MailKey.create());
+        multistack.onCreate(LIST.name(), savedInstanceState, nonConfigurationInstance, ListKey.create());
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
@@ -85,8 +78,7 @@ public class MainActivity
             @Override
             public void onMenuItemSelect(@IdRes int menuItemId, int itemIndex, boolean b) {
                 Log.i("MainActivity", "Selected index: [" + menuItemId + "] at [" + itemIndex + "]");
-                BackstackDelegate selectedStack = ServiceLocator.getService(MainActivity.this, StackType.values()[itemIndex].name());
-
+                multistack.setSelectedStack(StackType.values()[itemIndex].name());
             }
 
             @Override
@@ -94,66 +86,64 @@ public class MainActivity
 
             }
         });
-        chromeCastStack.setStateChanger(this);
+        multistack.setStateChanger(this);
     }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        return chromeCastStack.onRetainCustomNonConfigurationInstance();
+        return multistack.onRetainCustomNonConfigurationInstance();
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        chromeCastStack.onPostResume();
+        multistack.onPostResume();
     }
 
     @Override
     public void onBackPressed() {
-        if(!chromeCastStack.onBackPressed()) {
+        if(!multistack.onBackPressed()) {
             super.onBackPressed();
         }
     }
 
     @Override
     protected void onPause() {
-        chromeCastStack.onPause();
+        multistack.onPause();
         super.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        multistack.persistToBackstack(root.getChildAt(0));
+        multistack.persistViewToState(root.getChildAt(0));
         multistack.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
-        chromeCastStack.onDestroy();
+        multistack.onDestroy();
         super.onDestroy();
     }
 
     @Override
     public Object getSystemService(String name) {
-        if(name.equals(CHROMECAST.name())) {
-            return chromeCastStack;
-        } else if(name.equals(CLOUDSYNC.name())) {
-            return cloudSyncStack;
-        } else if(name.equals(LIST.name())) {
-            return listStack;
-        } else if(name.equals(MAIL.name())) {
-            return mailStack;
+        if(multistack != null) {
+            BackstackDelegate stack = multistack.get(name);
+            if(stack != null) {
+                return stack;
+            }
         }
         return super.getSystemService(name);
     }
 
     private void exchangeViewForKey(Key newKey) {
-        chromeCastStack.persistViewToState(root.getChildAt(0));
+        multistack.persistViewToState(root.getChildAt(0));
         root.removeAllViews();
+        multistack.setSelectedStack(newKey.stackIdentifier());
         Context newContext = new KeyContextWrapper(this, newKey);
         View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        chromeCastStack.restoreViewFromState(view);
+        multistack.restoreViewFromState(view);
         root.addView(view);
     }
 

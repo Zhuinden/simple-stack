@@ -16,7 +16,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:layout_height="wrap_content"
-            android:text="Hello to second!" />
+            android:text="Hello to Chrome Cast!"/>
 
         <EditText
             android:id="@+id/second_edittext"
