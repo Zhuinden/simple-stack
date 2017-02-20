@@ -101,48 +101,52 @@ public class NestedStack
     @Override
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        List<Object> history = backstack.getHistory();
-        ArrayList<Parcelable> parcelledHistory = new ArrayList<>();
-        for(Object key : history) {
-            parcelledHistory.add(keyParceler.toParcelable(key));
-        }
+        if(parent != null) { // root is managed by delegate
+            List<Object> history = backstack.getHistory();
+            ArrayList<Parcelable> parcelledHistory = new ArrayList<>();
+            for(Object key : history) {
+                parcelledHistory.add(keyParceler.toParcelable(key));
+            }
 
-        List<Object> initialParameters = backstack.getInitialParameters();
-        ArrayList<Parcelable> parcelledInitialParameters = new ArrayList<>();
-        for(Object key : initialParameters) {
-            parcelledInitialParameters.add(keyParceler.toParcelable(key));
-        }
+            List<Object> initialParameters = backstack.getInitialParameters();
+            ArrayList<Parcelable> parcelledInitialParameters = new ArrayList<>();
+            for(Object key : initialParameters) {
+                parcelledInitialParameters.add(keyParceler.toParcelable(key));
+            }
 
-        bundle.putParcelableArrayList("HISTORY", parcelledHistory);
-        bundle.putParcelableArrayList("INITIALPARAMS", parcelledInitialParameters);
+            bundle.putParcelableArrayList("HISTORY", parcelledHistory);
+            bundle.putParcelableArrayList("INITIALPARAMS", parcelledInitialParameters);
+        }
         return bundle;
     }
 
     @Override
     public void fromBundle(@Nullable Bundle bundle) {
         if(bundle != null) {
-            ArrayList<Parcelable> parcelledHistory = bundle.getParcelableArrayList("HISTORY");
-            ArrayList<Parcelable> parcelledInitialParams = bundle.getParcelableArrayList("INITIALPARAMS");
+            if(parent != null) { // root is managed by delegate
+                ArrayList<Parcelable> parcelledHistory = bundle.getParcelableArrayList("HISTORY");
+                ArrayList<Parcelable> parcelledInitialParams = bundle.getParcelableArrayList("INITIALPARAMS");
 
-            List<Object> history = new ArrayList<>();
-            if(parcelledHistory != null) {
-                for(Parcelable key : parcelledHistory) {
-                    history.add(keyParceler.fromParcelable(key));
+                List<Object> history = new ArrayList<>();
+                if(parcelledHistory != null) {
+                    for(Parcelable key : parcelledHistory) {
+                        history.add(keyParceler.fromParcelable(key));
+                    }
                 }
-            }
-            List<Object> initialParams = new ArrayList<>();
-            if(parcelledInitialParams != null) {
-                for(Parcelable key : parcelledInitialParams) {
-                    initialParams.add(keyParceler.fromParcelable(key));
+                List<Object> initialParams = new ArrayList<>();
+                if(parcelledInitialParams != null) {
+                    for(Parcelable key : parcelledInitialParams) {
+                        initialParams.add(keyParceler.fromParcelable(key));
+                    }
                 }
+                List<Object> keys;
+                if(history.isEmpty()) {
+                    keys = initialParams;
+                } else {
+                    keys = history;
+                }
+                backstack.setInitialParameters(keys);
             }
-            List<Object> keys;
-            if(history.isEmpty()) {
-                keys = initialParams;
-            } else {
-                keys = history;
-            }
-            backstack.setInitialParameters(keys);
         }
     }
 }
