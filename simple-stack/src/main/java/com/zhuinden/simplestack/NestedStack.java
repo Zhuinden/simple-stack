@@ -88,6 +88,10 @@ public class NestedStack
         backstack.setHistory(newHistory, direction);
     }
 
+    public void executePendingStateChange() {
+        backstack.executePendingStateChange();
+    }
+
     @Nullable
     public NestedStack getParent() {
         return parent;
