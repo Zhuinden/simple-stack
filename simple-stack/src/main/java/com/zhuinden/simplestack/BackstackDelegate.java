@@ -437,12 +437,17 @@ public class BackstackDelegate {
      * @param outState the Bundle into which the backstack history and view states are saved.
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        ArrayList<Parcelable> history = new ArrayList<>();
-        for(Object key : backstack.getHistory()) {
-            history.add(keyParceler.toParcelable(key));
+        List<Object> history = backstack.getHistory();
+        ArrayList<Parcelable> parcelledHistory = new ArrayList<>();
+        for(Object key : history) {
+            parcelledHistory.add(keyParceler.toParcelable(key));
         }
-        outState.putParcelableArrayList(getHistoryTag(), history);
+        outState.putParcelableArrayList(getHistoryTag(), parcelledHistory);
 
+        serviceManager.persistServicesForKey(this, ServiceManager.ROOT_KEY);
+        if(!history.isEmpty()) {
+            serviceManager.persistServicesForKeyHierarchy(this, history.get(history.size() - 1));
+        }
         ArrayList<ParcelledState> states = new ArrayList<>();
         for(SavedState savedState : keyStateMap.values()) {
             ParcelledState parcelledState = new ParcelledState();
