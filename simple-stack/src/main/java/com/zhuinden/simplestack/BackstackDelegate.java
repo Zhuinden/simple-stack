@@ -43,7 +43,6 @@ import java.util.Set;
  */
 public class BackstackDelegate {
     static final String ROOT_STACK = "simplestack.ROOT_STACK";
-    static final String PARENT_STACK = "simplestack.PARENT_STACK";
     static final String LOCAL_STACK = "simplestack.LOCAL_STACK";
 
     private static class ParcelledState
@@ -330,7 +329,7 @@ public class BackstackDelegate {
             servicesFactories.add(0, new ServiceFactory() {
                 @Override
                 public void bindServices(@NonNull Services.Builder builder) {
-                    NestedStack parentStack = builder.getService(PARENT_STACK);
+                    NestedStack parentStack = builder.getService(LOCAL_STACK);
                     if(parentStack == null) {
                         parentStack = builder.getService(ROOT_STACK);
                     }
