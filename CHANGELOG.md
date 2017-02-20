@@ -58,6 +58,11 @@ Previous services are destroyed when no longer active, but if the Service implem
 
 - ADDED: `simple-stack-example-services`.
 
+-Simple Stack 1.1.1 (2017-02-19)
+--------------------------------
+- FIX: A bug that allowed the possibility that an uninitialized backstack could restore its history to be an empty list after process death.
+
+- ADDED: `simple-stack-example-multistack` for handling multiple backstacks in the same Activity using a BottomNavigationView.
 
 -Simple Stack 1.1.0 (2017-02-18)
 --------------------------------
