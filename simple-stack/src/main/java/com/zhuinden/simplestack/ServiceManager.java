@@ -15,11 +15,11 @@ package com.zhuinden.simplestack;
  * limitations under the License.
  */
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 class ServiceManager {
+    static final String TAG = "simplestack.ServiceManager";
+
     static class RootKey implements Parcelable {
         private RootKey() {
         }
@@ -89,7 +91,10 @@ class ServiceManager {
         this(servicesFactories, Collections.<String, Object>emptyMap());
     }
 
-    ServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices) {
+    ServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices) {
+        Map<String, Object> rootServices = new LinkedHashMap<>();
+        rootServices.putAll(_rootServices);
+        rootServices.put(TAG, this);
         this.rootServices = new Services(ROOT_KEY, null, rootServices);
         this.servicesFactories.addAll(servicesFactories);
         keyToManagedServicesMap.put(ROOT_KEY, new ReferenceCountedServices(this.rootServices));
@@ -154,7 +159,7 @@ class ServiceManager {
     }
 
     @NonNull
-    private ReferenceCountedServices createNonExistentManagedServicesAndIncrementUsageCount(BackstackDelegate backstackDelegate, @Nullable Services parentServices, Object key) {
+    private ReferenceCountedServices createNonExistentManagedServicesAndIncrementUsageCount(BackstackDelegate backstackDelegate, @NonNull Services parentServices, Object key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         if(node == null) {
             // @formatter:off
@@ -257,6 +262,10 @@ class ServiceManager {
         private ReferenceCountedServices(Services services) {
             this.services = services;
         }
+    }
+
+    Context createContext(Context base, Object key) {
+        return new ManagedContextWrapper(base, key, findServices(key));
     }
 
     public void dumpLogData() {

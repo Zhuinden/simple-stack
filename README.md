@@ -160,7 +160,9 @@ public class MainActivity
 
 - [HistoryBuilder](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/HistoryBuilder.java): Convenience class for building `ArrayList<Object>`.
 
-- [ManagedContextWrapper](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/KeyContextWrapper.java): enables the ability to use `Backstack.getKey(context)` to obtain key parameter in custom viewgroup, and shares services through `getSystemService()`.
+- [ManagedContextWrapper](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/ManagedContextWrapper.java): enables the ability to use `Backstack.getKey(context)` to obtain key parameter in custom viewgroup, and shares services through `getSystemService()`.
+
+- [NestedStack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/NestedStack.java): A stack that is associated with a given key as a managed service.
 
 - [KeyParceler](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/KeyParceler.java): used for defining custom parcellation strategy if keys are not `Parcelable` by default.
 

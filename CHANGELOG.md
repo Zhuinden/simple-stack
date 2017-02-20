@@ -20,6 +20,8 @@ It is recommended that in order to create nested views, the `BackstackDelegate` 
 
 - BREAKING CHANGE (?): `clearStatesNotIn()` is now private instead of protected; replaced by `getAdditionalRetainedKeys()`.
 
+- BREAKING CHANGE (?): `BackstackDelegate` constructor now also receives `KeyParceler`.
+
 - **ENHANCEMENT: SCOPED SERVICES INTEGRATION.**
 
 You are now able to create SCOPED SERVICES that are created when a given Key is set, and they are torn down when the Key is no longer active.
@@ -57,6 +59,17 @@ Previous services are destroyed when no longer active, but if the Service implem
 `BackstackDelegate.clearStatesNotIn()` honors `Services.Child` and `Services.Component`, and you're able to store state that belongs to nested views directly.
 
 - ADDED: `simple-stack-example-services`.
+
+- **ENHANCEMENT: HIERARCHICAL BACKSTACKS FOR EACH KEY.**
+
+It is now possible to obtain a `NestedStack` inside any custom viewgroup's context using `Backstack.getNestedStack()`.
+
+Each View associated with its own particular unique Key receives its own `NestedStack`.
+
+This stack manages a stack of its own, but `goBack()` is delegated up to its parents if the current `NestedStack` cannot handle it.
+
+The keys inside the nested stack are managed automatically, and its parcellation strategy is the same as the KeyParceler in BackstackDelegate.
+
 
 -Simple Stack 1.1.1 (2017-02-19)
 --------------------------------

@@ -47,6 +47,19 @@ public class HistoryBuilder
     }
 
     /**
+     * Creates a new history builder based on the {@link NestedStack}'s history.
+     *
+     * @param nestedStack the {@link NestedStack}.
+     * @return the newly created {@link HistoryBuilder}.
+     */
+    public static HistoryBuilder from(@NonNull NestedStack nestedStack) {
+        if(nestedStack == null) {
+            throw new IllegalArgumentException("NestedStack cannot be null!");
+        }
+        return from(nestedStack.backstack.getHistory());
+    }
+
+    /**
      * Creates a new history builder based on the {@link BackstackDelegate}'s managed backstack history.
      *
      * @param backstackDelegate the {@link BackstackDelegate}.

@@ -42,6 +42,10 @@ import java.util.Set;
  * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
 public class BackstackDelegate {
+    static final String ROOT_STACK = "simplestack.ROOT_STACK";
+    static final String PARENT_STACK = "simplestack.PARENT_STACK";
+    static final String LOCAL_STACK = "simplestack.LOCAL_STACK";
+
     private static class ParcelledState
             implements Parcelable {
         Parcelable parcelableKey;
@@ -127,7 +131,7 @@ public class BackstackDelegate {
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
 
-    private KeyParceler keyParceler = new KeyParceler() {
+    private static final KeyParceler DEFAULT_KEYPARCELER = new KeyParceler() {
         @Override
         public Parcelable toParcelable(Object object) {
             return (Parcelable) object;
@@ -139,22 +143,7 @@ public class BackstackDelegate {
         }
     };
 
-    /**
-     * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
-     *
-     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
-     *
-     * @param keyParceler The custom {@link KeyParceler}.
-     */
-    public void setKeyParceler(KeyParceler keyParceler) {
-        if(backstack != null) {
-            throw new IllegalStateException("Custom key parceler should be set before calling `onCreate()`");
-        }
-        if(keyParceler == null) {
-            throw new IllegalArgumentException("The key parceler cannot be null!");
-        }
-        this.keyParceler = keyParceler;
-    }
+    private final KeyParceler keyParceler;
 
     private static final String HISTORY = "simplestack.HISTORY";
     private static final String STATES = HISTORY + "_STATES";
@@ -200,10 +189,11 @@ public class BackstackDelegate {
     Map<String, Object> rootServices;
     ServiceManager serviceManager;
 
-    protected BackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices) {
+    protected BackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices, KeyParceler keyParceler) {
         this.stateChanger = stateChanger;
         this.servicesFactories = servicesFactories;
         this.rootServices = rootServices;
+        this.keyParceler = keyParceler;
     }
 
     /**
@@ -223,7 +213,7 @@ public class BackstackDelegate {
      * @return {@link BackstackDelegate} with default configuration.
      */
     public static BackstackDelegate create() {
-        return new BackstackDelegate(null, Collections.<ServiceFactory>emptyList(), Collections.<String, Object>emptyMap());
+        return configure().build();
     }
 
     /**
@@ -231,19 +221,20 @@ public class BackstackDelegate {
      */
     public static class Builder {
         public interface DelegateProvider {
-            BackstackDelegate create(StateChanger stateChanger, List<ServiceFactory> serviceFactories, Map<String, Object> rootServices);
+            BackstackDelegate create(StateChanger stateChanger, List<ServiceFactory> serviceFactories, Map<String, Object> rootServices, KeyParceler keyParceler);
         }
 
         DelegateProvider delegateProvider = new DelegateProvider() {
             @Override
-            public BackstackDelegate create(StateChanger stateChanger, List<ServiceFactory> serviceFactories, Map<String, Object> rootServices) {
-                return new BackstackDelegate(stateChanger, serviceFactories, rootServices);
+            public BackstackDelegate create(StateChanger stateChanger, List<ServiceFactory> serviceFactories, Map<String, Object> rootServices, KeyParceler keyParceler) {
+                return new BackstackDelegate(stateChanger, serviceFactories, rootServices, keyParceler);
             }
         };
 
         List<ServiceFactory> servicesFactories = new LinkedList<>();
         Map<String, Object> rootServices = new LinkedHashMap<>();
         StateChanger stateChanger;
+        KeyParceler keyParceler = DEFAULT_KEYPARCELER;
 
         private Builder() {
         }
@@ -323,8 +314,30 @@ public class BackstackDelegate {
             return this;
         }
 
+        /**
+         * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
+         *
+         * @param keyParceler The custom {@link KeyParceler}.
+         */
+        public void setKeyParceler(KeyParceler keyParceler) {
+            if(keyParceler == null) {
+                throw new IllegalArgumentException("The key parceler cannot be null!");
+            }
+            this.keyParceler = keyParceler;
+        }
+
         public BackstackDelegate build() {
-            return delegateProvider.create(stateChanger, servicesFactories, rootServices);
+            servicesFactories.add(0, new ServiceFactory() {
+                @Override
+                public void bindServices(@NonNull Services.Builder builder) {
+                    NestedStack parentStack = builder.getService(PARENT_STACK);
+                    if(parentStack == null) {
+                        parentStack = builder.getService(ROOT_STACK);
+                    }
+                    builder.withService(LOCAL_STACK, new NestedStack(parentStack, keyParceler));
+                }
+            });
+            return delegateProvider.create(stateChanger, servicesFactories, rootServices, keyParceler);
         }
     }
 
@@ -374,6 +387,7 @@ public class BackstackDelegate {
             serviceManager = nonConfig.getServiceManager();
         } else {
             backstack = new Backstack(keys);
+            rootServices.put(ROOT_STACK, new NestedStack(backstack, keyParceler)); // This can only be done here.
             serviceManager = new ServiceManager(servicesFactories, rootServices);
             serviceManager.restoreServicesForKey(this, ServiceManager.ROOT_KEY);
         }
@@ -610,7 +624,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public Context createContext(Context base, Object key) {
-        return new ManagedContextWrapper(base, key, serviceManager.findServices(key));
+        return serviceManager.createContext(base, key);
     }
 
     /**

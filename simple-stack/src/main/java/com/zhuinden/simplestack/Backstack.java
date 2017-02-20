@@ -40,6 +40,11 @@ public class Backstack {
         return ManagedContextWrapper.getKey(context);
     }
 
+    public static NestedStack getNestedStack(Context context) {
+        //noinspection ResourceType
+        return (NestedStack) context.getSystemService(BackstackDelegate.LOCAL_STACK);
+    }
+
     //
     @Retention(SOURCE)
     @IntDef({INITIALIZE, REATTACH})
@@ -52,12 +57,32 @@ public class Backstack {
 
     private final List<Object> originalStack = new ArrayList<>();
 
-    private final List<Object> initialParameters;
+    private List<Object> initialParameters = Collections.emptyList();
     private List<Object> stack = originalStack;
 
     private LinkedList<PendingStateChange> queuedStateChanges = new LinkedList<>();
 
     private StateChanger stateChanger;
+
+    /**
+     * Empty constructor to support delayed setup using {@link NestedStack}.
+     */
+    Backstack() {
+    }
+
+    /**
+     * Ability to retrieve initial params to persist to Bundle in {@link NestedStack}.
+     */
+    List<Object> getInitialParameters() {
+        return initialParameters;
+    }
+
+    /**
+     * Ability to set initial params to restore from Bundle in {@link NestedStack}.
+     */
+    void setInitialParameters(List<?> initialParameters) {
+        this.initialParameters = Collections.unmodifiableList(new ArrayList<>(initialParameters));
+    }
 
     /**
      * Creates the Backstack with the provided initial keys.
@@ -68,7 +93,7 @@ public class Backstack {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
-        initialParameters = Collections.unmodifiableList(new ArrayList<>(Arrays.asList(initialKeys)));
+        setInitialParameters(Arrays.asList(initialKeys));
     }
 
     /**
@@ -83,7 +108,7 @@ public class Backstack {
         if(initialKeys.size() <= 0) {
             throw new IllegalArgumentException("Initial key list should contain at least one element");
         }
-        initialParameters = Collections.unmodifiableList(new ArrayList<>(initialKeys));
+        setInitialParameters(initialKeys);
     }
 
     /**

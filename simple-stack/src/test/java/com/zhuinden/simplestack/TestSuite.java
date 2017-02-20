@@ -16,6 +16,8 @@
 
 package com.zhuinden.simplestack;
 
+import com.zhuinden.simplestack.otherpackage.OtherPackageBackstackTest;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -23,6 +25,6 @@ import org.junit.runners.Suite;
  * Created by Owner on 2017. 01. 17..
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({StateChangerTest.class, FlowTest.class, ReentranceTest.class, BackstackTest.class, HistoryBuilderTest.class, BackstackDelegateTest.class, ServicesTest.class})
+@Suite.SuiteClasses({StateChangerTest.class, FlowTest.class, ReentranceTest.class, BackstackTest.class, OtherPackageBackstackTest.class, HistoryBuilderTest.class, BackstackDelegateTest.class, ServicesTest.class})
 public class TestSuite {
 }

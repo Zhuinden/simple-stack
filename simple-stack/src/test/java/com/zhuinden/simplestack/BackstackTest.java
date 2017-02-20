@@ -35,13 +35,8 @@ public class BackstackTest {
     StateChange stateChange = null;
 
     @Test
-    public void initialKeysShouldNotBeEmpty() {
-        try {
-            Backstack backstack = new Backstack();
-            Assert.fail();
-        } catch(IllegalArgumentException e) {
-            // good!
-        }
+    public void initialKeysCanBeEmptyInSamePackage() {
+        Backstack backstack = new Backstack();
     }
 
     @Test

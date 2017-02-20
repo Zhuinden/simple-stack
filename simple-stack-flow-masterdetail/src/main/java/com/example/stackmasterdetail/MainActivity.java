@@ -27,12 +27,8 @@ import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.MasterDetailBackstackDelegate;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.ServiceFactory;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
-
-import java.util.List;
-import java.util.Map;
 
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 

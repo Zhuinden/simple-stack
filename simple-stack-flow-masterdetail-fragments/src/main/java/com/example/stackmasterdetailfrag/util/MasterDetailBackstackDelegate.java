@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.example.stackmasterdetailfrag.Paths;
 import com.zhuinden.simplestack.BackstackDelegate;
+import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.ServiceFactory;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
@@ -22,8 +23,8 @@ import java.util.Set;
 
 public class MasterDetailBackstackDelegate
         extends BackstackDelegate {
-    public MasterDetailBackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices) {
-        super(stateChanger, servicesFactories, rootServices);
+    public MasterDetailBackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices, KeyParceler keyParceler) {
+        super(stateChanger, servicesFactories, rootServices, keyParceler);
     }
 
     @Override
