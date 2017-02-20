@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestack.Backstack;
@@ -15,9 +16,11 @@ import com.zhuinden.simplestackdemomultistack.R;
 import com.zhuinden.simplestackdemomultistack.application.Key;
 import com.zhuinden.simplestackdemomultistack.application.MainActivity;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.chromecast.ChromeCastKey;
+import com.zhuinden.simplestackdemomultistack.util.BackPressListener;
 
 import java.util.Arrays;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -27,7 +30,7 @@ import butterknife.OnClick;
 
 public class AnotherView
         extends RelativeLayout
-        implements StateChanger {
+        implements StateChanger, BackPressListener {
     @AutoValue
     public abstract static class InternalKey
             extends Key {
@@ -63,6 +66,9 @@ public class AnotherView
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+    @BindView(R.id.another_text)
+    TextView textView;
+
     @OnClick(R.id.another_back)
     public void backClicked() {
         nestedStack.goBack();
@@ -92,10 +98,16 @@ public class AnotherView
     }
 
     @Override
+    public boolean onBackPressed() {
+        return nestedStack.goBack();
+    }
+
+    @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
         Log.i("ANOTHER",
                 Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState()
                         .toArray())); //
+        textView.setText(stateChange.topNewState().toString());
         completionCallback.stateChangeComplete();
     }
 }

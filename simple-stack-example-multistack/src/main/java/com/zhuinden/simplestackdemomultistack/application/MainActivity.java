@@ -23,6 +23,7 @@ import com.zhuinden.simplestackdemomultistack.presentation.paths.main.chromecast
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.CloudSyncKey;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.list.ListKey;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.mail.MailKey;
+import com.zhuinden.simplestackdemomultistack.util.BackPressListener;
 import com.zhuinden.simplestackdemomultistack.util.Multistack;
 import com.zhuinden.simplestackdemomultistack.util.ViewUtils;
 
@@ -108,6 +109,13 @@ public class MainActivity
 
     @Override
     public void onBackPressed() {
+        View currentChild = root.getChildAt(0);
+        if(currentChild != null && currentChild instanceof BackPressListener) {
+            boolean handled = ((BackPressListener) currentChild).onBackPressed();
+            if(handled) {
+                return;
+            }
+        }
         if(!multistack.onBackPressed()) {
             super.onBackPressed();
         }
