@@ -107,5 +107,17 @@ public class BackstackDelegateTest {
         backstackDelegate.setStateChanger(stateChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(restoredKey);
     }
+
+    @Test
+    public void onCreateChoosesInitialKeysIfRestoredHistoryIsEmpty() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey testKey = new TestKey("hello");
+        ArrayList<Parcelable> restoredKeys = new ArrayList<>();
+        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getHistoryTag())).thenReturn(restoredKeys);
+        backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
+        assertThat(backstackDelegate.getBackstack()).isNotNull();
+        backstackDelegate.setStateChanger(stateChanger);
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(testKey);
+    }
     // TODO: services integration tests
 }

@@ -45,13 +45,13 @@ public class BackstackDelegate {
     static final String ROOT_STACK = "simplestack.ROOT_STACK";
     static final String LOCAL_STACK = "simplestack.LOCAL_STACK";
 
-    private static class ParcelledState
+    static class ParcelledState
             implements Parcelable {
         Parcelable parcelableKey;
         SparseArray<Parcelable> viewHierarchyState;
         Bundle bundle;
 
-        private ParcelledState() {
+        ParcelledState() {
         }
 
         protected ParcelledState(Parcel in) {
