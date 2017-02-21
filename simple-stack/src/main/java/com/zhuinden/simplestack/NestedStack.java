@@ -64,7 +64,7 @@ public class NestedStack
     }
 
     public void detachStateChanger() {
-        if(stateChanger != null && backstack.hasStateChanger()) {
+        if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
         }
     }
