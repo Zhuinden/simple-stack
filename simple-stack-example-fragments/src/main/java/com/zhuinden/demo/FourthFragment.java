@@ -21,7 +21,7 @@ import butterknife.OnClick;
 public class FourthFragment extends Fragment {
     @OnClick(R.id.fourth_button)
     public void goToSecond() {
-        BackstackService.getBackstack(getContext()).setHistory(HistoryBuilder.newBuilder().add(FirstKey.create()).add(SecondKey.create()).build(),
+        BackstackService.getBackstack(getContext()).setHistory(HistoryBuilder.from(FirstKey.create(), SecondKey.create()).build(),
                 StateChange.BACKWARD);
     }
 

@@ -117,4 +117,12 @@ public class HistoryBuilderTest {
             i++;
         }
     }
+
+    @Test
+    public void fromObjectsWorks() {
+        TestKey a = new TestKey("a");
+        TestKey b = new TestKey("b");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(a, b);
+        assertThat(historyBuilder.build()).containsExactly(a, b);
+    }
 }

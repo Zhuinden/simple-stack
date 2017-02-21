@@ -19,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -80,6 +81,16 @@ public class HistoryBuilder
      */
     public static HistoryBuilder from(@NonNull List<? extends Object> keys) {
         return newBuilder().addAll(keys);
+    }
+
+    /**
+     * Creates a new history builder from the provided ordered elements.
+     *
+     * @param keys
+     * @return the newly created {@link HistoryBuilder}.
+     */
+    public static HistoryBuilder from(Object... keys) {
+        return from(Arrays.asList(keys));
     }
 
     /**

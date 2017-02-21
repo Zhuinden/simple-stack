@@ -121,10 +121,9 @@ public class MainActivity
         menu.add("Friends").setShowAsActionFlags(SHOW_AS_ACTION_ALWAYS).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                BackstackService.get(MainActivity.this).setHistory(HistoryBuilder.newBuilder() //
-                        .add(Paths.ConversationList.create()) //
-                        .add(Paths.FriendList.create()) //
-                        .build(), StateChange.FORWARD);
+                BackstackService.get(MainActivity.this)
+                        .setHistory(HistoryBuilder.from(Paths.ConversationList.create(), Paths.FriendList.create()).build(),
+                                StateChange.FORWARD);
                 return true;
             }
         });

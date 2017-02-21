@@ -198,7 +198,7 @@ public class BackstackDelegateTest {
                 }
             }
         }).setStateChanger(stateChanger).build();
-        backstackDelegate.onCreate(null, null, HistoryBuilder.newBuilder().add(first).add(second).build());
+        backstackDelegate.onCreate(null, null, HistoryBuilder.from().add(first).add(second).build());
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(first, second);
         assertThat(backstackDelegate.findService(first, "FIRST")).isEqualTo("FIRST");
         assertThat(backstackDelegate.findService(second, "SECOND")).isEqualTo("SECOND");
@@ -225,7 +225,7 @@ public class BackstackDelegateTest {
                 }
             }
         }).build();
-        backstackDelegate.onCreate(null, null, HistoryBuilder.newBuilder().add(first).add(second).build());
+        backstackDelegate.onCreate(null, null, HistoryBuilder.from(first, second).build());
         backstackDelegate.setStateChanger(stateChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(first, second);
         try {
@@ -331,6 +331,72 @@ public class BackstackDelegateTest {
         ((Bundleable) Mockito.verify(view, Mockito.times(1))).fromBundle(stateBundle);
     }
 
+    @Test
+    public void onBackPressedGoesBack() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.configure().setStateChanger(stateChanger).build();
+        TestKey a = new TestKey("hello");
+        TestKey b = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.from(a, b).build());
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a, b);
+        backstackDelegate.onBackPressed();
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a);
+    }
 
-    // TODO: services integration tests
+    @Test
+    public void onPostResumeThrowsExceptionIfStateChangerNotSet() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        // no state changer set
+        try {
+            backstackDelegate.onPostResume();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void onPauseRemovesStateChanger() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.onPause();
+        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isFalse();
+    }
+
+    @Test
+    public void onPostResumeReattachesStateChanger() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.onPause();
+        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isFalse();
+        backstackDelegate.onPostResume();
+        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isTrue();
+    }
+
+    @Test
+    public void getBackstackShouldThrowIfOnCreateNotCalled() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        try {
+            backstackDelegate.getBackstack();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void onRetainCustomNonConfigurationInstanceReturnsBackstackAndServiceManager() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        backstackDelegate.backstack = backstack;
+        backstackDelegate.serviceManager = serviceManager;
+        BackstackDelegate.NonConfigurationInstance nonConfigurationInstance = backstackDelegate.onRetainCustomNonConfigurationInstance();
+        assertThat(nonConfigurationInstance).isNotNull();
+        assertThat(nonConfigurationInstance.getBackstack()).isSameAs(backstack);
+        assertThat(nonConfigurationInstance.getServiceManager()).isSameAs(serviceManager);
+    }
 }
