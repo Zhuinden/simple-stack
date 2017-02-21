@@ -26,7 +26,7 @@ import android.view.LayoutInflater;
  */
 class ManagedContextWrapper
         extends ContextWrapper {
-    public static final String TAG = "Backstack.KEY";
+    static final String TAG = "Backstack.KEY";
 
     LayoutInflater layoutInflater;
 
@@ -39,6 +39,9 @@ class ManagedContextWrapper
             throw new IllegalArgumentException("Key cannot be null!");
         }
         this.key = key;
+        if(services == null) {
+            throw new IllegalArgumentException("Services cannot be null!");
+        }
         this.services = services;
     }
 

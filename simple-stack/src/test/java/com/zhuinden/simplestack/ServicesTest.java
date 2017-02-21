@@ -3,6 +3,7 @@ package com.zhuinden.simplestack;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,6 +27,9 @@ public class ServicesTest {
 
     @Mock
     BackstackDelegate backstackDelegate;
+
+    @Mock
+    SavedState savedState;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -1018,5 +1022,50 @@ public class ServicesTest {
             assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
             fail();
         } catch(IllegalStateException e) { /* OK */ }
+    }
+
+    @Test
+    public void serviceManagerRestoresBundleableServices() {
+        final TestKey key = new TestKey("hello");
+        List<ServiceFactory> servicesFactories = new ArrayList<>();
+
+        class Service
+                implements Bundleable {
+            String nyah = null;
+
+            @NonNull
+            @Override
+            public StateBundle toBundle() {
+                StateBundle stateBundle = new StateBundle();
+                stateBundle.putString("nyarr", "nyah");
+                return stateBundle;
+            }
+
+            @Override
+            public void fromBundle(@Nullable StateBundle bundle) {
+                if(bundle != null) {
+                    nyah = bundle.getString("nyarr");
+                }
+            }
+
+        }
+
+        final Service service = new Service();
+        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(savedState);
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBundle("serv", service.toBundle());
+        Mockito.when(savedState.getServiceBundle()).thenReturn(stateBundle);
+        servicesFactories.add(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                if(builder.getKey() == key) {
+                    builder.withService("serv", service);
+                }
+            }
+        });
+        ServiceManager serviceManager = new ServiceManager(servicesFactories);
+        serviceManager.setUp(backstackDelegate, key);
+
+        assertThat(((Service) serviceManager.findServices(key).getService("serv")).nyah).isEqualTo("nyah");
     }
 }
