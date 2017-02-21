@@ -1,7 +1,6 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
@@ -254,12 +254,12 @@ public class TasksCoordinator
     }
 
     @Override
-    public Bundle toBundle() {
+    public StateBundle toBundle() {
         return tasksPresenter.toBundle();
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             tasksPresenter.fromBundle(bundle);
         }

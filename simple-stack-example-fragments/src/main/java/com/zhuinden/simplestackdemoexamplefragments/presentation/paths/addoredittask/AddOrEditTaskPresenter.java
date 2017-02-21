@@ -1,11 +1,11 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task;
@@ -78,15 +78,15 @@ public class AddOrEditTaskPresenter
 
     }
 
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
         bundle.putString("title", title);
         bundle.putString("description", description);
         return bundle;
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             title = bundle.getString("title");
             description = bundle.getString("description");

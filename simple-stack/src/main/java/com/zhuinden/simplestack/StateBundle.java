@@ -19,6 +19,7 @@ package com.zhuinden.simplestack;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
@@ -56,7 +57,7 @@ public class StateBundle {
     static final int type_DoubleArray = 21;
     static final int type_StringArray = 22;
     static final int type_CharSequenceArray = 23;
-    static final int type_Bundle = 26;
+    static final int type_StateBundle = 26;
     static final int type_Parcelable = 27;
     static final int type_ParcelableArray = 28;
     static final int type_ParcelableArrayList = 29;
@@ -73,7 +74,7 @@ public class StateBundle {
     /**
      * Constructs a new, empty Bundle.
      */
-    StateBundle() {
+    public StateBundle() {
         map = new LinkedHashMap<>();
         typeMap = new LinkedHashMap<>();
     }
@@ -84,7 +85,7 @@ public class StateBundle {
      *
      * @param bundle a Bundle to be copied.
      */
-    StateBundle(StateBundle bundle) {
+    public StateBundle(StateBundle bundle) {
         this();
         putAll(bundle);
     }
@@ -537,9 +538,9 @@ public class StateBundle {
      * @param key   a String, or null
      * @param value a Bundle object, or null
      */
-    public void putBundle(@Nullable String key, @Nullable Bundle value) {
+    public void putBundle(@Nullable String key, @Nullable StateBundle value) {
         map.put(key, value);
-        typeMap.put(key, type_Bundle);
+        typeMap.put(key, type_StateBundle);
     }
 
     /**
@@ -1223,13 +1224,13 @@ public class StateBundle {
      * @return a Bundle value, or null
      */
     @Nullable
-    public Bundle getBundle(@Nullable String key) {
+    public StateBundle getBundle(@Nullable String key) {
         Object o = map.get(key);
         if(o == null) {
             return null;
         }
         try {
-            return (Bundle) o;
+            return (StateBundle) o;
         } catch(ClassCastException e) {
             typeWarning(key, o, "Bundle", e);
             return null;
@@ -1343,6 +1344,7 @@ public class StateBundle {
         typeWarning(key, value, className, "<null>", e);
     }
 
+    @NonNull
     public Bundle toBundle() {
         Bundle rootBundle = new Bundle();
         ArrayList<Parcelable> types = new ArrayList<>();
@@ -1423,8 +1425,8 @@ public class StateBundle {
                 case type_CharSequenceArray:
                     innerBundle.putCharSequenceArray(key, getCharSequenceArray(key));
                     break;
-                case type_Bundle:
-                    innerBundle.putBundle(key, getBundle(key));
+                case type_StateBundle:
+                    innerBundle.putBundle(key, getBundle(key) == null ? null : getBundle(key).toBundle());
                     break;
                 case type_Parcelable:
                     innerBundle.putParcelable(key, getParcelable(key));
@@ -1442,10 +1444,19 @@ public class StateBundle {
         }
         rootBundle.putParcelableArrayList("___TYPES", types);
         rootBundle.putBundle("___INNER_BUNDLE", innerBundle);
+        rootBundle.putBoolean("______ROOT_FLAG", true);
         return rootBundle;
     }
 
-    public static StateBundle from(Bundle rootBundle) {
+    @Nullable
+    public static StateBundle from(@Nullable Bundle rootBundle) {
+        if(rootBundle == null) {
+            return null;
+        }
+        if(!rootBundle.getBoolean("______ROOT_FLAG")) {
+            throw new IllegalArgumentException(
+                    "The provided Bundle must be the root bundle of a StateBundle, obtained via `StateBundle.toBundle()`.");
+        }
         StateBundle stateBundle = new StateBundle();
         Bundle innerBundle = rootBundle.getBundle("___INNER_BUNDLE");
         ArrayList<TypeElement> typeElements = rootBundle.getParcelableArrayList("___TYPES");
@@ -1524,8 +1535,8 @@ public class StateBundle {
                     case type_CharSequenceArray:
                         stateBundle.putCharSequenceArray(typeElement.key, innerBundle.getCharSequenceArray(typeElement.key));
                         break;
-                    case type_Bundle:
-                        stateBundle.putBundle(typeElement.key, innerBundle.getBundle(typeElement.key));
+                    case type_StateBundle:
+                        stateBundle.putBundle(typeElement.key, StateBundle.from(innerBundle.getBundle(typeElement.key)));
                         break;
                     case type_Parcelable:
                         stateBundle.putParcelable(typeElement.key, innerBundle.getParcelable(typeElement.key));

@@ -19,7 +19,7 @@ import android.support.annotation.NonNull;
 
 /**
  * A factory class that allows creating scoped services bound to a given key, allowing both creation, and destroy hooks.
- * Bound services that implement {@link com.zhuinden.simplestack.Bundleable} are able to persist and restore their state.
+ * Bound services that implement {@link com.zhuinden.simplestack.Bundleable} are able to persist and restore their state into {@link StateBundle}.
  */
 public abstract class ServiceFactory {
     /**

@@ -374,8 +374,8 @@ public class BackstackDelegate {
                     SavedState savedState = getSavedState(keyParceler.fromParcelable(parcelledState.parcelableKey));
                     savedState.setViewHierarchyState(parcelledState.viewHierarchyState);
                     Bundle bundle = parcelledState.bundle;
-                    savedState.setViewBundle(bundle.getBundle("VIEW_BUNDLE"));
-                    savedState.setServiceBundle(bundle.getBundle("SERVICE_BUNDLE"));
+                    savedState.setViewBundle(StateBundle.from(bundle.getBundle("VIEW_BUNDLE")));
+                    savedState.setServiceBundle(StateBundle.from(bundle.getBundle("SERVICE_BUNDLE")));
                     keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
@@ -469,8 +469,8 @@ public class BackstackDelegate {
             parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
             parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
             Bundle bundle = new Bundle();
-            bundle.putBundle("VIEW_BUNDLE", savedState.getViewBundle());
-            bundle.putBundle("SERVICE_BUNDLE", savedState.getServiceBundle());
+            bundle.putBundle("VIEW_BUNDLE", savedState.getViewBundle() != null ? savedState.getViewBundle().toBundle() : null);
+            bundle.putBundle("SERVICE_BUNDLE", savedState.getServiceBundle().toBundle());
             parcelledState.bundle = bundle;
             states.add(parcelledState);
         }
@@ -529,7 +529,7 @@ public class BackstackDelegate {
     // ----- viewstate persistence
 
     /**
-     * Provides the means to save the provided view's hierarchy state, and its optional bundle via {@link Bundleable} into a {@link SavedState}.
+     * Provides the means to save the provided view's hierarchy state, and its optional {@link StateBundle} via {@link Bundleable} into a {@link SavedState}.
      *
      * @param view the view that belongs to a certain key
      */
@@ -541,7 +541,7 @@ public class BackstackDelegate {
             }
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             view.saveHierarchyState(viewHierarchyState);
-            Bundle bundle = null;
+            StateBundle bundle = null;
             if(view instanceof Bundleable) {
                 bundle = ((Bundleable) view).toBundle();
             }

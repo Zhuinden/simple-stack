@@ -1,6 +1,5 @@
 package com.zhuinden.simplestack;
 
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -99,8 +98,8 @@ public class NestedStack
 
     @NonNull
     @Override
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
         if(parent != null) { // root is managed by delegate
             List<Object> history = backstack.getHistory();
             ArrayList<Parcelable> parcelledHistory = new ArrayList<>();
@@ -121,7 +120,7 @@ public class NestedStack
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             if(parent != null) { // root is managed by delegate
                 ArrayList<Parcelable> parcelledHistory = bundle.getParcelableArrayList("HISTORY");

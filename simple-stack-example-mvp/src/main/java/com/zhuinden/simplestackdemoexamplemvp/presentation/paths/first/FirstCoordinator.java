@@ -1,11 +1,11 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
@@ -52,14 +52,14 @@ public class FirstCoordinator
     }
 
     @Override
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
         bundle.putString("HELLO", "WORLD");
         return bundle;
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             Log.i(TAG, bundle.getString("HELLO"));
         }

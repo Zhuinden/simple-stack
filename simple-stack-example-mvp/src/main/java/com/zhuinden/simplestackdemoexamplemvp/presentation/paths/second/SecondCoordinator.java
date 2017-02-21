@@ -1,12 +1,12 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
 
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
@@ -63,12 +63,12 @@ public class SecondCoordinator
     }
 
     @Override
-    public Bundle toBundle() {
+    public StateBundle toBundle() {
         return secondPresenter.toBundle();
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             secondPresenter.fromBundle(bundle);
         }

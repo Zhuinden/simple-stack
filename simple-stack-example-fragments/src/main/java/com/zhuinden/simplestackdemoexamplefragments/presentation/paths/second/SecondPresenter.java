@@ -1,11 +1,11 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.second;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.jakewharton.rxrelay.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter;
 
@@ -52,14 +52,14 @@ public class SecondPresenter
         backstack.goTo(TasksKey.create());
     }
 
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
         bundle.putString("state", state.getValue());
         return bundle;
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             state.call(bundle.getString("state"));
         }

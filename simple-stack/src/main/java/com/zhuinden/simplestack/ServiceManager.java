@@ -16,7 +16,6 @@ package com.zhuinden.simplestack;
  */
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -184,12 +183,12 @@ class ServiceManager {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
         if(savedState != null) {
-            Bundle bundle = savedState.getServiceBundle();
+            StateBundle bundle = savedState.getServiceBundle();
             if(bundle != null) {
                 //Log.i("ServiceManager", "<<< RESTORE [" + key + "] >>>");
                 for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
                     if(serviceEntry.getValue() instanceof Bundleable) {
-                        Bundle serviceBundle = bundle.getBundle(serviceEntry.getKey());
+                        StateBundle serviceBundle = bundle.getBundle(serviceEntry.getKey());
                         ((Bundleable) serviceEntry.getValue()).fromBundle(serviceBundle);
                     }
                 }
@@ -202,7 +201,7 @@ class ServiceManager {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
         if(savedState != null) {
-            Bundle bundle = savedState.getServiceBundle();
+            StateBundle bundle = savedState.getServiceBundle();
             for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
                 if(serviceEntry.getValue() instanceof Bundleable) {
                     bundle.putBundle(serviceEntry.getKey(), ((Bundleable) serviceEntry.getValue()).toBundle());

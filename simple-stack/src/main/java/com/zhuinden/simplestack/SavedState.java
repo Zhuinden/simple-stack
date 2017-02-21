@@ -15,7 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,8 +29,8 @@ import android.util.SparseArray;
 public class SavedState {
     private Object key;
     private SparseArray<Parcelable> viewHierarchyState;
-    private Bundle viewBundle;
-    private Bundle serviceBundle;
+    private StateBundle viewBundle;
+    private StateBundle serviceBundle;
 
     private SavedState() {
     }
@@ -48,23 +47,23 @@ public class SavedState {
         this.viewHierarchyState = viewHierarchyState;
     }
 
-    Bundle getServiceBundle() {
+    StateBundle getServiceBundle() {
         if(serviceBundle == null) {
-            serviceBundle = new Bundle();
+            serviceBundle = new StateBundle();
         }
         return serviceBundle;
     }
 
-    void setServiceBundle(Bundle serviceBundle) {
+    void setServiceBundle(StateBundle serviceBundle) {
         this.serviceBundle = serviceBundle;
     }
 
     @Nullable
-    public Bundle getViewBundle() {
+    public StateBundle getViewBundle() {
         return viewBundle;
     }
 
-    public void setViewBundle(Bundle viewBundle) {
+    public void setViewBundle(StateBundle viewBundle) {
         this.viewBundle = viewBundle;
     }
 

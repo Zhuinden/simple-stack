@@ -8,6 +8,10 @@ Additionally, `new BackstackDelegate(stateChanger)` is replaced with `BackstackD
 
 To support subclasses of `BackstackDelegate`, `configure().setDelegateProvider(MyDelegate::new)` can be used - but typically this is not needed.
 
+- BREAKING CHANGE: `Bundleable` interface is changed from `Bundle toBundle()` to `StateBundle toBundle()`, same for `fromBundle()`.
+
+- ADDED: `StateBundle` class, which can be parcelled as a Bundle with `stateBundle.toBundle()` and `StateBundle.from(rootBundle)`. It is a non-Android-specific replacement for `Bundle`.
+
 - BREAKING CHANGE: `KeyContextWrapper` constructor is no longer public, and is renamed to `ManagedContextWrapper`.
 
 - BREAKING CHANGE: `ManagedContextWrapper` is no longer public.
