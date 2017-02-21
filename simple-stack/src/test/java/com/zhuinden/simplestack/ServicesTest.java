@@ -71,6 +71,10 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
+
+        SavedState _ASaved = SavedState.builder().setKey(key).build();
+        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(_ASaved);
+
         serviceManager.setUp(backstackDelegate, key);
 
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isSameAs(service);
@@ -79,6 +83,10 @@ public class ServicesTest {
     @Test
     public void unbindingServiceMakesItInaccessible() {
         Parcelable key = new TestKey("test");
+
+        SavedState _ASaved = SavedState.builder().setKey(key).build();
+        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(_ASaved);
+
         final Object service = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -103,6 +111,13 @@ public class ServicesTest {
     public void bindingChildCreatesServiceOfParent() {
         final Parcelable parentKey = new TestKey("parent");
         ChildKey childKey = new ChildKey("child", parentKey);
+        SavedState _ASaved = SavedState.builder().setKey(parentKey).build();
+        SavedState _BSaved = SavedState.builder().setKey(childKey).build();
+
+        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_BSaved);
+
+
         final Object parentService = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -133,6 +148,13 @@ public class ServicesTest {
                 }
             }
         });
+        SavedState _ASaved = SavedState.builder().setKey(parentKey).build();
+        SavedState _BSaved = SavedState.builder().setKey(childKey).build();
+
+        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_BSaved);
+
+
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
         serviceManager.setUp(backstackDelegate, childKey);
         serviceManager.tearDown(backstackDelegate, true, childKey);
@@ -159,6 +181,13 @@ public class ServicesTest {
                 }
             }
         });
+
+        SavedState _ASaved = SavedState.builder().setKey(parentKey).build();
+        SavedState _BSaved = SavedState.builder().setKey(childKey).build();
+
+        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_BSaved);
+
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
         serviceManager.setUp(backstackDelegate, childKey);
 
@@ -182,6 +211,13 @@ public class ServicesTest {
                 }
             }
         });
+
+        SavedState _ASaved = SavedState.builder().setKey(childKey).build();
+        SavedState _BSaved = SavedState.builder().setKey(parentKey).build();
+
+        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_BSaved);
+
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
         serviceManager.setUp(backstackDelegate, childKey);
 
@@ -202,6 +238,10 @@ public class ServicesTest {
                 }
             }
         });
+
+        SavedState _ASaved = SavedState.builder().setKey(key).build();
+        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(_ASaved);
+
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
         serviceManager.setUp(backstackDelegate, key);
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isEqualTo(parentService);
@@ -260,6 +300,14 @@ public class ServicesTest {
         final CompositeKey composite = new CompositeKey("composite", Arrays.asList(childA, childB));
         childA.parent = composite;
         childB.parent = composite;
+
+        SavedState _ASaved = SavedState.builder().setKey(childA).build();
+        SavedState _BSaved = SavedState.builder().setKey(childB).build();
+        SavedState _CSaved = SavedState.builder().setKey(composite).build();
+
+        Mockito.when(backstackDelegate.getSavedState(childA)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(childB)).thenReturn(_BSaved);
+        Mockito.when(backstackDelegate.getSavedState(composite)).thenReturn(_CSaved);
 
         final Object childAService = new Object();
         final Object childBService = new Object();
@@ -330,6 +378,14 @@ public class ServicesTest {
         final CompositeKey composite = new CompositeKey("composite", Arrays.asList(childA, childB));
         childA.parent = composite;
         childB.parent = composite;
+
+        SavedState _ASaved = SavedState.builder().setKey(childA).build();
+        SavedState _BSaved = SavedState.builder().setKey(childB).build();
+        SavedState _CSaved = SavedState.builder().setKey(composite).build();
+
+        Mockito.when(backstackDelegate.getSavedState(childA)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(childB)).thenReturn(_BSaved);
+        Mockito.when(backstackDelegate.getSavedState(composite)).thenReturn(_CSaved);
 
         final Object childAService = new Object();
         final Object childBService = new Object();
@@ -456,6 +512,23 @@ public class ServicesTest {
         _E.parent = _B;
         _F.parent = _D;
         _G.parent = _D;
+
+        SavedState _ASaved = SavedState.builder().setKey(_A).build();
+        SavedState _BSaved = SavedState.builder().setKey(_B).build();
+        SavedState _CSaved = SavedState.builder().setKey(_C).build();
+        SavedState _DSaved = SavedState.builder().setKey(_D).build();
+        SavedState _ESaved = SavedState.builder().setKey(_E).build();
+        SavedState _FSaved = SavedState.builder().setKey(_F).build();
+        SavedState _GSaved = SavedState.builder().setKey(_G).build();
+
+        Mockito.when(backstackDelegate.getSavedState(_A)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(_B)).thenReturn(_BSaved);
+        Mockito.when(backstackDelegate.getSavedState(_C)).thenReturn(_CSaved);
+        Mockito.when(backstackDelegate.getSavedState(_D)).thenReturn(_DSaved);
+        Mockito.when(backstackDelegate.getSavedState(_E)).thenReturn(_ESaved);
+        Mockito.when(backstackDelegate.getSavedState(_F)).thenReturn(_FSaved);
+        Mockito.when(backstackDelegate.getSavedState(_G)).thenReturn(_GSaved);
+
 
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -777,6 +850,22 @@ public class ServicesTest {
         _F.parent = _D;
         _G.parent = _D;
 
+        SavedState _ASaved = SavedState.builder().setKey(_A).build();
+        SavedState _BSaved = SavedState.builder().setKey(_B).build();
+        SavedState _CSaved = SavedState.builder().setKey(_C).build();
+        SavedState _DSaved = SavedState.builder().setKey(_D).build();
+        SavedState _ESaved = SavedState.builder().setKey(_E).build();
+        SavedState _FSaved = SavedState.builder().setKey(_F).build();
+        SavedState _GSaved = SavedState.builder().setKey(_G).build();
+
+        Mockito.when(backstackDelegate.getSavedState(_A)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(_B)).thenReturn(_BSaved);
+        Mockito.when(backstackDelegate.getSavedState(_C)).thenReturn(_CSaved);
+        Mockito.when(backstackDelegate.getSavedState(_D)).thenReturn(_DSaved);
+        Mockito.when(backstackDelegate.getSavedState(_E)).thenReturn(_ESaved);
+        Mockito.when(backstackDelegate.getSavedState(_F)).thenReturn(_FSaved);
+        Mockito.when(backstackDelegate.getSavedState(_G)).thenReturn(_GSaved);
+
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
             @Override
@@ -1047,7 +1136,6 @@ public class ServicesTest {
                     nyah = bundle.getString("nyarr");
                 }
             }
-
         }
 
         final Service service = new Service();
@@ -1067,5 +1155,180 @@ public class ServicesTest {
         serviceManager.setUp(backstackDelegate, key);
 
         assertThat(((Service) serviceManager.findServices(key).getService("serv")).nyah).isEqualTo("nyah");
+    }
+
+    @Test
+    public void unidirectionLinksPersist() {
+        class CompositeChild
+                extends TestKey
+                implements Services.Composite, Services.Child {
+            private Parcelable parent;
+            private List<? extends Parcelable> children;
+
+            public CompositeChild(String name, Parcelable parent, List<? extends Parcelable> children) {
+                super(name);
+                this.parent = parent;
+                this.children = children;
+            }
+
+            @Override
+            public List<? extends Parcelable> keys() {
+                return children;
+            }
+
+            @Override
+            public Parcelable parent() {
+                return parent;
+            }
+        }
+
+        class Composite
+                extends TestKey
+                implements Services.Composite {
+            private List<? extends Parcelable> children;
+
+            public Composite(String name, List<? extends Parcelable> children) {
+                super(name);
+                this.children = children;
+            }
+
+            @Override
+            public List<? extends Parcelable> keys() {
+                return children;
+            }
+        }
+
+        class Child
+                extends TestKey
+                implements Services.Child {
+            private Parcelable parent;
+
+            private Child(String name) {
+                super(name);
+            }
+
+            public Child(String name, Parcelable parent) {
+                super(name);
+                this.parent = parent;
+            }
+
+            @Override
+            public Parcelable parent() {
+                return parent;
+            }
+        }
+
+        class Service
+                implements Bundleable {
+            String nyah = null;
+
+            private String name;
+
+            public Service(String name) {
+                this.name = name;
+            }
+
+            @NonNull
+            @Override
+            public StateBundle toBundle() {
+                StateBundle stateBundle = new StateBundle();
+                stateBundle.putString("nyarr", name);
+                nyah = name;
+                return stateBundle;
+            }
+
+            @Override
+            public void fromBundle(@Nullable StateBundle bundle) {
+                if(bundle != null) {
+                    //nyah = bundle.getString("nyarr");
+                }
+            }
+        }
+
+        final TestKey _A = new TestKey("A");
+
+        final Child _C = new Child("C");
+        final Child _E = new Child("E");
+        final Child _F = new Child("F");
+        final Child _G = new Child("G");
+
+        final Composite _D = new Composite("D", Arrays.asList(_F, _G));
+
+        final CompositeChild _B = new CompositeChild("B", _A, Arrays.asList(_C, _D, _E));
+
+        _C.parent = _B;
+        //_D.parent = _B;
+        _E.parent = _B;
+        _F.parent = _D;
+        _G.parent = _D;
+
+        final Service AService = new Service("A");
+        final Service BService = new Service("B");
+        final Service CService = new Service("C");
+        final Service DService = new Service("D");
+        final Service EService = new Service("E");
+        final Service FService = new Service("F");
+        final Service GService = new Service("G");
+
+        SavedState _ASaved = SavedState.builder().setKey(_A).build();
+        SavedState _BSaved = SavedState.builder().setKey(_B).build();
+        SavedState _CSaved = SavedState.builder().setKey(_C).build();
+        SavedState _DSaved = SavedState.builder().setKey(_D).build();
+        SavedState _ESaved = SavedState.builder().setKey(_E).build();
+        SavedState _FSaved = SavedState.builder().setKey(_F).build();
+        SavedState _GSaved = SavedState.builder().setKey(_G).build();
+
+        Mockito.when(backstackDelegate.getSavedState(_A)).thenReturn(_ASaved);
+        Mockito.when(backstackDelegate.getSavedState(_B)).thenReturn(_BSaved);
+        Mockito.when(backstackDelegate.getSavedState(_C)).thenReturn(_CSaved);
+        Mockito.when(backstackDelegate.getSavedState(_D)).thenReturn(_DSaved);
+        Mockito.when(backstackDelegate.getSavedState(_E)).thenReturn(_ESaved);
+        Mockito.when(backstackDelegate.getSavedState(_F)).thenReturn(_FSaved);
+        Mockito.when(backstackDelegate.getSavedState(_G)).thenReturn(_GSaved);
+
+        List<ServiceFactory> servicesFactories = new ArrayList<>();
+        servicesFactories.add(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                if(builder.getKey() == _A) {
+                    builder.withService("A", AService);
+                } else if(builder.getKey() == _B) {
+                    builder.withService("B", BService);
+                } else if(builder.getKey() == _C) {
+                    builder.withService("C", CService);
+                } else if(builder.getKey() == _D) {
+                    builder.withService("D", DService);
+                } else if(builder.getKey() == _E) {
+                    builder.withService("E", EService);
+                } else if(builder.getKey() == _F) {
+                    builder.withService("F", FService);
+                } else if(builder.getKey() == _G) {
+                    builder.withService("G", GService);
+                }
+            }
+        });
+        ServiceManager serviceManager = new ServiceManager(servicesFactories);
+        serviceManager.setUp(backstackDelegate, _B);
+
+        /**
+         *
+         *          A       ----        B
+         *                            / | \
+         *                           /  |  \
+         *                          C   D   E
+         *                             / \
+         *                            /   \
+         *                           F     G
+         */
+
+        serviceManager.persistServicesForKeyHierarchy(backstackDelegate, _B);
+
+        assertThat(((Service) serviceManager.findServices(_A).getService("A")).nyah).isEqualTo("A");
+        assertThat(((Service) serviceManager.findServices(_B).getService("B")).nyah).isEqualTo("B");
+        assertThat(((Service) serviceManager.findServices(_C).getService("C")).nyah).isEqualTo("C");
+        assertThat(((Service) serviceManager.findServices(_D).getService("D")).nyah).isEqualTo("D");
+        assertThat(((Service) serviceManager.findServices(_E).getService("E")).nyah).isEqualTo("E");
+        assertThat(((Service) serviceManager.findServices(_F).getService("F")).nyah).isEqualTo("F");
+        assertThat(((Service) serviceManager.findServices(_G).getService("G")).nyah).isEqualTo("G");
     }
 }

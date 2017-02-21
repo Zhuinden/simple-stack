@@ -30,7 +30,8 @@ import java.util.Map;
 class ServiceManager {
     static final String TAG = "simplestack.ServiceManager";
 
-    static class RootKey implements Parcelable {
+    static class RootKey
+            implements Parcelable {
         private RootKey() {
         }
 
@@ -182,15 +183,13 @@ class ServiceManager {
     void restoreServicesForKey(BackstackDelegate backstackDelegate, Object key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
-        if(savedState != null) {
-            StateBundle bundle = savedState.getServiceBundle();
-            if(bundle != null) {
-                //Log.i("ServiceManager", "<<< RESTORE [" + key + "] >>>");
-                for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
-                    if(serviceEntry.getValue() instanceof Bundleable) {
-                        StateBundle serviceBundle = bundle.getBundle(serviceEntry.getKey());
-                        ((Bundleable) serviceEntry.getValue()).fromBundle(serviceBundle);
-                    }
+        StateBundle bundle = savedState.getServiceBundle();
+        if(bundle != null) {
+            //Log.i("ServiceManager", "<<< RESTORE [" + key + "] >>>");
+            for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
+                if(serviceEntry.getValue() instanceof Bundleable) {
+                    StateBundle serviceBundle = bundle.getBundle(serviceEntry.getKey());
+                    ((Bundleable) serviceEntry.getValue()).fromBundle(serviceBundle);
                 }
             }
         }
@@ -200,12 +199,10 @@ class ServiceManager {
         //Log.i("ServiceManager", "<<< PERSIST [" + key + "] >>>");
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
-        if(savedState != null) {
-            StateBundle bundle = savedState.getServiceBundle();
-            for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
-                if(serviceEntry.getValue() instanceof Bundleable) {
-                    bundle.putBundle(serviceEntry.getKey(), ((Bundleable) serviceEntry.getValue()).toBundle());
-                }
+        StateBundle bundle = savedState.getServiceBundle();
+        for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
+            if(serviceEntry.getValue() instanceof Bundleable) {
+                bundle.putBundle(serviceEntry.getKey(), ((Bundleable) serviceEntry.getValue()).toBundle());
             }
         }
     }
