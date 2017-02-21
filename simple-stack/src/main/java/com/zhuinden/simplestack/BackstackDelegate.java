@@ -170,11 +170,11 @@ public class BackstackDelegate {
         }
     }
 
-    private String getHistoryTag() {
+    String getHistoryTag() {
         return "".equals(persistenceTag) ? HISTORY : HISTORY + persistenceTag;
     }
 
-    private String getStateTag() {
+    String getStateTag() {
         return "".equals(persistenceTag) ? STATES : STATES + persistenceTag;
     }
 

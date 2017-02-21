@@ -15,10 +15,19 @@
  */
 package com.zhuinden.simplestack;
 
+import android.os.Bundle;
+import android.os.Parcelable;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -26,6 +35,19 @@ import static org.junit.Assert.fail;
  */
 
 public class BackstackDelegateTest {
+    @Mock
+    Bundle savedInstanceState;
+
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
+    StateChanger stateChanger = new StateChanger() {
+        @Override
+        public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+            completionCallback.stateChangeComplete();
+        }
+    };
+
     @Test
     public void setNullPersistenceTagShouldThrow() {
         BackstackDelegate backstackDelegate = BackstackDelegate.create();
@@ -71,5 +93,19 @@ public class BackstackDelegateTest {
         }
     }
 
+    @Test
+    public void onCreateRestoresBackstackKeys() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey testKey = new TestKey("hello");
+        final TestKey restoredKey = new TestKey("world");
+        ArrayList<Parcelable> restoredKeys = new ArrayList<Parcelable>() {{
+            add(restoredKey);
+        }};
+        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getHistoryTag())).thenReturn(restoredKeys);
+        backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
+        assertThat(backstackDelegate.getBackstack()).isNotNull();
+        backstackDelegate.setStateChanger(stateChanger);
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(restoredKey);
+    }
     // TODO: services integration tests
 }

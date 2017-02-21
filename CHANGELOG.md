@@ -10,7 +10,7 @@ To support subclasses of `BackstackDelegate`, `configure().setDelegateProvider(M
 
 - BREAKING CHANGE: `Bundleable` interface is changed from `Bundle toBundle()` to `StateBundle toBundle()`, same for `fromBundle()`.
 
-- ADDED: `StateBundle` class, which can be parcelled as a Bundle with `stateBundle.toBundle()` and `StateBundle.from(rootBundle)`. It is a non-Android-specific replacement for `Bundle`.
+**- ADDED: `StateBundle` class, which can be parcelled as a Bundle with `stateBundle.toBundle()` and `StateBundle.from(rootBundle)`.** It is a non-Android-specific replacement for `Bundle`.
 
 - BREAKING CHANGE: `KeyContextWrapper` constructor is no longer public, and is renamed to `ManagedContextWrapper`.
 
@@ -20,9 +20,13 @@ To support subclasses of `BackstackDelegate`, `configure().setDelegateProvider(M
 
 It is recommended that in order to create nested views, the `BackstackDelegate` is shared via `context.getSystemService()`, to make it accessible via any view through its context.
 
-- BREAKING CHANGE (?): `SavedState.Builder` is no longer public.
+Do NOT make it a root service, the `BackstackDelegate` should not survive configuration change.
 
-- BREAKING CHANGE (?): `clearStatesNotIn()` is now private instead of protected; replaced by `getAdditionalRetainedKeys()`.
+- BREAKING CHANGE (?): `SavedState.Builder` is no longer public. Use `backstackDelegate.getSavedState()` to obtain an instance for a key.
+
+- BREAKING CHANGE (?): `clearStatesNotIn()` is now private instead of protected; replaced by `getAdditionalRetainedKeys()`. Although typically this is not needed.
+
+Use hierarchical keys instead (`Services.Child` and `Services.Composite`).
 
 - BREAKING CHANGE (?): `BackstackDelegate` constructor now also receives `KeyParceler`.
 
