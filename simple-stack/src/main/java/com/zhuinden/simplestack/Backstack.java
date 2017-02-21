@@ -40,6 +40,11 @@ public class Backstack {
         return ManagedContextWrapper.getKey(context);
     }
 
+    public static NestedStack getRootStack(Context context) {
+        //noinspection ResourceType
+        return (NestedStack) context.getSystemService(BackstackDelegate.ROOT_STACK);
+    }
+
     public static NestedStack getNestedStack(Context context) {
         //noinspection ResourceType
         return (NestedStack) context.getSystemService(BackstackDelegate.LOCAL_STACK);
