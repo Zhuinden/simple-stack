@@ -25,6 +25,6 @@ import org.junit.runners.Suite;
  * Created by Owner on 2017. 01. 17..
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({StateChangerTest.class, FlowTest.class, ReentranceTest.class, BackstackTest.class, OtherPackageBackstackTest.class, HistoryBuilderTest.class, BackstackDelegateTest.class, ServicesTest.class})
+@Suite.SuiteClasses({StateChangerTest.class, FlowTest.class, ReentranceTest.class, BackstackTest.class, OtherPackageBackstackTest.class, HistoryBuilderTest.class, BackstackDelegateTest.class, ServicesTest.class, StateBundleTest.class})
 public class TestSuite {
 }
