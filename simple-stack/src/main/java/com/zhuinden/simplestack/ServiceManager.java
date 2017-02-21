@@ -183,8 +183,8 @@ class ServiceManager {
     void restoreServicesForKey(BackstackDelegate backstackDelegate, Object key) {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
-        if(savedState != null && savedState.getBundle() != null) {
-            Bundle bundle = savedState.getBundle().getBundle("___SERVICE_STATES");
+        if(savedState != null) {
+            Bundle bundle = savedState.getServiceBundle();
             if(bundle != null) {
                 //Log.i("ServiceManager", "<<< RESTORE [" + key + "] >>>");
                 for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
@@ -202,8 +202,7 @@ class ServiceManager {
         ReferenceCountedServices node = keyToManagedServicesMap.get(key);
         SavedState savedState = backstackDelegate.getSavedState(key);
         if(savedState != null) {
-            Bundle bundle = new Bundle();
-            savedState.getBundle().putBundle("___SERVICE_STATES", bundle);
+            Bundle bundle = savedState.getServiceBundle();
             for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
                 if(serviceEntry.getValue() instanceof Bundleable) {
                     bundle.putBundle(serviceEntry.getKey(), ((Bundleable) serviceEntry.getValue()).toBundle());

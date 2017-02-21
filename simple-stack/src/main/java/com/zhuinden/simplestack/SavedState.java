@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 /**
@@ -29,7 +30,8 @@ import android.util.SparseArray;
 public class SavedState {
     private Object key;
     private SparseArray<Parcelable> viewHierarchyState;
-    private Bundle bundle;
+    private Bundle viewBundle;
+    private Bundle serviceBundle;
 
     private SavedState() {
     }
@@ -46,20 +48,24 @@ public class SavedState {
         this.viewHierarchyState = viewHierarchyState;
     }
 
-    Bundle getBundle() {
-        return bundle;
+    Bundle getServiceBundle() {
+        if(serviceBundle == null) {
+            serviceBundle = new Bundle();
+        }
+        return serviceBundle;
     }
 
-    void setBundle(Bundle bundle) {
-        this.bundle = bundle;
+    void setServiceBundle(Bundle serviceBundle) {
+        this.serviceBundle = serviceBundle;
     }
 
+    @Nullable
     public Bundle getViewBundle() {
-        return bundle.getBundle("___BUNDLE");
+        return viewBundle;
     }
 
-    public void setViewBundle(Bundle bundle) {
-        this.bundle.putBundle("___BUNDLE", bundle);
+    public void setViewBundle(Bundle viewBundle) {
+        this.viewBundle = viewBundle;
     }
 
     static Builder builder() {
@@ -74,10 +80,8 @@ public class SavedState {
     public static class Builder {
         private Object key;
         private SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-        private Bundle bundle = new Bundle();
 
         Builder() {
-            bundle.putString("___EXISTENCE_HOOK", "___EXISTENCE_HOOK");
         }
 
         public Builder setKey(@NonNull Object key) {
@@ -95,7 +99,6 @@ public class SavedState {
             SavedState savedState = new SavedState();
             savedState.key = key;
             savedState.viewHierarchyState = viewHierarchyState;
-            savedState.bundle = bundle;
             return savedState;
         }
     }

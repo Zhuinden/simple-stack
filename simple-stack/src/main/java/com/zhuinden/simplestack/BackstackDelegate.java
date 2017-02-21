@@ -373,7 +373,9 @@ public class BackstackDelegate {
                 for(ParcelledState parcelledState : savedStates) {
                     SavedState savedState = getSavedState(keyParceler.fromParcelable(parcelledState.parcelableKey));
                     savedState.setViewHierarchyState(parcelledState.viewHierarchyState);
-                    savedState.setBundle(parcelledState.bundle);
+                    Bundle bundle = parcelledState.bundle;
+                    savedState.setViewBundle(bundle.getBundle("VIEW_BUNDLE"));
+                    savedState.setServiceBundle(bundle.getBundle("SERVICE_BUNDLE"));
                     keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
@@ -466,7 +468,10 @@ public class BackstackDelegate {
             ParcelledState parcelledState = new ParcelledState();
             parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
             parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
-            parcelledState.bundle = savedState.getBundle();
+            Bundle bundle = new Bundle();
+            bundle.putBundle("VIEW_BUNDLE", savedState.getViewBundle());
+            bundle.putBundle("SERVICE_BUNDLE", savedState.getServiceBundle());
+            parcelledState.bundle = bundle;
             states.add(parcelledState);
         }
         outState.putParcelableArrayList(getStateTag(), states);
