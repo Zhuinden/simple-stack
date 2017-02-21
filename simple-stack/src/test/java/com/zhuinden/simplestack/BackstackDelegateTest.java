@@ -15,9 +15,13 @@
  */
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.view.View;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,6 +41,18 @@ import static org.junit.Assert.fail;
 public class BackstackDelegateTest {
     @Mock
     Bundle savedInstanceState;
+
+    @Mock
+    Backstack backstack;
+
+    @Mock
+    ServiceManager serviceManager;
+
+    @Mock(extraInterfaces = Bundleable.class)
+    View view;
+
+    @Mock
+    Context context;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -119,5 +135,202 @@ public class BackstackDelegateTest {
         backstackDelegate.setStateChanger(stateChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(testKey);
     }
+
+    @Test
+    public void getSavedStateForNullThrowsException() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        try {
+            backstackDelegate.getSavedState(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void onCreateInvalidNonConfigurationThrowsException() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        try {
+            backstackDelegate.onCreate(null, new TestKey("crashpls"), HistoryBuilder.single(new TestKey("hello")));
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void onCreateRestoresFromNonConfigInstance() {
+        BackstackDelegate.NonConfigurationInstance nonConfigurationInstance = new BackstackDelegate.NonConfigurationInstance(backstack,
+                serviceManager);
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey testKey = new TestKey("hello");
+        backstackDelegate.onCreate(null, nonConfigurationInstance, HistoryBuilder.single(testKey));
+        assertThat(backstackDelegate.getBackstack()).isSameAs(backstack);
+        assertThat(backstackDelegate.serviceManager).isSameAs(serviceManager);
+    }
+
+    @Test
+    public void nullServiceFactoryThrowsException() {
+        try {
+            BackstackDelegate.configure().addServiceFactory(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void goingBackTearsDownUnneededKeys() {
+        final TestKey first = new TestKey("hello");
+        final Services.Child second = new Services.Child() {
+            @Override
+            public Object parent() {
+                return first;
+            }
+        };
+        BackstackDelegate backstackDelegate = BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                if(builder.getKey() == first) {
+                    builder.withService("FIRST", "FIRST");
+                } else if(builder.getKey() == second) {
+                    builder.withService("SECOND", "SECOND");
+                }
+            }
+        }).setStateChanger(stateChanger).build();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.newBuilder().add(first).add(second).build());
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(first, second);
+        assertThat(backstackDelegate.findService(first, "FIRST")).isEqualTo("FIRST");
+        assertThat(backstackDelegate.findService(second, "SECOND")).isEqualTo("SECOND");
+        backstackDelegate.getBackstack().goBack();
+        try {
+            backstackDelegate.findService(second, "SECOND");
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void childWithoutRelationOnlyCreatesServicesWhenNavigatingToThem() {
+        final TestKey first = new TestKey("hello");
+        final TestKey second = new TestKey("world");
+        BackstackDelegate backstackDelegate = BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                if(builder.getKey() == first) {
+                    builder.withService("FIRST", "FIRST");
+                } else if(builder.getKey() == second) {
+                    builder.withService("SECOND", "SECOND");
+                }
+            }
+        }).build();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.newBuilder().add(first).add(second).build());
+        backstackDelegate.setStateChanger(stateChanger);
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(first, second);
+        try {
+            backstackDelegate.findService(first, "FIRST");
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+        assertThat(backstackDelegate.findService(second, "SECOND")).isEqualTo("SECOND");
+
+        backstackDelegate.getBackstack().goBack();
+        assertThat(backstackDelegate.findService(first, "FIRST")).isEqualTo("FIRST");
+        try {
+            backstackDelegate.findService(second, "SECOND");
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK
+        }
+    }
+
+//    @Test
+//    @Ignore // unfortunately, `stateBundle.toBundle()` just isn't very unit-test-friendly
+//    public void onCreateRestoresStatesOfService() {
+//        class Service implements Bundleable {
+//            String name;
+//
+//            @NonNull
+//            @Override
+//            public StateBundle toBundle() {
+//                return new StateBundle();
+//            }
+//
+//            @Override
+//            public void fromBundle(@Nullable StateBundle bundle) {
+//                if(bundle != null) {
+//                    name = bundle.getString("SERVICE");
+//                }
+//            }
+//        }
+//
+//        final Service service = new Service();
+//
+//        final TestKey testKey = new TestKey("hello");
+//        ArrayList<Parcelable> parcelledStates = new ArrayList<>();
+//        BackstackDelegate.ParcelledState parcelledState = new BackstackDelegate.ParcelledState();
+//        parcelledStates.add(parcelledState);
+//        parcelledState.parcelableKey = testKey;
+//        Bundle bundle = Mockito.mock(Bundle.class);
+//        StateBundle viewStateBundle = new StateBundle();
+//        viewStateBundle.putString("VIEW", "VIEW");
+//        StateBundle serviceStateBundle = new StateBundle();
+//        serviceStateBundle.putString("SERVICE", "SERVICE");
+//
+//        Mockito.when(bundle.getBundle("VIEW_BUNDLE")).thenReturn(viewStateBundle.toBundle()); // won't work
+//        Mockito.when(bundle.getBundle("SERVICE_BUNDLE")).thenReturn(serviceStateBundle.toBundle()); // won't work
+//        parcelledState.bundle = bundle;
+//
+//        BackstackDelegate backstackDelegate = BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
+//            @Override
+//            public void bindServices(@NonNull Services.Builder builder) {
+//                if(builder.getKey() == testKey) {
+//                    builder.withService("S", service);
+//                }
+//            }
+//        }).build();
+//        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getStateTag())).thenReturn(parcelledStates);
+//        backstackDelegate.setStateChanger(stateChanger);
+//
+//        assertThat(service.name).isEqualTo("SERVICE");
+//    }
+
+    @Test
+    public void testPersistViewToState() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        backstackDelegate.setStateChanger(stateChanger);
+
+        Mockito.when(view.getContext()).thenReturn(context);
+        StateBundle stateBundle = new StateBundle();
+        Mockito.when(((Bundleable) view).toBundle()).thenReturn(stateBundle);
+        // noinspection ResourceType
+        Mockito.when(context.getSystemService(ManagedContextWrapper.TAG)).thenReturn(key);
+        backstackDelegate.persistViewToState(view);
+
+        assertThat(backstackDelegate.keyStateMap.get(key).getViewBundle()).isSameAs(stateBundle);
+    }
+
+    @Test
+    public void testRestoreViewFromState() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        backstackDelegate.setStateChanger(stateChanger);
+
+        Mockito.when(view.getContext()).thenReturn(context);
+        StateBundle stateBundle = new StateBundle();
+        Mockito.when(((Bundleable) view).toBundle()).thenReturn(stateBundle);
+        // noinspection ResourceType
+        Mockito.when(context.getSystemService(ManagedContextWrapper.TAG)).thenReturn(key);
+        backstackDelegate.persistViewToState(view);
+
+        backstackDelegate.restoreViewFromState(view);
+        ((Bundleable) Mockito.verify(view, Mockito.times(1))).fromBundle(stateBundle);
+    }
+
+
     // TODO: services integration tests
 }

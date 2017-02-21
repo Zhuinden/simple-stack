@@ -632,13 +632,34 @@ public class BackstackDelegate {
     }
 
     /**
+     * Finds the service specified by the given service tag for the given key.
+     *
+     * If the service is not found, an IllegalStateException is thrown.
+     * If the key is not managed, an IllegalStateException is thrown.
+     *
+     * @param key        the key the given service belongs to.
+     * @param serviceTag the tag that identifies the service.
+     * @param <T>        the type of the service.
+     * @return the service.
+     */
+    @NonNull
+    public <T> T findService(Object key, String serviceTag) {
+        Object service = serviceManager.findServices(key).getService(serviceTag);
+        if(service == null) {
+            throw new IllegalStateException("The specified service [" + serviceTag + "] does not exist for key [" + key + "]!");
+        }
+        //noinspection unchecked
+        return (T) service;
+    }
+
+    /**
      * The class which stores the {@link Backstack} for surviving configuration change.
      */
     public static class NonConfigurationInstance {
         private final Backstack backstack;
         private final ServiceManager serviceManager;
 
-        private NonConfigurationInstance(Backstack backstack, ServiceManager serviceManager) {
+        NonConfigurationInstance(Backstack backstack, ServiceManager serviceManager) {
             this.backstack = backstack;
             this.serviceManager = serviceManager;
         }
