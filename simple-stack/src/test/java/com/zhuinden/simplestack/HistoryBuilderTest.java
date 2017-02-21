@@ -30,6 +30,147 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HistoryBuilderTest {
     @Test
+    public void containsWorks()
+            throws Exception {
+        TestKey hello = new TestKey("hello");
+        TestKey world = new TestKey("world");
+        TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world);
+        assertThat(historyBuilder.contains(hello)).isTrue();
+        assertThat(historyBuilder.contains(world)).isTrue();
+        assertThat(historyBuilder.contains(nyeh)).isFalse();
+    }
+
+    @Test
+    public void containsAllWorks()
+            throws Exception {
+        TestKey hello = new TestKey("hello");
+        TestKey world = new TestKey("world");
+        TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world);
+        assertThat(historyBuilder.containsAll(HistoryBuilder.from(hello, world).build())).isTrue();
+        assertThat(historyBuilder.containsAll(HistoryBuilder.from(hello, nyeh).build())).isFalse();
+    }
+
+    @Test
+    public void sizeWorks()
+            throws Exception {
+        TestKey hello = new TestKey("hello");
+        TestKey world = new TestKey("world");
+        TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world);
+        assertThat(historyBuilder.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void removeAtWorks()
+            throws Exception {
+        TestKey hello = new TestKey("hello");
+        TestKey world = new TestKey("world");
+        TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world, nyeh);
+        assertThat(historyBuilder.size()).isEqualTo(3);
+        historyBuilder.removeAt(1);
+        assertThat(historyBuilder.build()).containsExactly(hello, nyeh);
+        assertThat(historyBuilder.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void retainAllWorks()
+            throws Exception {
+        final TestKey hello = new TestKey("hello");
+        final TestKey world = new TestKey("world");
+        final TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world, nyeh);
+        historyBuilder.retainAll(new ArrayList<Object>() {{
+            add(hello);
+            add(nyeh);
+        }});
+        assertThat(historyBuilder.build()).containsExactly(hello, nyeh);
+        assertThat(historyBuilder.build()).doesNotContain(world);
+    }
+
+    @Test
+    public void isEmptyWorks()
+            throws Exception {
+        TestKey test = new TestKey("hello");
+        HistoryBuilder historyBuilder = HistoryBuilder.newBuilder();
+        assertThat(historyBuilder.isEmpty()).isTrue();
+        historyBuilder.add(test);
+        assertThat(historyBuilder.isEmpty()).isFalse();
+    }
+
+    @Test
+    public void indexOfWorks()
+            throws Exception {
+        final TestKey hello = new TestKey("hello");
+        final TestKey world = new TestKey("world");
+        final TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world, nyeh);
+        assertThat(historyBuilder.indexOf(hello)).isEqualTo(0);
+        assertThat(historyBuilder.indexOf(world)).isEqualTo(1);
+        assertThat(historyBuilder.indexOf(nyeh)).isEqualTo(2);
+    }
+
+    @Test
+    public void getWorks() {
+        final TestKey hello = new TestKey("hello");
+        final TestKey world = new TestKey("world");
+        final TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world, nyeh);
+        assertThat(historyBuilder.get(0)).isEqualTo(hello);
+        assertThat(historyBuilder.get(1)).isEqualTo(world);
+        assertThat(historyBuilder.get(2)).isEqualTo(nyeh);
+    }
+
+    @Test
+    public void clearWorks() {
+        final TestKey hello = new TestKey("hello");
+        final TestKey world = new TestKey("world");
+        final TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world, nyeh);
+        assertThat(historyBuilder.size()).isEqualTo(3);
+        historyBuilder.clear();
+        assertThat(historyBuilder).isEmpty();
+    }
+
+    @Test
+    public void addAtIndexWorks() {
+        final TestKey hello = new TestKey("hello");
+        final TestKey world = new TestKey("world");
+        final TestKey nyeh = new TestKey("nyeh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world);
+        assertThat(historyBuilder).containsExactly(hello, world);
+        historyBuilder.add(nyeh, 1);
+        assertThat(historyBuilder).containsExactly(hello, nyeh, world);
+    }
+
+    @Test
+    public void removeWorks() {
+        final TestKey hello = new TestKey("hello");
+        final TestKey world = new TestKey("world");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, world);
+        assertThat(historyBuilder).containsExactly(hello, world);
+        historyBuilder.remove(hello);
+        assertThat(historyBuilder).containsExactly(world);
+    }
+
+    @Test
+    public void addAllAtWorks() {
+        final TestKey hello = new TestKey("hello");
+        final TestKey world = new TestKey("world");
+        final TestKey nyeh = new TestKey("nyeh");
+        final TestKey bleh = new TestKey("bleh");
+        HistoryBuilder historyBuilder = HistoryBuilder.from(hello, bleh);
+        assertThat(historyBuilder).containsExactly(hello, bleh);
+        historyBuilder.addAllAt(new ArrayList<Object>() {{
+            add(world);
+            add(nyeh);
+        }}, 1);
+        assertThat(historyBuilder).containsExactly(hello, world, nyeh, bleh);
+    }
+
+    @Test
     public void removeUntilThrowsIfKeyNotFound() {
         try {
             HistoryBuilder builder = HistoryBuilder.newBuilder().add(new TestKey("hello"));
@@ -90,7 +231,7 @@ public class HistoryBuilderTest {
         TestKey bye = new TestKey("bye");
         HistoryBuilder historyBuilder = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye);
         assertThat(historyBuilder.getLast()).isEqualTo(bye);
-        assertThat(historyBuilder.build().get(historyBuilder.build().size()-1)).isEqualTo(bye);
+        assertThat(historyBuilder.build().get(historyBuilder.build().size() - 1)).isEqualTo(bye);
     }
 
     @Test

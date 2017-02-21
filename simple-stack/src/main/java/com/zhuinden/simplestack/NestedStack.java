@@ -83,6 +83,10 @@ public class NestedStack
         return false;
     }
 
+    public List<Object> getHistory() {
+        return backstack.getHistory();
+    }
+
     public void setHistory(List<Object> newHistory, @StateChange.StateChangeDirection int direction) {
         backstack.setHistory(newHistory, direction);
     }

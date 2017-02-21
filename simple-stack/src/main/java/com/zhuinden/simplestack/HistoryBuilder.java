@@ -57,7 +57,7 @@ public class HistoryBuilder
         if(nestedStack == null) {
             throw new IllegalArgumentException("NestedStack cannot be null!");
         }
-        return from(nestedStack.backstack.getHistory());
+        return from(nestedStack.getHistory());
     }
 
     /**
@@ -121,9 +121,7 @@ public class HistoryBuilder
      * @return the current builder.
      */
     public HistoryBuilder addAll(@NonNull List<? extends Object> keys) {
-        if(keys == null) {
-            throw new IllegalArgumentException("Provided collection cannot be null");
-        }
+        checkKeys(keys);
         this.list.addAll(keys);
         return this;
     }
@@ -136,9 +134,7 @@ public class HistoryBuilder
      * @return the current builder.
      */
     public HistoryBuilder addAllAt(@NonNull List<? extends Object> keys, int index) {
-        if(keys == null) {
-            throw new IllegalArgumentException("Provided collection cannot be null");
-        }
+        checkKeys(keys);
         this.list.addAll(index, keys);
         return this;
     }
@@ -170,10 +166,8 @@ public class HistoryBuilder
      * @param keys
      * @return true if the builder contains all keys.
      */
-    public boolean containsAll(@NonNull Collection<Object> keys) {
-        if(keys == null) {
-            throw new IllegalArgumentException("Keys cannot be null!");
-        }
+    public boolean containsAll(@NonNull Collection<? extends Object> keys) {
+        checkKeys(keys);
         return list.containsAll(keys);
     }
 
@@ -215,7 +209,7 @@ public class HistoryBuilder
      * @param keys
      * @return the current builder.
      */
-    public HistoryBuilder retainAll(@NonNull Collection<Object> keys) {
+    public HistoryBuilder retainAll(@NonNull Collection<? extends Object> keys) {
         checkKeys(keys);
         list.retainAll(keys);
         return this;
@@ -347,7 +341,7 @@ public class HistoryBuilder
         }
     }
 
-    private void checkKeys(Collection<Object> keys) {
+    private void checkKeys(Collection<? extends Object> keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Keys cannot be null!");
         }
