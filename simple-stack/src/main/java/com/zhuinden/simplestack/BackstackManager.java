@@ -81,34 +81,6 @@ class BackstackManager {
         this.serviceManager = serviceManager;
     }
 
-    public StateBundle toBundle() {
-        StateBundle outState = new StateBundle();
-        List<Object> history = backstack.getHistory();
-        ArrayList<Parcelable> parcelledHistory = new ArrayList<>();
-        for(Object key : history) {
-            parcelledHistory.add(keyParceler.toParcelable(key));
-        }
-        outState.putParcelableArrayList("HISTORY", parcelledHistory);
-
-        serviceManager.persistServicesForKey(this, ServiceManager.ROOT_KEY);
-        if(!history.isEmpty()) {
-            serviceManager.persistServicesForKeyHierarchy(this, history.get(history.size() - 1));
-        }
-        ArrayList<ParcelledState> states = new ArrayList<>();
-        for(SavedState savedState : keyStateMap.values()) {
-            ParcelledState parcelledState = new ParcelledState();
-            parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
-            parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
-            Bundle bundle = new Bundle();
-            bundle.putBundle("VIEW_BUNDLE", savedState.getViewBundle() != null ? savedState.getViewBundle().toBundle() : null);
-            bundle.putBundle("SERVICE_BUNDLE", savedState.getServiceBundle().toBundle());
-            parcelledState.bundle = bundle;
-            states.add(parcelledState);
-        }
-        outState.putParcelableArrayList("STATES", states);
-        return outState;
-    }
-
     public void setStateChanger(StateChanger stateChanger) {
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
@@ -191,22 +163,6 @@ class BackstackManager {
         serviceManager.restoreServicesForKey(this, ServiceManager.ROOT_KEY);
     }
 
-    public void restoreStates(StateBundle stateBundle) {
-        if(stateBundle != null) {
-            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList("STATES");
-            if(savedStates != null) {
-                for(ParcelledState parcelledState : savedStates) {
-                    SavedState savedState = getSavedState(keyParceler.fromParcelable(parcelledState.parcelableKey));
-                    savedState.setViewHierarchyState(parcelledState.viewHierarchyState);
-                    Bundle bundle = parcelledState.bundle;
-                    savedState.setViewBundle(StateBundle.from(bundle.getBundle("VIEW_BUNDLE")));
-                    savedState.setServiceBundle(StateBundle.from(bundle.getBundle("SERVICE_BUNDLE")));
-                    keyStateMap.put(savedState.getKey(), savedState);
-                }
-            }
-        }
-    }
-
     public Backstack getBackstack() {
         return backstack;
     }
@@ -263,11 +219,55 @@ class BackstackManager {
     }
 
     public <T> T findService(Object key, String serviceTag) {
-        Object service = serviceManager.findServices(key).getService(serviceTag); // TODO: service manager hierarchy!
+        Object service = serviceManager.findServices(key).getService(serviceTag);
         if(service == null) {
             throw new IllegalStateException("The specified service [" + serviceTag + "] does not exist for key [" + key + "]!");
         }
         //noinspection unchecked
         return (T) service;
+    }
+
+    public void restoreStates(StateBundle stateBundle) {
+        if(stateBundle != null) {
+            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList("STATES");
+            if(savedStates != null) {
+                for(ParcelledState parcelledState : savedStates) {
+                    SavedState savedState = getSavedState(keyParceler.fromParcelable(parcelledState.parcelableKey));
+                    savedState.setViewHierarchyState(parcelledState.viewHierarchyState);
+                    Bundle bundle = parcelledState.bundle;
+                    savedState.setViewBundle(StateBundle.from(bundle.getBundle("VIEW_BUNDLE")));
+                    savedState.setServiceBundle(StateBundle.from(bundle.getBundle("SERVICE_BUNDLE")));
+                    keyStateMap.put(savedState.getKey(), savedState);
+                }
+            }
+        }
+    }
+
+    public StateBundle toBundle() {
+        StateBundle outState = new StateBundle();
+        List<Object> history = backstack.getHistory();
+        ArrayList<Parcelable> parcelledHistory = new ArrayList<>();
+        for(Object key : history) {
+            parcelledHistory.add(keyParceler.toParcelable(key));
+        }
+        outState.putParcelableArrayList("HISTORY", parcelledHistory);
+
+        serviceManager.persistServicesForKey(this, ServiceManager.ROOT_KEY);
+        if(!history.isEmpty()) {
+            serviceManager.persistServicesForKeyHierarchy(this, history.get(history.size() - 1));
+        }
+        ArrayList<ParcelledState> states = new ArrayList<>();
+        for(SavedState savedState : keyStateMap.values()) {
+            ParcelledState parcelledState = new ParcelledState();
+            parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
+            parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
+            Bundle bundle = new Bundle();
+            bundle.putBundle("VIEW_BUNDLE", savedState.getViewBundle() != null ? savedState.getViewBundle().toBundle() : null);
+            bundle.putBundle("SERVICE_BUNDLE", savedState.getServiceBundle().toBundle());
+            parcelledState.bundle = bundle;
+            states.add(parcelledState);
+        }
+        outState.putParcelableArrayList("STATES", states);
+        return outState;
     }
 }
