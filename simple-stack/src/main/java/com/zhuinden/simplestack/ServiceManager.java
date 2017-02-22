@@ -83,6 +83,7 @@ class ServiceManager {
 
     static final Object ROOT_KEY = new RootKey();
 
+    private final ServiceManager parent;
     private final Services rootServices;
     private final Map<Object, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
     private final List<ServiceFactory> servicesFactories = new ArrayList<>();
@@ -94,18 +95,34 @@ class ServiceManager {
     ServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices) {
         Map<String, Object> rootServices = new LinkedHashMap<>();
         rootServices.putAll(_rootServices);
+        parent = (ServiceManager) rootServices.get(TAG);
         rootServices.put(TAG, this);
         this.rootServices = new Services(ROOT_KEY, null, rootServices);
+        if(parent != null) {
+            this.servicesFactories.addAll(0, parent.servicesFactories);
+        }
         this.servicesFactories.addAll(servicesFactories);
         keyToManagedServicesMap.put(ROOT_KEY, new ReferenceCountedServices(this.rootServices));
     }
 
     public boolean hasServices(Object key) {
-        return keyToManagedServicesMap.containsKey(key);
+        boolean hasServices = keyToManagedServicesMap.containsKey(key);
+        if(!hasServices && parent != null) {
+            return parent.hasServices(key);
+        }
+        return hasServices;
+    }
+
+    private ReferenceCountedServices findManagedServices(Object key) {
+        ReferenceCountedServices managedServices = keyToManagedServicesMap.get(key);
+        if(managedServices == null && parent != null) {
+            managedServices = parent.findManagedServices(key);
+        }
+        return managedServices;
     }
 
     public Services findServices(Object key) {
-        final ReferenceCountedServices managed = keyToManagedServicesMap.get(key);
+        final ReferenceCountedServices managed = findManagedServices(key);
         if(managed == null) {
             throw new IllegalStateException("No services currently exists for key " + key);
         }
@@ -113,11 +130,11 @@ class ServiceManager {
     }
 
     void setUp(BackstackManager backstackManager, Object key) {
-        Services parent = keyToManagedServicesMap.get(ROOT_KEY).services;
+        Services parent = findManagedServices(ROOT_KEY).services;
         if(key instanceof Services.Child) {
             final Object parentKey = ((Services.Child) key).parent();
             setUp(backstackManager, parentKey);
-            parent = keyToManagedServicesMap.get(parentKey).services;
+            parent = findManagedServices(parentKey).services;
         }
         ReferenceCountedServices managedService = createNonExistentManagedServicesAndIncrementUsageCount(backstackManager, parent, key);
         parent = managedService.services;
@@ -160,7 +177,7 @@ class ServiceManager {
 
     @NonNull
     private ReferenceCountedServices createNonExistentManagedServicesAndIncrementUsageCount(BackstackManager backstackManager, @NonNull Services parentServices, Object key) {
-        ReferenceCountedServices node = keyToManagedServicesMap.get(key);
+        ReferenceCountedServices node = findManagedServices(key);
         if(node == null) {
             // @formatter:off
             // Bind the local key as a service.
@@ -181,7 +198,7 @@ class ServiceManager {
     }
 
     void restoreServicesForKey(BackstackManager backstackManager, Object key) {
-        ReferenceCountedServices node = keyToManagedServicesMap.get(key);
+        ReferenceCountedServices node = findManagedServices(key);
         SavedState savedState = backstackManager.getSavedState(key);
         StateBundle bundle = savedState.getServiceBundle();
         if(bundle != null) {
@@ -197,7 +214,7 @@ class ServiceManager {
 
     void persistServicesForKey(BackstackManager backstackManager, Object key) {
         //Log.i("ServiceManager", "<<< PERSIST [" + key + "] >>>");
-        ReferenceCountedServices node = keyToManagedServicesMap.get(key);
+        ReferenceCountedServices node = findManagedServices(key);
         SavedState savedState = backstackManager.getSavedState(key);
         StateBundle bundle = savedState.getServiceBundle();
         for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
@@ -230,7 +247,7 @@ class ServiceManager {
     }
 
     private boolean decrementAndMaybeRemoveKey(BackstackManager backstackManager, boolean shouldPersist, Object key) {
-        ReferenceCountedServices node = keyToManagedServicesMap.get(key);
+        ReferenceCountedServices node = findManagedServices(key);
         if(node == null) {
             throw new IllegalStateException("Cannot remove a node that doesn't exist or has already been removed!");
         }

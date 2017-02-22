@@ -36,13 +36,6 @@ import java.util.Map;
  * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
 public final class BackstackDelegate {
-    private final Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
-        @Override
-        public void stateChangeCompleted(@NonNull StateChange stateChange) {
-            BackstackDelegate.this.stateChangeCompleted(stateChange);
-        }
-    };
-
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
 
@@ -89,16 +82,19 @@ public final class BackstackDelegate {
         return "".equals(persistenceTag) ? HISTORY : HISTORY + persistenceTag;
     }
 
+    private final KeyParceler keyParceler;
+
     StateChanger stateChanger;
 
     List<ServiceFactory> servicesFactories;
     Map<String, Object> rootServices;
 
-    protected BackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices, BackstackManager backstackManager) {
+    protected BackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices, KeyParceler keyParceler, BackstackManager backstackManager) {
         this.stateChanger = stateChanger;
         this.servicesFactories = servicesFactories;
         this.rootServices = rootServices;
         this.backstackManager = backstackManager;
+        this.keyParceler = keyParceler;
     }
 
     /**
@@ -219,7 +215,7 @@ public final class BackstackDelegate {
         }
 
         public BackstackDelegate build() {
-            return new BackstackDelegate(stateChanger, servicesFactories, rootServices, new BackstackManager(keyParceler));
+            return new BackstackDelegate(stateChanger, servicesFactories, rootServices, keyParceler, new BackstackManager(keyParceler));
         }
     }
 
@@ -249,18 +245,24 @@ public final class BackstackDelegate {
             backstackManager.setBackstack(nonConfig.getBackstack());
             backstackManager.setServiceManager(nonConfig.getServiceManager());
         } else {
+            servicesFactories.add(0, new ServiceFactory() {
+                @Override
+                public void bindServices(@NonNull Services.Builder builder) {
+                    Object parentKey = builder.getService(BackstackManager.LOCAL_KEY);
+                    if(parentKey != null) {
+                        builder.withService(BackstackManager.PARENT_KEY, parentKey);
+                    }
+                    builder.withService(BackstackManager.LOCAL_KEY, builder.getKey());
+                    NestedStack parentStack = builder.getService(BackstackManager.LOCAL_STACK);
+                    if(parentStack == null) {
+                        parentStack = builder.getService(BackstackManager.ROOT_STACK);
+                    }
+                    builder.withService(BackstackManager.LOCAL_STACK, new NestedStack(parentStack, keyParceler));
+                }
+            });
             backstackManager.initialize(servicesFactories, rootServices, stateBundle, initialKeys);
         }
-        registerAsCompletionListener();
         backstackManager.setStateChanger(stateChanger);
-    }
-
-    protected void registerAsCompletionListener() {
-        getBackstack().addCompletionListener(completionListener);
-    }
-
-    protected void unregisterAsCompletionListener() {
-        getBackstack().removeCompletionListener(completionListener);
     }
 
     /**
@@ -333,7 +335,6 @@ public final class BackstackDelegate {
      */
     public void onDestroy() {
         backstackManager.executePendingStateChange();
-        unregisterAsCompletionListener();
     }
 
     // ----- get backstack
@@ -370,11 +371,6 @@ public final class BackstackDelegate {
      */
     public void restoreViewFromState(@NonNull View view) {
         backstackManager.restoreViewFromState(view);
-    }
-
-
-    private void stateChangeCompleted(StateChange stateChange) {
-        backstackManager.clearStatesNotIn(stateChange);
     }
 
     // Context sharing

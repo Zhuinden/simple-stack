@@ -6,8 +6,6 @@
 
 Additionally, `new BackstackDelegate(stateChanger)` is replaced with `BackstackDelegate.configure().setStateChanger(stateChanger).build()`.
 
-To support subclasses of `BackstackDelegate`, `configure().setDelegateProvider(MyDelegate::new)` can be used - but typically this is not needed.
-
 - BREAKING CHANGE: `Bundleable` interface is changed from `Bundle toBundle()` to `StateBundle toBundle()`, same for `fromBundle()`.
 
 **- ADDED: `StateBundle` class, which can be parcelled as a Bundle with `stateBundle.toBundle()` and `StateBundle.from(rootBundle)`.** It is a non-Android-specific replacement for `Bundle`.
@@ -24,11 +22,9 @@ Do NOT make it a root service, the `BackstackDelegate` should not survive config
 
 - BREAKING CHANGE (?): `SavedState.Builder` is no longer public. Use `backstackDelegate.getSavedState()` to obtain an instance for a key.
 
-- BREAKING CHANGE (?): `clearStatesNotIn()` is now private instead of protected; replaced by `getAdditionalRetainedKeys()`. Although typically this is not needed.
+- BREAKING CHANGE (?): `clearStatesNotIn()` is now private instead of protected.
 
 Use hierarchical keys instead (`Services.Child` and `Services.Composite`).
-
-- BREAKING CHANGE (?): `BackstackDelegate` constructor now also receives `KeyParceler`.
 
 - **ENHANCEMENT: SCOPED SERVICES INTEGRATION.**
 
@@ -77,7 +73,6 @@ Each View associated with its own particular unique Key receives its own `Nested
 This stack manages a stack of its own, but `goBack()` is delegated up to its parents if the current `NestedStack` cannot handle it.
 
 The keys inside the nested stack are managed automatically, and its parcellation strategy is the same as the KeyParceler in BackstackDelegate.
-
 
 -Simple Stack 1.1.1 (2017-02-19)
 --------------------------------

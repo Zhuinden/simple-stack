@@ -9,9 +9,7 @@ import android.util.SparseArray;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,19 +23,22 @@ class BackstackManager {
     static final String ROOT_STACK = "simplestack.ROOT_STACK";
     static final String LOCAL_STACK = "simplestack.LOCAL_STACK";
 
+    static final String PARENT_KEY = "simplestack.PARENT_KEY";
+    static final String LOCAL_KEY = "simplestack.LOCAL_KEY";
+
     Backstack backstack;
 
     final KeyParceler keyParceler;
 
     ServiceManager serviceManager;
 
-    Map<Object, SavedState> keyStateMap = new HashMap<>();
+    Map<Object, SavedState> keyStateMap = new LinkedHashMap<>();
 
     StateChanger stateChanger;
 
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
-        public final void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        public final void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
             //Log.i("ServiceManager", Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState().toArray())); //
             //serviceManager.dumpLogData(); //
             Object topNewKey = stateChange.topNewState();
@@ -57,7 +58,15 @@ class BackstackManager {
                 serviceManager.tearDown(BackstackManager.this, true, topPreviousKey);
             }
             //serviceManager.dumpLogData(); //
-            stateChanger.handleStateChange(stateChange, completionCallback);
+            stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
+                @Override
+                public void stateChangeComplete() {
+                    completionCallback.stateChangeComplete();
+                    if(!backstack.isStateChangePending()) {
+                        clearStatesNotIn(stateChange);
+                    }
+                }
+            });
         }
     };
 
@@ -127,12 +136,7 @@ class BackstackManager {
         for(Object key : stateChange.getNewState()) {
             buildKeysToKeep(key, retainedKeys);
         }
-        retainedKeys.addAll(getAdditionalRetainedKeys(stateChange));
         keyStateMap.keySet().retainAll(retainedKeys);
-    }
-
-    protected Collection<? extends Object> getAdditionalRetainedKeys(@NonNull StateChange stateChange) {
-        return Collections.emptySet();
     }
 
     private void buildKeysToKeep(Object key, Set<Object> retainedKeys) {
@@ -168,17 +172,6 @@ class BackstackManager {
     }
 
     public void initialize(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices, StateBundle stateBundle, ArrayList<Object> initialKeys) {
-        servicesFactories.add(0, new ServiceFactory() {
-            @Override
-            public void bindServices(@NonNull Services.Builder builder) {
-                NestedStack parentStack = builder.getService(LOCAL_STACK);
-                if(parentStack == null) {
-                    parentStack = builder.getService(ROOT_STACK);
-                }
-                builder.withService(LOCAL_STACK, new NestedStack(parentStack, keyParceler));
-            }
-        });
-
         ArrayList<Object> keys = new ArrayList<>();
         if(stateBundle != null) {
             List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList("HISTORY");

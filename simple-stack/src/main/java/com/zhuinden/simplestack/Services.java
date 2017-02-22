@@ -48,6 +48,9 @@ public class Services {
 
         @NonNull
         public Builder withService(@NonNull String serviceName, @NonNull Object service) {
+            if(service == null) {
+                throw new IllegalArgumentException("The provided service [" + serviceName + "] cannot be null!");
+            }
             boundServices.put(serviceName, service);
             return this;
         }
