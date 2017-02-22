@@ -479,4 +479,207 @@ public class StateBundleTest {
         StateBundle stateBundle = new StateBundle();
         assertThat(stateBundle.getSparseParcelableArray("key")).isNull();
     }
+
+    @Test
+    public void testStringAsBooleanReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putString("key", "true");
+        assertThat(stateBundle.getBoolean("key")).isFalse();
+    }
+
+    @Test
+    public void testBooleanAsByteReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getByte("key")).isEqualTo((byte) 0);
+    }
+
+    @Test
+    public void testBooleanAsCharReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getChar("key")).isEqualTo((char) 0);
+    }
+
+    @Test
+    public void testBooleanAsShortReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getShort("key")).isEqualTo((short) 0);
+    }
+
+    @Test
+    public void testBooleanAsIntReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getInt("key")).isEqualTo(0);
+    }
+
+    @Test
+    public void testBooleanAsLongReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getLong("key")).isEqualTo(0L);
+    }
+
+    @Test
+    public void testBooleanAsFloatReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getFloat("key")).isEqualTo(0.0f);
+    }
+
+    @Test
+    public void testBooleanAsDoubleReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getDouble("key")).isEqualTo(0.0);
+    }
+
+    @Test
+    public void testBooleanAsStringReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getString("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsCharSequenceReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getCharSequence("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsSerializableReturnsBoolean() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat((Boolean) stateBundle.getSerializable("key")).isTrue();
+    }
+
+    @Test
+    public void testBooleanAsIntegerArrayListReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getIntegerArrayList("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsStringArrayListReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getStringArrayList("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsCharSequenceArrayListReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getCharSequenceArrayList("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsBooleanArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getBooleanArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsByteArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getByteArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsShortArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getShortArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsCharArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getCharArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsIntArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getIntArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsLongArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getLongArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsFloatArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getFloatArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsDoubleArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getDoubleArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsStringArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getStringArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsCharSequenceArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getCharSequenceArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsStateBundleReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getBundle("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsParcelableReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getParcelable("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsParcelableArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getParcelableArray("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsParcelableArrayListReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getParcelableArrayList("key")).isNull();
+    }
+
+    @Test
+    public void testBooleanAsSparseParcelableArrayReturnsDefaultValue() {
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putBoolean("key", true);
+        assertThat(stateBundle.getSparseParcelableArray("key")).isNull();
+    }
 }
