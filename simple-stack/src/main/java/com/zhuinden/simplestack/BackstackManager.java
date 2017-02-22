@@ -26,6 +26,9 @@ class BackstackManager {
     static final String PARENT_KEY = "simplestack.PARENT_KEY";
     static final String LOCAL_KEY = "simplestack.LOCAL_KEY";
 
+    static final String PARENT_SERVICE_MANAGER = "simplestack.PARENT_SERVICE_MANAGER";
+    static final String LOCAL_SERVICE_MANAGER = "simplestack.LOCAL_SERVICE_MANAGER";
+
     Backstack backstack;
 
     final KeyParceler keyParceler;
@@ -172,6 +175,28 @@ class BackstackManager {
     }
 
     public void initialize(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices, StateBundle stateBundle, ArrayList<Object> initialKeys) {
+        servicesFactories.add(0, new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                Object parentKey = builder.getService(BackstackManager.LOCAL_KEY);
+                if(parentKey != null) {
+                    builder.withService(BackstackManager.PARENT_KEY, parentKey);
+                }
+                builder.withService(BackstackManager.LOCAL_KEY, builder.getKey());
+                NestedStack parentStack = builder.getService(BackstackManager.LOCAL_STACK);
+                if(parentStack == null) {
+                    parentStack = builder.getService(BackstackManager.ROOT_STACK);
+                }
+                builder.withService(BackstackManager.LOCAL_STACK, new NestedStack(parentStack, keyParceler));
+
+                ServiceManager parentServiceManager = builder.getService(BackstackManager.LOCAL_SERVICE_MANAGER);
+                if(parentServiceManager != null) {
+                    builder.withService(BackstackManager.PARENT_SERVICE_MANAGER, parentServiceManager);
+                }
+                builder.withService(BackstackManager.LOCAL_SERVICE_MANAGER, serviceManager);
+            }
+        });
+
         ArrayList<Object> keys = new ArrayList<>();
         if(stateBundle != null) {
             List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList("HISTORY");

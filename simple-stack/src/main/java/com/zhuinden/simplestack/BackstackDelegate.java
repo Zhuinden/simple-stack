@@ -82,19 +82,16 @@ public final class BackstackDelegate {
         return "".equals(persistenceTag) ? HISTORY : HISTORY + persistenceTag;
     }
 
-    private final KeyParceler keyParceler;
-
     StateChanger stateChanger;
 
     List<ServiceFactory> servicesFactories;
     Map<String, Object> rootServices;
 
-    protected BackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices, KeyParceler keyParceler, BackstackManager backstackManager) {
+    protected BackstackDelegate(@Nullable StateChanger stateChanger, @NonNull List<ServiceFactory> servicesFactories, @NonNull Map<String, Object> rootServices, BackstackManager backstackManager) {
         this.stateChanger = stateChanger;
         this.servicesFactories = servicesFactories;
         this.rootServices = rootServices;
         this.backstackManager = backstackManager;
-        this.keyParceler = keyParceler;
     }
 
     /**
@@ -215,7 +212,7 @@ public final class BackstackDelegate {
         }
 
         public BackstackDelegate build() {
-            return new BackstackDelegate(stateChanger, servicesFactories, rootServices, keyParceler, new BackstackManager(keyParceler));
+            return new BackstackDelegate(stateChanger, servicesFactories, rootServices, new BackstackManager(keyParceler));
         }
     }
 
@@ -245,21 +242,6 @@ public final class BackstackDelegate {
             backstackManager.setBackstack(nonConfig.getBackstack());
             backstackManager.setServiceManager(nonConfig.getServiceManager());
         } else {
-            servicesFactories.add(0, new ServiceFactory() {
-                @Override
-                public void bindServices(@NonNull Services.Builder builder) {
-                    Object parentKey = builder.getService(BackstackManager.LOCAL_KEY);
-                    if(parentKey != null) {
-                        builder.withService(BackstackManager.PARENT_KEY, parentKey);
-                    }
-                    builder.withService(BackstackManager.LOCAL_KEY, builder.getKey());
-                    NestedStack parentStack = builder.getService(BackstackManager.LOCAL_STACK);
-                    if(parentStack == null) {
-                        parentStack = builder.getService(BackstackManager.ROOT_STACK);
-                    }
-                    builder.withService(BackstackManager.LOCAL_STACK, new NestedStack(parentStack, keyParceler));
-                }
-            });
             backstackManager.initialize(servicesFactories, rootServices, stateBundle, initialKeys);
         }
         backstackManager.setStateChanger(stateChanger);
