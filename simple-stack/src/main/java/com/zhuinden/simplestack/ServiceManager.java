@@ -89,16 +89,18 @@ class ServiceManager {
     private final List<ServiceFactory> servicesFactories = new ArrayList<>();
 
     ServiceManager(List<ServiceFactory> servicesFactories) {
-        this(servicesFactories, Collections.<String, Object>emptyMap());
+        this(servicesFactories, Collections.<String, Object>emptyMap(), BackstackDelegate.DEFAULT_KEYPARCELER);
     }
 
-    ServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices) {
+    ServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices, KeyParceler keyParceler) {
         Map<String, Object> rootServices = new LinkedHashMap<>();
         rootServices.putAll(_rootServices);
         parent = (ServiceManager) rootServices.get(TAG);
         rootServices.put(TAG, this);
         this.rootServices = new Services(ROOT_KEY, null, rootServices);
-        if(parent != null) {
+        if(parent == null) { // ROOT
+            servicesFactories.add(0, new HierarchyServiceFactory(keyParceler));
+        } else {
             this.servicesFactories.addAll(0, parent.servicesFactories);
         }
         this.servicesFactories.addAll(servicesFactories);

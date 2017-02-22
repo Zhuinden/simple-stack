@@ -39,7 +39,7 @@ public final class BackstackDelegate {
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
 
-    private static final KeyParceler DEFAULT_KEYPARCELER = new KeyParceler() {
+    static final KeyParceler DEFAULT_KEYPARCELER = new KeyParceler() {
         @Override
         public Parcelable toParcelable(Object object) {
             return (Parcelable) object;
