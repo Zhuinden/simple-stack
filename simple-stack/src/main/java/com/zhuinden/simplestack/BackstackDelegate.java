@@ -235,7 +235,7 @@ public final class BackstackDelegate {
         StateBundle stateBundle = null;
         if(savedInstanceState != null) {
             stateBundle = StateBundle.from(savedInstanceState.getBundle(getHistoryTag()));
-            backstackManager.restoreStates(stateBundle);
+            backstackManager.fromBundle(stateBundle);
         }
         NonConfigurationInstance nonConfig = (NonConfigurationInstance) nonConfigurationInstance;
         if(nonConfig != null) {
