@@ -287,6 +287,7 @@ public final class BackstackDelegate {
      * @param outState the Bundle into which the backstack history and view states are saved.
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        backstackManager.persistStates();
         StateBundle stateBundle = backstackManager.toBundle();
         outState.putBundle(getHistoryTag(), stateBundle.toBundle());
     }

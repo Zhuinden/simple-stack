@@ -142,7 +142,7 @@ class BackstackManager {
         return keyStateMap.get(key);
     }
 
-    public void initialize(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices, StateBundle stateBundle, ArrayList<Object> initialKeys) {
+    void setupBackstack(StateBundle stateBundle, List<?> initialKeys) {
         ArrayList<Object> keys = new ArrayList<>();
         if(stateBundle != null) {
             List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList("HISTORY");
@@ -153,13 +153,24 @@ class BackstackManager {
             }
         }
         if(keys.isEmpty()) {
-            keys = initialKeys;
+            keys = new ArrayList<>(initialKeys);
         }
-        restoreStates(stateBundle);
-
         backstack = new Backstack(keys);
-        rootServices.put(ROOT_STACK, new NestedStack(backstack, keyParceler)); // This can only be done here.
-        serviceManager = new ServiceManager(servicesFactories, rootServices, keyParceler);
+    }
+
+    public void initialize(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices, StateBundle stateBundle, List<?> initialKeys) {
+        restoreStates(stateBundle);
+        setupBackstack(stateBundle, initialKeys);
+        setupServiceManager(servicesFactories, rootServices);
+    }
+
+    void setupServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices) {
+        Map<String, Object> rootServices = new LinkedHashMap<>(_rootServices);
+        rootServices.put(ROOT_STACK,
+                new NestedStack(this, keyParceler)); // This can only be done here. // TODO: do this ONLY if this is the ROOT!
+        serviceManager = new ServiceManager(servicesFactories,
+                rootServices,
+                keyParceler); // TODO: this should receive the parent if applicable!
         serviceManager.restoreServicesForKey(this, ServiceManager.ROOT_KEY);
     }
 
@@ -227,6 +238,14 @@ class BackstackManager {
         return (T) service;
     }
 
+    public void persistStates() {
+        List<Object> history = backstack.getHistory();
+        serviceManager.persistServicesForKey(this, ServiceManager.ROOT_KEY);
+        if(!history.isEmpty()) {
+            serviceManager.persistServicesForKeyHierarchy(this, history.get(history.size() - 1));
+        }
+    }
+
     public void restoreStates(StateBundle stateBundle) {
         if(stateBundle != null) {
             List<ParcelledState> savedStates = stateBundle.getParcelableArrayList("STATES");
@@ -252,10 +271,6 @@ class BackstackManager {
         }
         outState.putParcelableArrayList("HISTORY", parcelledHistory);
 
-        serviceManager.persistServicesForKey(this, ServiceManager.ROOT_KEY);
-        if(!history.isEmpty()) {
-            serviceManager.persistServicesForKeyHierarchy(this, history.get(history.size() - 1));
-        }
         ArrayList<ParcelledState> states = new ArrayList<>();
         for(SavedState savedState : keyStateMap.values()) {
             ParcelledState parcelledState = new ParcelledState();

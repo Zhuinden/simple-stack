@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,6 +14,8 @@ import java.util.List;
  */
 public class NestedStack
         implements Bundleable {
+    BackstackManager backstackManager;
+
     Backstack backstack;
 
     NestedStack parent;
@@ -21,16 +24,19 @@ public class NestedStack
 
     StateChanger stateChanger;
 
-    NestedStack(Backstack root, KeyParceler keyParceler) {
+    NestedStack(BackstackManager backstackManager, KeyParceler keyParceler) {
         this.parent = null;
         this.keyParceler = keyParceler;
-        this.backstack = root;
+        this.backstackManager = backstackManager;
+        this.backstack = backstackManager.getBackstack();
     }
 
     NestedStack(NestedStack parent, KeyParceler keyParceler) {
         this.parent = parent;
         this.keyParceler = keyParceler;
         this.backstack = new Backstack();
+        this.backstackManager = new BackstackManager(keyParceler);
+        this.backstackManager.setBackstack(backstack);
     }
 
     public void initialize(Object... initialKeys) {
@@ -45,36 +51,34 @@ public class NestedStack
             if(this.backstack.getInitialParameters().isEmpty()) {
                 this.backstack.setInitialParameters(initialKeys);
             }
+            backstackManager.setupServiceManager(Collections.<ServiceFactory>emptyList(), Collections.<String, Object>emptyMap());
         }
     }
 
     public void setStateChanger(StateChanger stateChanger) {
-        this.stateChanger = stateChanger;
-        if(stateChanger != null) {
-            backstack.setStateChanger(stateChanger);
-        } else {
-            detachStateChanger();
+        if(parent != null) {
+            backstackManager.setStateChanger(stateChanger);
         }
     }
 
     public void reattachStateChanger() {
-        if(stateChanger != null && !backstack.hasStateChanger()) {
-            backstack.setStateChanger(stateChanger, Backstack.REATTACH);
+        if(parent != null) {
+            backstackManager.reattachStateChanger();
         }
     }
 
     public void detachStateChanger() {
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
+        if(parent != null) {
+            backstackManager.detachStateChanger();
         }
     }
 
     public void goTo(Object key) {
-        backstack.goTo(key);
+        backstackManager.getBackstack().goTo(key);
     }
 
     public boolean goBack() {
-        if(backstack.goBack()) {
+        if(backstackManager.getBackstack().goBack()) {
             return true;
         }
         if(parent != null) {
@@ -88,7 +92,7 @@ public class NestedStack
     }
 
     public void setHistory(List<Object> newHistory, @StateChange.StateChangeDirection int direction) {
-        backstack.setHistory(newHistory, direction);
+        backstackManager.getBackstack().setHistory(newHistory, direction);
     }
 
     public void executePendingStateChange() {

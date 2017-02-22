@@ -86,24 +86,24 @@ class ServiceManager {
     private final ServiceManager parent;
     private final Services rootServices;
     private final Map<Object, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
-    private final List<ServiceFactory> servicesFactories = new ArrayList<>();
+    private final List<ServiceFactory> serviceFactories = new ArrayList<>();
 
-    ServiceManager(List<ServiceFactory> servicesFactories) {
-        this(servicesFactories, Collections.<String, Object>emptyMap(), BackstackDelegate.DEFAULT_KEYPARCELER);
+    ServiceManager(List<ServiceFactory> serviceFactories) {
+        this(serviceFactories, Collections.<String, Object>emptyMap(), BackstackDelegate.DEFAULT_KEYPARCELER);
     }
 
-    ServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices, KeyParceler keyParceler) {
+    ServiceManager(List<ServiceFactory> serviceFactories, Map<String, Object> _rootServices, KeyParceler keyParceler) {
         Map<String, Object> rootServices = new LinkedHashMap<>();
         rootServices.putAll(_rootServices);
         parent = (ServiceManager) rootServices.get(TAG);
         rootServices.put(TAG, this);
         this.rootServices = new Services(ROOT_KEY, null, rootServices);
         if(parent == null) { // ROOT
-            servicesFactories.add(0, new HierarchyServiceFactory(keyParceler));
-        } else {
-            this.servicesFactories.addAll(0, parent.servicesFactories);
+            this.serviceFactories.add(0, new HierarchyServiceFactory(keyParceler));
+        } else { // TODO: this doesn't happen yet at all!
+            this.serviceFactories.addAll(0, parent.serviceFactories);
         }
-        this.servicesFactories.addAll(servicesFactories);
+        this.serviceFactories.addAll(serviceFactories);
         keyToManagedServicesMap.put(ROOT_KEY, new ReferenceCountedServices(this.rootServices));
     }
 
@@ -188,8 +188,8 @@ class ServiceManager {
             // @formatter:on
 
             // Add any services from the factories
-            for(int i = 0, size = servicesFactories.size(); i < size; i++) {
-                servicesFactories.get(i).bindServices(builder);
+            for(int i = 0, size = serviceFactories.size(); i < size; i++) {
+                serviceFactories.get(i).bindServices(builder);
             }
             node = new ReferenceCountedServices(builder.build());
             keyToManagedServicesMap.put(key, node);
@@ -258,9 +258,9 @@ class ServiceManager {
             if(shouldPersist) {
                 persistServicesForKey(backstackManager, key);
             }
-            int count = servicesFactories.size();
+            int count = serviceFactories.size();
             for(int i = count - 1; i >= 0; i--) {
-                servicesFactories.get(i).tearDownServices(node.services);
+                serviceFactories.get(i).tearDownServices(node.services);
             }
             keyToManagedServicesMap.remove(key);
             return true;
