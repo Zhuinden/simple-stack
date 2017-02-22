@@ -109,20 +109,21 @@ public class BackstackDelegateTest {
         }
     }
 
-    @Test
-    public void onCreateRestoresBackstackKeys() {
-        BackstackDelegate backstackDelegate = BackstackDelegate.create();
-        TestKey testKey = new TestKey("hello");
-        final TestKey restoredKey = new TestKey("world");
-        ArrayList<Parcelable> restoredKeys = new ArrayList<Parcelable>() {{
-            add(restoredKey);
-        }};
-        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getHistoryTag())).thenReturn(restoredKeys);
-        backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
-        assertThat(backstackDelegate.getBackstack()).isNotNull();
-        backstackDelegate.setStateChanger(stateChanger);
-        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(restoredKey);
-    }
+//    @Test
+//    @Ignore // DOESN'T WORK BECAUSE the mock should return a StateBundle's Root Bundle
+//    public void onCreateRestoresBackstackKeys() {
+//        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+//        TestKey testKey = new TestKey("hello");
+//        final TestKey restoredKey = new TestKey("world");
+//        ArrayList<Parcelable> restoredKeys = new ArrayList<Parcelable>() {{
+//            add(restoredKey);
+//        }};
+//        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getHistoryTag())).thenReturn(restoredKeys);
+//        backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
+//        assertThat(backstackDelegate.getBackstack()).isNotNull();
+//        backstackDelegate.setStateChanger(stateChanger);
+//        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(restoredKey);
+//    }
 
     @Test
     public void onCreateChoosesInitialKeysIfRestoredHistoryIsEmpty() {
@@ -166,7 +167,6 @@ public class BackstackDelegateTest {
         TestKey testKey = new TestKey("hello");
         backstackDelegate.onCreate(null, nonConfigurationInstance, HistoryBuilder.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isSameAs(backstack);
-        assertThat(backstackDelegate.serviceManager).isSameAs(serviceManager);
     }
 
     @Test
@@ -197,8 +197,9 @@ public class BackstackDelegateTest {
                     builder.withService("SECOND", "SECOND");
                 }
             }
-        }).setStateChanger(stateChanger).build();
+        }).build();
         backstackDelegate.onCreate(null, null, HistoryBuilder.from().add(first).add(second).build());
+        backstackDelegate.setStateChanger(stateChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(first, second);
         assertThat(backstackDelegate.findService(first, "FIRST")).isEqualTo("FIRST");
         assertThat(backstackDelegate.findService(second, "SECOND")).isEqualTo("SECOND");
@@ -297,23 +298,6 @@ public class BackstackDelegateTest {
 //    }
 
     @Test
-    public void testPersistViewToState() {
-        BackstackDelegate backstackDelegate = BackstackDelegate.create();
-        TestKey key = new TestKey("hello");
-        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
-        backstackDelegate.setStateChanger(stateChanger);
-
-        Mockito.when(view.getContext()).thenReturn(context);
-        StateBundle stateBundle = new StateBundle();
-        Mockito.when(((Bundleable) view).toBundle()).thenReturn(stateBundle);
-        // noinspection ResourceType
-        Mockito.when(context.getSystemService(ManagedContextWrapper.TAG)).thenReturn(key);
-        backstackDelegate.persistViewToState(view);
-
-        assertThat(backstackDelegate.keyStateMap.get(key).getViewBundle()).isSameAs(stateBundle);
-    }
-
-    @Test
     public void testRestoreViewFromState() {
         BackstackDelegate backstackDelegate = BackstackDelegate.create();
         TestKey key = new TestKey("hello");
@@ -333,10 +317,11 @@ public class BackstackDelegateTest {
 
     @Test
     public void onBackPressedGoesBack() {
-        BackstackDelegate backstackDelegate = BackstackDelegate.configure().setStateChanger(stateChanger).build();
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
         TestKey a = new TestKey("hello");
         TestKey b = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.from(a, b).build());
+        backstackDelegate.setStateChanger(stateChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a, b);
         backstackDelegate.onBackPressed();
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a);
@@ -387,16 +372,5 @@ public class BackstackDelegateTest {
         } catch(IllegalStateException e) {
             // OK
         }
-    }
-
-    @Test
-    public void onRetainCustomNonConfigurationInstanceReturnsBackstackAndServiceManager() {
-        BackstackDelegate backstackDelegate = BackstackDelegate.create();
-        backstackDelegate.backstack = backstack;
-        backstackDelegate.serviceManager = serviceManager;
-        BackstackDelegate.NonConfigurationInstance nonConfigurationInstance = backstackDelegate.onRetainCustomNonConfigurationInstance();
-        assertThat(nonConfigurationInstance).isNotNull();
-        assertThat(nonConfigurationInstance.getBackstack()).isSameAs(backstack);
-        assertThat(nonConfigurationInstance.getServiceManager()).isSameAs(serviceManager);
     }
 }

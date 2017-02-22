@@ -26,7 +26,7 @@ public class ServicesTest {
     StateChange stateChange;
 
     @Mock
-    BackstackDelegate backstackDelegate;
+    BackstackManager backstackManager;
 
     @Mock
     SavedState savedState;
@@ -73,9 +73,9 @@ public class ServicesTest {
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
 
         SavedState _ASaved = SavedState.builder().setKey(key).build();
-        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(key)).thenReturn(_ASaved);
 
-        serviceManager.setUp(backstackDelegate, key);
+        serviceManager.setUp(backstackManager, key);
 
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isSameAs(service);
     }
@@ -85,7 +85,7 @@ public class ServicesTest {
         Parcelable key = new TestKey("test");
 
         SavedState _ASaved = SavedState.builder().setKey(key).build();
-        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(key)).thenReturn(_ASaved);
 
         final Object service = new Object();
         List<ServiceFactory> servicesFactories = new ArrayList<>();
@@ -96,8 +96,8 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, key);
-        serviceManager.tearDown(backstackDelegate, true, key);
+        serviceManager.setUp(backstackManager, key);
+        serviceManager.tearDown(backstackManager, true, key);
 
         try {
             serviceManager.findServices(key).getService("HELLO");
@@ -114,8 +114,8 @@ public class ServicesTest {
         SavedState _ASaved = SavedState.builder().setKey(parentKey).build();
         SavedState _BSaved = SavedState.builder().setKey(childKey).build();
 
-        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(parentKey)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(childKey)).thenReturn(_BSaved);
 
 
         final Object parentService = new Object();
@@ -129,7 +129,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, childKey);
+        serviceManager.setUp(backstackManager, childKey);
 
         assertThat(serviceManager.findServices(parentKey).<Object>getService("HELLO")).isSameAs(parentService);
     }
@@ -151,13 +151,13 @@ public class ServicesTest {
         SavedState _ASaved = SavedState.builder().setKey(parentKey).build();
         SavedState _BSaved = SavedState.builder().setKey(childKey).build();
 
-        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(parentKey)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(childKey)).thenReturn(_BSaved);
 
 
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, childKey);
-        serviceManager.tearDown(backstackDelegate, true, childKey);
+        serviceManager.setUp(backstackManager, childKey);
+        serviceManager.tearDown(backstackManager, true, childKey);
 
         try {
             serviceManager.findServices(parentKey).getService("HELLO");
@@ -185,11 +185,11 @@ public class ServicesTest {
         SavedState _ASaved = SavedState.builder().setKey(parentKey).build();
         SavedState _BSaved = SavedState.builder().setKey(childKey).build();
 
-        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(parentKey)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(childKey)).thenReturn(_BSaved);
 
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, childKey);
+        serviceManager.setUp(backstackManager, childKey);
 
         assertThat(serviceManager.findServices(parentKey).<Object>getService("HELLO")).isEqualTo(parentService);
         assertThat(serviceManager.findServices(childKey).<Object>getService("HELLO")).isEqualTo(parentService);
@@ -215,11 +215,11 @@ public class ServicesTest {
         SavedState _ASaved = SavedState.builder().setKey(childKey).build();
         SavedState _BSaved = SavedState.builder().setKey(parentKey).build();
 
-        Mockito.when(backstackDelegate.getSavedState(childKey)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(parentKey)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(childKey)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(parentKey)).thenReturn(_BSaved);
 
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, childKey);
+        serviceManager.setUp(backstackManager, childKey);
 
         assertThat(serviceManager.findServices(childKey).<Object>getService("WORLD")).isNull();
     }
@@ -240,18 +240,18 @@ public class ServicesTest {
         });
 
         SavedState _ASaved = SavedState.builder().setKey(key).build();
-        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(key)).thenReturn(_ASaved);
 
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, key);
+        serviceManager.setUp(backstackManager, key);
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isEqualTo(parentService);
-        serviceManager.setUp(backstackDelegate, key);
+        serviceManager.setUp(backstackManager, key);
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isEqualTo(parentService);
-        serviceManager.tearDown(backstackDelegate, true, key);
+        serviceManager.tearDown(backstackManager, true, key);
         assertThat(serviceManager.findServices(key).<Object>getService("HELLO")).isEqualTo(parentService);
-        serviceManager.tearDown(backstackDelegate, true, key);
+        serviceManager.tearDown(backstackManager, true, key);
         try {
-            serviceManager.tearDown(backstackDelegate, true, key);
+            serviceManager.tearDown(backstackManager, true, key);
             fail();
         } catch(IllegalStateException e) {
             // OK!
@@ -305,9 +305,9 @@ public class ServicesTest {
         SavedState _BSaved = SavedState.builder().setKey(childB).build();
         SavedState _CSaved = SavedState.builder().setKey(composite).build();
 
-        Mockito.when(backstackDelegate.getSavedState(childA)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(childB)).thenReturn(_BSaved);
-        Mockito.when(backstackDelegate.getSavedState(composite)).thenReturn(_CSaved);
+        Mockito.when(backstackManager.getSavedState(childA)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(childB)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(composite)).thenReturn(_CSaved);
 
         final Object childAService = new Object();
         final Object childBService = new Object();
@@ -326,7 +326,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, composite);
+        serviceManager.setUp(backstackManager, composite);
 
         assertThat(serviceManager.findServices(composite).<Object>getService("HELLO")).isSameAs(parentService);
         assertThat(serviceManager.findServices(childA).<Object>getService("WORLD")).isSameAs(childAService);
@@ -383,9 +383,9 @@ public class ServicesTest {
         SavedState _BSaved = SavedState.builder().setKey(childB).build();
         SavedState _CSaved = SavedState.builder().setKey(composite).build();
 
-        Mockito.when(backstackDelegate.getSavedState(childA)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(childB)).thenReturn(_BSaved);
-        Mockito.when(backstackDelegate.getSavedState(composite)).thenReturn(_CSaved);
+        Mockito.when(backstackManager.getSavedState(childA)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(childB)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(composite)).thenReturn(_CSaved);
 
         final Object childAService = new Object();
         final Object childBService = new Object();
@@ -404,14 +404,14 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, composite);
+        serviceManager.setUp(backstackManager, composite);
         assertThat(serviceManager.findServices(composite).<Object>getService("HELLO")).isSameAs(parentService);
         assertThat(serviceManager.findServices(childA).<Object>getService("WORLD")).isSameAs(childAService);
         assertThat(serviceManager.findServices(childB).<Object>getService("CROCODILES")).isSameAs(childBService);
         assertThat(serviceManager.findServices(childA).<Object>getService("HELLO")).isSameAs(parentService);
         assertThat(serviceManager.findServices(childB).<Object>getService("HELLO")).isSameAs(parentService);
 
-        serviceManager.tearDown(backstackDelegate, true, composite);
+        serviceManager.tearDown(backstackManager, true, composite);
         try {
             assertThat(serviceManager.findServices(composite).<Object>getService("HELLO")).isSameAs(parentService);
             fail();
@@ -521,13 +521,13 @@ public class ServicesTest {
         SavedState _FSaved = SavedState.builder().setKey(_F).build();
         SavedState _GSaved = SavedState.builder().setKey(_G).build();
 
-        Mockito.when(backstackDelegate.getSavedState(_A)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(_B)).thenReturn(_BSaved);
-        Mockito.when(backstackDelegate.getSavedState(_C)).thenReturn(_CSaved);
-        Mockito.when(backstackDelegate.getSavedState(_D)).thenReturn(_DSaved);
-        Mockito.when(backstackDelegate.getSavedState(_E)).thenReturn(_ESaved);
-        Mockito.when(backstackDelegate.getSavedState(_F)).thenReturn(_FSaved);
-        Mockito.when(backstackDelegate.getSavedState(_G)).thenReturn(_GSaved);
+        Mockito.when(backstackManager.getSavedState(_A)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(_B)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(_C)).thenReturn(_CSaved);
+        Mockito.when(backstackManager.getSavedState(_D)).thenReturn(_DSaved);
+        Mockito.when(backstackManager.getSavedState(_E)).thenReturn(_ESaved);
+        Mockito.when(backstackManager.getSavedState(_F)).thenReturn(_FSaved);
+        Mockito.when(backstackManager.getSavedState(_G)).thenReturn(_GSaved);
 
 
         List<ServiceFactory> servicesFactories = new ArrayList<>();
@@ -552,7 +552,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, _B);
+        serviceManager.setUp(backstackManager, _B);
 
         /**
          *
@@ -585,7 +585,7 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.tearDown(backstackDelegate, true, _B);
+        serviceManager.tearDown(backstackManager, true, _B);
 
         try {
             assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
@@ -670,7 +670,7 @@ public class ServicesTest {
 
 
         /////
-        serviceManager.setUp(backstackDelegate, _D);
+        serviceManager.setUp(backstackManager, _D);
 
         assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
         assertThat(serviceManager.findServices(_B).<String>getService("A")).isEqualTo("A");
@@ -693,8 +693,8 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.setUp(backstackDelegate, _A);
-        serviceManager.tearDown(backstackDelegate, true, _D);
+        serviceManager.setUp(backstackManager, _A);
+        serviceManager.tearDown(backstackManager, true, _D);
 
         assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
         try {
@@ -858,13 +858,13 @@ public class ServicesTest {
         SavedState _FSaved = SavedState.builder().setKey(_F).build();
         SavedState _GSaved = SavedState.builder().setKey(_G).build();
 
-        Mockito.when(backstackDelegate.getSavedState(_A)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(_B)).thenReturn(_BSaved);
-        Mockito.when(backstackDelegate.getSavedState(_C)).thenReturn(_CSaved);
-        Mockito.when(backstackDelegate.getSavedState(_D)).thenReturn(_DSaved);
-        Mockito.when(backstackDelegate.getSavedState(_E)).thenReturn(_ESaved);
-        Mockito.when(backstackDelegate.getSavedState(_F)).thenReturn(_FSaved);
-        Mockito.when(backstackDelegate.getSavedState(_G)).thenReturn(_GSaved);
+        Mockito.when(backstackManager.getSavedState(_A)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(_B)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(_C)).thenReturn(_CSaved);
+        Mockito.when(backstackManager.getSavedState(_D)).thenReturn(_DSaved);
+        Mockito.when(backstackManager.getSavedState(_E)).thenReturn(_ESaved);
+        Mockito.when(backstackManager.getSavedState(_F)).thenReturn(_FSaved);
+        Mockito.when(backstackManager.getSavedState(_G)).thenReturn(_GSaved);
 
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -888,7 +888,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, _B);
+        serviceManager.setUp(backstackManager, _B);
 
         /**
          *
@@ -921,7 +921,7 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.tearDown(backstackDelegate, true, _B);
+        serviceManager.tearDown(backstackManager, true, _B);
 
         try {
             assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
@@ -1006,7 +1006,7 @@ public class ServicesTest {
 
 
         /////
-        serviceManager.setUp(backstackDelegate, _D);
+        serviceManager.setUp(backstackManager, _D);
 
         //assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
         //assertThat(serviceManager.findServices(_B).<String>getService("A")).isEqualTo("A");
@@ -1029,7 +1029,7 @@ public class ServicesTest {
         assertThat(serviceManager.findServices(_G).<String>getService("D")).isEqualTo("D");
         assertThat(serviceManager.findServices(_G).<String>getService("G")).isEqualTo("G");
 
-        serviceManager.tearDown(backstackDelegate, true, _D);
+        serviceManager.tearDown(backstackManager, true, _D);
 
         try {
             assertThat(serviceManager.findServices(_A).<String>getService("A")).isEqualTo("A");
@@ -1139,7 +1139,7 @@ public class ServicesTest {
         }
 
         final Service service = new Service();
-        Mockito.when(backstackDelegate.getSavedState(key)).thenReturn(savedState);
+        Mockito.when(backstackManager.getSavedState(key)).thenReturn(savedState);
         StateBundle stateBundle = new StateBundle();
         stateBundle.putBundle("serv", service.toBundle());
         Mockito.when(savedState.getServiceBundle()).thenReturn(stateBundle);
@@ -1152,7 +1152,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, key);
+        serviceManager.setUp(backstackManager, key);
 
         assertThat(((Service) serviceManager.findServices(key).getService("serv")).nyah).isEqualTo("nyah");
     }
@@ -1278,13 +1278,13 @@ public class ServicesTest {
         SavedState _FSaved = SavedState.builder().setKey(_F).build();
         SavedState _GSaved = SavedState.builder().setKey(_G).build();
 
-        Mockito.when(backstackDelegate.getSavedState(_A)).thenReturn(_ASaved);
-        Mockito.when(backstackDelegate.getSavedState(_B)).thenReturn(_BSaved);
-        Mockito.when(backstackDelegate.getSavedState(_C)).thenReturn(_CSaved);
-        Mockito.when(backstackDelegate.getSavedState(_D)).thenReturn(_DSaved);
-        Mockito.when(backstackDelegate.getSavedState(_E)).thenReturn(_ESaved);
-        Mockito.when(backstackDelegate.getSavedState(_F)).thenReturn(_FSaved);
-        Mockito.when(backstackDelegate.getSavedState(_G)).thenReturn(_GSaved);
+        Mockito.when(backstackManager.getSavedState(_A)).thenReturn(_ASaved);
+        Mockito.when(backstackManager.getSavedState(_B)).thenReturn(_BSaved);
+        Mockito.when(backstackManager.getSavedState(_C)).thenReturn(_CSaved);
+        Mockito.when(backstackManager.getSavedState(_D)).thenReturn(_DSaved);
+        Mockito.when(backstackManager.getSavedState(_E)).thenReturn(_ESaved);
+        Mockito.when(backstackManager.getSavedState(_F)).thenReturn(_FSaved);
+        Mockito.when(backstackManager.getSavedState(_G)).thenReturn(_GSaved);
 
         List<ServiceFactory> servicesFactories = new ArrayList<>();
         servicesFactories.add(new ServiceFactory() {
@@ -1308,7 +1308,7 @@ public class ServicesTest {
             }
         });
         ServiceManager serviceManager = new ServiceManager(servicesFactories);
-        serviceManager.setUp(backstackDelegate, _B);
+        serviceManager.setUp(backstackManager, _B);
 
         /**
          *
@@ -1321,7 +1321,7 @@ public class ServicesTest {
          *                           F     G
          */
 
-        serviceManager.persistServicesForKeyHierarchy(backstackDelegate, _B);
+        serviceManager.persistServicesForKeyHierarchy(backstackManager, _B);
 
         assertThat(((Service) serviceManager.findServices(_A).getService("A")).nyah).isEqualTo("A");
         assertThat(((Service) serviceManager.findServices(_B).getService("B")).nyah).isEqualTo("B");
