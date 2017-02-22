@@ -18,20 +18,24 @@ public class NestedStack
 
     Backstack backstack;
 
-    NestedStack parent;
+    Object key; // NULL for root!
+
+    NestedStack parent; // NULL for root!
 
     KeyParceler keyParceler;
 
     StateChanger stateChanger;
 
     NestedStack(BackstackManager backstackManager, KeyParceler keyParceler) {
+        this.key = null;
         this.parent = null;
         this.keyParceler = keyParceler;
         this.backstackManager = backstackManager;
         this.backstack = backstackManager.getBackstack();
     }
 
-    NestedStack(NestedStack parent, KeyParceler keyParceler) {
+    NestedStack(Object key, NestedStack parent, KeyParceler keyParceler) {
+        this.key = key;
         this.parent = parent;
         this.keyParceler = keyParceler;
         this.backstack = new Backstack();

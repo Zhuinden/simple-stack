@@ -158,16 +158,15 @@ class BackstackManager {
         backstack = new Backstack(keys);
     }
 
-    public void initialize(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices, StateBundle stateBundle, List<?> initialKeys) {
+    public void initializeRoot(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices, StateBundle stateBundle, List<?> initialKeys) {
+        Map<String, Object> rootServices = new LinkedHashMap<>(_rootServices);
         restoreStates(stateBundle);
         setupBackstack(stateBundle, initialKeys);
+        rootServices.put(ROOT_STACK, new NestedStack(this, keyParceler)); // This can only be done here.
         setupServiceManager(servicesFactories, rootServices);
     }
 
-    void setupServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> _rootServices) {
-        Map<String, Object> rootServices = new LinkedHashMap<>(_rootServices);
-        rootServices.put(ROOT_STACK,
-                new NestedStack(this, keyParceler)); // This can only be done here. // TODO: do this ONLY if this is the ROOT!
+    void setupServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices) {
         serviceManager = new ServiceManager(servicesFactories,
                 rootServices,
                 keyParceler); // TODO: this should receive the parent if applicable!

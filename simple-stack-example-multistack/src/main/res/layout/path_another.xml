@@ -24,7 +24,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="52dp"
+        android:layout_marginLeft="24dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="60dp"
         android:text="Back" />
+
+    <Button
+        android:id="@+id/another_forward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="60dp"
+        android:text="Forward"/>
 </com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.another.AnotherView>

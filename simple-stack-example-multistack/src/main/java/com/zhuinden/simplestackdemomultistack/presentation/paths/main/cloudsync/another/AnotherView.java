@@ -74,6 +74,12 @@ public class AnotherView
         nestedStack.goBack();
     }
 
+    @OnClick(R.id.another_forward)
+    public void forwardClicked() {
+        nestedStack.goTo(ChromeCastKey.create());
+    }
+
+
     NestedStack nestedStack;
 
     @Override

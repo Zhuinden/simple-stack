@@ -242,7 +242,7 @@ public final class BackstackDelegate {
             backstackManager.setBackstack(nonConfig.getBackstack());
             backstackManager.setServiceManager(nonConfig.getServiceManager());
         } else {
-            backstackManager.initialize(servicesFactories, rootServices, stateBundle, initialKeys);
+            backstackManager.initializeRoot(servicesFactories, rootServices, stateBundle, initialKeys);
         }
         backstackManager.setStateChanger(stateChanger);
     }

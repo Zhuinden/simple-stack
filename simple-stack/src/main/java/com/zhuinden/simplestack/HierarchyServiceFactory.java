@@ -24,6 +24,6 @@ class HierarchyServiceFactory
         if(parentStack == null) {
             parentStack = builder.getService(BackstackManager.ROOT_STACK);
         }
-        builder.withService(BackstackManager.LOCAL_STACK, new NestedStack(parentStack, keyParceler));
+        builder.withService(BackstackManager.LOCAL_STACK, new NestedStack(builder.getKey(), parentStack, keyParceler));
     }
 }
