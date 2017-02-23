@@ -117,6 +117,22 @@ public class NestedStack
         return parent;
     }
 
+    /**
+     * Finds the service specified by the given service tag for the given key.
+     *
+     * If the service is not found, an IllegalStateException is thrown.
+     * If the key is not managed, an IllegalStateException is thrown.
+     *
+     * @param key        the key the given service belongs to.
+     * @param serviceTag the tag that identifies the service.
+     * @param <T>        the type of the service.
+     * @return the service.
+     */
+    @NonNull
+    public <T> T findService(Object key, String serviceTag) {
+        return backstackManager.findService(key, serviceTag);
+    }
+
     @NonNull
     @Override
     public StateBundle toBundle() {
