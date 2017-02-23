@@ -137,26 +137,28 @@ class ServiceManager {
     }
 
     void setUp(BackstackManager backstackManager, Object key) {
-        Services parent = findManagedServices(ROOT_KEY).services;
+        Services parentServices = findManagedServices(ROOT_KEY).services;
         if(key instanceof Services.Child) {
             final Object parentKey = ((Services.Child) key).parent();
             setUp(backstackManager, parentKey);
-            parent = findManagedServices(parentKey).services;
+            parentServices = findManagedServices(parentKey).services;
         }
-        ReferenceCountedServices managedService = createNonExistentManagedServicesAndIncrementUsageCount(backstackManager, parent, key);
-        parent = managedService.services;
+        ReferenceCountedServices managedService = createNonExistentManagedServicesAndIncrementUsageCount(backstackManager,
+                parentServices,
+                key);
+        parentServices = managedService.services;
         if(key instanceof Services.Composite) {
-            buildComposite(backstackManager, key, parent);
+            buildComposite(backstackManager, key, parentServices);
         }
     }
 
-    private void buildComposite(BackstackManager backstackManager, Object key, Services parent) {
+    private void buildComposite(BackstackManager backstackManager, Object key, Services parentServices) {
         Services.Composite composite = (Services.Composite) key;
         List<? extends Object> children = composite.keys();
         for(int i = 0; i < children.size(); i++) {
             Object child = children.get(i);
             ReferenceCountedServices managedServices = createNonExistentManagedServicesAndIncrementUsageCount(backstackManager,
-                    parent,
+                    parentServices,
                     child);
             if(child instanceof Services.Composite) {
                 buildComposite(backstackManager, child, managedServices.services);
