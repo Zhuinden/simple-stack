@@ -19,7 +19,6 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,22 +84,28 @@ class ServiceManager {
 
     private final ServiceManager parent;
     private final Services rootServices;
+    private final Object parentKey;
     private final Map<Object, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
     private final List<ServiceFactory> serviceFactories = new ArrayList<>();
 
     ServiceManager(List<ServiceFactory> serviceFactories) {
-        this(serviceFactories, Collections.<String, Object>emptyMap(), BackstackDelegate.DEFAULT_KEYPARCELER);
+        this(serviceFactories, Collections.<String, Object>emptyMap(), null, null, BackstackDelegate.DEFAULT_KEYPARCELER);
     }
 
-    ServiceManager(List<ServiceFactory> serviceFactories, Map<String, Object> _rootServices, KeyParceler keyParceler) {
+    ServiceManager(List<ServiceFactory> serviceFactories, Map<String, Object> _rootServices, ServiceManager parentServiceManager, Object parentKey, KeyParceler keyParceler) {
         Map<String, Object> rootServices = new LinkedHashMap<>();
         rootServices.putAll(_rootServices);
-        parent = (ServiceManager) rootServices.get(TAG);
         rootServices.put(TAG, this);
-        this.rootServices = new Services(ROOT_KEY, null, rootServices);
+        this.parentKey = parentKey;
+        this.parent = parentServiceManager;
+        Services parentServices = null;
+        if(parentServiceManager != null && parentKey != null) {
+            parentServices = parentServiceManager.findServices(parentKey);
+        }
+        this.rootServices = new Services(ROOT_KEY, parentServices, rootServices);
         if(parent == null) { // ROOT
             this.serviceFactories.add(0, new HierarchyServiceFactory(keyParceler));
-        } else { // TODO: this doesn't happen yet at all!
+        } else {
             this.serviceFactories.addAll(0, parent.serviceFactories);
         }
         this.serviceFactories.addAll(serviceFactories);
@@ -283,9 +288,9 @@ class ServiceManager {
     }
 
     public void dumpLogData() {
-        Log.i("ServiceManager", "Services: ");
+        //Log.i("ServiceManager", "Services: ");
         for(Map.Entry<Object, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
-            Log.i("ServiceManager", "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
+            //Log.i("ServiceManager", "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
         }
     }
 }

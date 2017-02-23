@@ -163,13 +163,12 @@ class BackstackManager {
         restoreStates(stateBundle);
         setupBackstack(stateBundle, initialKeys);
         rootServices.put(ROOT_STACK, new NestedStack(this, keyParceler)); // This can only be done here.
-        setupServiceManager(servicesFactories, rootServices);
+        setupServiceManager(null, null, servicesFactories, rootServices);
     }
 
-    void setupServiceManager(List<ServiceFactory> servicesFactories, Map<String, Object> rootServices) {
+    void setupServiceManager(@Nullable ServiceManager parentServiceManager, @Nullable Object parentKey, List<ServiceFactory> servicesFactories, Map<String, Object> rootServices) {
         serviceManager = new ServiceManager(servicesFactories,
-                rootServices,
-                keyParceler); // TODO: this should receive the parent if applicable!
+                rootServices, parentServiceManager, parentKey, keyParceler);
         serviceManager.restoreServicesForKey(this, ServiceManager.ROOT_KEY);
     }
 

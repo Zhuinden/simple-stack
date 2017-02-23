@@ -18,7 +18,7 @@ public class NestedStack
 
     Backstack backstack;
 
-    Object key; // NULL for root!
+    Object parentKey; // NULL for root!
 
     NestedStack parent; // NULL for root!
 
@@ -27,15 +27,15 @@ public class NestedStack
     StateChanger stateChanger;
 
     NestedStack(BackstackManager backstackManager, KeyParceler keyParceler) {
-        this.key = null;
+        this.parentKey = null;
         this.parent = null;
         this.keyParceler = keyParceler;
         this.backstackManager = backstackManager;
         this.backstack = backstackManager.getBackstack();
     }
 
-    NestedStack(Object key, NestedStack parent, KeyParceler keyParceler) {
-        this.key = key;
+    NestedStack(Object parentKey, NestedStack parent, KeyParceler keyParceler) {
+        this.parentKey = parentKey;
         this.parent = parent;
         this.keyParceler = keyParceler;
         this.backstack = new Backstack();
@@ -55,7 +55,16 @@ public class NestedStack
             if(this.backstack.getInitialParameters().isEmpty()) {
                 this.backstack.setInitialParameters(initialKeys);
             }
-            backstackManager.setupServiceManager(Collections.<ServiceFactory>emptyList(), Collections.<String, Object>emptyMap());
+            ServiceManager parentServiceManager = null;
+            NestedStack runningParent = parent;
+            while(runningParent != null && parentServiceManager == null) {
+                parentServiceManager = runningParent.backstackManager == null ? null : runningParent.backstackManager.serviceManager;
+                runningParent = runningParent.parent;
+            }
+            backstackManager.setupServiceManager(parentServiceManager,
+                    parentKey,
+                    Collections.<ServiceFactory>emptyList(),
+                    Collections.<String, Object>emptyMap());
         }
     }
 
