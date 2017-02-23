@@ -24,8 +24,6 @@ public class NestedStack
 
     KeyParceler keyParceler;
 
-    StateChanger stateChanger;
-
     NestedStack(BackstackManager backstackManager, KeyParceler keyParceler) {
         this.parentKey = null;
         this.parent = null;

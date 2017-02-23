@@ -10,10 +10,14 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.NestedStack;
 import com.zhuinden.simplestack.StateBundle;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemomultistack.R;
 import com.zhuinden.simplestackdemomultistack.application.Key;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.another.AnotherKey;
+import com.zhuinden.simplestackdemomultistack.presentation.paths.main.mail.MailKey;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -23,7 +27,7 @@ import butterknife.OnClick;
 
 public class CloudSyncView
         extends RelativeLayout
-        implements Bundleable {
+        implements Bundleable, StateChanger {
     private static final String TAG = "FirstView";
 
     public CloudSyncView(Context context) {
@@ -65,6 +69,23 @@ public class CloudSyncView
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
+        NestedStack nestedStack = Backstack.getNestedStack(getContext());
+        nestedStack.initialize(MailKey.create());
+        nestedStack.setStateChanger(this);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        NestedStack nestedStack = Backstack.getNestedStack(getContext());
+        nestedStack.reattachStateChanger();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        NestedStack nestedStack = Backstack.getNestedStack(getContext());
+        nestedStack.detachStateChanger();
     }
 
     @Override
@@ -83,5 +104,10 @@ public class CloudSyncView
             Log.i(TAG, bundle.getString("HELLO"));
             Log.i(TAG, bundle.getBundle("GOOMBA") == null ? null : bundle.getBundle("GOOMBA").getString("KAPPA"));
         }
+    }
+
+    @Override
+    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        completionCallback.stateChangeComplete();
     }
 }
