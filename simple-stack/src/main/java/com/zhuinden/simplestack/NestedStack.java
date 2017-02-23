@@ -50,19 +50,21 @@ public class NestedStack
             throw new IllegalArgumentException("To use nested stack, at least one initial key must be provided.");
         }
         if(parent != null) {
-            if(this.backstack.getInitialParameters().isEmpty()) {
+            if(this.backstack.getInitialParameters().isEmpty()) { // is first init
                 this.backstack.setInitialParameters(initialKeys);
             }
-            ServiceManager parentServiceManager = null;
-            NestedStack runningParent = parent;
-            while(runningParent != null && parentServiceManager == null) {
-                parentServiceManager = runningParent.backstackManager == null ? null : runningParent.backstackManager.serviceManager;
-                runningParent = runningParent.parent;
+            if(backstackManager.getServiceManager() == null) { // uninitialized
+                ServiceManager parentServiceManager = null;
+                NestedStack runningParent = parent;
+                while(runningParent != null && parentServiceManager == null) {
+                    parentServiceManager = runningParent.backstackManager == null ? null : runningParent.backstackManager.serviceManager;
+                    runningParent = runningParent.parent;
+                }
+                backstackManager.setupServiceManager(parentServiceManager,
+                        parentKey,
+                        Collections.<ServiceFactory>emptyList(),
+                        Collections.<String, Object>emptyMap());
             }
-            backstackManager.setupServiceManager(parentServiceManager,
-                    parentKey,
-                    Collections.<ServiceFactory>emptyList(),
-                    Collections.<String, Object>emptyMap());
         }
     }
 
