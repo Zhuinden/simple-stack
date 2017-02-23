@@ -18,6 +18,8 @@ class HierarchyServiceFactory
         Object parentKey = builder.getService(BackstackManager.LOCAL_KEY);
         if(parentKey != null) {
             builder.withService(BackstackManager.PARENT_KEY, parentKey);
+        } else {
+            parentKey = builder.getKey();
         }
         builder.withService(BackstackManager.LOCAL_KEY, builder.getKey());
         NestedStack parentStack = builder.getService(BackstackManager.LOCAL_STACK);

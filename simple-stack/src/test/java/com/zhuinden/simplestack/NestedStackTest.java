@@ -47,4 +47,30 @@ public class NestedStackTest {
         assertThat(nestedStack.getParent().getHistory()).containsExactly(rootKey);
         assertThat(nestedStack.getParent().goBack()).isFalse();
     }
+
+    @Test
+    public void nestedStackChildWorks() {
+        TestKey rootKey = new TestKey("root");
+        TestKey rootKey2 = new TestKey("root2");
+        TestKey rootKey3 = new TestKey("root3");
+
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(rootKey));
+        backstackDelegate.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        NestedStack nestedStack = backstackDelegate.findService(rootKey, BackstackManager.LOCAL_STACK);
+        nestedStack.initialize(rootKey2);
+        nestedStack.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        NestedStack nestedStack2 = nestedStack.findService(rootKey2, BackstackManager.LOCAL_STACK);
+        nestedStack2.initialize(rootKey3);
+        nestedStack2.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        assertThat(nestedStack2.getHistory()).containsExactly(rootKey3);
+        assertThat(nestedStack.getHistory()).containsExactly(rootKey2);
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(rootKey);
+    }
 }
