@@ -96,14 +96,15 @@ public class StateBundle
     static final int type_LongArray = 19;
     static final int type_FloatArray = 20;
     static final int type_DoubleArray = 21;
-    //static final int type_StringArray = 22;
-    //static final int type_CharSequenceArray = 23;
+
     static final int type_StateBundle = 26;
     static final int type_Parcelable = 27;
-    //static final int type_ParcelableArray = 28;
     static final int type_ParcelableArrayList = 29;
     static final int type_SparseParcelableArray = 30;
 
+    //static final int type_StringArray = 22;
+    //static final int type_CharSequenceArray = 23;
+    //static final int type_ParcelableArray = 28;
     //static final int type_Size = 24;
     //static final int type_SizeF = 25;
 
@@ -348,7 +349,7 @@ public class StateBundle
      * @param key   a String, or null
      * @param value a short
      */
-    void putShort(@Nullable String key, short value) {
+    public void putShort(@Nullable String key, short value) {
         map.put(key, value);
         typeMap.put(key, type_short);
     }
