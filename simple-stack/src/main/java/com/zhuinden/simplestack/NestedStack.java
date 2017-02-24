@@ -3,6 +3,7 @@ package com.zhuinden.simplestack;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,6 +111,36 @@ public class NestedStack
 
     public void executePendingStateChange() {
         backstack.executePendingStateChange();
+    }
+
+    /**
+     * Returns a {@link SavedState} instance for the given key.
+     * If the state does not exist, then a new associated state is created.
+     *
+     * @param key The key to which the {@link SavedState} belongs.
+     * @return the saved state that belongs to the given key.
+     */
+    @NonNull
+    public SavedState getSavedState(@NonNull Object key) {
+        return backstackManager.getSavedState(key);
+    }
+
+    /**
+     * Provides the means to save the provided view's hierarchy state, and its optional {@link StateBundle} via {@link Bundleable} into a {@link SavedState}.
+     *
+     * @param view the view that belongs to a certain key
+     */
+    public void persistViewToState(@Nullable View view) {
+        backstackManager.persistViewToState(view);
+    }
+
+    /**
+     * Restores the state of the view based on the currently stored {@link SavedState}, according to the view's key.
+     *
+     * @param view the view that belongs to a certain key
+     */
+    public void restoreViewFromState(@NonNull View view) {
+        backstackManager.restoreViewFromState(view);
     }
 
     @Nullable
