@@ -19,6 +19,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import org.junit.Assert;
@@ -247,56 +248,60 @@ public class BackstackDelegateTest {
         }
     }
 
-//    @Test
-//    @Ignore // unfortunately, `serviceBundle.toBundle()` just isn't very unit-test-friendly
-//    public void onCreateRestoresStatesOfService() {
-//        class Service implements Bundleable {
-//            String name;
-//
-//            @NonNull
-//            @Override
-//            public StateBundle toBundle() {
-//                return new StateBundle();
-//            }
-//
-//            @Override
-//            public void fromBundle(@Nullable StateBundle bundle) {
-//                if(bundle != null) {
-//                    name = bundle.getString("SERVICE");
-//                }
-//            }
-//        }
-//
-//        final Service service = new Service();
-//
-//        final TestKey testKey = new TestKey("hello");
-//        ArrayList<Parcelable> parcelledStates = new ArrayList<>();
-//        BackstackDelegate.ParcelledState parcelledState = new BackstackDelegate.ParcelledState();
-//        parcelledStates.add(parcelledState);
-//        parcelledState.parcelableKey = testKey;
-//        Bundle bundle = Mockito.mock(Bundle.class);
-//        StateBundle viewStateBundle = new StateBundle();
-//        viewStateBundle.putString("VIEW", "VIEW");
-//        StateBundle serviceStateBundle = new StateBundle();
-//        serviceStateBundle.putString("SERVICE", "SERVICE");
-//
-//        Mockito.when(bundle.getBundle("VIEW_BUNDLE")).thenReturn(viewStateBundle.toBundle()); // won't work
-//        Mockito.when(bundle.getBundle("SERVICE_BUNDLE")).thenReturn(serviceStateBundle.toBundle()); // won't work
-//        parcelledState.bundle = bundle;
-//
-//        BackstackDelegate backstackDelegate = BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
-//            @Override
-//            public void bindServices(@NonNull Services.Builder builder) {
-//                if(builder.getKey() == testKey) {
-//                    builder.withService("S", service);
-//                }
-//            }
-//        }).build();
-//        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getStateTag())).thenReturn(parcelledStates);
-//        backstackDelegate.setStateChanger(stateChanger);
-//
-//        assertThat(service.name).isEqualTo("SERVICE");
-//    }
+    @Test
+    public void onCreateRestoresStatesOfService() {
+        class Service
+                implements Bundleable {
+            String name;
+
+            @NonNull
+            @Override
+            public StateBundle toBundle() {
+                return new StateBundle();
+            }
+
+            @Override
+            public void fromBundle(@Nullable StateBundle bundle) {
+                if(bundle != null) {
+                    name = bundle.getString("SERVICE");
+                }
+            }
+        }
+
+        final Service service = new Service();
+
+        final TestKey testKey = new TestKey("hello");
+        ArrayList<Parcelable> parcelledStates = new ArrayList<>();
+        ParcelledState parcelledState = new ParcelledState();
+        parcelledStates.add(parcelledState);
+        parcelledState.parcelableKey = testKey;
+        StateBundle viewStateBundle = new StateBundle();
+        viewStateBundle.putString("VIEW", "VIEW");
+        StateBundle serviceStateBundle = new StateBundle();
+
+        StateBundle stateToRestore = new StateBundle();
+        stateToRestore.putString("SERVICE", "KAPPA");
+        serviceStateBundle.putBundle("S", stateToRestore);
+
+        parcelledState.viewBundle = viewStateBundle;
+        parcelledState.serviceBundle = serviceStateBundle;
+
+        BackstackDelegate backstackDelegate = BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                if(builder.getKey() == testKey) {
+                    builder.withService("S", service);
+                }
+            }
+        }).build();
+        StateBundle serviceHistory = new StateBundle();
+        serviceHistory.putParcelableArrayList("STATES", parcelledStates);
+        Mockito.when(savedInstanceState.getParcelable(backstackDelegate.getHistoryTag())).thenReturn(serviceHistory);
+        backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
+        backstackDelegate.setStateChanger(stateChanger);
+
+        assertThat(service.name).isEqualTo("KAPPA");
+    }
 
     @Test
     public void testRestoreViewFromState() {
