@@ -195,7 +195,10 @@ public class NestedStackTest {
         }
         assertThat(nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK)).isNotNull();
 
-        assertThat(((NestedStack) nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK)).getHistory()).containsExactly(rootKeyB1,
-                rootKeyB2);
+        nestedStackA1 = ((NestedStack) nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK));
+        nestedStackA1.initialize(rootKeyB1, rootKeyC1); // initialization should be ignored once initial params are restored
+        nestedStackA1.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+        assertThat(nestedStackA1.getHistory()).containsExactly(rootKeyB1, rootKeyB2);
     }
 }
