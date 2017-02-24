@@ -247,7 +247,7 @@ public class BackstackDelegateTest {
     }
 
 //    @Test
-//    @Ignore // unfortunately, `stateBundle.toBundle()` just isn't very unit-test-friendly
+//    @Ignore // unfortunately, `serviceBundle.toBundle()` just isn't very unit-test-friendly
 //    public void onCreateRestoresStatesOfService() {
 //        class Service implements Bundleable {
 //            String name;

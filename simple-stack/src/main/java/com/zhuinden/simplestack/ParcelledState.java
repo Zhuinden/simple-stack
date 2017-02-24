@@ -14,7 +14,8 @@ class ParcelledState
         implements Parcelable {
     Parcelable parcelableKey;
     SparseArray<Parcelable> viewHierarchyState;
-    Bundle bundle;
+    Bundle viewBundle;
+    Bundle serviceBundle;
 
     ParcelledState() {
     }
@@ -23,9 +24,13 @@ class ParcelledState
         parcelableKey = in.readParcelable(getClass().getClassLoader());
         // noinspection unchecked
         viewHierarchyState = in.readSparseArray(getClass().getClassLoader());
-        boolean hasBundle = in.readByte() > 0;
-        if(hasBundle) {
-            bundle = in.readBundle(getClass().getClassLoader());
+        boolean hasViewBundle = in.readByte() > 0;
+        if(hasViewBundle) {
+            viewBundle = in.readBundle(getClass().getClassLoader());
+        }
+        boolean hasStateBundle = in.readByte() > 0;
+        if(hasStateBundle) {
+            serviceBundle = in.readBundle(getClass().getClassLoader());
         }
     }
 
@@ -52,9 +57,13 @@ class ParcelledState
         // noinspection unchecked
         SparseArray<Object> sparseArray = (SparseArray) viewHierarchyState;
         dest.writeSparseArray(sparseArray);
-        dest.writeByte(bundle != null ? (byte) 0x01 : 0x00);
-        if(bundle != null) {
-            dest.writeBundle(bundle);
+        dest.writeByte(viewBundle != null ? (byte) 0x01 : 0x00);
+        if(viewBundle != null) {
+            dest.writeBundle(viewBundle);
+        }
+        dest.writeByte(serviceBundle != null ? (byte) 0x01 : 0x00);
+        if(serviceBundle != null) {
+            dest.writeBundle(serviceBundle);
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.zhuinden.simplestack;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -251,9 +250,8 @@ class BackstackManager {
                 for(ParcelledState parcelledState : savedStates) {
                     SavedState savedState = getSavedState(keyParceler.fromParcelable(parcelledState.parcelableKey));
                     savedState.setViewHierarchyState(parcelledState.viewHierarchyState);
-                    Bundle bundle = parcelledState.bundle;
-                    savedState.setViewBundle(StateBundle.from(bundle.getBundle("VIEW_BUNDLE")));
-                    savedState.setServiceBundle(StateBundle.from(bundle.getBundle("SERVICE_BUNDLE")));
+                    savedState.setViewBundle(StateBundle.from(parcelledState.viewBundle));
+                    savedState.setServiceBundle(StateBundle.from(parcelledState.serviceBundle));
                     keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
@@ -274,10 +272,8 @@ class BackstackManager {
             ParcelledState parcelledState = new ParcelledState();
             parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
             parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
-            Bundle bundle = new Bundle();
-            bundle.putBundle("VIEW_BUNDLE", savedState.getViewBundle() != null ? savedState.getViewBundle().toBundle() : null);
-            bundle.putBundle("SERVICE_BUNDLE", savedState.getServiceBundle().toBundle());
-            parcelledState.bundle = bundle;
+            parcelledState.viewBundle = savedState.getViewBundle() != null ? savedState.getViewBundle().toBundle() : null;
+            parcelledState.serviceBundle = savedState.getServiceBundle().toBundle();
             states.add(parcelledState);
         }
         outState.putParcelableArrayList("STATES", states);
