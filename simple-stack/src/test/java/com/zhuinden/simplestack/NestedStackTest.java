@@ -143,7 +143,7 @@ public class NestedStackTest {
         } catch(IllegalStateException e) {
             // OK!
         }
-        assertThat(nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK)).isNotNull();
+        assertThat(nestedStack.getChildStack(rootKeyA1)).isNotNull();
     }
 
     @Test
@@ -193,9 +193,9 @@ public class NestedStackTest {
         } catch(IllegalStateException e) {
             // OK!
         }
-        assertThat(nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK)).isNotNull();
+        assertThat(nestedStack.getChildStack(rootKeyA1)).isNotNull();
 
-        nestedStackA1 = ((NestedStack) nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK));
+        nestedStackA1 = nestedStack.getChildStack(rootKeyA1);
         nestedStackA1.initialize(rootKeyB1, rootKeyC1); // initialization should be ignored once initial params are restored
         nestedStackA1.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
