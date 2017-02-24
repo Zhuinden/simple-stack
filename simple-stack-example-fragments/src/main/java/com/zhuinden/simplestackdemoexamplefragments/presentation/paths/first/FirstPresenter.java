@@ -1,9 +1,9 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.first;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.second.SecondKey;
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter;
 
@@ -35,12 +35,12 @@ public class FirstPresenter
     }
 
     @Override
-    public Bundle toBundle() {
-        return new Bundle();
+    public StateBundle toBundle() {
+        return new StateBundle();
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
 
     }
 }

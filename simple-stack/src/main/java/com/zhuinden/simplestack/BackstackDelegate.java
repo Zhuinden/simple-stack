@@ -126,6 +126,10 @@ public final class BackstackDelegate {
         return backstackManager.getSavedState(key);
     }
 
+    public NestedStack getChildStack(Object key) {
+        return findService(key, BackstackManager.LOCAL_STACK);
+    }
+
     /**
      * Allows the configuration of the initial state changer, the scoped service factories, and the root services.
      */
@@ -234,7 +238,7 @@ public final class BackstackDelegate {
         }
         StateBundle stateBundle = null;
         if(savedInstanceState != null) {
-            stateBundle = StateBundle.from(savedInstanceState.getBundle(getHistoryTag()));
+            stateBundle = savedInstanceState.getParcelable(getHistoryTag());
             backstackManager.restoreStates(stateBundle);
         }
         NonConfigurationInstance nonConfig = (NonConfigurationInstance) nonConfigurationInstance;
@@ -289,7 +293,7 @@ public final class BackstackDelegate {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         backstackManager.persistStates();
         StateBundle stateBundle = backstackManager.toBundle();
-        outState.putBundle(getHistoryTag(), stateBundle.toBundle());
+        outState.putParcelable(getHistoryTag(), stateBundle);
     }
 
     /**

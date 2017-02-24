@@ -16,10 +16,8 @@
 
 package com.zhuinden.simplestack;
 
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
@@ -32,7 +30,50 @@ import java.util.Set;
 /**
  * A mapping from String keys to values of various types.
  */
-public class StateBundle {
+public class StateBundle
+        implements Parcelable {
+    static class TypeElement
+            implements Parcelable {
+        String key;
+        int type;
+
+        TypeElement() {
+        }
+
+        TypeElement(String key, int type) {
+            this.key = key;
+            this.type = type;
+        }
+
+        protected TypeElement(Parcel in) {
+            key = in.readString();
+            type = in.readInt();
+        }
+
+        public static final Creator<TypeElement> CREATOR = new Creator<TypeElement>() {
+            @Override
+            public TypeElement createFromParcel(Parcel in) {
+                return new TypeElement(in);
+            }
+
+            @Override
+            public TypeElement[] newArray(int size) {
+                return new TypeElement[size];
+            }
+        };
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(key);
+            dest.writeInt(type);
+        }
+    }
+    
     static final int type_boolean = 0;
     static final int type_byte = 1;
     static final int type_char = 2;
@@ -55,11 +96,11 @@ public class StateBundle {
     static final int type_LongArray = 19;
     static final int type_FloatArray = 20;
     static final int type_DoubleArray = 21;
-    static final int type_StringArray = 22;
-    static final int type_CharSequenceArray = 23;
+    //static final int type_StringArray = 22;
+    //static final int type_CharSequenceArray = 23;
     static final int type_StateBundle = 26;
     static final int type_Parcelable = 27;
-    static final int type_ParcelableArray = 28;
+    //static final int type_ParcelableArray = 28;
     static final int type_ParcelableArrayList = 29;
     static final int type_SparseParcelableArray = 30;
 
@@ -68,15 +109,13 @@ public class StateBundle {
 
     private static final String TAG = "Bundle";
 
-    Map<String, Object> map = null;
-    Map<String, Integer> typeMap = null;
+    Map<String, Object> map = new LinkedHashMap<>();
+    Map<String, Integer> typeMap = new LinkedHashMap<>();
 
     /**
      * Constructs a new, empty Bundle.
      */
     public StateBundle() {
-        map = new LinkedHashMap<>();
-        typeMap = new LinkedHashMap<>();
     }
 
     /**
@@ -86,9 +125,108 @@ public class StateBundle {
      * @param bundle a Bundle to be copied.
      */
     public StateBundle(StateBundle bundle) {
-        this();
         putAll(bundle);
     }
+
+    protected StateBundle(Parcel in) {
+        int size = in.readInt();
+        for(int i = 0; i < size; i++) {
+            TypeElement typeElement = in.readParcelable(TypeElement.class.getClassLoader());
+            Object object = in.readValue(getClass().getClassLoader());
+            switch(typeElement.type) {
+                case type_boolean:
+                    putBoolean(typeElement.key, (Boolean) object);
+                    break;
+                case type_byte:
+                    putByte(typeElement.key, (Byte) object);
+                    break;
+                case type_char:
+                    putChar(typeElement.key, (Character) object);
+                    break;
+                case type_short:
+                    putShort(typeElement.key, (Short) object);
+                    break;
+                case type_int:
+                    putInt(typeElement.key, (Integer) object);
+                    break;
+                case type_long:
+                    putLong(typeElement.key, (Long) object);
+                    break;
+                case type_float:
+                    putFloat(typeElement.key, (Float) object);
+                    break;
+                case type_double:
+                    putDouble(typeElement.key, (Double) object);
+                    break;
+                case type_String:
+                    putString(typeElement.key, (String) object);
+                    break;
+                case type_CharSequence:
+                    putCharSequence(typeElement.key, (CharSequence) object);
+                    break;
+                case type_Serializable:
+                    putSerializable(typeElement.key, (Serializable) object);
+                    break;
+                case type_IntegerArrayList:
+                    putIntegerArrayList(typeElement.key, (ArrayList<Integer>) object);
+                    break;
+                case type_StringArrayList:
+                    putStringArrayList(typeElement.key, (ArrayList<String>) object);
+                    break;
+                case type_CharSequenceArrayList:
+                    putCharSequenceArrayList(typeElement.key, (ArrayList<CharSequence>) object);
+                    break;
+                case type_BooleanArray:
+                    putBooleanArray(typeElement.key, (boolean[]) object);
+                    break;
+                case type_ByteArray:
+                    putByteArray(typeElement.key, (byte[]) object);
+                    break;
+                case type_ShortArray:
+                    putShortArray(typeElement.key, (short[]) object);
+                    break;
+                case type_CharArray:
+                    putCharArray(typeElement.key, (char[]) object);
+                    break;
+                case type_IntArray:
+                    putIntArray(typeElement.key, (int[]) object);
+                    break;
+                case type_LongArray:
+                    putLongArray(typeElement.key, (long[]) object);
+                    break;
+                case type_FloatArray:
+                    putFloatArray(typeElement.key, (float[]) object);
+                    break;
+                case type_DoubleArray:
+                    putDoubleArray(typeElement.key, (double[]) object);
+                    break;
+                case type_StateBundle:
+                    putBundle(typeElement.key, (StateBundle) object);
+                    break;
+                case type_Parcelable:
+                    putParcelable(typeElement.key, (Parcelable) object);
+                    break;
+                case type_ParcelableArrayList:
+                    putParcelableArrayList(typeElement.key, (ArrayList<Parcelable>) object);
+                    break;
+                case type_SparseParcelableArray:
+                    putSparseParcelableArray(typeElement.key, (SparseArray<Parcelable>) object);
+                    break;
+            }
+        }
+    }
+
+    public static final Creator<StateBundle> CREATOR = new Creator<StateBundle>() {
+        @Override
+        public StateBundle createFromParcel(Parcel in) {
+            return new StateBundle(in);
+        }
+
+        @Override
+        public StateBundle[] newArray(int size) {
+            return new StateBundle[size];
+        }
+    };
 
     /**
      * Returns the number of mappings contained in this Bundle.
@@ -438,10 +576,10 @@ public class StateBundle {
      * @param key   a String, or null
      * @param value a String array object, or null
      */
-    public void putStringArray(@Nullable String key, @Nullable String[] value) {
-        map.put(key, value);
-        typeMap.put(key, type_StringArray);
-    }
+//    public void putStringArray(@Nullable String key, @Nullable String[] value) {
+//        map.put(key, value);
+//        typeMap.put(key, type_StringArray);
+//    }
 
     /**
      * Inserts a CharSequence array value into the mapping of this Bundle, replacing
@@ -450,10 +588,10 @@ public class StateBundle {
      * @param key   a String, or null
      * @param value a CharSequence array object, or null
      */
-    public void putCharSequenceArray(@Nullable String key, @Nullable CharSequence[] value) {
-        map.put(key, value);
-        typeMap.put(key, type_CharSequenceArray);
-    }
+//    public void putCharSequenceArray(@Nullable String key, @Nullable CharSequence[] value) {
+//        map.put(key, value);
+//        typeMap.put(key, type_CharSequenceArray);
+//    }
 
 
     /**
@@ -500,10 +638,10 @@ public class StateBundle {
      * @param key   a String, or null
      * @param value an array of Parcelable objects, or null
      */
-    public void putParcelableArray(@Nullable String key, @Nullable Parcelable[] value) {
-        map.put(key, value);
-        typeMap.put(key, type_ParcelableArray);
-    }
+//    public void putParcelableArray(@Nullable String key, @Nullable Parcelable[] value) {
+//        map.put(key, value);
+//        typeMap.put(key, type_ParcelableArray);
+//    }
 
     /**
      * Inserts a List of Parcelable values into the mapping of this Bundle,
@@ -1141,19 +1279,19 @@ public class StateBundle {
      * @param key a String, or null
      * @return a String[] value, or null
      */
-    @Nullable
-    public String[] getStringArray(@Nullable String key) {
-        Object o = map.get(key);
-        if(o == null) {
-            return null;
-        }
-        try {
-            return (String[]) o;
-        } catch(ClassCastException e) {
-            typeWarning(key, o, "String[]", e);
-            return null;
-        }
-    }
+//    @Nullable
+//    public String[] getStringArray(@Nullable String key) {
+//        Object o = map.get(key);
+//        if(o == null) {
+//            return null;
+//        }
+//        try {
+//            return (String[]) o;
+//        } catch(ClassCastException e) {
+//            typeWarning(key, o, "String[]", e);
+//            return null;
+//        }
+//    }
 
     /**
      * Returns the value associated with the given key, or null if
@@ -1163,19 +1301,19 @@ public class StateBundle {
      * @param key a String, or null
      * @return a CharSequence[] value, or null
      */
-    @Nullable
-    public CharSequence[] getCharSequenceArray(@Nullable String key) {
-        Object o = map.get(key);
-        if(o == null) {
-            return null;
-        }
-        try {
-            return (CharSequence[]) o;
-        } catch(ClassCastException e) {
-            typeWarning(key, o, "CharSequence[]", e);
-            return null;
-        }
-    }
+//    @Nullable
+//    public CharSequence[] getCharSequenceArray(@Nullable String key) {
+//        Object o = map.get(key);
+//        if(o == null) {
+//            return null;
+//        }
+//        try {
+//            return (CharSequence[]) o;
+//        } catch(ClassCastException e) {
+//            typeWarning(key, o, "CharSequence[]", e);
+//            return null;
+//        }
+//    }
 
     /**
      * Returns the value associated with the given key, or null if
@@ -1267,19 +1405,19 @@ public class StateBundle {
      * @param key a String, or null
      * @return a Parcelable[] value, or null
      */
-    @Nullable
-    public Parcelable[] getParcelableArray(@Nullable String key) {
-        Object o = map.get(key);
-        if(o == null) {
-            return null;
-        }
-        try {
-            return (Parcelable[]) o;
-        } catch(ClassCastException e) {
-            typeWarning(key, o, "Parcelable[]", e);
-            return null;
-        }
-    }
+//    @Nullable
+//    public Parcelable[] getParcelableArray(@Nullable String key) {
+//        Object o = map.get(key);
+//        if(o == null) {
+//            return null;
+//        }
+//        try {
+//            return (Parcelable[]) o;
+//        } catch(ClassCastException e) {
+//            typeWarning(key, o, "Parcelable[]", e);
+//            return null;
+//        }
+//    }
 
     /**
      * Returns the value associated with the given key, or null if
@@ -1344,257 +1482,18 @@ public class StateBundle {
         typeWarning(key, value, className, "<null>", e);
     }
 
-    @NonNull
-    public Bundle toBundle() {
-        Bundle rootBundle = new Bundle();
-        ArrayList<Parcelable> types = new ArrayList<>();
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-        Bundle innerBundle = new Bundle();
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(map.keySet().size());
         for(String key : map.keySet()) {
-            types.add(new TypeElement(key, typeMap.get(key)));
-            switch(typeMap.get(key)) {
-                case type_boolean:
-                    innerBundle.putBoolean(key, getBoolean(key));
-                    break;
-                case type_byte:
-                    innerBundle.putByte(key, getByte(key));
-                    break;
-                case type_char:
-                    innerBundle.putChar(key, getChar(key));
-                    break;
-                case type_short:
-                    innerBundle.putShort(key, getShort(key));
-                    break;
-                case type_int:
-                    innerBundle.putInt(key, getInt(key));
-                    break;
-                case type_long:
-                    innerBundle.putLong(key, getLong(key));
-                    break;
-                case type_float:
-                    innerBundle.putFloat(key, getFloat(key));
-                    break;
-                case type_double:
-                    innerBundle.putDouble(key, getDouble(key));
-                    break;
-                case type_String:
-                    innerBundle.putString(key, getString(key));
-                    break;
-                case type_CharSequence:
-                    innerBundle.putCharSequence(key, getCharSequence(key));
-                    break;
-                case type_Serializable:
-                    innerBundle.putSerializable(key, getSerializable(key));
-                    break;
-                case type_IntegerArrayList:
-                    innerBundle.putIntegerArrayList(key, getIntegerArrayList(key));
-                    break;
-                case type_StringArrayList:
-                    innerBundle.putStringArrayList(key, getStringArrayList(key));
-                    break;
-                case type_CharSequenceArrayList:
-                    innerBundle.putCharSequenceArrayList(key, getCharSequenceArrayList(key));
-                    break;
-                case type_BooleanArray:
-                    innerBundle.putBooleanArray(key, getBooleanArray(key));
-                    break;
-                case type_ByteArray:
-                    innerBundle.putByteArray(key, getByteArray(key));
-                    break;
-                case type_ShortArray:
-                    innerBundle.putShortArray(key, getShortArray(key));
-                    break;
-                case type_CharArray:
-                    innerBundle.putCharArray(key, getCharArray(key));
-                    break;
-                case type_IntArray:
-                    innerBundle.putIntArray(key, getIntArray(key));
-                    break;
-                case type_LongArray:
-                    innerBundle.putLongArray(key, getLongArray(key));
-                    break;
-                case type_FloatArray:
-                    innerBundle.putFloatArray(key, getFloatArray(key));
-                    break;
-                case type_DoubleArray:
-                    innerBundle.putDoubleArray(key, getDoubleArray(key));
-                    break;
-                case type_StringArray:
-                    innerBundle.putStringArray(key, getStringArray(key));
-                    break;
-                case type_CharSequenceArray:
-                    innerBundle.putCharSequenceArray(key, getCharSequenceArray(key));
-                    break;
-                case type_StateBundle:
-                    innerBundle.putBundle(key, getBundle(key) == null ? null : getBundle(key).toBundle());
-                    break;
-                case type_Parcelable:
-                    innerBundle.putParcelable(key, getParcelable(key));
-                    break;
-                case type_ParcelableArray:
-                    innerBundle.putParcelableArray(key, getParcelableArray(key));
-                    break;
-                case type_ParcelableArrayList:
-                    innerBundle.putParcelableArrayList(key, getParcelableArrayList(key));
-                    break;
-                case type_SparseParcelableArray:
-                    innerBundle.putSparseParcelableArray(key, getSparseParcelableArray(key));
-                    break;
-            }
-        }
-        rootBundle.putParcelableArrayList("___TYPES", types);
-        rootBundle.putBundle("___INNER_BUNDLE", innerBundle);
-        rootBundle.putBoolean("______ROOT_FLAG", true);
-        return rootBundle;
-    }
-
-    @Nullable
-    public static StateBundle from(@Nullable Bundle rootBundle) {
-        if(rootBundle == null) {
-            return null;
-        }
-        if(!rootBundle.getBoolean("______ROOT_FLAG")) {
-            throw new IllegalArgumentException(
-                    "The provided Bundle must be the root bundle of a StateBundle, obtained via `StateBundle.toBundle()`.");
-        }
-        StateBundle stateBundle = new StateBundle();
-        Bundle innerBundle = rootBundle.getBundle("___INNER_BUNDLE");
-        ArrayList<TypeElement> typeElements = rootBundle.getParcelableArrayList("___TYPES");
-        if(typeElements != null && innerBundle != null) {
-            for(TypeElement typeElement : typeElements) {
-                switch(typeElement.type) {
-                    case type_boolean:
-                        stateBundle.putBoolean(typeElement.key, innerBundle.getBoolean(typeElement.key));
-                        break;
-                    case type_byte:
-                        stateBundle.putByte(typeElement.key, innerBundle.getByte(typeElement.key));
-                        break;
-                    case type_char:
-                        stateBundle.putChar(typeElement.key, innerBundle.getChar(typeElement.key));
-                        break;
-                    case type_short:
-                        stateBundle.putShort(typeElement.key, innerBundle.getShort(typeElement.key));
-                        break;
-                    case type_int:
-                        stateBundle.putInt(typeElement.key, innerBundle.getInt(typeElement.key));
-                        break;
-                    case type_long:
-                        stateBundle.putLong(typeElement.key, innerBundle.getLong(typeElement.key));
-                        break;
-                    case type_float:
-                        stateBundle.putFloat(typeElement.key, innerBundle.getFloat(typeElement.key));
-                        break;
-                    case type_double:
-                        stateBundle.putDouble(typeElement.key, innerBundle.getDouble(typeElement.key));
-                        break;
-                    case type_String:
-                        stateBundle.putString(typeElement.key, innerBundle.getString(typeElement.key));
-                        break;
-                    case type_CharSequence:
-                        stateBundle.putCharSequence(typeElement.key, innerBundle.getCharSequence(typeElement.key));
-                        break;
-                    case type_Serializable:
-                        stateBundle.putSerializable(typeElement.key, innerBundle.getSerializable(typeElement.key));
-                        break;
-                    case type_IntegerArrayList:
-                        stateBundle.putIntegerArrayList(typeElement.key, innerBundle.getIntegerArrayList(typeElement.key));
-                        break;
-                    case type_StringArrayList:
-                        stateBundle.putStringArrayList(typeElement.key, innerBundle.getStringArrayList(typeElement.key));
-                        break;
-                    case type_CharSequenceArrayList:
-                        stateBundle.putCharSequenceArrayList(typeElement.key, innerBundle.getCharSequenceArrayList(typeElement.key));
-                        break;
-                    case type_BooleanArray:
-                        stateBundle.putBooleanArray(typeElement.key, innerBundle.getBooleanArray(typeElement.key));
-                        break;
-                    case type_ByteArray:
-                        stateBundle.putByteArray(typeElement.key, innerBundle.getByteArray(typeElement.key));
-                        break;
-                    case type_ShortArray:
-                        stateBundle.putShortArray(typeElement.key, innerBundle.getShortArray(typeElement.key));
-                        break;
-                    case type_CharArray:
-                        stateBundle.putCharArray(typeElement.key, innerBundle.getCharArray(typeElement.key));
-                        break;
-                    case type_IntArray:
-                        stateBundle.putIntArray(typeElement.key, innerBundle.getIntArray(typeElement.key));
-                        break;
-                    case type_LongArray:
-                        stateBundle.putLongArray(typeElement.key, innerBundle.getLongArray(typeElement.key));
-                        break;
-                    case type_FloatArray:
-                        stateBundle.putFloatArray(typeElement.key, innerBundle.getFloatArray(typeElement.key));
-                        break;
-                    case type_DoubleArray:
-                        stateBundle.putDoubleArray(typeElement.key, innerBundle.getDoubleArray(typeElement.key));
-                        break;
-                    case type_StringArray:
-                        stateBundle.putStringArray(typeElement.key, innerBundle.getStringArray(typeElement.key));
-                        break;
-                    case type_CharSequenceArray:
-                        stateBundle.putCharSequenceArray(typeElement.key, innerBundle.getCharSequenceArray(typeElement.key));
-                        break;
-                    case type_StateBundle:
-                        stateBundle.putBundle(typeElement.key, StateBundle.from(innerBundle.getBundle(typeElement.key)));
-                        break;
-                    case type_Parcelable:
-                        stateBundle.putParcelable(typeElement.key, innerBundle.getParcelable(typeElement.key));
-                        break;
-                    case type_ParcelableArray:
-                        stateBundle.putParcelableArray(typeElement.key, innerBundle.getParcelableArray(typeElement.key));
-                        break;
-                    case type_ParcelableArrayList:
-                        stateBundle.putParcelableArrayList(typeElement.key, innerBundle.getParcelableArrayList(typeElement.key));
-                        break;
-                    case type_SparseParcelableArray:
-                        stateBundle.putSparseParcelableArray(typeElement.key, innerBundle.getSparseParcelableArray(typeElement.key));
-                        break;
-                }
-            }
-        }
-        return stateBundle;
-    }
-
-    static class TypeElement
-            implements Parcelable {
-        String key;
-        int type;
-
-        TypeElement() {
-        }
-
-        TypeElement(String key, int type) {
-            this.key = key;
-            this.type = type;
-        }
-
-        protected TypeElement(Parcel in) {
-            key = in.readString();
-            type = in.readInt();
-        }
-
-        public static final Creator<TypeElement> CREATOR = new Creator<TypeElement>() {
-            @Override
-            public TypeElement createFromParcel(Parcel in) {
-                return new TypeElement(in);
-            }
-
-            @Override
-            public TypeElement[] newArray(int size) {
-                return new TypeElement[size];
-            }
-        };
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(key);
-            dest.writeInt(type);
+            TypeElement typeElement = new TypeElement(key, typeMap.get(key));
+            dest.writeParcelable(typeElement, 0);
+            dest.writeValue(get(key));
         }
     }
 }

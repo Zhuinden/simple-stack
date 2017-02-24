@@ -250,8 +250,8 @@ class BackstackManager {
                 for(ParcelledState parcelledState : savedStates) {
                     SavedState savedState = getSavedState(keyParceler.fromParcelable(parcelledState.parcelableKey));
                     savedState.setViewHierarchyState(parcelledState.viewHierarchyState);
-                    savedState.setViewBundle(StateBundle.from(parcelledState.viewBundle));
-                    savedState.setServiceBundle(StateBundle.from(parcelledState.serviceBundle));
+                    savedState.setViewBundle(parcelledState.viewBundle);
+                    savedState.setServiceBundle(parcelledState.serviceBundle);
                     keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
@@ -272,8 +272,8 @@ class BackstackManager {
             ParcelledState parcelledState = new ParcelledState();
             parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
             parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
-            parcelledState.viewBundle = savedState.getViewBundle() != null ? savedState.getViewBundle().toBundle() : null;
-            parcelledState.serviceBundle = savedState.getServiceBundle().toBundle();
+            parcelledState.viewBundle = savedState.getViewBundle() != null ? savedState.getViewBundle() : null;
+            parcelledState.serviceBundle = savedState.getServiceBundle();
             states.add(parcelledState);
         }
         outState.putParcelableArrayList("STATES", states);

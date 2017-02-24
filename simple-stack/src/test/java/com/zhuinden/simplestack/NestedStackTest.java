@@ -32,7 +32,7 @@ public class NestedStackTest {
         backstackDelegate.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStack = backstackDelegate.findService(rootKey, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
         assertThat(nestedStack.getHistory()).isEmpty(); // it is a NestedStack that belongs to TestKey
         assertThat(nestedStack.getParent()).isNotNull(); // its parent is the root
         assertThat(nestedStack.getParent().getParent()).isNull();
@@ -61,12 +61,12 @@ public class NestedStackTest {
         backstackDelegate.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStack = backstackDelegate.findService(rootKey, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
         nestedStack.initialize(rootKey2);
         nestedStack.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStack2 = nestedStack.findService(rootKey2, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack2 = nestedStack.getChildStack(rootKey2);
         nestedStack2.initialize(rootKey3);
         nestedStack2.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
@@ -88,12 +88,12 @@ public class NestedStackTest {
         backstackDelegate.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStack = backstackDelegate.findService(rootKey, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
         nestedStack.initialize(rootKeyA1, rootKeyA2);
         nestedStack.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStack2 = nestedStack.findService(rootKeyA2, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack2 = nestedStack.getChildStack(rootKeyA2);
         nestedStack2.initialize(rootKeyB1);
         nestedStack2.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
@@ -118,18 +118,18 @@ public class NestedStackTest {
         backstackDelegate.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStack = backstackDelegate.findService(rootKey, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
         nestedStack.initialize(rootKeyA1, rootKeyA2);
         nestedStack.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
         try {
-            nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK);
+            nestedStack.getChildStack(rootKeyA1);
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK!
         }
-        NestedStack nestedStack2 = nestedStack.findService(rootKeyA2, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack2 = nestedStack.getChildStack(rootKeyA2);
         nestedStack2.initialize(rootKeyB1);
         nestedStack2.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
@@ -138,7 +138,7 @@ public class NestedStackTest {
         completionCallback.stateChangeComplete();
 
         try {
-            nestedStack.findService(rootKeyA2, BackstackManager.LOCAL_STACK);
+            nestedStack.getChildStack(rootKeyA2);
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK!
@@ -160,12 +160,12 @@ public class NestedStackTest {
         backstackDelegate.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStack = backstackDelegate.findService(rootKey, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
         nestedStack.initialize(rootKeyA1);
         nestedStack.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
 
-        NestedStack nestedStackA1 = nestedStack.findService(rootKeyA1, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStackA1 = nestedStack.getChildStack(rootKeyA1);
         nestedStackA1.initialize(rootKeyB1, rootKeyB2);
         nestedStackA1.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
@@ -174,12 +174,12 @@ public class NestedStackTest {
         completionCallback.stateChangeComplete();
 
         try {
-            nestedStackA1.findService(rootKeyA1, BackstackManager.LOCAL_STACK); // TODO: add `nestedStack.getChildStack(Object)`
+            nestedStackA1.getChildStack(rootKeyA1);
         } catch(IllegalStateException e) {
             // OK!
         }
 
-        NestedStack nestedStack2 = nestedStack.findService(rootKeyA2, BackstackManager.LOCAL_STACK);
+        NestedStack nestedStack2 = nestedStack.getChildStack(rootKeyA2);
         nestedStack2.initialize(rootKeyC1);
         nestedStack2.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
@@ -188,7 +188,7 @@ public class NestedStackTest {
         completionCallback.stateChangeComplete();
 
         try {
-            nestedStack.findService(rootKeyA2, BackstackManager.LOCAL_STACK);
+            nestedStack.getChildStack(rootKeyA2);
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK!

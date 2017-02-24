@@ -133,6 +133,19 @@ public class NestedStack
         return backstackManager.findService(key, serviceTag);
     }
 
+    /**
+     * Returns the {@link NestedStack} that belongs to the given child key.
+     * Please note that they are treated like services, so inactive stacks are destroyed and parcelled until they become active again.
+     * If a service is not found, an exception is thrown.
+     *
+     * @param key the key the child view is associated with
+     * @return the nested stack that belongs to the child key.
+     */
+    @NonNull
+    public NestedStack getChildStack(Object key) {
+        return findService(key, BackstackManager.LOCAL_STACK);
+    }
+
     @NonNull
     @Override
     public StateBundle toBundle() {
