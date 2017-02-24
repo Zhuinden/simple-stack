@@ -109,21 +109,22 @@ public class BackstackDelegateTest {
         }
     }
 
-//    @Test
-//    @Ignore // DOESN'T WORK BECAUSE the mock should return a StateBundle's Root Bundle
-//    public void onCreateRestoresBackstackKeys() {
-//        BackstackDelegate backstackDelegate = BackstackDelegate.create();
-//        TestKey testKey = new TestKey("hello");
-//        final TestKey restoredKey = new TestKey("world");
-//        ArrayList<Parcelable> restoredKeys = new ArrayList<Parcelable>() {{
-//            add(restoredKey);
-//        }};
-//        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getHistoryTag())).thenReturn(restoredKeys);
-//        backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
-//        assertThat(backstackDelegate.getBackstack()).isNotNull();
-//        backstackDelegate.setStateChanger(stateChanger);
-//        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(restoredKey);
-//    }
+    @Test
+    public void onCreateRestoresBackstackKeys() {
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        TestKey testKey = new TestKey("hello");
+        final TestKey restoredKey = new TestKey("world");
+        ArrayList<Parcelable> restoredKeys = new ArrayList<Parcelable>() {{
+            add(restoredKey);
+        }};
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putParcelableArrayList("HISTORY", restoredKeys);
+        Mockito.when(savedInstanceState.getParcelable(backstackDelegate.getHistoryTag())).thenReturn(stateBundle);
+        backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
+        assertThat(backstackDelegate.getBackstack()).isNotNull();
+        backstackDelegate.setStateChanger(stateChanger);
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(restoredKey);
+    }
 
     @Test
     public void onCreateChoosesInitialKeysIfRestoredHistoryIsEmpty() {
