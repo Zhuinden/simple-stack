@@ -24,6 +24,9 @@ class BackstackManager {
     static final String PARENT_KEY = "simplestack.PARENT_KEY";
     static final String LOCAL_KEY = "simplestack.LOCAL_KEY";
 
+    static final String HISTORY_TAG = "HISTORY";
+    static final String STATES_TAG = "STATES";
+
     Backstack backstack;
 
     final KeyParceler keyParceler;
@@ -144,7 +147,7 @@ class BackstackManager {
     void setupBackstack(StateBundle stateBundle, List<?> initialKeys) {
         ArrayList<Object> keys = new ArrayList<>();
         if(stateBundle != null) {
-            List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList("HISTORY");
+            List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(HISTORY_TAG);
             if(parcelledKeys != null) {
                 for(Parcelable parcelledKey : parcelledKeys) {
                     keys.add(keyParceler.fromParcelable(parcelledKey));
@@ -245,7 +248,7 @@ class BackstackManager {
 
     public void restoreStates(StateBundle stateBundle) {
         if(stateBundle != null) {
-            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList("STATES");
+            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList(STATES_TAG);
             if(savedStates != null) {
                 for(ParcelledState parcelledState : savedStates) {
                     SavedState savedState = getSavedState(keyParceler.fromParcelable(parcelledState.parcelableKey));
@@ -265,7 +268,7 @@ class BackstackManager {
         for(Object key : history) {
             parcelledHistory.add(keyParceler.toParcelable(key));
         }
-        outState.putParcelableArrayList("HISTORY", parcelledHistory);
+        outState.putParcelableArrayList(HISTORY_TAG, parcelledHistory);
 
         ArrayList<ParcelledState> states = new ArrayList<>();
         for(SavedState savedState : keyStateMap.values()) {
@@ -276,7 +279,7 @@ class BackstackManager {
             parcelledState.serviceBundle = savedState.getServiceBundle();
             states.add(parcelledState);
         }
-        outState.putParcelableArrayList("STATES", states);
+        outState.putParcelableArrayList(STATES_TAG, states);
         return outState;
     }
 }

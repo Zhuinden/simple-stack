@@ -194,7 +194,7 @@ public class NestedStack
                 parcelledInitialParameters.add(keyParceler.toParcelable(key));
             }
 
-            bundle.putParcelableArrayList("HISTORY", parcelledHistory);
+            bundle.putParcelableArrayList(BackstackManager.HISTORY_TAG, parcelledHistory);
             bundle.putParcelableArrayList("INITIALPARAMS", parcelledInitialParameters);
 
             if(backstackManager.serviceManager != null) { // TODO: there must be a better way to keep track of whether a NestedStack is initialized...
@@ -210,7 +210,7 @@ public class NestedStack
         if(bundle != null) {
             if(parent != null) { // root is managed by delegate
                 backstackManager.restoreStates(bundle.getBundle("MANAGER_STATES"));
-                ArrayList<Parcelable> parcelledHistory = bundle.getParcelableArrayList("HISTORY");
+                ArrayList<Parcelable> parcelledHistory = bundle.getParcelableArrayList(BackstackManager.HISTORY_TAG);
                 ArrayList<Parcelable> parcelledInitialParams = bundle.getParcelableArrayList("INITIALPARAMS");
 
                 List<Object> history = new ArrayList<>();
