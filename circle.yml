@@ -25,4 +25,5 @@ test:
     - mv simple-stack-example-services/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
     - mv simple-stack-flow-masterdetail/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
     - mv simple-stack-flow-masterdetail-fragments/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-example-nestedstack/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
     

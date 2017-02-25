@@ -20,6 +20,8 @@ import android.content.ContextWrapper;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 
+import java.lang.reflect.Field;
+
 /**
  * ContextWrapper for inflating views, containing the key inside it.
  * The key is accessible via {@link Backstack#getKey(Context)} or {@link ManagedContextWrapper#getKey(Context)}.
@@ -50,6 +52,16 @@ class ManagedContextWrapper
         if(Context.LAYOUT_INFLATER_SERVICE.equals(name)) {
             if(layoutInflater == null) {
                 layoutInflater = LayoutInflater.from(getBaseContext()).cloneInContext(this);
+                Field field = null;
+                try {
+                    field = LayoutInflater.class.getDeclaredField("mContext");
+                    field.setAccessible(true);
+                    field.set(layoutInflater, this);
+                } catch(NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch(IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
             return layoutInflater;
         } else if(TAG.equals(name)) {

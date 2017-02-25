@@ -289,4 +289,8 @@ class BackstackManager {
         outState.putParcelableArrayList(STATES_TAG, states);
         return outState;
     }
+
+    StateChanger getStateChanger() {
+        return stateChanger;
+    }
 }
