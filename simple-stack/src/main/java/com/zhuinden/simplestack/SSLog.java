@@ -17,6 +17,10 @@ public class SSLog {
 
     final static List<SSLogger> loggers = new ArrayList<>();
 
+    public static boolean hasLoggers() {
+        return !loggers.isEmpty();
+    }
+
     public static void addLogger(SSLogger ssLogger) {
         loggers.add(ssLogger);
     }
@@ -30,7 +34,7 @@ public class SSLog {
     }
 
     public static void info(String tag, String message) {
-        if(!loggers.isEmpty()) {
+        if(hasLoggers()) {
             for(SSLogger logger : loggers) {
                 logger.info(tag, message);
             }

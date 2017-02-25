@@ -210,10 +210,15 @@ class ServiceManager {
         SavedState savedState = backstackManager.getSavedState(key);
         StateBundle bundle = savedState.getServiceBundle();
         if(bundle != null) {
-            SSLog.info(TAG, "<<< RESTORE [" + key + "] >>>");
+            if(SSLog.hasLoggers()) {
+                SSLog.info(TAG, "<<< RESTORE [" + key + "] >>>");
+            }
             for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
                 if(serviceEntry.getValue() instanceof Bundleable) {
                     StateBundle serviceBundle = bundle.getBundle(serviceEntry.getKey());
+                    if(SSLog.hasLoggers()) {
+                        SSLog.info(TAG, "<<[[ Restoring service [" + serviceEntry.getKey() + "] with [" + serviceBundle + "] ]]>>");
+                    }
                     ((Bundleable) serviceEntry.getValue()).fromBundle(serviceBundle);
                 }
             }
@@ -221,7 +226,9 @@ class ServiceManager {
     }
 
     void persistServicesForKey(BackstackManager backstackManager, Object key) {
-        SSLog.info(TAG, "<<< PERSIST [" + key + "] >>>");
+        if(SSLog.hasLoggers()) {
+            SSLog.info(TAG, "<<< PERSIST [" + key + "] >>>");
+        }
         ReferenceCountedServices node = findManagedServices(key);
         SavedState savedState = backstackManager.getSavedState(key);
         StateBundle bundle = savedState.getServiceBundle();
@@ -289,9 +296,11 @@ class ServiceManager {
     }
 
     public void dumpLogData() {
-        SSLog.info(TAG, "Services: ");
-        for(Map.Entry<Object, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
-            SSLog.info(TAG, "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
+        if(SSLog.hasLoggers()) {
+            SSLog.info(TAG, "Services: ");
+            for(Map.Entry<Object, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
+                SSLog.info(TAG, "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
+            }
         }
     }
 }

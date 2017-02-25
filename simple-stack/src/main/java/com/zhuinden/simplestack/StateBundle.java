@@ -108,7 +108,7 @@ public class StateBundle
     //static final int type_Size = 24;
     //static final int type_SizeF = 25;
 
-    private static final String TAG = "Bundle";
+    private static final String TAG = "StateBundle";
 
     Map<String, Object> map = new LinkedHashMap<>();
     Map<String, Integer> typeMap = new LinkedHashMap<>();
@@ -1466,17 +1466,19 @@ public class StateBundle
 
     // Log a message if the value was non-null but not of the expected type
     void typeWarning(String key, Object value, String className, Object defaultValue, ClassCastException e) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Key ");
-        sb.append(key);
-        sb.append(" expected ");
-        sb.append(className);
-        sb.append(" but value was a ");
-        sb.append(value.getClass().getName());
-        sb.append(".  The default value ");
-        sb.append(defaultValue);
-        sb.append(" was returned.");
-        System.out.print(sb.toString());
+        if(SSLog.hasLoggers()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Key ");
+            sb.append(key);
+            sb.append(" expected ");
+            sb.append(className);
+            sb.append(" but value was a ");
+            sb.append(value.getClass().getName());
+            sb.append(".  The default value ");
+            sb.append(defaultValue);
+            sb.append(" was returned.");
+            SSLog.info(TAG, sb.toString());
+        }
     }
 
     void typeWarning(String key, Object value, String className, ClassCastException e) {
@@ -1496,5 +1498,18 @@ public class StateBundle
             dest.writeParcelable(typeElement, 0);
             dest.writeValue(get(key));
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(Map.Entry<String, Object> entry : map.entrySet()) {
+            stringBuilder.append("[[");
+            stringBuilder.append(entry.getKey());
+            stringBuilder.append("] :: [");
+            stringBuilder.append(entry.getValue());
+            stringBuilder.append("]]");
+        }
+        return stringBuilder.toString();
     }
 }

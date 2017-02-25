@@ -43,9 +43,11 @@ class BackstackManager {
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public final void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
-            SSLog.info(TAG,
-                    Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState()
-                            .toArray())); //
+            if(SSLog.hasLoggers()) {
+                SSLog.info(TAG,
+                        Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState()
+                                .toArray())); //
+            }
             serviceManager.dumpLogData();
             Object topNewKey = stateChange.topNewState();
             boolean isInitializeStateChange = stateChange.getPreviousState().isEmpty();
