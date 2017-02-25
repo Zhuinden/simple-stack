@@ -1,7 +1,6 @@
 package com.zhuinden.simplestack;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -200,5 +199,101 @@ public class NestedStackTest {
         nestedStackA1.setStateChanger(stateChanger);
         completionCallback.stateChangeComplete();
         assertThat(nestedStackA1.getHistory()).containsExactly(rootKeyB1, rootKeyB2);
+    }
+
+    @Test
+    public void setStateChangerThrowsIfUninitialized() {
+        TestKey rootKey = new TestKey("root");
+        TestKey rootKeyA1 = new TestKey("rootA1");
+
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(rootKey));
+        backstackDelegate.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
+        nestedStack.goTo(rootKeyA1);
+        try {
+            nestedStack.setStateChanger(stateChanger); // uninitialized!
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void initializeAndGoToUsesTypicalReentranceAndEnqueuesGoTo() {
+        TestKey rootKey = new TestKey("root");
+        TestKey rootKeyA1 = new TestKey("rootA1");
+        TestKey rootKeyA2 = new TestKey("rootA2");
+
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(rootKey));
+        backstackDelegate.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
+        nestedStack.initialize(rootKeyA1);
+        nestedStack.goTo(rootKeyA2);
+        nestedStack.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+        assertThat(nestedStack.getHistory()).containsExactly(rootKeyA1, rootKeyA2);
+    }
+
+    @Test
+    public void goToAndInitializeResultsInIgnoredBootstrap() {
+        TestKey rootKey = new TestKey("root");
+        TestKey rootKeyA1 = new TestKey("rootA1");
+        TestKey rootKeyA2 = new TestKey("rootA2");
+
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(rootKey));
+        backstackDelegate.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
+        nestedStack.goTo(rootKeyA2);
+        nestedStack.initialize(rootKeyA1);
+        nestedStack.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+        assertThat(nestedStack.getHistory()).containsExactly(rootKeyA2);
+    }
+
+    @Test
+    public void initializeAndSetHistoryEndsWithSetHistory() {
+        TestKey rootKey = new TestKey("root");
+        TestKey rootKeyA1 = new TestKey("rootA1");
+        TestKey rootKeyA2 = new TestKey("rootA2");
+        TestKey rootKeyA3 = new TestKey("rootA3");
+
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(rootKey));
+        backstackDelegate.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
+        nestedStack.initialize(rootKeyA1);
+        nestedStack.setHistory(HistoryBuilder.from(rootKeyA2, rootKeyA3).build(), StateChange.REPLACE);
+        nestedStack.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+        assertThat(nestedStack.getHistory()).containsExactly(rootKeyA2, rootKeyA3);
+    }
+
+    @Test
+    public void initializeWithEmptyListThrowsException() {
+        TestKey rootKey = new TestKey("root");
+
+        BackstackDelegate backstackDelegate = BackstackDelegate.create();
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(rootKey));
+        backstackDelegate.setStateChanger(stateChanger);
+        completionCallback.stateChangeComplete();
+
+        NestedStack nestedStack = backstackDelegate.getChildStack(rootKey);
+        try {
+            nestedStack.initialize();
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
     }
 }

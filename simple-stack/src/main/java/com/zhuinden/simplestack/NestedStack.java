@@ -71,6 +71,7 @@ public class NestedStack
 
     public void setStateChanger(StateChanger stateChanger) {
         if(parent != null) {
+            checkInitialized();
             backstackManager.setStateChanger(stateChanger);
         }
     }
@@ -99,6 +100,14 @@ public class NestedStack
             return parent.goBack();
         }
         return false;
+    }
+
+    public void addCompletionListener(Backstack.CompletionListener completionListener) {
+        this.backstack.addCompletionListener(completionListener);
+    }
+
+    public void removeCompletionListener(Backstack.CompletionListener completionListener) {
+        this.backstack.removeCompletionListener(completionListener);
     }
 
     public List<Object> getHistory() {
@@ -161,6 +170,7 @@ public class NestedStack
      */
     @NonNull
     public <T> T findService(Object key, String serviceTag) {
+        checkInitialized();
         return backstackManager.findService(key, serviceTag);
     }
 
@@ -177,6 +187,16 @@ public class NestedStack
         return findService(key, BackstackManager.LOCAL_STACK);
     }
 
+
+    // assertion
+    private void checkInitialized() {
+        if(backstackManager.getServiceManager() == null) {
+            throw new IllegalStateException(
+                    "You cannot set the state changer on an uninitalized nested stack, did you forget to call `initialize()`?");
+        }
+    }
+
+    // state persistence
     @NonNull
     @Override
     public StateBundle toBundle() {
