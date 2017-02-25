@@ -12,6 +12,9 @@ public class SSLog {
         void info(String tag, String message);
     }
 
+    private SSLog() {
+    }
+
     final static List<SSLogger> loggers = new ArrayList<>();
 
     public static void addLogger(SSLogger ssLogger) {
