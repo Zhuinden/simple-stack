@@ -1,0 +1,28 @@
+machine:
+   environment:
+     ANDROID_HOME: /usr/local/android-sdk-linux
+
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,android-25"
+    - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.2"
+    - echo y | android update sdk --no-ui --all --filter "extra-android-support";
+    - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository";
+    - echo y | android update sdk --no-ui --all --filter "extra-google-google_play_services";
+
+test:
+  override:
+    - ./gradlew build check
+
+    # copy lint report
+    - mkdir $CIRCLE_TEST_REPORTS/Lint
+    - mv simple-stack/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-example/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-example-fragments/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-example-multistack/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-example-mvp/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-example-rx/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-example-services/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-flow-masterdetail/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    - mv simple-stack-flow-masterdetail-fragments/build/outputs/lint-results-debug.xml $CIRCLE_TEST_REPORTS/lint
+    

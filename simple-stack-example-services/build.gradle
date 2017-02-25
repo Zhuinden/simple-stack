@@ -37,6 +37,9 @@ android {
         exclude 'META-INF/ASL2.0'
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
+    lintOptions { // CI
+        abortOnError false
+    }
 }
 
 dependencies {
