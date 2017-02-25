@@ -13,3 +13,7 @@ dependencies:
 test:
   override:
     - ./gradlew build check
+
+    # copy lint report
+    - mkdir $CIRCLE_TEST_REPORTS/Lint
+    - mv simple-stack/build/outputs/lint-results-debug_files $CIRCLE_TEST_REPORTS/lint
