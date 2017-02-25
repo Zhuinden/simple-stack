@@ -23,7 +23,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +31,9 @@ import java.util.Map;
 /**
  * A delegate class that manages the {@link Backstack}'s Activity lifecycle integration,
  * and provides view-state persistence for custom views that are associated with a key using {@link ManagedContextWrapper}.
+ *
+ * The states managed by the {@link BackstackDelegate} are also used to persist and restore the states of managed services for keys in the root stack,
+ * and any of their children.
  *
  * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
@@ -167,21 +169,6 @@ public final class BackstackDelegate {
                 throw new IllegalArgumentException("Service factory cannot be null!");
             }
             this.servicesFactories.add(serviceFactory);
-            return this;
-        }
-
-        /**
-         * Adds the {@link ServiceFactory}s.
-         * When a new key is set up, then the added {@link ServiceFactory}s bind the specified services into the given key's scope.
-         *
-         * @param serviceFactories The {@link ServiceFactory}s that create or destroy services.
-         * @return the builder.
-         */
-        public Builder addServiceFactories(@NonNull Collection<? extends ServiceFactory> serviceFactories) {
-            if(serviceFactories == null) {
-                throw new IllegalArgumentException("Service factories cannot be null!");
-            }
-            this.servicesFactories.addAll(serviceFactories);
             return this;
         }
 
@@ -391,7 +378,7 @@ public final class BackstackDelegate {
     }
 
     /**
-     * The class which stores the {@link Backstack} for surviving configuration change.
+     * The class which stores the {@link Backstack} and the {@link ServiceManager} for surviving configuration change.
      */
     public static class NonConfigurationInstance {
         private final Backstack backstack;

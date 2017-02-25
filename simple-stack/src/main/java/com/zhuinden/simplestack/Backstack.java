@@ -190,8 +190,6 @@ public class Backstack {
 
     /**
      * Goes back in the history.
-     * If the key is found, then it goes backward to the existing key.
-     * If the key is not found, then it goes forward to the newly added key.
      *
      * @return true if a state change is pending or is handled with a state change, false if there is only one state left.
      */

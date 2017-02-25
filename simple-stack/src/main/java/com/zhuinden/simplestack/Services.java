@@ -24,15 +24,38 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link Services} contain the managed services that are bound to a given key.
+ * It also provides the ability to access the parents' services by name as well.
+ */
 public class Services {
+    /**
+     * Used to portray a relationship towards the previous state that it is this current state's parent.
+     *
+     * For example, in chain A-B-C, if B is C's parent, then if C is the top state, B's services are not yet destroyed.
+     *
+     * At A-B-C-D, if C is not parent of D, then both B and C are persisted and torn down.
+     */
     public interface Child {
         Object parent();
     }
 
+    /**
+     * Used to portray a relationship that the current state is composed of multiple states that should all exist simultaneously.
+     *
+     * For example, in a bottom navigation view, 3-4 children should exist at the same time.
+     *
+     * Their children are represented by a {@link NestedStack} that belongs to each view.
+     */
     public interface Composite {
         List<? extends Object> keys();
     }
 
+    /**
+     * A builder that is able to access all services inherited from their parent services using {@link Services#getService(String)}.
+     *
+     * It is used to specify what managed services exist for the current key.
+     */
     public static final class Builder
             extends Services {
         private final Map<String, Object> boundServices = new LinkedHashMap<>();
@@ -46,6 +69,13 @@ public class Services {
             this.parentServices = parentServices;
         }
 
+        /**
+         * Used to bind a managed service to the given key's services by a given name.
+         *
+         * @param serviceName the name of the service
+         * @param service     the service
+         * @return the builder
+         */
         @NonNull
         public Builder withService(@NonNull String serviceName, @NonNull Object service) {
             if(serviceName == null) {
@@ -75,6 +105,15 @@ public class Services {
         this.ownedServices.putAll(boundServices);
     }
 
+    /**
+     * Returns the managed service bound with the given name.
+     * It checks both locally, and if not found, then in its parent, and so on.
+     * If not found, it returns null.
+     *
+     * @param name the name of the service.
+     * @param <T>  the type of the service.
+     * @return the service, or null if not found.
+     */
     @Nullable
     public <T> T getService(@NonNull String name) {
         if(ownedServices.containsKey(name)) {
@@ -88,6 +127,12 @@ public class Services {
         return null;
     }
 
+    /**
+     * Returns the key this services belongs to.
+
+     * @param <T> the type of the key.
+     * @return the key.
+     */
     @NonNull
     public <T> T getKey() {
         //noinspection unchecked

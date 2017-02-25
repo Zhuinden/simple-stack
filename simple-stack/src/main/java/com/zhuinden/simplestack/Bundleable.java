@@ -23,6 +23,9 @@ import android.view.View;
  * Specifies that the custom view that implements this also places its persisted state into a {@link StateBundle}.
  *
  * This is used by {@link BackstackDelegate#persistViewToState(View)} and {@link BackstackDelegate#restoreViewFromState(View)}.
+ * It is also used by {@link NestedStack#persistViewToState(View)} and {@link NestedStack#restoreViewFromState(View)}.
+ *
+ * It is the contract by which services registered as managed using {@link Services.Builder} are able to persist and restore their state.
  */
 public interface Bundleable {
     @NonNull

@@ -28,7 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A mapping from String keys to values of various types.
+ * Parcelable representation of Bundle, independent from the Android framework.
+ *
+ * Used as the contract for {@link Bundleable}.
  */
 public class StateBundle
         implements Parcelable {
