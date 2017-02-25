@@ -95,7 +95,6 @@ class ServiceManager {
     ServiceManager(List<ServiceFactory> serviceFactories, Map<String, Object> _rootServices, ServiceManager parentServiceManager, Object parentKey, KeyParceler keyParceler) {
         Map<String, Object> rootServices = new LinkedHashMap<>();
         rootServices.putAll(_rootServices);
-        rootServices.put(TAG, this);
         this.parentKey = parentKey;
         this.parent = parentServiceManager;
         Services parentServices = null;
@@ -211,7 +210,7 @@ class ServiceManager {
         SavedState savedState = backstackManager.getSavedState(key);
         StateBundle bundle = savedState.getServiceBundle();
         if(bundle != null) {
-            //Log.i("ServiceManager", "<<< RESTORE [" + key + "] >>>");
+            SSLog.info(TAG, "<<< RESTORE [" + key + "] >>>");
             for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
                 if(serviceEntry.getValue() instanceof Bundleable) {
                     StateBundle serviceBundle = bundle.getBundle(serviceEntry.getKey());
@@ -222,7 +221,7 @@ class ServiceManager {
     }
 
     void persistServicesForKey(BackstackManager backstackManager, Object key) {
-        //Log.i("ServiceManager", "<<< PERSIST [" + key + "] >>>");
+        SSLog.info(TAG, "<<< PERSIST [" + key + "] >>>");
         ReferenceCountedServices node = findManagedServices(key);
         SavedState savedState = backstackManager.getSavedState(key);
         StateBundle bundle = savedState.getServiceBundle();
@@ -290,9 +289,9 @@ class ServiceManager {
     }
 
     public void dumpLogData() {
-        //Log.i("ServiceManager", "Services: ");
+        SSLog.info(TAG, "Services: ");
         for(Map.Entry<Object, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
-            //Log.i("ServiceManager", "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
+            SSLog.info(TAG, "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
         }
     }
 }

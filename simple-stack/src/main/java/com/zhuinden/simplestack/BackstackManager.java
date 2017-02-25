@@ -8,6 +8,7 @@ import android.util.SparseArray;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,6 +19,8 @@ import java.util.Set;
  * Created by Owner on 2017. 02. 22..
  */
 class BackstackManager {
+    private static final String TAG = "simplestack.BackstackManager";
+
     static final String ROOT_STACK = "simplestack.ROOT_STACK";
     static final String LOCAL_STACK = "simplestack.LOCAL_STACK";
 
@@ -40,8 +43,10 @@ class BackstackManager {
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public final void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
-            //Log.i("ServiceManager", Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState().toArray())); //
-            //serviceManager.dumpLogData(); //
+            SSLog.info(TAG,
+                    Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState()
+                            .toArray())); //
+            serviceManager.dumpLogData();
             Object topNewKey = stateChange.topNewState();
             boolean isInitializeStateChange = stateChange.getPreviousState().isEmpty();
             boolean servicesUninitialized = (isInitializeStateChange && !serviceManager.hasServices(topNewKey));
@@ -58,7 +63,7 @@ class BackstackManager {
             if(topPreviousKey != null && stateChange.getNewState().contains(topPreviousKey)) {
                 serviceManager.tearDown(BackstackManager.this, true, topPreviousKey);
             }
-            //serviceManager.dumpLogData(); //
+            serviceManager.dumpLogData();
             stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
                 @Override
                 public void stateChangeComplete() {
