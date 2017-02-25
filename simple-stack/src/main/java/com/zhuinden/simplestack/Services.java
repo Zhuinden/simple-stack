@@ -48,6 +48,9 @@ public class Services {
 
         @NonNull
         public Builder withService(@NonNull String serviceName, @NonNull Object service) {
+            if(serviceName == null) {
+                throw new IllegalArgumentException("The provided service [" + service + "] must have a non-null name!");
+            }
             if(service == null) {
                 throw new IllegalArgumentException("The provided service [" + serviceName + "] cannot be null!");
             }

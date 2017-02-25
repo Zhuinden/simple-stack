@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -1330,5 +1331,43 @@ public class ServicesTest {
         assertThat(((Service) serviceManager.findServices(_E).getService("E")).nyah).isEqualTo("E");
         assertThat(((Service) serviceManager.findServices(_F).getService("F")).nyah).isEqualTo("F");
         assertThat(((Service) serviceManager.findServices(_G).getService("G")).nyah).isEqualTo("G");
+    }
+
+    @Test
+    public void serviceCannotBeMadeWithoutName() {
+        TestKey testKey = new TestKey("hello");
+        List<ServiceFactory> serviceFactories = new ArrayList<>();
+        serviceFactories.add(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                builder.withService(null, new Object());
+            }
+        });
+        ServiceManager serviceManager = new ServiceManager(serviceFactories);
+        try {
+            serviceManager.setUp(backstackManager, testKey);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void serviceCannotBeNull() {
+        TestKey testKey = new TestKey("hello");
+        List<ServiceFactory> serviceFactories = new ArrayList<>();
+        serviceFactories.add(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                builder.withService("asd", null);
+            }
+        });
+        ServiceManager serviceManager = new ServiceManager(serviceFactories);
+        try {
+            serviceManager.setUp(backstackManager, testKey);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
     }
 }
