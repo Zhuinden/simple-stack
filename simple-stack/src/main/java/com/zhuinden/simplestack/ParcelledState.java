@@ -65,4 +65,19 @@ class ParcelledState
             dest.writeParcelable(serviceBundle, 0);
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Key [");
+        stringBuilder.append(parcelableKey);
+        stringBuilder.append("]\n");
+        stringBuilder.append("ServiceBundle [");
+        stringBuilder.append(serviceBundle);
+        stringBuilder.append("]\n");
+        stringBuilder.append("ViewBundle [");
+        stringBuilder.append(viewBundle);
+        stringBuilder.append("]\n");
+        return stringBuilder.toString();
+    }
 }

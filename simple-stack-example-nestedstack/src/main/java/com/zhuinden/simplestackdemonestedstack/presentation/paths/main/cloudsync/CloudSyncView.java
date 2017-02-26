@@ -115,7 +115,8 @@ public class CloudSyncView
             nestedStack.persistViewToState(nestedContainer.getChildAt(0));
             nestedContainer.removeAllViews();
         }
-        View newView = LayoutInflater.from(nestedStack.createContext(getContext(), newKey)).inflate(newKey.layout(), this, false);
+        View newView = LayoutInflater.from(nestedStack.createContext(getContext(), newKey))
+                .inflate(newKey.layout(), this, false); // FIXME AppCompatV9Delegate workaround
         nestedStack.restoreViewFromState(newView);
         nestedContainer.addView(newView);
         completionCallback.stateChangeComplete();

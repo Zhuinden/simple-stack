@@ -1510,7 +1510,7 @@ public class StateBundle
             stringBuilder.append(entry.getKey());
             stringBuilder.append("] :: [");
             stringBuilder.append(entry.getValue());
-            stringBuilder.append("]]");
+            stringBuilder.append("]]\n");
         }
         return stringBuilder.toString();
     }

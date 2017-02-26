@@ -3,6 +3,7 @@ package com.zhuinden.simplestackdemonestedstack.application;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -10,6 +11,7 @@ import android.widget.FrameLayout;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.SSLog;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
@@ -37,6 +39,12 @@ public class MainActivity
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SSLog.addLogger(new SSLog.SSLogger() {
+            @Override
+            public void info(String tag, String message) {
+                Log.i(tag, message);
+            }
+        });
         backstackDelegate = BackstackDelegate.create();
         backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), HistoryBuilder.single(MainKey.create()));
         backstack = backstackDelegate.getBackstack();
@@ -87,6 +95,7 @@ public class MainActivity
     @Override
     protected void onDestroy() {
         backstackDelegate.onDestroy();
+        SSLog.removeAllLoggers();
         super.onDestroy();
     }
 

@@ -54,6 +54,8 @@ class BackstackManager {
             boolean servicesUninitialized = (isInitializeStateChange && !serviceManager.hasServices(topNewKey));
             if(servicesUninitialized || !isInitializeStateChange) {
                 serviceManager.setUp(BackstackManager.this, topNewKey);
+            } else {
+                serviceManager.restoreServicesForKey(BackstackManager.this, topNewKey);
             }
             for(int i = stateChange.getPreviousState().size() - 1; i >= 0; i--) {
                 Object previousKey = stateChange.getPreviousState().get(i);
@@ -112,7 +114,7 @@ class BackstackManager {
 
     private void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange) {
         Set<Object> retainedKeys = new LinkedHashSet<>();
-        retainedKeys.add(ServiceManager.ROOT_KEY);
+        retainedKeys.add(serviceManager.getRootKey());
         for(Object key : stateChange.getNewState()) {
             Object stateRoot = key;
             if(serviceManager.hasServices(stateRoot)) {
@@ -182,13 +184,13 @@ class BackstackManager {
         restoreStates(stateBundle);
         setupBackstack(stateBundle, initialKeys);
         rootServices.put(ROOT_STACK, new NestedStack(this, keyParceler)); // This can only be done here.
-        setupServiceManager(null, null, servicesFactories, rootServices);
+        setupServiceManager(null, null, null, servicesFactories, rootServices);
     }
 
-    void setupServiceManager(@Nullable ServiceManager parentServiceManager, @Nullable Object parentKey, List<ServiceFactory> servicesFactories, Map<String, Object> rootServices) {
-        serviceManager = new ServiceManager(servicesFactories,
+    void setupServiceManager(Object localKey, @Nullable ServiceManager parentServiceManager, @Nullable Object parentKey, List<ServiceFactory> servicesFactories, Map<String, Object> rootServices) {
+        serviceManager = new ServiceManager(localKey, servicesFactories,
                 rootServices, parentServiceManager, parentKey, keyParceler);
-        serviceManager.restoreServicesForKey(this, ServiceManager.ROOT_KEY);
+        serviceManager.restoreServicesForKey(this, serviceManager.getRootKey());
     }
 
     public Backstack getBackstack() {
@@ -257,7 +259,7 @@ class BackstackManager {
 
     public void persistStates() {
         List<Object> history = backstack.getHistory();
-        serviceManager.persistServicesForKey(this, ServiceManager.ROOT_KEY);
+        serviceManager.persistServicesForKey(this, serviceManager.getRootKey());
         if(!history.isEmpty()) {
             serviceManager.persistServicesForKeyHierarchy(this, history.get(history.size() - 1));
         }

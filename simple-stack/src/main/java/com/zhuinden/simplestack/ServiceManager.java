@@ -31,10 +31,19 @@ class ServiceManager {
 
     static class RootKey
             implements Parcelable {
-        private RootKey() {
+        final Parcelable parcelableLocalKey;
+
+        private RootKey(Parcelable parcelableLocalKey, boolean withKey) {
+            this.parcelableLocalKey = parcelableLocalKey;
         }
 
         protected RootKey(Parcel in) {
+            boolean hasParcelable = in.readByte() > 0;
+            if(hasParcelable) {
+                parcelableLocalKey = in.readParcelable(getClass().getClassLoader());
+            } else {
+                parcelableLocalKey = null;
+            }
         }
 
         public static final Creator<RootKey> CREATOR = new Creator<RootKey>() {
@@ -56,6 +65,10 @@ class ServiceManager {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
+            dest.writeByte(parcelableLocalKey == null ? (byte) 0x00 : 0x01);
+            if(parcelableLocalKey != null) {
+                dest.writeParcelable(parcelableLocalKey, 0);
+            }
         }
 
         @Override
@@ -64,35 +77,48 @@ class ServiceManager {
                 return false;
             }
             if(object instanceof RootKey) {
-                return true;
+                RootKey rootKey = (RootKey) object;
+                return (rootKey.parcelableLocalKey == null && this.parcelableLocalKey == null) || (this.parcelableLocalKey != null && this.parcelableLocalKey
+                        .equals(rootKey.parcelableLocalKey));
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return RootKey.class.hashCode();
+            return parcelableLocalKey != null ? parcelableLocalKey.hashCode() : 0;
         }
 
         @Override
         public String toString() {
-            return "Services.ROOT_KEY";
+            return "Services.rootKey[" + parcelableLocalKey + "]";
         }
     }
 
-    static final Object ROOT_KEY = new RootKey();
+    private Object rootKey = new RootKey(null, true);
+
+    Object getRootKey() {
+        return rootKey;
+    }
 
     private final ServiceManager parent;
     private final Services rootServices;
+    private final Object localKey;
     private final Object parentKey;
     private final Map<Object, ReferenceCountedServices> keyToManagedServicesMap = new LinkedHashMap<>();
     private final List<ServiceFactory> serviceFactories = new ArrayList<>();
 
     ServiceManager(List<ServiceFactory> serviceFactories) {
-        this(serviceFactories, Collections.<String, Object>emptyMap(), null, null, BackstackDelegate.DEFAULT_KEYPARCELER);
+        this(null, serviceFactories, Collections.<String, Object>emptyMap(), null, null, BackstackDelegate.DEFAULT_KEYPARCELER);
     }
 
-    ServiceManager(List<ServiceFactory> serviceFactories, Map<String, Object> _rootServices, ServiceManager parentServiceManager, Object parentKey, KeyParceler keyParceler) {
+    ServiceManager(Object localKey, List<ServiceFactory> serviceFactories, Map<String, Object> _rootServices, ServiceManager parentServiceManager, Object parentKey, KeyParceler keyParceler) {
+        if(localKey == null) {
+            this.localKey = rootKey;
+        } else {
+            this.localKey = localKey;
+            this.rootKey = new RootKey(keyParceler.toParcelable(localKey), true);
+        }
         Map<String, Object> rootServices = new LinkedHashMap<>();
         rootServices.putAll(_rootServices);
         this.parentKey = parentKey;
@@ -101,14 +127,14 @@ class ServiceManager {
         if(parentServiceManager != null && parentKey != null) {
             parentServices = parentServiceManager.findServices(parentKey);
         }
-        this.rootServices = new Services(ROOT_KEY, parentServices, rootServices);
+        this.rootServices = new Services(rootKey, parentServices, rootServices);
         if(parent == null) { // ROOT
             this.serviceFactories.add(0, new HierarchyServiceFactory(keyParceler));
         } else {
             this.serviceFactories.addAll(0, parent.serviceFactories);
         }
         this.serviceFactories.addAll(serviceFactories);
-        keyToManagedServicesMap.put(ROOT_KEY, new ReferenceCountedServices(this.rootServices));
+        keyToManagedServicesMap.put(rootKey, new ReferenceCountedServices(this.rootServices));
     }
 
     public boolean hasServices(Object key) {
@@ -136,7 +162,7 @@ class ServiceManager {
     }
 
     void setUp(BackstackManager backstackManager, Object key) {
-        Services parentServices = findManagedServices(ROOT_KEY).services;
+        Services parentServices = findManagedServices(rootKey).services;
         if(key instanceof Services.Child) {
             final Object parentKey = ((Services.Child) key).parent();
             setUp(backstackManager, parentKey);
@@ -217,7 +243,10 @@ class ServiceManager {
                 if(serviceEntry.getValue() instanceof Bundleable) {
                     StateBundle serviceBundle = bundle.getBundle(serviceEntry.getKey());
                     if(SSLog.hasLoggers()) {
-                        SSLog.info(TAG, "<<[[ Restoring service [" + serviceEntry.getKey() + "] with [" + serviceBundle + "] ]]>>");
+                        SSLog.info(TAG, "<<[[ Restoring service [" + serviceEntry.getKey() + "] with:");
+                        SSLog.info(TAG, "" + serviceBundle);
+                        SSLog.info(TAG, "]]>>");
+                        SSLog.info(TAG, " ");
                     }
                     ((Bundleable) serviceEntry.getValue()).fromBundle(serviceBundle);
                 }
@@ -267,7 +296,7 @@ class ServiceManager {
             throw new IllegalStateException("Cannot remove a node that doesn't exist or has already been removed!");
         }
         node.usageCount--;
-        if(key != ROOT_KEY && node.usageCount == 0) {
+        if(key != rootKey && node.usageCount == 0) {
             if(shouldPersist) {
                 persistServicesForKey(backstackManager, key);
             }
@@ -297,7 +326,7 @@ class ServiceManager {
 
     public void dumpLogData() {
         if(SSLog.hasLoggers()) {
-            SSLog.info(TAG, "Services: ");
+            SSLog.info(TAG, "Services with key [" + localKey + "] and with parent [" + parentKey + "]: ");
             for(Map.Entry<Object, ReferenceCountedServices> entry : keyToManagedServicesMap.entrySet()) {
                 SSLog.info(TAG, "  [" + entry.getKey() + "] :: " + entry.getValue().usageCount);
             }

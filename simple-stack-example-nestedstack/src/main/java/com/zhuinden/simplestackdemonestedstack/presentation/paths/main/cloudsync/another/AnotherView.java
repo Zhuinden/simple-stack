@@ -14,6 +14,7 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
+import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.another.internal.InternalKey;
 import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 
@@ -84,6 +85,12 @@ public class AnotherView
 
     @Override
     public boolean onBackPressed() {
+        if(nestedContainer.getChildAt(0) != null && nestedContainer.getChildAt(0) instanceof BackPressListener) {
+            boolean handled = ((BackPressListener) nestedContainer.getChildAt(0)).onBackPressed();
+            if(handled) {
+                return true;
+            }
+        }
         return nestedStack.goBack();
     }
 
@@ -98,7 +105,8 @@ public class AnotherView
             nestedStack.persistViewToState(nestedContainer.getChildAt(0));
             nestedContainer.removeAllViews();
         }
-        View newView = LayoutInflater.from(nestedStack.createContext(getContext(), newKey)).inflate(newKey.layout(), this, false);
+        View newView = LayoutInflater.from(nestedStack.createContext(MainActivity.get(getContext()), newKey))
+                .inflate(newKey.layout(), this, false);
         nestedStack.restoreViewFromState(newView);
         nestedContainer.addView(newView);
         completionCallback.stateChangeComplete();

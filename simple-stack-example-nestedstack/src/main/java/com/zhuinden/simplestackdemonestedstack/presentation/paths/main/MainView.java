@@ -114,9 +114,8 @@ public class MainView
 
     private void exchangeViewForKey(Key newKey, int direction) {
         nestedStack.persistViewToState(root.getChildAt(0));
-        Context newContext = nestedStack.createContext(getContext(), newKey);
         View previousView = root.getChildAt(0);
-        View newView = LayoutInflater.from(newContext).inflate(newKey.layout(), this, false);
+        View newView = LayoutInflater.from(nestedStack.createContext(getContext(), newKey)).inflate(newKey.layout(), this, false);
         nestedStack.restoreViewFromState(newView);
         root.addView(newView);
 
