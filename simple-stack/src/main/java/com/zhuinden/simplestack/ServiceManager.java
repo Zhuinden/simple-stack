@@ -162,7 +162,7 @@ class ServiceManager {
     }
 
     void setUp(BackstackManager backstackManager, Object key) {
-        Services parentServices = findManagedServices(rootKey).services;
+        Services parentServices = findManagedServices(localKey).services;
         if(key instanceof Services.Child) {
             final Object parentKey = ((Services.Child) key).parent();
             setUp(backstackManager, parentKey);

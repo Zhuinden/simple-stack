@@ -94,10 +94,13 @@ public class MainView
             @Override
             public void onMenuItemSelect(@IdRes int menuItemId, int itemIndex, boolean b) {
                 Key previousKey = Backstack.getKey(root.getChildAt(0).getContext());
-                StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
                 StackType newStack = StackType.values()[itemIndex];
                 Key newKey = newStack.getKey();
-                int direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
+                int direction = StateChange.REPLACE;
+                if(previousKey != null && !"".equals(previousKey.stackIdentifier())) {
+                    StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
+                    direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
+                }
                 nestedStack.setHistory(HistoryBuilder.from(nestedStack).removeLast().add(newKey).build(), direction);
             }
 
@@ -142,11 +145,13 @@ public class MainView
         }
         int direction = StateChange.REPLACE;
         if(root.getChildAt(0) != null) {
-            Key previousKey = Backstack.getKey(root.getChildAt(0).getContext());
-            StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
+            Key previousKey = stateChange.topPreviousState();
             Key newKey = stateChange.topNewState();
-            StackType newStack = StackType.valueOf(newKey.stackIdentifier());
-            direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
+            StackType newStack = StackType.valueOf(newKey.stackIdentifier()); // TODO: WHY is ListView's KEY in its Context MAINKEY?
+            if(previousKey != null) {
+                StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
+                direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
+            }
         }
         exchangeViewForKey(stateChange.topNewState(), direction);
         completionCallback.stateChangeComplete();
