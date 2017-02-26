@@ -132,7 +132,7 @@ class BackstackManager {
     private void buildKeysToKeep(Object key, Set<Object> retainedKeys) {
         retainedKeys.add(key);
         if(key instanceof Services.Composite) {
-            List<? extends Object> children = ((Services.Composite) key).keys();
+            List<?> children = ((Services.Composite) key).keys();
             for(Object childKey : children) {
                 buildKeysToKeep(childKey, retainedKeys);
             }

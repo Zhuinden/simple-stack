@@ -153,7 +153,7 @@ class ServiceManager {
 
     private void buildComposite(BackstackManager backstackManager, Object key, Services parentServices) {
         Services.Composite composite = (Services.Composite) key;
-        List<? extends Object> children = composite.keys();
+        List<?> children = composite.keys();
         for(int i = 0; i < children.size(); i++) {
             Object child = children.get(i);
             ReferenceCountedServices managedServices = createNonExistentManagedServicesAndIncrementUsageCount(backstackManager,
@@ -172,7 +172,7 @@ class ServiceManager {
     private void tearDown(BackstackManager backstackManager, boolean shouldPersist, Object key, boolean isFromComposite) {
         if(key instanceof Services.Composite) {
             Services.Composite composite = (Services.Composite) key;
-            List<? extends Object> children = composite.keys();
+            List<?> children = composite.keys();
             for(int i = children.size() - 1; i >= 0; i--) {
                 tearDown(backstackManager, shouldPersist, children.get(i), true);
             }
@@ -251,7 +251,7 @@ class ServiceManager {
 
     private void persistComposite(BackstackManager backstackManager, Object key) {
         Services.Composite composite = (Services.Composite) key;
-        List<? extends Object> children = composite.keys();
+        List<?> children = composite.keys();
         for(int i = 0; i < children.size(); i++) {
             Object child = children.get(i);
             persistServicesForKey(backstackManager, child);

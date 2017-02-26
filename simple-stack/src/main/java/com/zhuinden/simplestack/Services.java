@@ -48,7 +48,7 @@ public class Services {
      * Their children are represented by a {@link NestedStack} that belongs to each view.
      */
     public interface Composite {
-        List<? extends Object> keys();
+        List<?> keys();
     }
 
     /**

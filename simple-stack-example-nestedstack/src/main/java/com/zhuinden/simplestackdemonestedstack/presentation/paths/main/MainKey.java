@@ -31,7 +31,7 @@ public abstract class MainKey
     }
 
     @Override
-    public List<? extends Object> keys() {
+    public List<?> keys() {
         MainView.StackType[] stackTypes = MainView.StackType.values();
         List<Key> list = new ArrayList<>(stackTypes.length);
         for(MainView.StackType stackType : stackTypes) {
