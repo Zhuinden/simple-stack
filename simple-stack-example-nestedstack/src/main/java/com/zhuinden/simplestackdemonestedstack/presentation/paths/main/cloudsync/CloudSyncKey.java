@@ -3,7 +3,7 @@ package com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsyn
 import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
-import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
+import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.MainView;
 
 /**
  * Created by Owner on 2017. 01. 12..
@@ -22,6 +22,6 @@ public abstract class CloudSyncKey
 
     @Override
     public String stackIdentifier() {
-        return MainActivity.StackType.CLOUDSYNC.name();
+        return MainView.StackType.CLOUDSYNC.name();
     }
 }

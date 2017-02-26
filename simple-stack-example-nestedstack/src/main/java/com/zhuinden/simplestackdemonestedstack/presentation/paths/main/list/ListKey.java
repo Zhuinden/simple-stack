@@ -1,11 +1,9 @@
 package com.zhuinden.simplestackdemonestedstack.presentation.paths.main.list;
 
-import android.os.Parcelable;
-
 import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
-import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
+import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.MainView;
 
 /**
  * Created by Zhuinden on 2017.02.19..
@@ -25,6 +23,6 @@ public abstract class ListKey
 
     @Override
     public String stackIdentifier() {
-        return MainActivity.StackType.LIST.name();
+        return MainView.StackType.LIST.name();
     }
 }

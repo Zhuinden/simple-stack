@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout android:id="@+id/coordinator_root"
-                                                 xmlns:android="http://schemas.android.com/apk/res/android"
-                                                 android:layout_width="match_parent"
-                                                 android:layout_height="match_parent"
-                                                 xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <RelativeLayout
-        android:id="@+id/root"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </RelativeLayout>
-
-    <it.sephiroth.android.library.bottomnavigation.BottomNavigation
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:bbn_entries="@menu/bottom_nav"
-        app:bbn_scrollEnabled="true"
-        app:bbn_badgeProvider="@string/bbn_badgeProvider"
-        app:layout_behavior="@string/bbn_phone_view_behavior" />>
-</android.support.design.widget.CoordinatorLayout>
+<FrameLayout android:id="@+id/view_root"
+             xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical">
+</FrameLayout>

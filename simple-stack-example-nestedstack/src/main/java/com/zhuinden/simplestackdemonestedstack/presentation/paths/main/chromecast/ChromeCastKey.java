@@ -3,7 +3,7 @@ package com.zhuinden.simplestackdemonestedstack.presentation.paths.main.chromeca
 import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
-import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
+import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.MainView;
 
 /**
  * Created by Owner on 2017. 01. 12..
@@ -23,6 +23,6 @@ public abstract class ChromeCastKey
 
     @Override
     public String stackIdentifier() {
-        return MainActivity.StackType.CHROMECAST.name();
+        return MainView.StackType.CHROMECAST.name();
     }
 }

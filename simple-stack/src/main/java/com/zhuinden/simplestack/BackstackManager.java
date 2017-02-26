@@ -114,7 +114,17 @@ class BackstackManager {
         Set<Object> retainedKeys = new LinkedHashSet<>();
         retainedKeys.add(ServiceManager.ROOT_KEY);
         for(Object key : stateChange.getNewState()) {
-            buildKeysToKeep(key, retainedKeys);
+            Object stateRoot = key;
+            if(serviceManager.hasServices(stateRoot)) {
+                Object parentKey = serviceManager.findServices(stateRoot).getService(PARENT_KEY);
+                while(parentKey instanceof Services.Composite) { // TODO: there NEEDS to be a unit test for this!
+                    stateRoot = parentKey;
+                    if(serviceManager.hasServices(stateRoot)) {
+                        parentKey = serviceManager.findServices(stateRoot).getService(PARENT_KEY);
+                    }
+                }
+            }
+            buildKeysToKeep(stateRoot, retainedKeys);
         }
         keyStateMap.keySet().retainAll(retainedKeys);
     }

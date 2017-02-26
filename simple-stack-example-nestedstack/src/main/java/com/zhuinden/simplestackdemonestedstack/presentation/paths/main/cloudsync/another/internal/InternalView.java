@@ -13,7 +13,6 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
-import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.chromecast.ChromeCastKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.list.ListKey;
 
 import butterknife.BindView;
@@ -56,7 +55,7 @@ public class InternalView extends RelativeLayout implements StateChanger {
 
     @OnClick(R.id.another_forward)
     public void forwardClicked() {
-        nestedStack.goTo(ChromeCastKey.create());
+
     }
 
 

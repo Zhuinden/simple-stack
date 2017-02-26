@@ -18,14 +18,10 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
-import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.another.AnotherKey;
-import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.another.AnotherView;
-import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.mail.MailKey;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 /**
  * Created by Owner on 2017. 01. 12..
  */
@@ -119,9 +115,7 @@ public class CloudSyncView
             nestedStack.persistViewToState(nestedContainer.getChildAt(0));
             nestedContainer.removeAllViews();
         }
-        Context newContext = nestedStack.createContext(MainActivity.get(getContext()), newKey); // TODO: AppCompatV9 overrides the provided NewContext with the parent context during inflation, effectively fucking everything up - this is the ugliest workaround ever, but it works
-        LayoutInflater layoutInflater = LayoutInflater.from(newContext);
-        View newView = layoutInflater.inflate(newKey.layout(), null, false); // TODO: AppCompatV9 overrides the provided NewContext with the parent context during inflation, effectively fucking everything up - this is the ugliest workaround ever, but it works
+        View newView = LayoutInflater.from(nestedStack.createContext(getContext(), newKey)).inflate(newKey.layout(), this, false);
         nestedStack.restoreViewFromState(newView);
         nestedContainer.addView(newView);
         completionCallback.stateChangeComplete();
