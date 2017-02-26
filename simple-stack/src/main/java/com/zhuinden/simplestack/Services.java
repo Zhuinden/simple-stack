@@ -61,8 +61,8 @@ public class Services {
         private final Map<String, Object> boundServices = new LinkedHashMap<>();
         private final Services parentServices;
 
-        private Builder(Services parentServices, Object key) {
-            super(key, parentServices, Collections.<String, Object>emptyMap());
+        private Builder(ServiceManager serviceManager, Services parentServices, Object key) {
+            super(serviceManager, key, parentServices, Collections.<String, Object>emptyMap());
             if(parentServices == null) {
                 throw new NullPointerException("only root Services should have a null parentServices");
             }
@@ -90,16 +90,18 @@ public class Services {
 
         @NonNull
         Services build() {
-            return new Services(getKey(), parentServices, boundServices);
+            return new Services(serviceManager, getKey(), parentServices, boundServices);
         }
     }
 
+    protected final ServiceManager serviceManager;
     private final Object key;
     @Nullable
     private final Services parentServices;
     final Map<String, Object> ownedServices = new LinkedHashMap<>();
 
-    Services(Object key, @Nullable Services parentServices, Map<String, Object> boundServices) {
+    Services(ServiceManager serviceManager, Object key, @Nullable Services parentServices, Map<String, Object> boundServices) {
+        this.serviceManager = serviceManager;
         this.key = key;
         this.parentServices = parentServices;
         this.ownedServices.putAll(boundServices);
@@ -141,6 +143,6 @@ public class Services {
 
     @NonNull
     Builder extend(@NonNull Object key) {
-        return new Builder(this, key);
+        return new Builder(serviceManager, this, key);
     }
 }

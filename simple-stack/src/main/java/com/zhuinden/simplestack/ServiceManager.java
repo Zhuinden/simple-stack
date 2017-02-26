@@ -127,7 +127,7 @@ class ServiceManager {
         if(parentServiceManager != null && parentKey != null) {
             parentServices = parentServiceManager.findServices(parentKey);
         }
-        this.rootServices = new Services(rootKey, parentServices, rootServices);
+        this.rootServices = new Services(this, rootKey, parentServices, rootServices);
         if(parent == null) { // ROOT
             this.serviceFactories.add(0, new HierarchyServiceFactory(keyParceler));
         } else {
