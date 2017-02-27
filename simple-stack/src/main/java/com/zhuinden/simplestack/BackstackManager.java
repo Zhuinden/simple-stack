@@ -60,6 +60,7 @@ class BackstackManager {
             } else {
                 serviceManager.restoreServicesForKey(BackstackManager.this, topNewKey);
             }
+            persistStates();
             for(int i = stateChange.getPreviousState().size() - 1; i >= 0; i--) {
                 Object previousKey = stateChange.getPreviousState().get(i);
                 if(localManagedKeys.contains(previousKey) && !stateChange.getNewState().contains(previousKey)) {
