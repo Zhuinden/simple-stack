@@ -263,6 +263,9 @@ class ServiceManager {
             SSLog.info(TAG, "<<< PERSIST [" + key + "] >>>");
         }
         ReferenceCountedServices node = findManagedServices(key);
+        if(node == null) {
+            throw new IllegalStateException("Node for [" + key + "] was not found in the service hierarchy!");
+        }
         SavedState savedState = backstackManager.getSavedState(key);
         StateBundle bundle = savedState.getServiceBundle();
         for(Map.Entry<String, Object> serviceEntry : node.services.ownedServices.entrySet()) {
