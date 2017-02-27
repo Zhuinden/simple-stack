@@ -101,6 +101,10 @@ class ServiceManager {
         return rootKey;
     }
 
+    Object getLocalKey() {
+        return localKey;
+    }
+
     private final ServiceManager parent;
     private final Services rootServices;
     private final Object localKey;

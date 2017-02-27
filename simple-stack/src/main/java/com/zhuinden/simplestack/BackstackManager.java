@@ -45,8 +45,8 @@ class BackstackManager {
         public final void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
             if(SSLog.hasLoggers()) {
                 SSLog.info(TAG,
-                        Arrays.toString(stateChange.getPreviousState().toArray()) + " :: " + Arrays.toString(stateChange.getNewState()
-                                .toArray())); //
+                        (serviceManager != null ? ("[" + serviceManager.getLocalKey() + "]: ") : "" + Arrays.toString(stateChange.getPreviousState()
+                                .toArray()) + " :: " + Arrays.toString(stateChange.getNewState().toArray())));
             }
             serviceManager.dumpLogData();
             Object topNewKey = stateChange.topNewState();
@@ -188,8 +188,7 @@ class BackstackManager {
     }
 
     void setupServiceManager(Object localKey, @Nullable ServiceManager parentServiceManager, @Nullable Object parentKey, List<ServiceFactory> servicesFactories, Map<String, Object> rootServices) {
-        serviceManager = new ServiceManager(localKey, servicesFactories,
-                rootServices, parentServiceManager, parentKey, keyParceler);
+        serviceManager = new ServiceManager(localKey, servicesFactories, rootServices, parentServiceManager, parentKey, keyParceler);
         serviceManager.restoreServicesForKey(this, serviceManager.getRootKey());
     }
 

@@ -23,6 +23,7 @@ import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.chromecas
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.CloudSyncKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.list.ListKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.mail.MailKey;
+import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 import com.zhuinden.simplestackdemonestedstack.util.ViewUtils;
 
 import butterknife.BindView;
@@ -35,7 +36,7 @@ import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 
 public class MainView
         extends CoordinatorLayout
-        implements StateChanger {
+        implements StateChanger, BackPressListener {
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -112,6 +113,16 @@ public class MainView
         nestedStack.setStateChanger(this);
     }
 
+    @Override
+    public boolean onBackPressed() {
+        if(root.getChildAt(0) != null && root.getChildAt(0) instanceof BackPressListener) {
+            boolean handled = ((BackPressListener) root.getChildAt(0)).onBackPressed();
+            if(handled) {
+                return true;
+            }
+        }
+        return nestedStack.goBack();
+    }
 
     private void exchangeViewForKey(Key newKey, int direction) {
         nestedStack.persistViewToState(root.getChildAt(0));

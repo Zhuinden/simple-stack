@@ -19,6 +19,7 @@ import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.another.AnotherKey;
+import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +29,7 @@ import butterknife.ButterKnife;
 
 public class CloudSyncView
         extends RelativeLayout
-        implements Bundleable, StateChanger {
+        implements Bundleable, StateChanger, BackPressListener {
     private static final String TAG = "FirstView";
 
     public CloudSyncView(Context context) {
@@ -119,5 +120,16 @@ public class CloudSyncView
         nestedStack.restoreViewFromState(newView);
         nestedContainer.addView(newView);
         completionCallback.stateChangeComplete();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if(nestedContainer.getChildAt(0) != null && nestedContainer.getChildAt(0) instanceof BackPressListener) {
+            boolean handled = ((BackPressListener) nestedContainer.getChildAt(0)).onBackPressed();
+            if(handled) {
+                return true;
+            }
+        }
+        return nestedStack.goBack();
     }
 }

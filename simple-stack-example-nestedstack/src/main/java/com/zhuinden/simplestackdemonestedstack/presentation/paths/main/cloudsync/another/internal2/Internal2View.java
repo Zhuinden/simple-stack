@@ -8,6 +8,7 @@ import android.widget.RelativeLayout;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.NestedStack;
 import com.zhuinden.simplestackdemonestedstack.R;
+import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -17,7 +18,8 @@ import butterknife.OnClick;
  */
 
 public class Internal2View
-        extends RelativeLayout {
+        extends RelativeLayout
+        implements BackPressListener {
     public Internal2View(Context context) {
         super(context);
         init(context);
@@ -59,5 +61,10 @@ public class Internal2View
         super.onFinishInflate();
         ButterKnife.bind(this);
         nestedStack = Backstack.getNestedStack(getContext());
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return nestedStack.getParent().goBack();
     }
 }
