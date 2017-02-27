@@ -97,10 +97,8 @@ public class MainView
                 StackType newStack = StackType.values()[itemIndex];
                 Key newKey = newStack.getKey();
                 int direction = StateChange.REPLACE;
-                if(previousKey != null && !"".equals(previousKey.stackIdentifier())) {
-                    StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
-                    direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
-                }
+                StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
+                direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
                 nestedStack.setHistory(HistoryBuilder.from(nestedStack).removeLast().add(newKey).build(), direction);
             }
 
@@ -147,7 +145,7 @@ public class MainView
         if(root.getChildAt(0) != null) {
             Key previousKey = stateChange.topPreviousState();
             Key newKey = stateChange.topNewState();
-            StackType newStack = StackType.valueOf(newKey.stackIdentifier()); // TODO: WHY is ListView's KEY in its Context MAINKEY?
+            StackType newStack = StackType.valueOf(newKey.stackIdentifier());
             if(previousKey != null) {
                 StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
                 direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
