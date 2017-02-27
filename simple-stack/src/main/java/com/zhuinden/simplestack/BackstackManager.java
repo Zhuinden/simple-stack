@@ -59,7 +59,8 @@ class BackstackManager {
             }
             for(int i = stateChange.getPreviousState().size() - 1; i >= 0; i--) {
                 Object previousKey = stateChange.getPreviousState().get(i);
-                if(serviceManager.hasServices(previousKey) && !stateChange.getNewState().contains(previousKey)) {
+                if(serviceManager.hasServices(previousKey) && !stateChange.getNewState()
+                        .contains(previousKey)) { // TODO: INSUFFICIENT. IF THIS IS A NESTED STACK OF A COMPOSITE KEY, IT SHOULD NOT SET UP / TEAR DOWN ON NAVIGATION UNLESS THEY TRULY DON'T EXIST.
                     serviceManager.tearDown(BackstackManager.this, false, previousKey);
                 }
             }

@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemonestedstack.application;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.SSLog;
+import com.zhuinden.simplestack.ServiceFactory;
+import com.zhuinden.simplestack.Services;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
@@ -48,7 +51,17 @@ public class MainActivity
                 Log.i(tag, message);
             }
         });
-        backstackDelegate = BackstackDelegate.create();
+        backstackDelegate = BackstackDelegate.configure().addServiceFactory(new ServiceFactory() {
+            @Override
+            public void bindServices(@NonNull Services.Builder builder) {
+                Log.i("ServiceManager", "<[Build Services :: " + builder.getKey() + "]>");
+            }
+
+            @Override
+            public void tearDownServices(@NonNull Services services) {
+                Log.i("ServiceManager", "<[Tearing down :: " + services.getKey() + "]>");
+            }
+        }).build();
         backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), HistoryBuilder.single(MainKey.create()));
         backstack = backstackDelegate.getBackstack();
         super.onCreate(savedInstanceState);

@@ -308,10 +308,18 @@ class ServiceManager {
             for(int i = count - 1; i >= 0; i--) {
                 serviceFactories.get(i).tearDownServices(node.services);
             }
-            keyToManagedServicesMap.remove(key);
+            removeManagedServicesForKey(key);
             return true;
         }
         return false;
+    }
+
+    private void removeManagedServicesForKey(Object key) {
+        if(keyToManagedServicesMap.containsKey(key)) {
+            keyToManagedServicesMap.remove(key);
+        } else if(parent != null) {
+            parent.removeManagedServicesForKey(key);
+        }
     }
 
     private static final class ReferenceCountedServices {
