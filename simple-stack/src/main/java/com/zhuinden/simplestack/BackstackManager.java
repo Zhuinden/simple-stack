@@ -47,7 +47,7 @@ class BackstackManager {
         public final void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
             if(SSLog.hasLoggers()) {
                 SSLog.info(TAG,
-                        (serviceManager != null ? ("[" + serviceManager.getLocalKey() + "]: ") : "" + Arrays.toString(stateChange.getPreviousState()
+                        (serviceManager != null ? ("[" + serviceManager.getLocalKey() + "]: ") : "" + "" + Arrays.toString(stateChange.getPreviousState()
                                 .toArray()) + " :: " + Arrays.toString(stateChange.getNewState().toArray())));
             }
             serviceManager.dumpLogData();
