@@ -41,6 +41,8 @@ class BackstackManager {
     StateChanger stateChanger;
 
     private final StateChanger managedStateChanger = new StateChanger() {
+        Set<Object> localManagedKeys = new LinkedHashSet<>();
+
         @Override
         public final void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
             if(SSLog.hasLoggers()) {
@@ -51,22 +53,24 @@ class BackstackManager {
             serviceManager.dumpLogData();
             Object topNewKey = stateChange.topNewState();
             boolean isInitializeStateChange = stateChange.getPreviousState().isEmpty();
-            boolean servicesUninitialized = (isInitializeStateChange && !serviceManager.hasServices(topNewKey));
+            boolean servicesUninitialized = (isInitializeStateChange && !localManagedKeys.contains(topNewKey));
             if(servicesUninitialized || !isInitializeStateChange) {
                 serviceManager.setUp(BackstackManager.this, topNewKey);
+                localManagedKeys.add(topNewKey);
             } else {
                 serviceManager.restoreServicesForKey(BackstackManager.this, topNewKey);
             }
             for(int i = stateChange.getPreviousState().size() - 1; i >= 0; i--) {
                 Object previousKey = stateChange.getPreviousState().get(i);
-                if(serviceManager.hasServices(previousKey) && !stateChange.getNewState()
-                        .contains(previousKey)) { // TODO: INSUFFICIENT. IF THIS IS A NESTED STACK OF A COMPOSITE KEY, IT SHOULD NOT SET UP / TEAR DOWN ON NAVIGATION UNLESS THEY TRULY DON'T EXIST.
+                if(serviceManager.hasServices(previousKey) && !stateChange.getNewState().contains(previousKey)) {
                     serviceManager.tearDown(BackstackManager.this, false, previousKey);
+                    localManagedKeys.remove(previousKey);
                 }
             }
             Object topPreviousKey = stateChange.topPreviousState();
             if(topPreviousKey != null && stateChange.getNewState().contains(topPreviousKey)) {
                 serviceManager.tearDown(BackstackManager.this, true, topPreviousKey);
+                localManagedKeys.remove(topPreviousKey);
             }
             serviceManager.dumpLogData();
             stateChanger.handleStateChange(stateChange, new StateChanger.Callback() {
@@ -120,7 +124,7 @@ class BackstackManager {
             Object stateRoot = key;
             if(serviceManager.hasServices(stateRoot)) {
                 Object parentKey = serviceManager.findServices(stateRoot).getService(PARENT_KEY);
-                while(parentKey instanceof Services.Composite) { // TODO: there NEEDS to be a unit test for this!
+                while(parentKey instanceof Services.Composite) {
                     stateRoot = parentKey;
                     if(serviceManager.hasServices(stateRoot)) {
                         parentKey = serviceManager.findServices(stateRoot).getService(PARENT_KEY);
