@@ -429,11 +429,11 @@ public class StateBundle
     }
 
     /**
-     * Inserts an ArrayList<Integer> value into the mapping of this Bundle, replacing
+     * Inserts an ArrayList of Integer value into the mapping of this Bundle, replacing
      * any existing value for the given key.  Either key or value may be null.
      *
      * @param key   a String, or null
-     * @param value an ArrayList<Integer> object, or null
+     * @param value an ArrayList of Integer object, or null
      */
     public void putIntegerArrayList(@Nullable String key, @Nullable ArrayList<Integer> value) {
         map.put(key, value);
@@ -441,11 +441,11 @@ public class StateBundle
     }
 
     /**
-     * Inserts an ArrayList<String> value into the mapping of this Bundle, replacing
+     * Inserts an ArrayList of String value into the mapping of this Bundle, replacing
      * any existing value for the given key.  Either key or value may be null.
      *
      * @param key   a String, or null
-     * @param value an ArrayList<String> object, or null
+     * @param value an ArrayList of String object, or null
      */
     public void putStringArrayList(@Nullable String key, @Nullable ArrayList<String> value) {
         map.put(key, value);
@@ -453,11 +453,11 @@ public class StateBundle
     }
 
     /**
-     * Inserts an ArrayList<CharSequence> value into the mapping of this Bundle, replacing
+     * Inserts an ArrayList of CharSequence value into the mapping of this Bundle, replacing
      * any existing value for the given key.  Either key or value may be null.
      *
      * @param key   a String, or null
-     * @param value an ArrayList<CharSequence> object, or null
+     * @param value an ArrayList of CharSequence object, or null
      */
     public void putCharSequenceArrayList(@Nullable String key, @Nullable ArrayList<CharSequence> value) {
         map.put(key, value);
@@ -1038,7 +1038,7 @@ public class StateBundle
      * value is explicitly associated with the key.
      *
      * @param key a String, or null
-     * @return an ArrayList<String> value, or null
+     * @return an ArrayList of String value, or null
      */
     @Nullable
     public ArrayList<Integer> getIntegerArrayList(@Nullable String key) {
@@ -1060,7 +1060,7 @@ public class StateBundle
      * value is explicitly associated with the key.
      *
      * @param key a String, or null
-     * @return an ArrayList<String> value, or null
+     * @return an ArrayList of String value, or null
      */
     @Nullable
     public ArrayList<String> getStringArrayList(@Nullable String key) {
@@ -1082,7 +1082,7 @@ public class StateBundle
      * value is explicitly associated with the key.
      *
      * @param key a String, or null
-     * @return an ArrayList<CharSequence> value, or null
+     * @return an ArrayList of CharSequence value, or null
      */
     @Nullable
     public ArrayList<CharSequence> getCharSequenceArrayList(@Nullable String key) {
@@ -1428,7 +1428,7 @@ public class StateBundle
      * value is explicitly associated with the key.
      *
      * @param key a String, or null
-     * @return an ArrayList<T> value, or null
+     * @return an ArrayList of T value, or null
      */
     @Nullable
     public <T extends Parcelable> ArrayList<T> getParcelableArrayList(@Nullable String key) {
