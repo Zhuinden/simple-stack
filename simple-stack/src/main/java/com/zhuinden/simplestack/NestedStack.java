@@ -368,4 +368,10 @@ public class NestedStack
             }
         }
     }
+
+    public void tearDownServices() {
+        if(parent != null) {
+            backstackManager.tearDownLocalKeys();
+        }
+    }
 }

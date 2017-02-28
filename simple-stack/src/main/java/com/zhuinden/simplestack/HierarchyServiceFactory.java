@@ -28,4 +28,10 @@ class HierarchyServiceFactory
         }
         builder.withService(BackstackManager.LOCAL_STACK, new NestedStack(builder.getKey(), parentKey, parentStack, keyParceler));
     }
+
+    @Override
+    public void tearDownServices(@NonNull Services services) {
+        NestedStack nestedStack = services.getService(BackstackManager.LOCAL_STACK);
+        nestedStack.tearDownServices();
+    }
 }
