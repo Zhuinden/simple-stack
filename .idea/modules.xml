@@ -4,8 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/simple-stack/simple-stack.iml" filepath="$PROJECT_DIR$/simple-stack/simple-stack.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-1.x.iml" filepath="$PROJECT_DIR$/simple-stack-1.x.iml" />
+      <module fileurl="file://$PROJECT_DIR$/simple-stack-demo.iml" filepath="$PROJECT_DIR$/simple-stack-demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example/simple-stack-example.iml" filepath="$PROJECT_DIR$/simple-stack-example/simple-stack-example.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-fragments/simple-stack-example-fragments.iml" filepath="$PROJECT_DIR$/simple-stack-example-fragments/simple-stack-example-fragments.iml" />
+      <module fileurl="file://$PROJECT_DIR$/simple-stack-example-multistack/simple-stack-example-multistack.iml" filepath="$PROJECT_DIR$/simple-stack-example-multistack/simple-stack-example-multistack.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-multistack/simple-stack-example-multistack.iml" filepath="$PROJECT_DIR$/simple-stack-example-multistack/simple-stack-example-multistack.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-mvp/simple-stack-example-mvp.iml" filepath="$PROJECT_DIR$/simple-stack-example-mvp/simple-stack-example-mvp.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-rx/simple-stack-example-rx.iml" filepath="$PROJECT_DIR$/simple-stack-example-rx/simple-stack-example-rx.iml" />

@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stacl 1.X.X (2017-03-XX)
+--------------------------------
+- REFACTOR: `BackstackDelegate` is separated into `BackstackManager`.
+
+- ADD: `BackstackManager` class to help with creating backstacks inside views, but not heavily tested yet.
+
+
 -Simple Stack 1.2.1 (2017-02-28)
 --------------------------------
 - FIX: `HistoryBuilder` should receive `List<?>` as parameters, not `List<Object>` on all methods.

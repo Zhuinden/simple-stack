@@ -16,16 +16,11 @@
 package com.zhuinden.simplestack;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.SparseArray;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A delegate class that manages the {@link Backstack}'s Activity lifecycle integration,
@@ -34,25 +29,10 @@ import java.util.Map;
  * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
 public class BackstackDelegate {
-    private final StateChanger managedStateChanger = new StateChanger() {
-        @Override
-        public void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
-            stateChanger.handleStateChange(stateChange, new Callback() {
-                @Override
-                public void stateChangeComplete() {
-                    completionCallback.stateChangeComplete();
-                    if(!backstack.isStateChangePending()) {
-                        clearStatesNotIn(keyStateMap, stateChange);
-                    }
-                }
-            });
-        }
-    };
+    private BackstackManager backstackManager;
 
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
-
-    private KeyParceler keyParceler = new DefaultKeyParceler();
 
     /**
      * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
@@ -62,16 +42,12 @@ public class BackstackDelegate {
      * @param keyParceler The custom {@link KeyParceler}.
      */
     public void setKeyParceler(KeyParceler keyParceler) {
-        if(backstack != null) {
-            throw new IllegalStateException("Custom key parceler should be set before calling `onCreate()`");
-        }
-        if(keyParceler == null) {
-            throw new IllegalArgumentException("The key parceler cannot be null!");
-        }
-        this.keyParceler = keyParceler;
+        backstackManager.setKeyParceler(keyParceler);
     }
 
     private static final String HISTORY = "simplestack.HISTORY";
+
+    private StateChanger stateChanger;
 
     /**
      * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
@@ -83,7 +59,7 @@ public class BackstackDelegate {
      */
     @SuppressWarnings("StringEquality")
     public void setPersistenceTag(@NonNull String persistenceTag) {
-        if(backstack != null) {
+        if(backstackManager != null && backstackManager.getBackstack() != null) {
             throw new IllegalStateException("Persistence tag should be set before calling `onCreate()`");
         }
         if(persistenceTag == null) {
@@ -99,12 +75,6 @@ public class BackstackDelegate {
     private String getHistoryTag() {
         return "".equals(persistenceTag) ? HISTORY : HISTORY + persistenceTag;
     }
-
-    Backstack backstack;
-
-    Map<Object, SavedState> keyStateMap = new HashMap<>();
-
-    StateChanger stateChanger;
 
     /**
      * Creates the {@link BackstackDelegate}.
@@ -133,44 +103,15 @@ public class BackstackDelegate {
             throw new IllegalArgumentException(
                     "The provided non configuration instance must be of type BackstackDelegate.NonConfigurationInstance!");
         }
-        ArrayList<Object> keys;
-        if(savedInstanceState != null) {
-            keys = new ArrayList<>();
-            StateBundle stateBundle = savedInstanceState.getParcelable(getHistoryTag());
-            if(stateBundle != null) {
-                List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList("HISTORY");
-                if(parcelledKeys != null) {
-                    for(Parcelable parcelledKey : parcelledKeys) {
-                        keys.add(keyParceler.fromParcelable(parcelledKey));
-                    }
-                }
-            }
-            if(keys.isEmpty()) {
-                keys = initialKeys;
-            }
-            if(stateBundle != null) {
-                List<ParcelledState> savedStates = stateBundle.getParcelableArrayList("STATES");
-                if(savedStates != null) {
-                    for(ParcelledState parcelledState : savedStates) {
-                        SavedState savedState = SavedState.builder()
-                                .setKey(keyParceler.fromParcelable(parcelledState.parcelableKey))
-                                .setViewHierarchyState(parcelledState.viewHierarchyState)
-                                .setBundle(parcelledState.bundle)
-                                .build();
-                        keyStateMap.put(savedState.getKey(), savedState);
-                    }
-                }
-            }
-        } else {
-            keys = initialKeys;
-        }
         NonConfigurationInstance nonConfig = (NonConfigurationInstance) nonConfigurationInstance;
         if(nonConfig != null) {
-            backstack = nonConfig.getBackstack();
+            backstackManager = nonConfig.getBackstackManager();
         } else {
-            backstack = new Backstack(keys);
+            backstackManager = new BackstackManager();
+            backstackManager.setupOrRestore(savedInstanceState != null ? savedInstanceState.<StateBundle>getParcelable(getHistoryTag()) : null,
+                    initialKeys);
         }
-        initializeBackstack(stateChanger);
+        backstackManager.setStateChanger(stateChanger);
     }
 
     /**
@@ -180,17 +121,8 @@ public class BackstackDelegate {
      * @param stateChanger The {@link StateChanger} to be set.
      */
     public void setStateChanger(@Nullable StateChanger stateChanger) {
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
-        }
         this.stateChanger = stateChanger;
-        initializeBackstack(stateChanger);
-    }
-
-    protected void initializeBackstack(StateChanger stateChanger) {
-        if(stateChanger != null) {
-            backstack.setStateChanger(managedStateChanger, Backstack.INITIALIZE);
-        }
+        backstackManager.setStateChanger(stateChanger);
     }
 
     /**
@@ -200,7 +132,7 @@ public class BackstackDelegate {
      * @return a {@link NonConfigurationInstance} that contains the internal backstack instance.
      */
     public NonConfigurationInstance onRetainCustomNonConfigurationInstance() {
-        return new NonConfigurationInstance(backstack);
+        return new NonConfigurationInstance(backstackManager);
     }
 
     /**
@@ -210,7 +142,8 @@ public class BackstackDelegate {
      * @return true if the {@link Backstack} handled the back press
      */
     public boolean onBackPressed() {
-        return backstack.goBack();
+        // FIXME pre-initialize
+        return backstackManager.getBackstack().goBack();
     }
 
     /**
@@ -221,23 +154,8 @@ public class BackstackDelegate {
      * @param outState the Bundle into which the backstack history and view states are saved.
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        StateBundle stateBundle = new StateBundle();
-        ArrayList<Parcelable> history = new ArrayList<>();
-        for(Object key : backstack.getHistory()) {
-            history.add(keyParceler.toParcelable(key));
-        }
-        stateBundle.putParcelableArrayList("HISTORY", history);
-
-        ArrayList<ParcelledState> states = new ArrayList<>();
-        for(SavedState savedState : keyStateMap.values()) {
-            ParcelledState parcelledState = new ParcelledState();
-            parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
-            parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
-            parcelledState.bundle = savedState.getBundle();
-            states.add(parcelledState);
-        }
-        stateBundle.putParcelableArrayList("STATES", states);
-        outState.putParcelable(getHistoryTag(), stateBundle);
+        // FIXME pre-initialize
+        outState.putParcelable(getHistoryTag(), backstackManager.toStateBundle());
     }
 
     /**
@@ -248,9 +166,7 @@ public class BackstackDelegate {
         if(stateChanger == null) {
             throw new IllegalStateException("State changer is still not set in `onPostResume`!");
         }
-        if(!backstack.hasStateChanger()) {
-            backstack.setStateChanger(managedStateChanger, Backstack.REATTACH);
-        }
+        backstackManager.reattachStateChanger();
     }
 
     /**
@@ -258,18 +174,16 @@ public class BackstackDelegate {
      * It removes the {@link StateChanger} if it is set.
      */
     public void onPause() {
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
-        }
+        backstackManager.detachStateChanger();
     }
 
     /**
      * The onDestroy() delegate for the Activity.
-     * Forces any pending state change to execute with {@link Backstack#executePendingStateChange()},
-     * and unregisters the delegate's {@link Backstack.CompletionListener} that was registered in {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * Forces any pending state change to execute with {@link Backstack#executePendingStateChange()}.
      */
     public void onDestroy() {
-        backstack.executePendingStateChange();
+        // FIXME preinitialize
+        backstackManager.getBackstack().executePendingStateChange();
     }
 
     // ----- get backstack
@@ -282,10 +196,10 @@ public class BackstackDelegate {
      */
     @NonNull
     public Backstack getBackstack() {
-        if(backstack == null) {
+        if(backstackManager == null) {
             throw new IllegalStateException("The backstack within the delegate must be initialized by `onCreate()`");
         }
-        return backstack;
+        return backstackManager.getBackstack();
     }
 
     // ----- viewstate persistence
@@ -296,24 +210,8 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void persistViewToState(@Nullable View view) {
-        if(view != null) {
-            Object key = KeyContextWrapper.getKey(view.getContext());
-            if(key == null) {
-                throw new IllegalArgumentException("The view [" + view + "] contained no key!");
-            }
-            SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-            view.saveHierarchyState(viewHierarchyState);
-            StateBundle bundle = null;
-            if(view instanceof Bundleable) {
-                bundle = ((Bundleable) view).toBundle();
-            }
-            SavedState previousSavedState = SavedState.builder() //
-                    .setKey(key) //
-                    .setViewHierarchyState(viewHierarchyState) //
-                    .setBundle(bundle) //
-                    .build();
-            keyStateMap.put(key, previousSavedState);
-        }
+        // FIXME pre-initialize
+        backstackManager.persistViewToState(view);
     }
 
     /**
@@ -322,15 +220,8 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void restoreViewFromState(@NonNull View view) {
-        if(view == null) {
-            throw new IllegalArgumentException("You cannot restore state into null view!");
-        }
-        Object newKey = KeyContextWrapper.getKey(view.getContext());
-        SavedState savedState = getSavedState(newKey);
-        view.restoreHierarchyState(savedState.getViewHierarchyState());
-        if(view instanceof Bundleable) {
-            ((Bundleable) view).fromBundle(savedState.getBundle());
-        }
+        // FIXME pre-initialize
+        backstackManager.restoreViewFromState(view);
     }
 
     /**
@@ -342,31 +233,22 @@ public class BackstackDelegate {
      */
     @NonNull
     public SavedState getSavedState(@NonNull Object key) {
-        if(key == null) {
-            throw new IllegalArgumentException("Key cannot be null!");
-        }
-        if(!keyStateMap.containsKey(key)) {
-            keyStateMap.put(key, SavedState.builder().setKey(key).build());
-        }
-        return keyStateMap.get(key);
-    }
-
-    protected void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange) {
-        keyStateMap.keySet().retainAll(stateChange.getNewState());
+        // FIXME pre-initialize
+        return backstackManager.getSavedState(key);
     }
 
     /**
      * The class which stores the {@link Backstack} for surviving configuration change.
      */
     public static class NonConfigurationInstance {
-        private Backstack backstack;
+        private BackstackManager backstackManager;
 
-        private NonConfigurationInstance(Backstack backstack) {
-            this.backstack = backstack;
+        private NonConfigurationInstance(BackstackManager backstackManager) {
+            this.backstackManager = backstackManager;
         }
 
-        Backstack getBackstack() {
-            return backstack;
+        BackstackManager getBackstackManager() {
+            return backstackManager;
         }
     }
 }
