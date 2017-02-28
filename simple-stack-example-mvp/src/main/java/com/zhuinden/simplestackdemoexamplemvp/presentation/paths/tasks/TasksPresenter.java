@@ -1,12 +1,12 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.jakewharton.rxrelay.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
@@ -97,14 +97,14 @@ public class TasksPresenter
     }
 
     @Override
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
         bundle.putString("FILTERING", filterType.getValue().name());
         return bundle;
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             filterType.call(TasksFilterType.valueOf(bundle.getString("FILTERING")));
         }

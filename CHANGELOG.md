@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 1.2.0 (2017-02-28)
+--------------------------------
+- BREAKING CHANGE: `Bundleable` and `SavedState` now use `StateBundle` class.
+
+- ENHANCEMENT: Added `StateBundle` class to replace `android.os.Bundle`.
+
 -Simple Stack 1.1.1 (2017-02-19)
 --------------------------------
 - FIX: A bug that allowed the possibility that an uninitialized backstack could restore its history to be an empty list after process death.

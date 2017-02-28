@@ -2,13 +2,13 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -35,13 +35,13 @@ public class AddOrEditTaskView
     }
 
     @Override
-    public Bundle toBundle() {
+    public StateBundle toBundle() {
         AddOrEditTaskCoordinator coordinator = Coordinators.getCoordinator(this);
         return coordinator.toBundle();
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         AddOrEditTaskCoordinator coordinator = Coordinators.getCoordinator(this);
         coordinator.fromBundle(bundle);
     }

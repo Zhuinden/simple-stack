@@ -1,12 +1,12 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
 
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 
@@ -72,12 +72,12 @@ public class AddOrEditTaskCoordinator
     }
 
     @Override
-    public Bundle toBundle() {
+    public StateBundle toBundle() {
         return addOrEditTaskPresenter.toBundle();
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             addOrEditTaskPresenter.fromBundle(bundle);
         }

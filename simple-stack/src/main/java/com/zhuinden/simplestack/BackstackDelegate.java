@@ -39,7 +39,7 @@ public class BackstackDelegate {
             implements Parcelable {
         Parcelable parcelableKey;
         SparseArray<Parcelable> viewHierarchyState;
-        Bundle bundle;
+        StateBundle bundle;
 
         private ParcelledState() {
         }
@@ -50,7 +50,7 @@ public class BackstackDelegate {
             viewHierarchyState = in.readSparseArray(getClass().getClassLoader());
             boolean hasBundle = in.readByte() > 0;
             if(hasBundle) {
-                bundle = in.readBundle(getClass().getClassLoader());
+                bundle = in.readParcelable(getClass().getClassLoader());
             }
         }
 
@@ -79,7 +79,7 @@ public class BackstackDelegate {
             dest.writeSparseArray(sparseArray);
             dest.writeByte(bundle != null ? (byte) 0x01 : 0x00);
             if(bundle != null) {
-                dest.writeBundle(bundle);
+                dest.writeParcelable(bundle, 0);
             }
         }
 
@@ -352,7 +352,7 @@ public class BackstackDelegate {
     // ----- viewstate persistence
 
     /**
-     * Provides the means to save the provided view's hierarchy state, and its optional bundle via {@link Bundleable} into a {@link SavedState}.
+     * Provides the means to save the provided view's hierarchy state, and its optional {@link StateBundle} via {@link Bundleable} into a {@link SavedState}.
      *
      * @param view the view that belongs to a certain key
      */
@@ -364,7 +364,7 @@ public class BackstackDelegate {
             }
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             view.saveHierarchyState(viewHierarchyState);
-            Bundle bundle = null;
+            StateBundle bundle = null;
             if(view instanceof Bundleable) {
                 bundle = ((Bundleable) view).toBundle();
             }

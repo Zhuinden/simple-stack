@@ -2,7 +2,6 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
@@ -10,6 +9,7 @@ import android.widget.RelativeLayout;
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.application.CustomApplication;
 
 import javax.inject.Inject;
@@ -55,13 +55,13 @@ public class SecondView
     SecondKey secondKey;
 
     @Override
-    public Bundle toBundle() {
+    public StateBundle toBundle() {
         SecondCoordinator coordinator = Coordinators.getCoordinator(this);
         return coordinator.toBundle();
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         SecondCoordinator coordinator = Coordinators.getCoordinator(this);
         coordinator.fromBundle(bundle);
     }

@@ -2,7 +2,6 @@ package com.zhuinden.simplestackdemoexample.demo;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -11,6 +10,7 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexample.R;
 
 import butterknife.ButterKnife;
@@ -68,14 +68,14 @@ public class FirstView
     }
 
     @Override
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
         bundle.putString("HELLO", "WORLD");
         return bundle;
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             Log.i(TAG, bundle.getString("HELLO"));
         }

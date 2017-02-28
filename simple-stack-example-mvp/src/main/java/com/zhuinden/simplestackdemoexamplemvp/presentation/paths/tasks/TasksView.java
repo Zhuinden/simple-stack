@@ -1,13 +1,13 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
@@ -63,13 +63,13 @@ public class TasksView
     }
 
     @Override
-    public Bundle toBundle() {
+    public StateBundle toBundle() {
         TasksCoordinator coordinator = Coordinators.getCoordinator(this);
         return coordinator.toBundle();
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         TasksCoordinator coordinator = Coordinators.getCoordinator(this);
         coordinator.fromBundle(bundle);
     }

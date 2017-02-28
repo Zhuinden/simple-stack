@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemomultistack.R;
 import com.zhuinden.simplestackdemomultistack.application.Key;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.another.AnotherKey;
@@ -68,14 +69,15 @@ public class CloudSyncView
     }
 
     @Override
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
+    @NonNull
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
         bundle.putString("HELLO", "WORLD");
         return bundle;
     }
 
     @Override
-    public void fromBundle(@Nullable Bundle bundle) {
+    public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
             Log.i(TAG, bundle.getString("HELLO"));
         }
