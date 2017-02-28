@@ -87,7 +87,7 @@ public class NestedStack
                 ServiceManager parentServiceManager = null;
                 NestedStack runningParent = parent;
                 while(runningParent != null && parentServiceManager == null) {
-                    parentServiceManager = runningParent.backstackManager == null ? null : runningParent.backstackManager.serviceManager;
+                    parentServiceManager = runningParent.backstackManager == null ? null : runningParent.backstackManager.getServiceManager();
                     runningParent = runningParent.parent;
                 }
                 backstackManager.setupServiceManager(localKey, parentServiceManager,
@@ -325,7 +325,7 @@ public class NestedStack
             bundle.putParcelableArrayList(BackstackManager.HISTORY_TAG, parcelledHistory);
             bundle.putParcelableArrayList("INITIALPARAMS", parcelledInitialParameters);
 
-            if(backstackManager.serviceManager != null) { // TODO: there must be a better way to keep track of whether a NestedStack is initialized...
+            if(backstackManager.getServiceManager() != null) { // TODO: there must be a better way to keep track of whether a NestedStack is initialized...
                 backstackManager.persistStates();
             }
             bundle.putBundle("MANAGER_STATES", backstackManager.toBundle());
