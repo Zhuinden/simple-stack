@@ -369,9 +369,15 @@ public class NestedStack
         }
     }
 
-    public void tearDownServices() {
+    public void tearDownLocalKeys() {
         if(parent != null) {
             backstackManager.tearDownLocalKeys();
+            if(localKey instanceof Services.Composite) {
+                for(Object key : ((Services.Composite) localKey).keys()) {
+                    NestedStack nestedStack = getChildStack(key);
+                    nestedStack.tearDownLocalKeys();
+                }
+            }
         }
     }
 }

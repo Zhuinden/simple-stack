@@ -9,6 +9,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -19,28 +20,8 @@ import java.util.Set;
  * Created by Owner on 2017. 02. 22..
  */
 class BackstackManager {
-    private static final String TAG = "simplestack.BackstackManager";
-
-    static final String ROOT_STACK = "simplestack.ROOT_STACK";
-    static final String LOCAL_STACK = "simplestack.LOCAL_STACK";
-
-    static final String PARENT_KEY = "simplestack.PARENT_KEY";
-    static final String LOCAL_KEY = "simplestack.LOCAL_KEY";
-
-    static final String HISTORY_TAG = "HISTORY";
-    static final String STATES_TAG = "STATES";
-
-    Backstack backstack;
-
-    final KeyParceler keyParceler;
-
-    ServiceManager serviceManager;
-
-    Map<Object, SavedState> keyStateMap = new LinkedHashMap<>();
-
-    StateChanger stateChanger;
-
-    private final StateChanger managedStateChanger = new StateChanger() {
+    class ManagedStateChanger
+            implements StateChanger {
         Set<Object> localManagedKeys = new LinkedHashSet<>();
 
         @Override
@@ -85,7 +66,39 @@ class BackstackManager {
                 }
             });
         }
-    };
+
+        void tearDownLocalKeys() {
+            Iterator<Object> keys = localManagedKeys.iterator();
+            while(keys.hasNext()) {
+                Object key = keys.next();
+                serviceManager.tearDown(BackstackManager.this, true, key);
+                keys.remove();
+            }
+        }
+    }
+
+    private static final String TAG = "simplestack.BackstackManager";
+
+    static final String ROOT_STACK = "simplestack.ROOT_STACK";
+    static final String LOCAL_STACK = "simplestack.LOCAL_STACK";
+
+    static final String PARENT_KEY = "simplestack.PARENT_KEY";
+    static final String LOCAL_KEY = "simplestack.LOCAL_KEY";
+
+    static final String HISTORY_TAG = "HISTORY";
+    static final String STATES_TAG = "STATES";
+
+    Backstack backstack;
+
+    final KeyParceler keyParceler;
+
+    ServiceManager serviceManager;
+
+    Map<Object, SavedState> keyStateMap = new LinkedHashMap<>();
+
+    StateChanger stateChanger;
+
+    private final ManagedStateChanger managedStateChanger = new ManagedStateChanger();
 
     public BackstackManager(KeyParceler keyParceler) {
         this.keyParceler = keyParceler;
@@ -313,6 +326,8 @@ class BackstackManager {
     }
 
     public void tearDownLocalKeys() {
-        // TODO add and see if it works.
+        if(serviceManager != null) {
+            // TODO make this reliable. -_-
+        }
     }
 }
