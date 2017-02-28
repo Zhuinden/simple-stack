@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.2.1 (2017-02-28)
+--------------------------------
+- FIX: `HistoryBuilder` should receive `List<?>` as parameters, not `List<Object>` on all methods.
+
 -Simple Stack 1.2.0 (2017-02-28)
 --------------------------------
 - BREAKING CHANGE: `Bundleable` and `SavedState` now use `StateBundle` class.
