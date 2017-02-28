@@ -79,10 +79,10 @@ public class HistoryBuilder
     }
 
     /**
-     * Creates a new array list of Object that contains only the provided key.
+     * Creates a new array list of object that contains only the provided key.
      *
      * @param key
-     * @return an array list of Object that contains the key.
+     * @return an array list of object that contains the key.
      */
     public static ArrayList<Object> single(@NonNull Object key) {
         return newBuilder()
@@ -146,7 +146,7 @@ public class HistoryBuilder
      * @param keys
      * @return true if the builder contains all keys.
      */
-    public boolean containsAll(@NonNull Collection<Object> keys) {
+    public boolean containsAll(@NonNull Collection<?> keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Keys cannot be null!");
         }
@@ -191,7 +191,7 @@ public class HistoryBuilder
      * @param keys
      * @return the current builder.
      */
-    public HistoryBuilder retainAll(@NonNull Collection<Object> keys) {
+    public HistoryBuilder retainAll(@NonNull Collection<?> keys) {
         checkKeys(keys);
         list.retainAll(keys);
         return this;
@@ -323,7 +323,7 @@ public class HistoryBuilder
         }
     }
 
-    private void checkKeys(Collection<Object> keys) {
+    private void checkKeys(Collection<?> keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Keys cannot be null!");
         }
