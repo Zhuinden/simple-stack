@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stacl 1.X.X (2017-03-XX)
+-Simple Stack 1.X.X (2017-03-XX)
 --------------------------------
 - REFACTOR: `BackstackDelegate` is separated into `BackstackManager`.
 
