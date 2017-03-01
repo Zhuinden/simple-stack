@@ -53,7 +53,7 @@ public abstract class BaseFragment<C extends BaseFragment<C, P>, P extends BaseP
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(savedInstanceState != null) {
-            getPresenter().fromBundle(savedInstanceState.getBundle("PRESENTER_STATE"));
+            getPresenter().fromBundle(savedInstanceState.getParcelable("PRESENTER_STATE"));
         }
         key = getArguments().getParcelable(KEY_TAG);
         if(key == null) {
@@ -73,7 +73,7 @@ public abstract class BaseFragment<C extends BaseFragment<C, P>, P extends BaseP
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle("PRESENTER_STATE", getPresenter().toBundle());
+        outState.putParcelable("PRESENTER_STATE", getPresenter().toBundle());
     }
 
     @Override
