@@ -15,8 +15,10 @@
  */
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.View;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -36,6 +38,12 @@ import static org.junit.Assert.fail;
  */
 
 public class BackstackDelegateTest {
+    @Mock(extraInterfaces = Bundleable.class)
+    View view;
+
+    @Mock
+    Context context;
+
     @Mock
     Backstack backstack;
 
@@ -174,6 +182,84 @@ public class BackstackDelegateTest {
         TestKey testKey = new TestKey("hello");
         backstackDelegate.onCreate(null, nonConfigurationInstance, HistoryBuilder.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isSameAs(backstack);
+    }
+
+
+    @Test
+    public void testRestoreViewFromState() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        backstackDelegate.setStateChanger(stateChanger);
+
+        Mockito.when(view.getContext()).thenReturn(context);
+        StateBundle stateBundle = new StateBundle();
+        Mockito.when(((Bundleable) view).toBundle()).thenReturn(stateBundle);
+        // noinspection ResourceType
+        Mockito.when(context.getSystemService(KeyContextWrapper.TAG)).thenReturn(key);
+        backstackDelegate.persistViewToState(view);
+
+        backstackDelegate.restoreViewFromState(view);
+        ((Bundleable) Mockito.verify(view, Mockito.times(1))).fromBundle(stateBundle);
+    }
+
+    @Test
+    public void onBackPressedGoesBack() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        TestKey a = new TestKey("hello");
+        TestKey b = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.from(a, b).build());
+        backstackDelegate.setStateChanger(stateChanger);
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a, b);
+        backstackDelegate.onBackPressed();
+        assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a);
+    }
+
+    @Test
+    public void onPostResumeThrowsExceptionIfStateChangerNotSet() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        // no state changer set
+        try {
+            backstackDelegate.onPostResume();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void onPauseRemovesStateChanger() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.onPause();
+        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isFalse();
+    }
+
+    @Test
+    public void onPostResumeReattachesStateChanger() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        TestKey key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.onPause();
+        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isFalse();
+        backstackDelegate.onPostResume();
+        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isTrue();
+    }
+
+    @Test
+    public void getBackstackShouldThrowIfOnCreateNotCalled() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.getBackstack();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK
+        }
     }
 
 }
