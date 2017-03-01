@@ -42,12 +42,14 @@ public class BackstackDelegate {
      * @param keyParceler The custom {@link KeyParceler}.
      */
     public void setKeyParceler(KeyParceler keyParceler) {
-        backstackManager.setKeyParceler(keyParceler);
+        this.keyParceler = keyParceler;
     }
 
     private static final String HISTORY = "simplestack.HISTORY";
 
     private StateChanger stateChanger;
+
+    private KeyParceler keyParceler = new DefaultKeyParceler();
 
     /**
      * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
@@ -108,6 +110,7 @@ public class BackstackDelegate {
             backstackManager = nonConfig.getBackstackManager();
         } else {
             backstackManager = new BackstackManager();
+            backstackManager.setKeyParceler(keyParceler);
             backstackManager.setupOrRestore(savedInstanceState != null ? savedInstanceState.<StateBundle>getParcelable(getHistoryTag()) : null,
                     initialKeys);
         }
@@ -142,8 +145,7 @@ public class BackstackDelegate {
      * @return true if the {@link Backstack} handled the back press
      */
     public boolean onBackPressed() {
-        // FIXME pre-initialize
-        return backstackManager.getBackstack().goBack();
+        return getBackstack().goBack();
     }
 
     /**
@@ -154,7 +156,10 @@ public class BackstackDelegate {
      * @param outState the Bundle into which the backstack history and view states are saved.
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        // FIXME pre-initialize
+        if(backstackManager == null) {
+            throw new IllegalStateException(
+                    "You cannot persist the state of an uninitialized backstack delegate, did you forget to call `onCreate()`?");
+        }
         outState.putParcelable(getHistoryTag(), backstackManager.toStateBundle());
     }
 
@@ -182,8 +187,7 @@ public class BackstackDelegate {
      * Forces any pending state change to execute with {@link Backstack#executePendingStateChange()}.
      */
     public void onDestroy() {
-        // FIXME preinitialize
-        backstackManager.getBackstack().executePendingStateChange();
+        getBackstack().executePendingStateChange();
     }
 
     // ----- get backstack
