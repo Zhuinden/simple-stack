@@ -72,7 +72,7 @@ public class BackstackDelegate {
         }
     }
 
-    private String getHistoryTag() {
+    String getHistoryTag() {
         return "".equals(persistenceTag) ? HISTORY : HISTORY + persistenceTag;
     }
 
@@ -233,7 +233,9 @@ public class BackstackDelegate {
      */
     @NonNull
     public SavedState getSavedState(@NonNull Object key) {
-        // FIXME pre-initialize
+        if(backstackManager == null) {
+            throw new IllegalStateException("You can call this method only after `onCreate()`");
+        }
         return backstackManager.getSavedState(key);
     }
 
@@ -243,7 +245,7 @@ public class BackstackDelegate {
     public static class NonConfigurationInstance {
         private BackstackManager backstackManager;
 
-        private NonConfigurationInstance(BackstackManager backstackManager) {
+        NonConfigurationInstance(BackstackManager backstackManager) {
             this.backstackManager = backstackManager;
         }
 

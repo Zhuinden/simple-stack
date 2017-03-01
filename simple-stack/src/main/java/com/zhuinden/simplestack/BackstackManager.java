@@ -17,6 +17,9 @@ import java.util.Map;
  */
 
 public class BackstackManager {
+    static final String HISTORY_TAG = "HISTORY";
+    static final String STATES_TAG = "STATES";
+
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
@@ -63,7 +66,7 @@ public class BackstackManager {
         ArrayList<Object> keys;
         keys = new ArrayList<>();
         if(stateBundle != null) {
-            List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList("HISTORY");
+            List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(HISTORY_TAG);
             if(parcelledKeys != null) {
                 for(Parcelable parcelledKey : parcelledKeys) {
                     keys.add(keyParceler.fromParcelable(parcelledKey));
@@ -74,7 +77,7 @@ public class BackstackManager {
             keys = initialKeys;
         }
         if(stateBundle != null) {
-            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList("STATES");
+            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList(STATES_TAG);
             if(savedStates != null) {
                 for(ParcelledState parcelledState : savedStates) {
                     SavedState savedState = SavedState.builder()
@@ -129,7 +132,7 @@ public class BackstackManager {
         for(Object key : backstack.getHistory()) {
             history.add(keyParceler.toParcelable(key));
         }
-        stateBundle.putParcelableArrayList("HISTORY", history);
+        stateBundle.putParcelableArrayList(HISTORY_TAG, history);
 
         ArrayList<ParcelledState> states = new ArrayList<>();
         for(SavedState savedState : keyStateMap.values()) {
@@ -139,7 +142,7 @@ public class BackstackManager {
             parcelledState.bundle = savedState.getBundle();
             states.add(parcelledState);
         }
-        stateBundle.putParcelableArrayList("STATES", states);
+        stateBundle.putParcelableArrayList(STATES_TAG, states);
         return stateBundle;
     }
 
