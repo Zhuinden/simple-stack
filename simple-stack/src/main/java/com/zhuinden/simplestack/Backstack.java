@@ -209,6 +209,15 @@ public class Backstack {
     }
 
     /**
+     * Returns an unmodifiable list that contains the keys this backstack is initialized with.
+     *
+     * @return the list of keys used at first initialization
+     */
+    public List<Object> getInitialParameters() {
+        return initialParameters;
+    }
+
+    /**
      * Returns whether there is at least one queued {@link StateChange}.
      *
      * @return true if there is at least one enqueued {@link StateChange}.
