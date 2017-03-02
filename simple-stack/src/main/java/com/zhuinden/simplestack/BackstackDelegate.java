@@ -112,8 +112,10 @@ public class BackstackDelegate {
         if(backstackManager == null) {
             backstackManager = new BackstackManager();
             backstackManager.setKeyParceler(keyParceler);
-            backstackManager.setupOrRestore(savedInstanceState != null ? savedInstanceState.<StateBundle>getParcelable(getHistoryTag()) : null,
-                    initialKeys);
+            backstackManager.setup(initialKeys);
+            if(savedInstanceState != null) {
+                backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable(getHistoryTag()));
+            }
         }
         backstackManager.setStateChanger(stateChanger);
     }
@@ -160,7 +162,7 @@ public class BackstackDelegate {
         if(backstackManager == null) {
             throw new IllegalStateException("You can call this method only after `onCreate()`");
         }
-        outState.putParcelable(getHistoryTag(), backstackManager.toStateBundle());
+        outState.putParcelable(getHistoryTag(), backstackManager.toBundle());
     }
 
     /**

@@ -72,7 +72,7 @@ public class MainActivity
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
+        return new NonConfigurationInstance(backstackDelegate.onRetainCustomNonConfigurationInstance(), serviceManager);
     }
 
     @Override

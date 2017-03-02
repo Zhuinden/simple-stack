@@ -52,7 +52,7 @@ public class Backstack {
 
     private final List<Object> originalStack = new ArrayList<>();
 
-    private final List<Object> initialParameters;
+    private List<Object> initialParameters;
     private List<Object> stack = originalStack;
 
     private LinkedList<PendingStateChange> queuedStateChanges = new LinkedList<>();
@@ -84,6 +84,13 @@ public class Backstack {
             throw new IllegalArgumentException("Initial key list should contain at least one element");
         }
         initialParameters = Collections.unmodifiableList(new ArrayList<>(initialKeys));
+    }
+
+    void setInitialParameters(List<?> initialKeys) {
+        if(initialKeys == null || initialKeys.size() <= 0) {
+            throw new IllegalArgumentException("At least one initial key must be defined");
+        }
+        this.initialParameters = Collections.unmodifiableList(new ArrayList<>(initialKeys));
     }
 
     /**
