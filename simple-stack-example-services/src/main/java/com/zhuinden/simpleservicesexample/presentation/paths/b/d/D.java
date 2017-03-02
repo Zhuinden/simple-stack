@@ -7,7 +7,7 @@ import com.zhuinden.simpleservicesexample.application.Key;
 import com.zhuinden.simpleservicesexample.presentation.paths.b.d.f.F;
 import com.zhuinden.simpleservicesexample.presentation.paths.b.d.g.G;
 import com.zhuinden.simpleservicesexample.utils.Composite;
-
+import com.zhuinden.simpleservicesexample.utils.MockService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +36,6 @@ public abstract class D
 
     @Override
     public void bindServices(ServiceTree.Node.Binder binder) {
-        binder.bindService("D", "D");
+        binder.bindService("D", new MockService("D"));
     }
 }

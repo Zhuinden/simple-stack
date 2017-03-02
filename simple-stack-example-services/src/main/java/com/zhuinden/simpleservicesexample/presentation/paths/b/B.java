@@ -10,6 +10,7 @@ import com.zhuinden.simpleservicesexample.presentation.paths.b.d.D;
 import com.zhuinden.simpleservicesexample.presentation.paths.b.e.E;
 import com.zhuinden.simpleservicesexample.utils.Child;
 import com.zhuinden.simpleservicesexample.utils.Composite;
+import com.zhuinden.simpleservicesexample.utils.MockService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ public abstract class B
 
     @Override
     public void bindServices(ServiceTree.Node.Binder binder) {
-        binder.bindService("B", "B");
+        binder.bindService("B", new MockService("B"));
     }
 
     @Override

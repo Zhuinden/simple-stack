@@ -3,6 +3,7 @@ package com.zhuinden.simpleservicesexample.presentation.paths.j.n;
 import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simpleservicesexample.application.Key;
+import com.zhuinden.simpleservicesexample.utils.MockService;
 
 
 /**
@@ -23,6 +24,6 @@ public abstract class N
 
     @Override
     public void bindServices(ServiceTree.Node.Binder binder) {
-        binder.bindService("N", "N");
+        binder.bindService("N", new MockService("N"));
     }
 }

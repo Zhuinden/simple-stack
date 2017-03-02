@@ -3,6 +3,7 @@ package com.zhuinden.simpleservicesexample.application;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -81,16 +82,15 @@ public class MainActivity
         super.onSaveInstanceState(outState);
         backstackDelegate.onSaveInstanceState(outState);
         StateBundle serviceStates = new StateBundle();
-        for(Object key : backstackDelegate.getBackstack().getHistory()) {
+        serviceTree.traverseTree(ServiceTree.Walk.PRE_ORDER, node -> {
             StateBundle keyBundle = new StateBundle();
-            ServiceTree.Node node = serviceTree.getNode(key);
             for(ServiceTree.Node.Entry entry : node.getBoundServices()) {
                 if(entry.getService() instanceof Bundleable) {
                     keyBundle.putParcelable(entry.getName(), ((Bundleable)entry.getService()).toBundle());
                 }
             }
-            serviceStates.putParcelable(key.toString(), keyBundle);
-        }
+            serviceStates.putParcelable(node.getKey().toString(), keyBundle);
+        });
         outState.putParcelable(SERVICE_STATES, serviceStates);
     }
 
@@ -150,6 +150,7 @@ public class MainActivity
                 if(states != null) {
                     serviceTree.traverseSubtree(previousNode, ServiceTree.Walk.POST_ORDER, node -> {
                         states.remove(node.getKey().toString());
+                        Log.i(TAG, "Destroy [" + node + "]");
                     });
                 }
                 serviceTree.removeNodeAndChildren(previousNode);

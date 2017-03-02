@@ -5,6 +5,7 @@ import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simpleservicesexample.R;
 import com.zhuinden.simpleservicesexample.application.Key;
 import com.zhuinden.simpleservicesexample.utils.Child;
+import com.zhuinden.simpleservicesexample.utils.MockService;
 
 
 /**
@@ -28,6 +29,6 @@ public abstract class K
 
     @Override
     public void bindServices(ServiceTree.Node.Binder binder) {
-        binder.bindService("K", "K");
+        binder.bindService("K", new MockService("K"));
     }
 }

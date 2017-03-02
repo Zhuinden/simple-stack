@@ -4,6 +4,7 @@ import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simpleservicesexample.R;
 import com.zhuinden.simpleservicesexample.application.Key;
+import com.zhuinden.simpleservicesexample.utils.MockService;
 
 
 /**
@@ -24,6 +25,6 @@ public abstract class C
 
     @Override
     public void bindServices(ServiceTree.Node.Binder binder) {
-        binder.bindService("C", "C");
+        binder.bindService("C", new MockService("C"));
     }
 }
