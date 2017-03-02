@@ -62,7 +62,7 @@ public class BackstackManager {
     StateChanger stateChanger;
 
 
-    public void setupOrRestore(StateBundle stateBundle, ArrayList<Object> initialKeys) {
+    public void setupOrRestore(@Nullable StateBundle stateBundle, @NonNull List<?> initialKeys) {
         ArrayList<Object> keys;
         keys = new ArrayList<>();
         if(stateBundle != null) {
@@ -74,7 +74,7 @@ public class BackstackManager {
             }
         }
         if(keys.isEmpty()) {
-            keys = initialKeys;
+            keys = HistoryBuilder.from(initialKeys).build();
         }
         if(stateBundle != null) {
             List<ParcelledState> savedStates = stateBundle.getParcelableArrayList(STATES_TAG);
@@ -97,6 +97,9 @@ public class BackstackManager {
     }
 
     public Backstack getBackstack() {
+        if(backstack == null) {
+            throw new IllegalStateException("You must call `initializeOrRestore()` before calling `getBackstack()`");
+        }
         return backstack;
     }
 

@@ -108,7 +108,8 @@ public class BackstackDelegate {
         NonConfigurationInstance nonConfig = (NonConfigurationInstance) nonConfigurationInstance;
         if(nonConfig != null) {
             backstackManager = nonConfig.getBackstackManager();
-        } else {
+        }
+        if(backstackManager == null) {
             backstackManager = new BackstackManager();
             backstackManager.setKeyParceler(keyParceler);
             backstackManager.setupOrRestore(savedInstanceState != null ? savedInstanceState.<StateBundle>getParcelable(getHistoryTag()) : null,
@@ -157,8 +158,7 @@ public class BackstackDelegate {
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
         if(backstackManager == null) {
-            throw new IllegalStateException(
-                    "You cannot persist the state of an uninitialized backstack delegate, did you forget to call `onCreate()`?");
+            throw new IllegalStateException("You can call this method only after `onCreate()`");
         }
         outState.putParcelable(getHistoryTag(), backstackManager.toStateBundle());
     }
@@ -171,6 +171,9 @@ public class BackstackDelegate {
         if(stateChanger == null) {
             throw new IllegalStateException("State changer is still not set in `onPostResume`!");
         }
+        if(backstackManager == null) {
+            throw new IllegalStateException("You can call this method only after `onCreate()`");
+        }
         backstackManager.reattachStateChanger();
     }
 
@@ -179,6 +182,9 @@ public class BackstackDelegate {
      * It removes the {@link StateChanger} if it is set.
      */
     public void onPause() {
+        if(backstackManager == null) {
+            throw new IllegalStateException("You can call this method only after `onCreate()`");
+        }
         backstackManager.detachStateChanger();
     }
 
@@ -214,7 +220,9 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void persistViewToState(@Nullable View view) {
-        // FIXME pre-initialize
+        if(backstackManager == null) {
+            throw new IllegalStateException("You can call this method only after `onCreate()`");
+        }
         backstackManager.persistViewToState(view);
     }
 
@@ -224,7 +232,9 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void restoreViewFromState(@NonNull View view) {
-        // FIXME pre-initialize
+        if(backstackManager == null) {
+            throw new IllegalStateException("You can call this method only after `onCreate()`");
+        }
         backstackManager.restoreViewFromState(view);
     }
 
