@@ -47,7 +47,7 @@ public class EView
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "B"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "E"), "Service should not be null");
     }

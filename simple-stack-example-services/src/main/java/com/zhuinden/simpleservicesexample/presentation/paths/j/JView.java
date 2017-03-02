@@ -47,8 +47,8 @@ public class JView
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "H"), "Service should not be null");
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "I"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "H"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "I"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "J"), "Service should not be null");
 
     }

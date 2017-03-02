@@ -2,9 +2,7 @@ package com.zhuinden.simpleservicesexample.application;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -12,14 +10,13 @@ import android.widget.RelativeLayout;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simpleservicesexample.R;
 import com.zhuinden.simpleservicesexample.presentation.paths.a.A;
+import com.zhuinden.simpleservicesexample.utils.Child;
 import com.zhuinden.simpleservicesexample.utils.Composite;
 import com.zhuinden.simpleservicesexample.utils.ServiceLocator;
 import com.zhuinden.simpleservicesexample.utils.StackService;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
-
-
 import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
@@ -161,7 +158,12 @@ public class MainActivity
         for(Object _newKey : stateChange.getNewState()) {
             Key newKey = (Key)_newKey;
             if(!serviceTree.hasNodeWithKey(newKey)) {
-                ServiceTree.Node.Binder binder = serviceTree.createRootNode(newKey);
+                ServiceTree.Node.Binder binder;
+                if(newKey instanceof Child) {
+                    binder = serviceTree.createChildNode(serviceTree.getNode(((Child) newKey).parent()), newKey);
+                } else {
+                    binder = serviceTree.createRootNode(newKey);
+                }
                 newKey.bindServices(binder);
                 ServiceTree.Node node = binder.get();
                 restoreServiceStateForKey(states, newKey, node);

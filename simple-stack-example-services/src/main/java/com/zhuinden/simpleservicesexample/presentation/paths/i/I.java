@@ -4,6 +4,7 @@ import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simpleservicesexample.R;
 import com.zhuinden.simpleservicesexample.application.Key;
+import com.zhuinden.simpleservicesexample.utils.Child;
 
 
 /**
@@ -12,7 +13,8 @@ import com.zhuinden.simpleservicesexample.application.Key;
 
 @AutoValue
 public abstract class I
-        extends Key {
+        extends Key
+        implements Child {
     public abstract Key parent();
 
     @Override

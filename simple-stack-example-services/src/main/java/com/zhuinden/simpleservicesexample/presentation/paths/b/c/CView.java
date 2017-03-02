@@ -34,8 +34,9 @@ public class CView
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null"); // child relation sucks for now
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "B"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"),
+                "Service should not be null"); // child relation sucks for now
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "B"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "C"), "Service should not be null");
     }
 }

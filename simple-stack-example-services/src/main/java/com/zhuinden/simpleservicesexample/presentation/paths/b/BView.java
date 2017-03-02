@@ -14,7 +14,6 @@ import com.zhuinden.simpleservicesexample.utils.ServiceLocator;
 import com.zhuinden.simpleservicesexample.utils.ViewPagerAdapter;
 import com.zhuinden.simplestack.Backstack;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +58,7 @@ public class BView
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        // Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null"); // child relation sucks for now
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "B"), "Service should not be null");
         ButterKnife.bind(this);
         B b = Backstack.getKey(getContext());

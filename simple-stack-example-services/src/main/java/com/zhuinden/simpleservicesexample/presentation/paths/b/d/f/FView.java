@@ -34,7 +34,7 @@ public class FView
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "A"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "B"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "D"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "F"), "Service should not be null");

@@ -4,20 +4,15 @@ import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simpleservicesexample.R;
 import com.zhuinden.simpleservicesexample.application.Key;
-import com.zhuinden.simpleservicesexample.presentation.paths.j.l.L;
-import com.zhuinden.simpleservicesexample.presentation.paths.j.m.M;
-import com.zhuinden.simpleservicesexample.presentation.paths.j.n.N;
-
-
-import java.util.Arrays;
-import java.util.List;
+import com.zhuinden.simpleservicesexample.utils.Child;
 
 /**
  * Created by Owner on 2017. 02. 17..
  */
 @AutoValue
 public abstract class J
-        extends Key {
+        extends Key
+        implements Child {
     public abstract Key parent();
 
     @Override

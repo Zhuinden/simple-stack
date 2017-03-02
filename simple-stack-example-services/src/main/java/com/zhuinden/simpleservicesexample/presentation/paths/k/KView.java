@@ -34,9 +34,9 @@ public class KView
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "H"), "Service should not be null");
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "I"), "Service should not be null");
-//        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "J"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "H"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "I"), "Service should not be null");
+        Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "J"), "Service should not be null");
         Preconditions.checkNotNull(ServiceLocator.getService(getContext(), "K"), "Service should not be null");
     }
 }
