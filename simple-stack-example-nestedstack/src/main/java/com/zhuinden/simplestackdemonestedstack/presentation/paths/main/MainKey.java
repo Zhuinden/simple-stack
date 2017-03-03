@@ -1,11 +1,7 @@
 package com.zhuinden.simplestackdemonestedstack.presentation.paths.main;
 
-import android.support.annotation.NonNull;
-
 import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestack.BackstackManager;
-import com.zhuinden.simplestack.SavedState;
-import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.simplestackdemonestedstack.util.Composite;
@@ -14,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Zhuinden on 2017.02.26..
@@ -59,13 +54,10 @@ public abstract class MainKey
 
     @Override
     protected BackstackManager createBackstackManager() {
-        return new NoClearBackstackManager();
-    }
-
-    private static class NoClearBackstackManager extends BackstackManager {
-        @Override
-        protected void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange) {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setStateClearStrategy((keyStateMap, stateChange) -> {
             // do nothing
-        }
+        });
+        return backstackManager;
     }
 }

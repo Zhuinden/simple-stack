@@ -1,6 +1,5 @@
 package com.zhuinden.simplestack;
 
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,11 +12,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * TODO
+ *
  * Created by Zhuinden on 2017.02.28..
  */
-
 public class BackstackManager
         implements Bundleable {
+    /**
+     * Specifies the strategy to be used in order to delete saved states that are no longer needed after a state change, when there is no pending state change left.
+     */
+    public interface StateClearStrategy {
+        /**
+         * Allows a hook to clear the saved state for obsolete keys.
+         *
+         * @param keyStateMap the map that contains the keys and their corresponding retained saved state.
+         * @param stateChange the last state change
+         */
+        void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange);
+    }
+
     static final String HISTORY_TAG = "HISTORY";
     static final String STATES_TAG = "STATES";
 
@@ -29,7 +42,7 @@ public class BackstackManager
                 public void stateChangeComplete() {
                     completionCallback.stateChangeComplete();
                     if(!backstack.isStateChangePending()) {
-                        clearStatesNotIn(keyStateMap, stateChange);
+                        stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
                     }
                 }
             });
@@ -37,11 +50,12 @@ public class BackstackManager
     };
 
     private KeyParceler keyParceler = new DefaultKeyParceler();
+    private StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
 
     /**
      * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
      *
-     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * If used, this method must be called before {@link BackstackManager#setup(List)} .
      *
      * @param keyParceler The custom {@link KeyParceler}.
      */
@@ -55,6 +69,23 @@ public class BackstackManager
         this.keyParceler = keyParceler;
     }
 
+    /**
+     * Specifies a custom {@link StateClearStrategy}, allowing a custom strategy for clearing the retained state of keys.
+     * The {@link DefaultStateClearStrategy} clears the {@link SavedState} for keys that are not found in the new state.
+     *
+     * If used, this method must be called before {@link BackstackManager#setup(List)} .
+     *
+     * @param stateClearStrategy The custom {@link StateClearStrategy}.
+     */
+    public void setStateClearStrategy(StateClearStrategy stateClearStrategy) {
+        if(backstack != null) {
+            throw new IllegalStateException("Custom state clear strategy should be set before calling `initialize()`");
+        }
+        if(stateClearStrategy == null) {
+            throw new IllegalArgumentException("The state clear strategy cannot be null!");
+        }
+        this.stateClearStrategy = stateClearStrategy;
+    }
 
     Backstack backstack;
 
@@ -66,13 +97,9 @@ public class BackstackManager
         backstack = new Backstack(initialKeys);
     }
 
-    protected void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange) {
-        keyStateMap.keySet().retainAll(stateChange.getNewState());
-    }
-
     public Backstack getBackstack() {
         if(backstack == null) {
-            throw new IllegalStateException("You must call `initializeOrRestore()` before calling `getBackstack()`");
+            throw new IllegalStateException("You must call `initialize()` before calling `getBackstack()`");
         }
         return backstack;
     }
@@ -124,7 +151,8 @@ public class BackstackManager
     // ----- viewstate persistence
 
     /**
-     * Provides the means to save the provided view's hierarchy state, and its optional {@link StateBundle} via {@link Bundleable} into a {@link SavedState}.
+     * Provides the means to save the provided view's hierarchy state
+     * and its optional {@link StateBundle} via {@link Bundleable} into a {@link SavedState}.
      *
      * @param view the view that belongs to a certain key
      */

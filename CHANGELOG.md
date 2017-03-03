@@ -4,8 +4,11 @@
 --------------------------------
 - REFACTOR: `BackstackDelegate` is separated into `BackstackManager`.
 
-- ADD: `BackstackManager` class to help with creating backstacks inside views, but not heavily tested yet.
+- ADD: `BackstackManager` class to help with creating backstacks inside views.
 
+- ENHANCEMENT: `BackstackManager` is now `Bundleable`, therefore its state can be automatically restored along with other managed services (see examples).
+
+- CHANGE: `clearStatesNotIn()` is no longer a method of `BackstackDelegate` or `BackstackManager`, it can be specified as custom using a `BackstackManager.StateClearStrategy`.
 
 -Simple Stack 1.2.1 (2017-02-28)
 --------------------------------

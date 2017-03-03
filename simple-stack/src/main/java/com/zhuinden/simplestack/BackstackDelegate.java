@@ -42,7 +42,25 @@ public class BackstackDelegate {
      * @param keyParceler The custom {@link KeyParceler}.
      */
     public void setKeyParceler(KeyParceler keyParceler) {
+        if(keyParceler == null) {
+            throw new IllegalArgumentException("Specified custom key parceler should not be null!");
+        }
         this.keyParceler = keyParceler;
+    }
+
+    /**
+     * Specifies a custom {@link BackstackManager.StateClearStrategy}, allowing a custom way of retaining saved state.
+     * The {@link DefaultStateClearStrategy} clears saved state for keys not found in the new state.
+     *
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     *
+     * @param stateClearStrategy The custom {@link BackstackManager.StateClearStrategy}.
+     */
+    public void setStateClearStrategy(BackstackManager.StateClearStrategy stateClearStrategy) {
+        if(stateClearStrategy == null) {
+            throw new IllegalArgumentException("Specified state clear strategy should not be null!");
+        }
+        this.stateClearStrategy = stateClearStrategy;
     }
 
     private static final String HISTORY = "simplestack.HISTORY";
@@ -50,6 +68,7 @@ public class BackstackDelegate {
     private StateChanger stateChanger;
 
     private KeyParceler keyParceler = new DefaultKeyParceler();
+    private BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
 
     /**
      * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
@@ -112,6 +131,7 @@ public class BackstackDelegate {
         if(backstackManager == null) {
             backstackManager = new BackstackManager();
             backstackManager.setKeyParceler(keyParceler);
+            backstackManager.setStateClearStrategy(stateClearStrategy);
             backstackManager.setup(initialKeys);
             if(savedInstanceState != null) {
                 backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable(getHistoryTag()));
@@ -256,7 +276,7 @@ public class BackstackDelegate {
     }
 
     /**
-     * The class which stores the {@link Backstack} for surviving configuration change.
+     * The class which stores the {@link BackstackManager} for surviving configuration change.
      */
     public static class NonConfigurationInstance {
         private BackstackManager backstackManager;

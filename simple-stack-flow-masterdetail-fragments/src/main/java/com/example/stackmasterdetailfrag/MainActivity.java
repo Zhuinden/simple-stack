@@ -26,7 +26,7 @@ import com.example.stackmasterdetailfrag.pathview.HandlesBack;
 import com.example.stackmasterdetailfrag.pathview.TabletMasterDetailRoot;
 import com.example.stackmasterdetailfrag.util.BackstackService;
 import com.example.stackmasterdetailfrag.util.FragmentManagerService;
-import com.example.stackmasterdetailfrag.util.MasterDetailBackstackDelegate;
+import com.example.stackmasterdetailfrag.util.MasterDetailStateClearStrategy;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
@@ -66,7 +66,8 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
-        backstackDelegate = new MasterDetailBackstackDelegate(null);
+        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.setStateClearStrategy(new MasterDetailStateClearStrategy());
         backstackDelegate.onCreate(savedInstanceState,
                 getLastCustomNonConfigurationInstance(),
                 HistoryBuilder.single(Paths.ConversationList.create()));
