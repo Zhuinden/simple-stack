@@ -46,7 +46,6 @@ public class NestSupportServiceManager {
     }
 
     public void setupServices(StateChange stateChange) {
-        // services
         StateBundle states = serviceTree.getRootService(SERVICE_STATES);
         for(Object _previousKey : stateChange.getPreviousState()) {
             Key previousKey = (Key) _previousKey;
@@ -65,7 +64,6 @@ public class NestSupportServiceManager {
             Key newKey = (Key) _newKey;
             buildServices(states, newKey);
         }
-        // end services
     }
 
     private void buildServices(StateBundle states, Key newKey) {
@@ -76,35 +74,25 @@ public class NestSupportServiceManager {
             } else {
                 binder = serviceTree.createRootNode(newKey);
             }
-            newKey.bindServices(binder);
-            ServiceTree.Node node = binder.get();
-            restoreServiceStateForKey(states, newKey, node);
-            if(newKey instanceof Composite) {
-                buildComposite(states, node, ((Composite) newKey));
-            }
-            if(newKey.hasNestedStack()) {
-                Backstack nestedStack = serviceTree.getNode(newKey).<BackstackManager>getService(Key.NESTED_STACK).getBackstack();
-                for(Object _childKey : nestedStack.getInitialParameters()) {
-                    buildServices(states, (Key)_childKey);
-                }
-            }
+            buildServicesForKey(states, newKey, binder);
         }
     }
 
-    private void buildComposite(StateBundle states, ServiceTree.Node parentNode, Composite composite) {
-        for(Object _nestedKey : composite.keys()) {
-            Key nestedKey = (Key) _nestedKey;
-            ServiceTree.Node.Binder nestedBinder = serviceTree.createChildNode(parentNode, nestedKey);
-            nestedKey.bindServices(nestedBinder);
-            restoreServiceStateForKey(states, nestedKey, nestedBinder.get());
-            if(nestedKey instanceof Composite) {
-                buildComposite(states, nestedBinder.get(), (Composite) nestedKey);
+    private void buildServicesForKey(StateBundle states, Key newKey, ServiceTree.Node.Binder binder) {
+        newKey.bindServices(binder);
+        ServiceTree.Node node = binder.get();
+        restoreServiceStateForKey(states, newKey, node);
+        if(newKey instanceof Composite) {
+            for(Object _nestedKey : ((Composite) newKey).keys()) {
+                Key nestedKey = (Key) _nestedKey;
+                ServiceTree.Node.Binder nestedBinder = serviceTree.createChildNode(node, nestedKey);
+                buildServicesForKey(states, (Key) _nestedKey, nestedBinder);
             }
-            if(nestedKey.hasNestedStack()) {
-                Backstack nestedStack = serviceTree.getNode(nestedKey).<BackstackManager>getService(Key.NESTED_STACK).getBackstack();
-                for(Object _childKey : nestedStack.getInitialParameters()) {
-                    buildServices(states, (Key)_childKey);
-                }
+        }
+        if(newKey.hasNestedStack()) {
+            Backstack nestedStack = serviceTree.getNode(newKey).<BackstackManager>getService(Key.NESTED_STACK).getBackstack();
+            for(Object _childKey : nestedStack.getInitialParameters()) {
+                buildServices(states, (Key) _childKey);
             }
         }
     }
