@@ -26,6 +26,8 @@ The [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stac
 
 The [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java) provides Activity lifecycle integration, and manages view state persistence for custom views associated with a key.
 
+Internally, the [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java) uses a [BackstackManager](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackManager.java), which can also be used.
+
 ## Using Simple Stack
 
 In order to use Simple Stack, you need to add jitpack to your project root gradle:
@@ -153,7 +155,9 @@ public class MainActivity
 
 - [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java): exposes operators for manipulating the backstack, and stores current history.
 
-- [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java): delegate class to hide Activity lifecycle integration, and provide view state persistence.
+- [BackstackDelegate](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackDelegate.java): delegate class to hide Activity lifecycle integration, and provide view state persistence using `BackstackManager`.
+
+- [BackstackManager](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackManager.java): provides view-state and backstack history persistence.
 
 - [Bundleable](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Bundleable.java): interface that allows you to persist state directly from a custom View into a StateBundle, using the delegate.
 
