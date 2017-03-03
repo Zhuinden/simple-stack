@@ -12,18 +12,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * The backstack manager manages a {@link Backstack} internally, and wraps it with the ability of persisting view state and the backstack history itself.
  *
- * Created by Zhuinden on 2017.02.28..
+ * The backstack is created by {@link BackstackManager#setup(List)}, and initialized by {@link BackstackManager#setStateChanger(StateChanger)}.
  */
 public class BackstackManager
         implements Bundleable {
     /**
-     * Specifies the strategy to be used in order to delete saved states that are no longer needed after a state change, when there is no pending state change left.
+     * Specifies the strategy to be used in order to delete {@link SavedState}s that are no longer needed after a {@link StateChange}, when there is no pending {@link StateChange} left.
      */
     public interface StateClearStrategy {
         /**
-         * Allows a hook to clear the saved state for obsolete keys.
+         * Allows a hook to clear the {@link SavedState} for obsolete keys.
          *
          * @param keyStateMap the map that contains the keys and their corresponding retained saved state.
          * @param stateChange the last state change
@@ -93,14 +93,22 @@ public class BackstackManager
 
     StateChanger stateChanger;
 
+    /**
+     * Setup creates the {@link Backstack} with the specified initial keys.
+     *
+     * @param initialKeys the initial keys of the backstack
+     */
     public void setup(@NonNull List<?> initialKeys) {
         backstack = new Backstack(initialKeys);
     }
 
+    /**
+     * Gets the managed {@link Backstack}. It can only be called after {@link BackstackManager#setup(List)}.
+     *
+     * @return the backstack
+     */
     public Backstack getBackstack() {
-        if(backstack == null) {
-            throw new IllegalStateException("You must call `initialize()` before calling `getBackstack()`");
-        }
+        checkBackstack("You must call `setup()` before calling `getBackstack()`");
         return backstack;
     }
 
@@ -110,7 +118,13 @@ public class BackstackManager
         }
     }
 
-    public void setStateChanger(StateChanger stateChanger) {
+    /**
+     * Sets the {@link StateChanger} for the given {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     *
+     * @param stateChanger the state changer
+     */
+    public void setStateChanger(@Nullable StateChanger stateChanger) {
+        checkBackstack("You must call `setup()` before calling `setStateChanger().");
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
         }
@@ -118,13 +132,21 @@ public class BackstackManager
         initializeBackstack(stateChanger);
     }
 
+    /**
+     * Detaches the {@link StateChanger} from the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     */
     public void detachStateChanger() {
+        checkBackstack("You must call `setup()` before calling `detachStateChanger().`");
         if(backstack.hasStateChanger()) {
             backstack.removeStateChanger();
         }
     }
 
+    /**
+     * Reattaches the {@link StateChanger} to the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     */
     public void reattachStateChanger() {
+        checkBackstack("You must call `setup()` before calling `reattachStateChanger().`");
         if(!backstack.hasStateChanger()) {
             backstack.setStateChanger(managedStateChanger, Backstack.REATTACH);
         }
@@ -194,11 +216,15 @@ public class BackstackManager
         }
     }
 
+    /**
+     * Restores the BackstackManager from a {@link StateBundle}.
+     * This can only be called after {@link BackstackManager#setup(List)}.
+     *
+     * @param stateBundle the state bundle obtained via {@link BackstackManager#toBundle()}
+     */
     @Override
     public void fromBundle(@Nullable StateBundle stateBundle) {
-        if(backstack == null) {
-            throw new IllegalStateException("A backstack must be set up before it is restored!");
-        }
+        checkBackstack("A backstack must be set up before it is restored!");
         if(stateBundle != null) {
             List<Object> keys = new ArrayList<>();
             List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(HISTORY_TAG);
@@ -224,6 +250,17 @@ public class BackstackManager
         }
     }
 
+    private void checkBackstack(String message) {
+        if(backstack == null) {
+            throw new IllegalStateException(message);
+        }
+    }
+
+    /**
+     * Persists the backstack history and view state into a {@link StateBundle}.
+     *
+     * @return the state bundle
+     */
     @NonNull
     @Override
     public StateBundle toBundle() {

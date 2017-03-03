@@ -1,14 +1,18 @@
 # Change log
 
--Simple Stack 1.X.X (2017-03-XX)
+-Simple Stack 1.3.0 (2017-03-03)
 --------------------------------
 - REFACTOR: `BackstackDelegate` is separated into `BackstackManager`.
 
-- ADD: `BackstackManager` class to help with creating backstacks inside views.
+- ADDED: `BackstackManager` class to help with creating backstacks inside views.
 
 - ENHANCEMENT: `BackstackManager` is now `Bundleable`, therefore its state can be automatically restored along with other managed services (see examples).
 
 - CHANGE: `clearStatesNotIn()` is no longer a method of `BackstackDelegate` or `BackstackManager`, it can be specified as custom using a `BackstackManager.StateClearStrategy`.
+
+- ADDED: `simple-stack-example-services` that shows how to use `service-tree` with `simple-stack` to store scoped services that can have their states restored and survive configuration change.
+
+- ADDED: `simple-stack-example-nestedstack` that shows how to use view-level `BackstackManager` stored in `service-tree` to have nested backstacks inside views.
 
 -Simple Stack 1.2.1 (2017-02-28)
 --------------------------------

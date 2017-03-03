@@ -3,7 +3,7 @@ package com.zhuinden.simplestack;
 import android.os.Parcelable;
 
 /**
- * Created by Owner on 2017. 02. 28..
+ * Default key parceler implementation that assumes your keys are Parcelable.
  */
 public class DefaultKeyParceler
         implements KeyParceler {
