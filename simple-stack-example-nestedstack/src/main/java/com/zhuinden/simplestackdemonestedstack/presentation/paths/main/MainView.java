@@ -148,6 +148,7 @@ public class MainView
 
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        // no need to setup services here, because it is handled by Composite
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             // no-op
             completionCallback.stateChangeComplete();
