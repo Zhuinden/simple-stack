@@ -16,10 +16,9 @@ import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
-import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.another.internal.InternalKey;
 import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
+import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
-import com.zhuinden.simplestackdemonestedstack.util.ServiceManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -98,7 +97,7 @@ public class AnotherView
 
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
-        ServiceManager.get(getContext()).setupServices(stateChange);
+        NestSupportServiceManager.get(getContext()).setupServices(stateChange);
 
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             completionCallback.stateChangeComplete();

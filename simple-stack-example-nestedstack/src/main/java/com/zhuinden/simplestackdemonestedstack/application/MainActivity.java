@@ -2,9 +2,7 @@ package com.zhuinden.simplestackdemonestedstack.application;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,8 +19,8 @@ import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.MainKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.other.OtherKey;
 import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
+import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
-import com.zhuinden.simplestackdemonestedstack.util.ServiceManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,16 +42,16 @@ public class MainActivity
     Backstack backstack;
 
     static class NonConfigurationInstance {
-        ServiceManager serviceManager;
+        NestSupportServiceManager serviceManager;
         BackstackDelegate.NonConfigurationInstance backstackDelegateNonConfig;
 
-        private NonConfigurationInstance(ServiceManager serviceManager, BackstackDelegate.NonConfigurationInstance backstackDelegateNonConfig) {
+        private NonConfigurationInstance(NestSupportServiceManager serviceManager, BackstackDelegate.NonConfigurationInstance backstackDelegateNonConfig) {
             this.serviceManager = serviceManager;
             this.backstackDelegateNonConfig = backstackDelegateNonConfig;
         }
     }
 
-    ServiceManager serviceManager;
+    NestSupportServiceManager serviceManager;
     ServiceTree serviceTree;
 
     @Override
@@ -64,7 +62,7 @@ public class MainActivity
             serviceTree =  serviceManager.getServiceTree();
         } else {
             serviceTree = new ServiceTree();
-            serviceManager = new ServiceManager(serviceTree);
+            serviceManager = new NestSupportServiceManager(serviceTree);
             if(savedInstanceState != null) {
                 serviceManager.setRestoredStates(savedInstanceState.getParcelable("SERVICE_BUNDLE"));
             }
@@ -131,7 +129,7 @@ public class MainActivity
         if(ServiceLocator.SERVICE_TREE.equals(name)) {
             return serviceTree;
         }
-        if(ServiceManager.SERVICE_MANAGER.equals(name)) {
+        if(NestSupportServiceManager.SERVICE_MANAGER.equals(name)) {
             return serviceManager;
         }
         return super.getSystemService(name);

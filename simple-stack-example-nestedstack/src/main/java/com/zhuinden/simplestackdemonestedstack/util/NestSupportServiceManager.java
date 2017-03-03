@@ -13,23 +13,23 @@ import com.zhuinden.simplestackdemonestedstack.application.Key;
 
 import java.util.List;
 
-public class ServiceManager {
+public class NestSupportServiceManager {
     public static final String SERVICE_MANAGER = "SERVICE_MANAGER";
 
-    public static ServiceManager get(Context context) {
+    public static NestSupportServiceManager get(Context context) {
         //noinspection ResourceType
-        return (ServiceManager)context.getSystemService(SERVICE_MANAGER);
+        return (NestSupportServiceManager) context.getSystemService(SERVICE_MANAGER);
     }
 
     private final ServiceTree serviceTree;
 
-    public ServiceManager(ServiceTree serviceTree) {
+    public NestSupportServiceManager(ServiceTree serviceTree) {
         this.serviceTree = serviceTree;
     }
 
     public static final String SERVICE_STATES = "SERVICE_BUNDLE";
 
-    private static final String TAG = "ServiceManager";
+    private static final String TAG = "NestServiceManager";
 
     public StateBundle persistStates() {
         StateBundle serviceStates = new StateBundle();
