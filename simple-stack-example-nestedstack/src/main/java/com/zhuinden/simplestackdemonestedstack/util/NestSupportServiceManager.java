@@ -7,9 +7,9 @@ import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
+import com.zhuinden.statebundle.StateBundle;
 
 import java.util.List;
 

@@ -5,8 +5,8 @@ import android.util.Log;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simpleservicesexample.application.Key;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.statebundle.StateBundle;
 
 import java.util.List;
 

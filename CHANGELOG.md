@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 1.4.0 (2017-03-06)
+--------------------------------
+- BREAKING CHANGE: `StateBundle` is moved from `com.zhuinden.simplestack.StateBundle` to `com.zhuinden.statebundle.StateBundle`
+
+- CHANGE: `StateBundle` is moved to https://github.com/Zhuinden/state-bundle and is a compile dependency of `simple-stack`
+
 -Simple Stack 1.3.0 (2017-03-03)
 --------------------------------
 - REFACTOR: `BackstackDelegate` is separated into `BackstackManager`.

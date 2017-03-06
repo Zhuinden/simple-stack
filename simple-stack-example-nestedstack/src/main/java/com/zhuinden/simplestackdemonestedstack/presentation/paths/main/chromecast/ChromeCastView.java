@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
+import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
 

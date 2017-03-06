@@ -50,7 +50,7 @@ In order to use Simple Stack, you need to add jitpack to your project root gradl
 
 and add the compile dependency to your module level gradle.
 
-    compile 'com.github.Zhuinden:simple-stack:1.3.0'
+    compile 'com.github.Zhuinden:simple-stack:1.4.0'
 
 ## How does it work?
 
@@ -159,7 +159,7 @@ public class MainActivity
 
 - [BackstackManager](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/BackstackManager.java): provides view-state and backstack history persistence.
 
-- [Bundleable](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Bundleable.java): interface that allows you to persist state directly from a custom View into a StateBundle, using the delegate.
+- [Bundleable](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Bundleable.java): interface that allows you to persist state directly from a custom View into a [StateBundle](https://github.com/Zhuinden/state-bundle/), using the delegate.
 
 - [HistoryBuilder](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/HistoryBuilder.java): Convenience class for building `ArrayList<Object>`.
 
@@ -168,8 +168,6 @@ public class MainActivity
 - [KeyParceler](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/KeyParceler.java): used for defining custom parcellation strategy if keys are not `Parcelable` by default.
 
 - [PendingStateChange](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/PendingStateChange.java): represents a change that will occur when possible.
-
-- [StateBundle](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateBundle.java): a class which works as a state storage, a replacement for `android.os.Bundle`.
 
 - [StateChanger](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChanger.java): interface for a class that listens to changes inside the Backstack.
 

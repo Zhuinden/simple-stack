@@ -6,9 +6,9 @@ import android.support.annotation.Nullable;
 import com.jakewharton.rxrelay.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 

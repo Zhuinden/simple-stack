@@ -5,9 +5,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 

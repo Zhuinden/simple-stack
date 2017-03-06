@@ -8,7 +8,7 @@ import android.widget.ScrollView;
 
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
+import com.zhuinden.statebundle.StateBundle;
 
 /**
  * Created by Owner on 2017. 01. 26..

@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
+import com.zhuinden.statebundle.StateBundle;
 
 /**
  * Created by Zhuinden on 2017.03.02..

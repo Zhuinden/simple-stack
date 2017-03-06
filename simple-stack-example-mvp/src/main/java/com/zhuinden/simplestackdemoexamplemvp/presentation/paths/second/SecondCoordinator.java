@@ -6,9 +6,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 

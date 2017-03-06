@@ -3,9 +3,9 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.first;
 import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.second.SecondKey;
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 

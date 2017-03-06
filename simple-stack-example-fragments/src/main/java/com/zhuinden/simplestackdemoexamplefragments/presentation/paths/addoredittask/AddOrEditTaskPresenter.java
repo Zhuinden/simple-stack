@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task;
@@ -14,6 +13,7 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.Tas
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter;
 import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue;
 import com.zhuinden.simplestackdemoexamplefragments.util.Strings;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 

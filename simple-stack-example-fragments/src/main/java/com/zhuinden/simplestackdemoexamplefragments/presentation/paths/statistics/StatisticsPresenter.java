@@ -2,10 +2,10 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statisti
 
 import android.support.annotation.Nullable;
 
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter;
+import com.zhuinden.statebundle.StateBundle;
 
 import org.javatuples.Pair;
 

@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.zhuinden.statebundle.StateBundle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

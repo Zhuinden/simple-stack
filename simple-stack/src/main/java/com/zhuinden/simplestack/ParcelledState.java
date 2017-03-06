@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseArray;
 
+import com.zhuinden.statebundle.StateBundle;
+
 /**
  * Created by Owner on 2017. 02. 28..
  */

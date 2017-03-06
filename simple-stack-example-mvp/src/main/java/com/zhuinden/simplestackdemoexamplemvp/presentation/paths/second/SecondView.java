@@ -9,8 +9,8 @@ import android.widget.RelativeLayout;
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.application.CustomApplication;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 

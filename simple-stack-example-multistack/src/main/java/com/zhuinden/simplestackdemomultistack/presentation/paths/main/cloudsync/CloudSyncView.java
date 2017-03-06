@@ -11,10 +11,10 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemomultistack.R;
 import com.zhuinden.simplestackdemomultistack.application.Key;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.another.AnotherKey;
+import com.zhuinden.statebundle.StateBundle;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;

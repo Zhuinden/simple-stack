@@ -7,12 +7,12 @@ import android.view.MenuItem;
 
 import com.squareup.coordinators.Coordinators;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.util.ScrollChildSwipeRefreshLayout;
+import com.zhuinden.statebundle.StateBundle;
 
 /**
  * Created by Owner on 2017. 01. 26..

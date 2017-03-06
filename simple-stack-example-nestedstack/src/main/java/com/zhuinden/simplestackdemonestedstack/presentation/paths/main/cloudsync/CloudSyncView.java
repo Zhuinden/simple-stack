@@ -14,7 +14,6 @@ import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.KeyContextWrapper;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
@@ -22,6 +21,7 @@ import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
+import com.zhuinden.statebundle.StateBundle;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

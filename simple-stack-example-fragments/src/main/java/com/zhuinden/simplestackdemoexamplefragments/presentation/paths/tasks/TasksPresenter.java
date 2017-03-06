@@ -7,13 +7,13 @@ import android.support.annotation.Nullable;
 import com.jakewharton.rxrelay.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplefragments.application.Key;
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail.TaskDetailKey;
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 

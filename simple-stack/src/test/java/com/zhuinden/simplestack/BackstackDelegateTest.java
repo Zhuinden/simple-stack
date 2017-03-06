@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
 
+import com.zhuinden.statebundle.StateBundle;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

@@ -14,12 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateBundle;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.util.BaseCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
+import com.zhuinden.statebundle.StateBundle;
 
 import org.javatuples.Pair;
 

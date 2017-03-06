@@ -20,6 +20,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
+import com.zhuinden.statebundle.StateBundle;
+
 /**
  * A container for the view hierarchy state and an optional Bundle.
  * Made to be used with {@link BackstackDelegate}'s view state persistence.
