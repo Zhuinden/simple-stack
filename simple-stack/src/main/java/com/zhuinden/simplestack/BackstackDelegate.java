@@ -239,7 +239,7 @@ public class BackstackDelegate {
     // ----- viewstate persistence
 
     /**
-     * Provides the means to save the provided view's hierarchy state, and its optional {@link StateBundle} via {@link Bundleable} into a {@link SavedState}.
+     * Provides the means to save the provided view's hierarchy state, and its optional StateBundle via {@link Bundleable} into a {@link SavedState}.
      *
      * @param view the view that belongs to a certain key
      */

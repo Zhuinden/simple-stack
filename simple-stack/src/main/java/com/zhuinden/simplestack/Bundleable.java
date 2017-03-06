@@ -22,7 +22,7 @@ import android.view.View;
 import com.zhuinden.statebundle.StateBundle;
 
 /**
- * Specifies that the custom view that implements this also places its persisted state into a {@link StateBundle}.
+ * Specifies that the custom view that implements this also places its persisted state into a StateBundle.
  *
  * This is used by {@link BackstackDelegate#persistViewToState(View)} and {@link BackstackDelegate#restoreViewFromState(View)}.
  */

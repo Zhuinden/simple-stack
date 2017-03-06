@@ -176,7 +176,7 @@ public class BackstackManager
 
     /**
      * Provides the means to save the provided view's hierarchy state
-     * and its optional {@link StateBundle} via {@link Bundleable} into a {@link SavedState}.
+     * and its optional StateBundle via {@link Bundleable} into a {@link SavedState}.
      *
      * @param view the view that belongs to a certain key
      */
@@ -219,7 +219,7 @@ public class BackstackManager
     }
 
     /**
-     * Restores the BackstackManager from a {@link StateBundle}.
+     * Restores the BackstackManager from a StateBundle.
      * This can only be called after {@link BackstackManager#setup(List)}.
      *
      * @param stateBundle the state bundle obtained via {@link BackstackManager#toBundle()}
@@ -259,7 +259,7 @@ public class BackstackManager
     }
 
     /**
-     * Persists the backstack history and view state into a {@link StateBundle}.
+     * Persists the backstack history and view state into a StateBundle.
      *
      * @return the state bundle
      */
