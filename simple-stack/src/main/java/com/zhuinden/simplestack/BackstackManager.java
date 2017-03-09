@@ -63,7 +63,7 @@ public class BackstackManager
      */
     public void setKeyParceler(KeyParceler keyParceler) {
         if(backstack != null) {
-            throw new IllegalStateException("Custom key parceler should be set before calling `onCreate()`");
+            throw new IllegalStateException("Custom key parceler should be set before calling `setup()`");
         }
         if(keyParceler == null) {
             throw new IllegalArgumentException("The key parceler cannot be null!");
@@ -81,7 +81,7 @@ public class BackstackManager
      */
     public void setStateClearStrategy(StateClearStrategy stateClearStrategy) {
         if(backstack != null) {
-            throw new IllegalStateException("Custom state clear strategy should be set before calling `initialize()`");
+            throw new IllegalStateException("Custom state clear strategy should be set before calling `setup()`");
         }
         if(stateClearStrategy == null) {
             throw new IllegalArgumentException("The state clear strategy cannot be null!");

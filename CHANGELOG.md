@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.4.1 (2017-03-09)
+--------------------------------
+- MINOR FIX: Adjusted exception message in `BackstackManager` to say `setup()`.
+
 -Simple Stack 1.4.0 (2017-03-06)
 --------------------------------
 - BREAKING CHANGE: `StateBundle` is moved from `com.zhuinden.simplestack.StateBundle` to `com.zhuinden.statebundle.StateBundle`
