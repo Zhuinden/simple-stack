@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.4.2 (2017-03-20)
+--------------------------------
+- CHANGE: Decreased minSDK to 1.
+
 -Simple Stack 1.4.1 (2017-03-09)
 --------------------------------
 - MINOR FIX: Adjusted exception message in `BackstackManager` to say `setup()`.
