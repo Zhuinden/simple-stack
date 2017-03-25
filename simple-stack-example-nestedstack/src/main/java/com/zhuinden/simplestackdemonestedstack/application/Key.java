@@ -27,11 +27,11 @@ public abstract class Key
 
     public abstract String stackIdentifier();
 
-    public void bindServices(ServiceTree.Node.Binder binder) {
+    public void bindServices(ServiceTree.Node node) {
         if(hasNestedStack()) {
             BackstackManager backstackManager = createBackstackManager();
             backstackManager.setup(initialKeys());
-            binder.bindService(NESTED_STACK, backstackManager);
+            node.bindService(NESTED_STACK, backstackManager);
         }
     }
 

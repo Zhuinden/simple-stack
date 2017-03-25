@@ -13,5 +13,5 @@ public abstract class Key
         implements Parcelable {
     public abstract int layout();
 
-    public abstract void bindServices(ServiceTree.Node.Binder binder);
+    public abstract void bindServices(ServiceTree.Node node);
 }

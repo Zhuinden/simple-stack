@@ -58,14 +58,13 @@ public class ServiceManager {
         for(Object _newKey : stateChange.getNewState()) {
             Key newKey = (Key) _newKey;
             if(!serviceTree.hasNodeWithKey(newKey)) {
-                ServiceTree.Node.Binder binder;
+                ServiceTree.Node node;
                 if(newKey instanceof Child) {
-                    binder = serviceTree.createChildNode(serviceTree.getNode(((Child) newKey).parent()), newKey);
+                    node = serviceTree.createChildNode(serviceTree.getNode(((Child) newKey).parent()), newKey);
                 } else {
-                    binder = serviceTree.createRootNode(newKey);
+                    node = serviceTree.createRootNode(newKey);
                 }
-                newKey.bindServices(binder);
-                ServiceTree.Node node = binder.get();
+                newKey.bindServices(node);
                 restoreServiceStateForKey(states, newKey, node);
                 if(newKey instanceof Composite) {
                     buildComposite(states, node, ((Composite) newKey));
@@ -78,11 +77,11 @@ public class ServiceManager {
     private void buildComposite(StateBundle states, ServiceTree.Node parentNode, Composite composite) {
         for(Object _nestedKey : composite.keys()) {
             Key nestedKey = (Key) _nestedKey;
-            ServiceTree.Node.Binder nestedBinder = serviceTree.createChildNode(parentNode, nestedKey);
-            nestedKey.bindServices(nestedBinder);
-            restoreServiceStateForKey(states, nestedKey, nestedBinder.get());
+            ServiceTree.Node nestedNode = serviceTree.createChildNode(parentNode, nestedKey);
+            nestedKey.bindServices(nestedNode);
+            restoreServiceStateForKey(states, nestedKey, nestedNode);
             if(nestedKey instanceof Composite) {
-                buildComposite(states, nestedBinder.get(), (Composite) nestedKey);
+                buildComposite(states, nestedNode, (Composite) nestedKey);
             }
         }
     }

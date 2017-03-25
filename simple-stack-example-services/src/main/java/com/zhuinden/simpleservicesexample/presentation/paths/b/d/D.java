@@ -35,7 +35,7 @@ public abstract class D
     }
 
     @Override
-    public void bindServices(ServiceTree.Node.Binder binder) {
-        binder.bindService("D", new MockService("D"));
+    public void bindServices(ServiceTree.Node node) {
+        node.bindService("D", new MockService("D"));
     }
 }

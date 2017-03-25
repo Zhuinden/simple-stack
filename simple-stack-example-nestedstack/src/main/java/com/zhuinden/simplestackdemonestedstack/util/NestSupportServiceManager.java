@@ -68,25 +68,24 @@ public class NestSupportServiceManager {
 
     private void buildServices(StateBundle states, Key newKey) {
         if(!serviceTree.hasNodeWithKey(newKey)) {
-            ServiceTree.Node.Binder binder;
+            ServiceTree.Node node;
             if(newKey instanceof Child) {
-                binder = serviceTree.createChildNode(serviceTree.getNode(((Child) newKey).parent()), newKey);
+                node = serviceTree.createChildNode(serviceTree.getNode(((Child) newKey).parent()), newKey);
             } else {
-                binder = serviceTree.createRootNode(newKey);
+                node = serviceTree.createRootNode(newKey);
             }
-            buildServicesForKey(states, newKey, binder);
+            buildServicesForKey(states, newKey, node);
         }
     }
 
-    private void buildServicesForKey(StateBundle states, Key newKey, ServiceTree.Node.Binder binder) {
-        newKey.bindServices(binder);
-        ServiceTree.Node node = binder.get();
+    private void buildServicesForKey(StateBundle states, Key newKey, ServiceTree.Node node) {
+        newKey.bindServices(node);
         restoreServiceStateForKey(states, newKey, node);
         if(newKey instanceof Composite) {
             for(Object _nestedKey : ((Composite) newKey).keys()) {
                 Key nestedKey = (Key) _nestedKey;
-                ServiceTree.Node.Binder nestedBinder = serviceTree.createChildNode(node, nestedKey);
-                buildServicesForKey(states, (Key) _nestedKey, nestedBinder);
+                ServiceTree.Node nestedNode = serviceTree.createChildNode(node, nestedKey);
+                buildServicesForKey(states, (Key) _nestedKey, nestedNode);
             }
         }
         if(newKey.hasNestedStack()) {

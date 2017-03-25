@@ -24,7 +24,7 @@ public abstract class C
     }
 
     @Override
-    public void bindServices(ServiceTree.Node.Binder binder) {
-        binder.bindService("C", new MockService("C"));
+    public void bindServices(ServiceTree.Node node) {
+        node.bindService("C", new MockService("C"));
     }
 }
