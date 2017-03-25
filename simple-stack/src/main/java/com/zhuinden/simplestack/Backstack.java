@@ -52,6 +52,7 @@ public class Backstack {
 
     private final List<Object> originalStack = new ArrayList<>();
 
+    private final List<Object> initialKeys;
     private List<Object> initialParameters;
     private List<Object> stack = originalStack;
 
@@ -68,7 +69,8 @@ public class Backstack {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
-        initialParameters = Collections.unmodifiableList(new ArrayList<>(Arrays.asList(initialKeys)));
+        this.initialKeys = Collections.unmodifiableList(new ArrayList<>(Arrays.asList(initialKeys)));
+        setInitialParameters(new ArrayList<>(this.initialKeys));
     }
 
     /**
@@ -83,14 +85,15 @@ public class Backstack {
         if(initialKeys.size() <= 0) {
             throw new IllegalArgumentException("Initial key list should contain at least one element");
         }
-        initialParameters = Collections.unmodifiableList(new ArrayList<>(initialKeys));
+        this.initialKeys = Collections.unmodifiableList(new ArrayList<>(initialKeys));
+        setInitialParameters(new ArrayList<>(this.initialKeys));
     }
 
     void setInitialParameters(List<?> initialKeys) {
         if(initialKeys == null || initialKeys.size() <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
-        this.initialParameters = Collections.unmodifiableList(new ArrayList<>(initialKeys));
+        this.initialParameters = new ArrayList<>(initialKeys);
     }
 
     /**
@@ -173,7 +176,7 @@ public class Backstack {
             return true;
         }
         if(stack.size() <= 1) {
-            stack.clear();
+            resetBackstack();
             return false;
         }
         ArrayList<Object> newHistory = new ArrayList<>();
@@ -184,6 +187,11 @@ public class Backstack {
         }
         enqueueStateChange(newHistory, StateChange.BACKWARD, false);
         return true;
+    }
+
+    private void resetBackstack() {
+        stack.clear();
+        initialParameters = new ArrayList<>(initialKeys);
     }
 
     /**

@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 1.4.3 (2017-03-25)
+--------------------------------
+- FIX: Fixed a bug that if a restored backstack is cleared and an initialize state change is triggered,
+       then the restored keys were used instead of the initial key
+    (this only surfaced if you attempt to use multiple backstacks, and a cleared backstack is re-used)
+
 -Simple Stack 1.4.2 (2017-03-20)
 --------------------------------
 - CHANGE: Decreased minSDK to 1.
