@@ -120,7 +120,7 @@ public class BackstackDelegateTest {
             add(restoredKey);
         }};
         StateBundle stateBundle = new StateBundle();
-        stateBundle.putParcelableArrayList(BackstackManager.HISTORY_TAG, restoredKeys);
+        stateBundle.putParcelableArrayList(BackstackManager.getHistoryTag(), restoredKeys);
         Mockito.when(savedInstanceState.getParcelable(backstackDelegate.getHistoryTag())).thenReturn(stateBundle);
         backstackDelegate.onCreate(savedInstanceState, null, HistoryBuilder.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isNotNull();

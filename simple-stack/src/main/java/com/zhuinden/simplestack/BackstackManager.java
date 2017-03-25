@@ -33,8 +33,16 @@ public class BackstackManager
         void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange);
     }
 
-    static final String HISTORY_TAG = "HISTORY";
-    static final String STATES_TAG = "STATES";
+    private static final String HISTORY_TAG = "HISTORY";
+    private static final String STATES_TAG = "STATES";
+
+    static String getHistoryTag() {
+        return HISTORY_TAG;
+    }
+
+    static String getStatesTag() {
+        return STATES_TAG;
+    }
 
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
@@ -229,7 +237,7 @@ public class BackstackManager
         checkBackstack("A backstack must be set up before it is restored!");
         if(stateBundle != null) {
             List<Object> keys = new ArrayList<>();
-            List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(HISTORY_TAG);
+            List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(getHistoryTag());
             if(parcelledKeys != null) {
                 for(Parcelable parcelledKey : parcelledKeys) {
                     keys.add(keyParceler.fromParcelable(parcelledKey));
@@ -238,7 +246,7 @@ public class BackstackManager
             if(!keys.isEmpty()) {
                 backstack.setInitialParameters(keys);
             }
-            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList(STATES_TAG);
+            List<ParcelledState> savedStates = stateBundle.getParcelableArrayList(getStatesTag());
             if(savedStates != null) {
                 for(ParcelledState parcelledState : savedStates) {
                     SavedState savedState = SavedState.builder()
@@ -271,7 +279,7 @@ public class BackstackManager
         for(Object key : backstack.getHistory()) {
             history.add(keyParceler.toParcelable(key));
         }
-        stateBundle.putParcelableArrayList(HISTORY_TAG, history);
+        stateBundle.putParcelableArrayList(getHistoryTag(), history);
 
         ArrayList<ParcelledState> states = new ArrayList<>();
         for(SavedState savedState : keyStateMap.values()) {
@@ -281,7 +289,7 @@ public class BackstackManager
             parcelledState.bundle = savedState.getBundle();
             states.add(parcelledState);
         }
-        stateBundle.putParcelableArrayList(STATES_TAG, states);
+        stateBundle.putParcelableArrayList(getStatesTag(), states);
         return stateBundle;
     }
 }
