@@ -29,7 +29,8 @@ public abstract class Key
 
     public void bindServices(ServiceTree.Node node) {
         if(hasNestedStack()) {
-            BackstackManager backstackManager = createBackstackManager();
+            BackstackManager backstackManager = new BackstackManager();
+            backstackManager.setStateClearStrategy((keyStateMap, stateChange) -> keyStateMap.keySet().retainAll(node.getTree().getKeys()));
             backstackManager.setup(initialKeys());
             node.bindService(NESTED_STACK, backstackManager);
         }
@@ -41,9 +42,5 @@ public abstract class Key
 
     public boolean hasNestedStack() {
         return false;
-    }
-
-    protected BackstackManager createBackstackManager() {
-        return new BackstackManager();
     }
 }

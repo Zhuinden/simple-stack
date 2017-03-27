@@ -1,7 +1,6 @@
 package com.zhuinden.simplestackdemonestedstack.presentation.paths.main;
 
 import com.google.auto.value.AutoValue;
-import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.simplestackdemonestedstack.util.Composite;
@@ -50,14 +49,5 @@ public abstract class MainKey
     @Override
     protected List<?> initialKeys() {
         return Arrays.asList(MainView.StackType.values()[0].getKey());
-    }
-
-    @Override
-    protected BackstackManager createBackstackManager() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setStateClearStrategy((keyStateMap, stateChange) -> {
-            // do nothing
-        });
-        return backstackManager;
     }
 }
