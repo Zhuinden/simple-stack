@@ -206,6 +206,20 @@ public class Backstack {
     }
 
     /**
+     * Returns the last element in the list, or null if the history is empty.
+     *
+     * @param <T> the type of the key
+     * @return the top key
+     */
+    public <T> T top() {
+        if(stack.isEmpty()) {
+            return null;
+        }
+        // noinspection unchecked
+        return (T) stack.get(stack.size() - 1);
+    }
+
+    /**
      * Returns an unmodifiable copy of the current history.
      *
      * @return the unmodifiable copy of history.
