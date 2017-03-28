@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.BackstackManager;
+import com.zhuinden.simplestackdemonestedstack.util.PreserveTreeScopesStrategy;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
 
 import java.util.Collections;
@@ -30,7 +31,7 @@ public abstract class Key
     public void bindServices(ServiceTree.Node node) {
         if(hasNestedStack()) {
             BackstackManager backstackManager = new BackstackManager();
-            backstackManager.setStateClearStrategy((keyStateMap, stateChange) -> keyStateMap.keySet().retainAll(node.getTree().getKeys()));
+            backstackManager.setStateClearStrategy(new PreserveTreeScopesStrategy(node.getTree()));
             backstackManager.setup(initialKeys());
             node.bindService(NESTED_STACK, backstackManager);
         }

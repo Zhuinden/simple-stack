@@ -20,6 +20,7 @@ import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.MainKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.other.OtherKey;
 import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
+import com.zhuinden.simplestackdemonestedstack.util.PreserveTreeScopesStrategy;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
 
 import butterknife.BindView;
@@ -68,6 +69,7 @@ public class MainActivity
             }
         }
         backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.setStateClearStrategy(new PreserveTreeScopesStrategy(serviceTree));
         backstackDelegate.onCreate(savedInstanceState, nonConfigurationInstance == null ? null : nonConfigurationInstance.backstackDelegateNonConfig, HistoryBuilder.single(MainKey.create()));
         backstack = backstackDelegate.getBackstack();
         super.onCreate(savedInstanceState);
