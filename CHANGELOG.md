@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.4.4 (2017-03-28)
+--------------------------------
+- ADDED: `backstack.top()` method that returns `null` or the last element in the backstack
+
 -Simple Stack 1.4.3 (2017-03-25)
 --------------------------------
 - FIX: Fixed a bug that if a restored backstack is cleared and an initialize state change is triggered,
