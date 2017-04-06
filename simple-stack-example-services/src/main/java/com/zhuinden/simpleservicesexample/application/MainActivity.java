@@ -17,6 +17,7 @@ import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.statebundle.StateBundle;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,7 +58,8 @@ public class MainActivity
             serviceTree = serviceManager.getServiceTree();
         } else {
             serviceTree = new ServiceTree();
-            serviceManager = new ServiceManager(serviceTree);
+            serviceTree.createRootNode(TAG);
+            serviceManager = new ServiceManager(serviceTree, TAG);
         }
 
         backstackDelegate = new BackstackDelegate(null);
@@ -66,6 +68,8 @@ public class MainActivity
                 HistoryBuilder.single(A.create()));
         if(savedInstanceState != null) {
             serviceManager.setRestoredStates(savedInstanceState.getParcelable(ServiceManager.SERVICE_STATES));
+        } else {
+            serviceManager.setRestoredStates(new StateBundle());
         }
         backstackDelegate.setStateChanger(this);
     }

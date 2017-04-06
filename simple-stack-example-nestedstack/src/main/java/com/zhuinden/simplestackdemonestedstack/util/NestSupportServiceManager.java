@@ -22,9 +22,11 @@ public class NestSupportServiceManager {
     }
 
     private final ServiceTree serviceTree;
+    private final Object rootKey;
 
-    public NestSupportServiceManager(ServiceTree serviceTree) {
+    public NestSupportServiceManager(ServiceTree serviceTree, Object rootKey) {
         this.serviceTree = serviceTree;
+        this.rootKey = rootKey;
     }
 
     public static final String SERVICE_STATES = "SERVICE_BUNDLE";
@@ -33,7 +35,7 @@ public class NestSupportServiceManager {
 
     public StateBundle persistStates() {
         StateBundle serviceStates = new StateBundle();
-        serviceTree.traverseTree(ServiceTree.Walk.PRE_ORDER, node -> {
+        serviceTree.traverseTree(ServiceTree.Walk.PRE_ORDER, (node, cancellationToken) -> {
             StateBundle keyBundle = new StateBundle();
             for(ServiceTree.Node.Entry entry : node.getBoundServices()) {
                 if(entry.getService() instanceof Bundleable) {
@@ -46,13 +48,13 @@ public class NestSupportServiceManager {
     }
 
     public void setupServices(StateChange stateChange) {
-        StateBundle states = serviceTree.getRootService(SERVICE_STATES);
+        StateBundle states = serviceTree.getNode(rootKey).getService(SERVICE_STATES);
         for(Object _previousKey : stateChange.getPreviousState()) {
             Key previousKey = (Key) _previousKey;
             if(!stateChange.getNewState().contains(previousKey)) {
                 ServiceTree.Node previousNode = serviceTree.getNode(previousKey);
                 if(states != null) {
-                    serviceTree.traverseSubtree(previousNode, ServiceTree.Walk.POST_ORDER, node -> {
+                    serviceTree.traverseSubtree(previousNode, ServiceTree.Walk.POST_ORDER, (node, cancellationToken) -> {
                         states.remove(node.getKey().toString());
                         Log.i(TAG, "Destroy [" + node + "]");
                     });
@@ -68,12 +70,8 @@ public class NestSupportServiceManager {
 
     private void buildServices(StateBundle states, Key newKey) {
         if(!serviceTree.hasNodeWithKey(newKey)) {
-            ServiceTree.Node node;
-            if(newKey instanceof Child) {
-                node = serviceTree.createChildNode(serviceTree.getNode(((Child) newKey).parent()), newKey);
-            } else {
-                node = serviceTree.createRootNode(newKey);
-            }
+            ServiceTree.Node node = serviceTree.createChildNode(serviceTree.getNode((newKey instanceof Child) ? ((Child) newKey).parent() : rootKey),
+                    newKey);
             buildServicesForKey(states, newKey, node);
         }
     }
@@ -111,7 +109,7 @@ public class NestSupportServiceManager {
     }
 
     public void setRestoredStates(StateBundle states) {
-        serviceTree.registerRootService(SERVICE_STATES, states);
+        serviceTree.getNode(rootKey).bindService(SERVICE_STATES, states);
     }
 
     public ServiceTree getServiceTree() {

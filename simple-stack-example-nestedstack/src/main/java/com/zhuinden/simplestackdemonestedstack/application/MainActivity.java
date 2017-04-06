@@ -22,6 +22,7 @@ import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.PreserveTreeScopesStrategy;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
+import com.zhuinden.statebundle.StateBundle;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,7 +30,7 @@ import butterknife.ButterKnife;
 public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
-    private static final String TAG = "MainActivity";
+    public static final String TAG = "MainActivity";
 
     public static MainActivity get(Context context) {
         //noinspection ResourceType
@@ -60,12 +61,15 @@ public class MainActivity
         NonConfigurationInstance nonConfigurationInstance = (NonConfigurationInstance)getLastCustomNonConfigurationInstance();
         if(nonConfigurationInstance != null) {
             serviceManager = nonConfigurationInstance.serviceManager;
-            serviceTree =  serviceManager.getServiceTree();
+            serviceTree = serviceManager.getServiceTree();
         } else {
             serviceTree = new ServiceTree();
-            serviceManager = new NestSupportServiceManager(serviceTree);
+            serviceTree.createRootNode(TAG);
+            serviceManager = new NestSupportServiceManager(serviceTree, TAG);
             if(savedInstanceState != null) {
                 serviceManager.setRestoredStates(savedInstanceState.getParcelable("SERVICE_BUNDLE"));
+            } else {
+                serviceManager.setRestoredStates(new StateBundle());
             }
         }
         backstackDelegate = new BackstackDelegate(null);
