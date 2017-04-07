@@ -80,85 +80,108 @@ Afterwards, the [Backstack](https://github.com/Zhuinden/simple-stack/blob/master
 
 ## Example code
 
+
+- **Activity**
+
 ``` java
 public class MainActivity
-        extends AppCompatActivity
-        implements StateChanger {
+        extends AppCompatActivity {
+    public static final String TAG = "MainActivity";
+
     @BindView(R.id.root)
     RelativeLayout root;
 
-    BackstackDelegate backstackDelegate;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate(null);
-        backstackDelegate.onCreate(savedInstanceState, //
-                        getLastCustomNonConfigurationInstance(), //
-                        HistoryBuilder.single(new FirstKey()));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        backstackDelegate.setStateChanger(this);
-
-        // get reference to Backstack with `backstackDelegate.getBackstack()`
-        // you can also share it either with
-            // `BackstackService.getContext()` through `getSystemService()`
-            // or with lazy-initialized Dagger module, check the examples for exact usage.
-    }
-
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
+        Navigator.install(this, root, HistoryBuilder.single(FirstKey.create()));
+        // additional configuration possible with `Navigator.configure()...install()`
     }
 
     @Override
     public void onBackPressed() {
-        if(!backstackDelegate.onBackPressed()) {
+        if(!Navigator.onBackPressed(this)) {
             super.onBackPressed();
         }
     }
+}
+```
 
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
+- **StateKey**
+
+``` java
+@AutoValue
+public abstract class FirstKey
+        implements StateKey, Parcelable {
+    public static FirstKey create() {
+        return new AutoValue_FirstKey();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        backstackDelegate.persistViewToState(root.getChildAt(0)); // <-- persisting view state
-        backstackDelegate.onSaveInstanceState(outState); // <-- persisting backstack + view states
+    public int layout() {
+        return R.layout.path_first;
     }
 
     @Override
-    protected void onDestroy() {
-        backstackDelegate.onDestroy(); // <-- very important!
-        super.onDestroy();
+    public ViewChangeHandler viewChangeHandler() {
+        return new SegueViewChangeHandler();
+    }
+}
+```
+
+- **Layout XML**
+
+``` xml
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhuinden.simplestackdemoexample.FirstView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+              android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/first_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter text here"/>
+
+    <Button
+        android:id="@+id/first_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go to second!"/>
+
+</com.zhuinden.simplestackdemoexample.FirstView>
+```
+
+- **Custom Viewgroup**
+
+``` java
+public class FirstView
+        extends LinearLayout { // can implement Bundleable
+
+    public FirstView(Context context) {
+        super(context);
     }
 
-    // StateChanger implementation
+    public FirstView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    //...
+
+    @OnClick(R.id.first_button)
+    public void firstButtonClick(View view) {
+        Navigator.getBackstack(view.getContext()).goTo(SecondKey.create());
+    }
+
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
-        if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
-            completionCallback.stateChangeComplete();
-            return;
-        }
-        backstackDelegate.persistViewToState(root.getChildAt(0));
-        root.removeAllViews();
-        Key newKey = stateChange.topNewState();
-        Context newContext = stateChange.createContext(this, newKey);
-        View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        backstackDelegate.restoreViewFromState(view);
-        root.addView(view);
-        completionCallback.stateChangeComplete();
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        ButterKnife.bind(this);
     }
 }
 ```

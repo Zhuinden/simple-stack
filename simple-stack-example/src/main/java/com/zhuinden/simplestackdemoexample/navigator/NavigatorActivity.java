@@ -4,10 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.RelativeLayout;
 
-import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.StateChanger;
-import com.zhuinden.simplestack.navigator.DefaultStateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestackdemoexample.R;
 import com.zhuinden.simplestackdemoexample.common.BackstackService;
@@ -22,12 +19,8 @@ import butterknife.ButterKnife;
 
 public class NavigatorActivity
         extends AppCompatActivity {
-    public static final String TAG = "BackstackDelegateActivity";
-
     @BindView(R.id.root)
     RelativeLayout root;
-
-    Backstack backstack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
