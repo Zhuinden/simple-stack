@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.5.1 (2017-04-07)
+--------------------------------
+- Added a method to `DefaultStateChanger` to allow perform view change with an externally specified direction.
+
 -Simple Stack 1.5.0 (2017-04-07)
 --------------------------------
 - Merged `zhuinden/navigator` into `zhuinden/simple-stack`.

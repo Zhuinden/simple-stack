@@ -23,9 +23,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zhuinden.simplestack.navigator.changehandlers.NoOpViewChangeHandler;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.navigator.changehandlers.NoOpViewChangeHandler;
 
 /**
  * A default state changer that handles view changes, and allows an optional external state changer (which is executed before the view change).
@@ -253,7 +253,32 @@ public final class DefaultStateChanger
         });
     }
 
-    public final <T extends StateKey> void performViewChange(T previousKey, T newKey, final StateChange stateChange, final Callback completionCallback) {
+    /**
+     * Handles the view change using the provided parameters. The direction is specified by the direction in the state change.
+     *
+     * @param previousKey        the previous key
+     * @param newKey             the new key
+     * @param stateChange        the state change
+     * @param completionCallback the completion callback
+     * @param <T>                the type of the previous key
+     * @param <U>                the type of the new key
+     */
+    public final <T extends StateKey, U extends StateKey> void performViewChange(T previousKey, U newKey, final StateChange stateChange, final Callback completionCallback) {
+        performViewChange(previousKey, newKey, stateChange, stateChange.getDirection(), completionCallback);
+    }
+
+    /**
+     * Handles the view change using the provided parameters. The direction is also manually provided.
+     *
+     * @param previousKey        the previous key
+     * @param newKey             the new key
+     * @param stateChange        the state change
+     * @param direction          the direction
+     * @param completionCallback the completion callback
+     * @param <T>                the type of the previous key
+     * @param <U>                the type of the new key
+     */
+    public final <T extends StateKey, U extends StateKey> void performViewChange(T previousKey, U newKey, final StateChange stateChange, final int direction, final Callback completionCallback) {
         final View previousView = container.getChildAt(0);
         if(previousView != null && previousKey != null) {
             statePersistenceStrategy.persistViewToState(previousKey, previousView);
@@ -267,9 +292,9 @@ public final class DefaultStateChanger
             finishStateChange(stateChange, container, previousView, newView, completionCallback);
         } else {
             final ViewChangeHandler viewChangeHandler;
-            if(stateChange.getDirection() == StateChange.FORWARD) {
+            if(direction == StateChange.FORWARD) {
                 viewChangeHandler = newKey.viewChangeHandler();
-            } else if(previousKey != null && stateChange.getDirection() == StateChange.BACKWARD) {
+            } else if(previousKey != null && direction == StateChange.BACKWARD) {
                 viewChangeHandler = previousKey.viewChangeHandler();
             } else {
                 viewChangeHandler = NO_OP_VIEW_CHANGE_HANDLER;
@@ -277,7 +302,7 @@ public final class DefaultStateChanger
             viewChangeHandler.performViewChange(container,
                     previousView,
                     newView,
-                    stateChange.getDirection(),
+                    direction,
                     new ViewChangeHandler.CompletionCallback() {
                         @Override
                         public void onCompleted() {
