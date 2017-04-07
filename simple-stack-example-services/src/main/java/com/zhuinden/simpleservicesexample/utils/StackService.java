@@ -14,15 +14,8 @@ public class StackService {
 
     public static final String TAG = "StackService";
 
-    public static final String DELEGATE_TAG = "DelegateService";
-
     public static Backstack get(Context context) {
         // noinspection ResourceType
         return (Backstack) context.getSystemService(TAG);
-    }
-
-    public static BackstackDelegate getDelegate(Context context) {
-        // noinspection ResourceType
-        return (BackstackDelegate) context.getSystemService(DELEGATE_TAG);
     }
 }

@@ -7,8 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.navigator.DefaultStateChanger;
+import com.zhuinden.simplestack.navigator.Navigator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,9 +23,9 @@ public class MainActivity
     @BindView(R.id.root)
     FrameLayout root;
 
-    BackstackDelegate backstackDelegate;
-
     Subscription subscription;
+
+    DefaultStateChanger defaultStateChanger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,51 +33,20 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        backstackDelegate = new BackstackDelegate(null);
-        backstackDelegate.onCreate(savedInstanceState, //
-                getLastCustomNonConfigurationInstance(), //
-                HistoryBuilder.single(FirstKey.create()));
-        subscription = RxStackObservable.create(backstackDelegate.getBackstack()).subscribe(stateChange -> {
-            backstackDelegate.persistViewToState(root.getChildAt(0));
-            root.removeAllViews();
-            Key newKey = stateChange.topNewState();
-            Context newContext = stateChange.createContext(MainActivity.this, newKey);
-            View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-            backstackDelegate.restoreViewFromState(view);
-            root.addView(view);
+        defaultStateChanger = DefaultStateChanger.create(this, root);
+        Backstack backstack = Navigator.configure().setStateChanger(new NoOpStateChanger()).setDeferredInitialization(true).install(this, root, HistoryBuilder.single(FirstKey.create()));
+        subscription = RxStackObservable.create(backstack).subscribe(stateChange -> {
+            defaultStateChanger.performViewChange(stateChange.topPreviousState(), stateChange.topNewState(), stateChange, () -> {
+            });
         });
-        backstackDelegate.setStateChanger(new NoOpStateChanger());
-    }
-
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
+        Navigator.executeDeferredInitialization(this);
     }
 
     @Override
     public void onBackPressed() {
-        if(!backstackDelegate.onBackPressed()) {
+        if(!Navigator.onBackPressed(this)) {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        backstackDelegate.persistViewToState(root.getChildAt(0)); // <-- persisting view state
-        backstackDelegate.onSaveInstanceState(outState); // <-- persisting backstack + view states
     }
 
     @Override
@@ -82,14 +55,13 @@ public class MainActivity
             subscription.unsubscribe();
             subscription = null;
         }
-        backstackDelegate.onDestroy(); // <-- very important!
         super.onDestroy();
     }
 
     @Override
     public Object getSystemService(String name) {
         if(BackstackService.TAG.equals(name)) {
-            return backstackDelegate.getBackstack();
+            return Navigator.getBackstack(this);
         }
         return super.getSystemService(name);
     }

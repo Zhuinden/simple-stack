@@ -1,13 +1,14 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.google.auto.value.AutoValue;
-import com.squareup.coordinators.Coordinator;
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
-import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -16,9 +17,10 @@ import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonCom
 @AutoValue
 public abstract class StatisticsKey
         implements Key {
+    @NonNull
     @Override
-    public Coordinator newCoordinator(SingletonComponent singletonComponent) {
-        return singletonComponent.statisticsCoordinator();
+    public ViewChangeHandler viewChangeHandler() {
+        return new SegueViewChangeHandler();
     }
 
     public static Parcelable create() {

@@ -23,6 +23,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.zhuinden.simplestackdemo", appContext.getPackageName());
+        assertEquals("com.zhuinden.simplestackdemoexamplemvp", appContext.getPackageName());
     }
 }

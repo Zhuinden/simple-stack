@@ -3,6 +3,10 @@ package com.zhuinden.simplestackdemoexamplemvp.application.injection;
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskView;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsView;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailView;
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksView;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainScopeListener;
@@ -10,14 +14,8 @@ import com.zhuinden.simplestackdemoexamplemvp.application.MainView;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.mapper.TaskMapper;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskCoordinator;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstView;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondView;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsCoordinator;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailCoordinator;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder;
 
@@ -54,18 +52,6 @@ public interface SingletonComponent {
 
     Resources resources();
 
-    AddOrEditTaskCoordinator addOrEditTaskCoordinator();
-
-    FirstCoordinator firstCoordinator();
-
-    SecondCoordinator secondCoordinator();
-
-    StatisticsCoordinator statisticsCoordinator();
-
-    TaskDetailCoordinator taskDetailCoordinator();
-
-    TasksCoordinator tasksCoordinator();
-
     void inject(MainActivity mainActivity);
 
     void inject(MainScopeListener mainScopeListener);
@@ -75,4 +61,12 @@ public interface SingletonComponent {
     void inject(FirstView firstView);
 
     void inject(SecondView secondView);
+
+    void inject(TaskDetailView taskDetailView);
+
+    void inject(AddOrEditTaskView addOrEditTaskView);
+
+    void inject(StatisticsView statisticsView);
+
+    void inject(TasksView tasksView);
 }

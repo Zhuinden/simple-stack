@@ -4,15 +4,20 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.squareup.coordinators.Coordinators;
+import com.zhuinden.simplestackdemoexamplemvp.R;
+import com.zhuinden.simplestackdemoexamplemvp.application.CustomApplication;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestackdemoexamplemvp.application.CustomApplication;
 import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by Owner on 2017. 01. 12..
@@ -56,15 +61,43 @@ public class FirstView
         }
     }
 
+    @Inject
+    FirstPresenter firstPresenter;
+
+    @OnClick(R.id.first_button)
+    public void clickButton(View view) {
+        firstPresenter.goToSecondKey();
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        firstPresenter.attachView(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        firstPresenter.detachView(this);
+        super.onDetachedFromWindow();
+    }
+
     @Override
     public StateBundle toBundle() {
-        FirstCoordinator firstCoordinator = Coordinators.getCoordinator(this);
-        return firstCoordinator.toBundle();
+        StateBundle bundle = new StateBundle();
+        bundle.putString("HELLO", "WORLD");
+        return bundle;
     }
 
     @Override
     public void fromBundle(@Nullable StateBundle bundle) {
-        FirstCoordinator firstCoordinator = Coordinators.getCoordinator(this);
-        firstCoordinator.fromBundle(bundle);
+        if(bundle != null) {
+            Log.i(TAG, bundle.getString("HELLO"));
+        }
     }
 }

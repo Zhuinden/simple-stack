@@ -1,13 +1,14 @@
 package com.zhuinden.simplestackdemonestedstack.application;
 
-import android.content.Context;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-import com.zhuinden.servicetree.ServiceTree;
-import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.BackstackManager;
+import com.zhuinden.simplestack.navigator.StateKey;
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler;
 import com.zhuinden.simplestackdemonestedstack.util.PreserveTreeScopesStrategy;
-import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
+import com.zhuinden.servicetree.ServiceTree;
+import com.zhuinden.simplestack.BackstackManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,14 +18,10 @@ import java.util.List;
  */
 
 public abstract class Key
-        implements Parcelable {
+        implements Parcelable, StateKey {
     public static final String NESTED_STACK = "NESTED_STACK";
 
     public abstract int layout();
-
-    public final BackstackDelegate selectDelegate(Context context) {
-        return ServiceLocator.getService(context, stackIdentifier());
-    }
 
     public abstract String stackIdentifier();
 
@@ -43,5 +40,11 @@ public abstract class Key
 
     public boolean hasNestedStack() {
         return false;
+    }
+
+    @NonNull
+    @Override
+    public ViewChangeHandler viewChangeHandler() {
+        return new SegueViewChangeHandler();
     }
 }

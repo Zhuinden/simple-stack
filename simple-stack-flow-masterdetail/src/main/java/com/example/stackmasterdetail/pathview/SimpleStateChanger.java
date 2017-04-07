@@ -31,20 +31,18 @@ import com.example.stackmasterdetail.util.Utils;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.navigator.DefaultStateChanger;
+import com.zhuinden.simplestack.navigator.Navigator;
 
 /**
  * Provides basic right-to-left transitions. Saves and restores view state.
  */
 public class SimpleStateChanger
         implements StateChanger {
-    private ViewGroup root;
-    private BackstackDelegate backstackDelegate;
-    private Context baseContext;
+    private DefaultStateChanger defaultStateChanger;
 
     public SimpleStateChanger(ViewGroup root) {
-        this.root = root;
-        this.backstackDelegate = BackstackService.getDelegate(root.getContext());
-        this.baseContext = root.getContext();
+        this.defaultStateChanger = DefaultStateChanger.create(root.getContext(), root);
     }
 
     @Override
@@ -56,65 +54,10 @@ public class SimpleStateChanger
 
         Paths.Path newKey = stateChange.topNewState();
         newKey = getActiveKey(newKey);
-
-        Context context = stateChange.createContext(baseContext, newKey);
-        View newView = LayoutInflater.from(context).inflate(newKey.layout(), root, false);
-
-        View previousView = null;
-        if(stateChange.topPreviousState() != null) {
-            previousView = root.getChildAt(0);
-            backstackDelegate.persistViewToState(previousView);
-        }
-        backstackDelegate.restoreViewFromState(newView);
-
-        if(previousView == null || stateChange.getDirection() == StateChange.REPLACE) {
-            root.removeAllViews();
-            root.addView(newView);
-            callback.stateChangeComplete();
-        } else {
-            root.addView(newView);
-            final View finalPreviousView = previousView;
-            Utils.waitForMeasure(newView, new Utils.OnMeasuredCallback() {
-                @Override
-                public void onMeasured(View view, int width, int height) {
-                    runAnimation(root, finalPreviousView, view, stateChange.getDirection(), new StateChanger.Callback() {
-                        @Override
-                        public void stateChangeComplete() {
-                            root.removeView(finalPreviousView);
-                            callback.stateChangeComplete();
-                        }
-                    });
-                }
-            });
-        }
+        defaultStateChanger.performViewChange(stateChange.<Paths.Path>topPreviousState(), newKey, stateChange, callback);
     }
 
     protected Paths.Path getActiveKey(Paths.Path path) {
         return path;
-    }
-
-    private void runAnimation(final ViewGroup container, final View from, final View to, int direction, final StateChanger.Callback callback) {
-        Animator animator = createSegue(from, to, direction);
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                container.removeView(from);
-                callback.stateChangeComplete();
-            }
-        });
-        animator.start();
-    }
-
-    private Animator createSegue(View from, View to, int direction) {
-        boolean backward = direction == StateChange.BACKWARD;
-        int fromTranslation = backward ? from.getWidth() : -from.getWidth();
-        int toTranslation = backward ? -to.getWidth() : to.getWidth();
-
-        AnimatorSet set = new AnimatorSet();
-
-        set.play(ObjectAnimator.ofFloat(from, View.TRANSLATION_X, fromTranslation));
-        set.play(ObjectAnimator.ofFloat(to, View.TRANSLATION_X, toTranslation, 0));
-
-        return set;
     }
 }

@@ -18,15 +18,22 @@ package com.example.stackmasterdetail;
 
 import android.os.Parcelable;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
+import com.zhuinden.simplestack.navigator.StateKey;
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler;
 
 public final class Paths {
-    public abstract static class Path implements Parcelable {
+    public abstract static class Path implements Parcelable, StateKey {
         public abstract String getTitle();
 
-        @LayoutRes
-        public abstract int layout();
+        @NonNull
+        @Override
+        public ViewChangeHandler viewChangeHandler() {
+            return new SegueViewChangeHandler();
+        }
     }
 
     @AutoValue

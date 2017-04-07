@@ -1,6 +1,10 @@
 package com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync;
 
+import android.support.annotation.NonNull;
+
 import com.google.auto.value.AutoValue;
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestackdemonestedstack.util.TransitionHandler;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
@@ -38,5 +42,11 @@ public abstract class CloudSyncKey
     @Override
     public boolean hasNestedStack() {
         return true;
+    }
+
+    @NonNull
+    @Override
+    public ViewChangeHandler viewChangeHandler() {
+        return new TransitionHandler();
     }
 }

@@ -28,22 +28,14 @@ public class RxStackObservable
 
     @Override
     public void call(Subscriber<? super StateChange> subscriber) {
-        final Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
-            @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
-                if(!subscriber.isUnsubscribed()) {
-                    if(!stateChange.topNewState().equals(stateChange.topPreviousState())) { // distinct top
-                        subscriber.onNext(stateChange);
-                    }
+        final Backstack.CompletionListener completionListener = stateChange -> {
+            if(!subscriber.isUnsubscribed()) {
+                if(!stateChange.topNewState().equals(stateChange.topPreviousState())) { // distinct top
+                    subscriber.onNext(stateChange);
                 }
             }
         };
-        subscriber.add(Subscriptions.create(new Action0() {
-            @Override
-            public void call() {
-                backstack.removeCompletionListener(completionListener);
-            }
-        }));
+        subscriber.add(Subscriptions.create(() -> backstack.removeCompletionListener(completionListener)));
         backstack.addCompletionListener(completionListener);
         // no initial value. it's handled by `setStateChanger()`
     }

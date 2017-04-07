@@ -3,10 +3,10 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second;
 import android.support.annotation.Nullable;
 
 import com.jakewharton.rxrelay.BehaviorRelay;
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
@@ -18,7 +18,7 @@ import rx.Subscription;
  */
 
 public class SecondPresenter
-        extends BasePresenter<SecondCoordinator, SecondPresenter>
+        extends BasePresenter<SecondView, SecondPresenter>
         implements Bundleable {
     @Inject
     public SecondPresenter() {
@@ -32,14 +32,14 @@ public class SecondPresenter
     Subscription subscription;
 
     @Override
-    protected void onAttach(SecondCoordinator coordinator) {
+    protected void onAttach(SecondView view) {
         subscription = state.asObservable() //
-                .doOnNext(_state -> coordinator.setStateText(_state)) //
+                .doOnNext(_state -> view.setStateText(_state)) //
                 .subscribe();
     }
 
     @Override
-    protected void onDetach(SecondCoordinator coordinator) {
+    protected void onDetach(SecondView view) {
         subscription.unsubscribe();
     }
 

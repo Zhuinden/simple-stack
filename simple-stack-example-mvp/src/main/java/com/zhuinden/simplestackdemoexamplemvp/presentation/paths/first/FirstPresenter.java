@@ -11,7 +11,7 @@ import javax.inject.Inject;
  */
 
 public class FirstPresenter
-        extends BasePresenter<FirstCoordinator, FirstPresenter> {
+        extends BasePresenter<FirstView, FirstPresenter> {
     @Inject
     public FirstPresenter() {
     }
@@ -20,11 +20,11 @@ public class FirstPresenter
     Backstack backstack;
 
     @Override
-    protected void onAttach(FirstCoordinator coordinator) {
+    protected void onAttach(FirstView view) {
     }
 
     @Override
-    protected void onDetach(FirstCoordinator coordinator) {
+    protected void onDetach(FirstView view) {
     }
 
     public void goToSecondKey() {

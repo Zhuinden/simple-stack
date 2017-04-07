@@ -1,12 +1,13 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.google.auto.value.AutoValue;
-import com.squareup.coordinators.Coordinator;
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
-import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 
 /**
  * Created by Owner on 2017. 01. 12..
@@ -18,9 +19,10 @@ public abstract class SecondKey implements Key {
         return new AutoValue_SecondKey(R.layout.path_second);
     }
 
+    @NonNull
     @Override
-    public final Coordinator newCoordinator(SingletonComponent singletonComponent) {
-        return singletonComponent.secondCoordinator();
+    public ViewChangeHandler viewChangeHandler() {
+        return new SegueViewChangeHandler();
     }
 
     @Override

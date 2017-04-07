@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemoexample.demo;
+package com.zhuinden.simplestackdemoexample.common;
 
 import android.content.Context;
 

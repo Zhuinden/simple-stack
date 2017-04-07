@@ -8,14 +8,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.another.internal2.Internal2Key;
-import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.BackstackManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,8 +25,7 @@ import butterknife.OnClick;
  */
 
 public class InternalView
-        extends RelativeLayout
-        implements BackPressListener {
+        extends RelativeLayout {
     public InternalView(Context context) {
         super(context);
         init(context);
@@ -62,9 +60,7 @@ public class InternalView
 
     @OnClick(R.id.another_back)
     public void backClicked() {
-        if(!parentStack.getBackstack().goBack()) {
-            MainActivity.get(getContext()).onBackPressed();
-        }
+        MainActivity.get(getContext()).onBackPressed();
     }
 
     @OnClick(R.id.another_forward)
@@ -87,10 +83,5 @@ public class InternalView
         parentStack = ServiceLocator.getService(getContext(), Key.NESTED_STACK);
         Object key = Backstack.getKey(getContext());
         Log.i("Internal", "[" + key + "]");
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        return false;
     }
 }

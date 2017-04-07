@@ -12,21 +12,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.BackstackManager;
-import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.KeyContextWrapper;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.chromecast.ChromeCastKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.CloudSyncKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.list.ListKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.mail.MailKey;
-import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
+import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
 import com.zhuinden.simplestackdemonestedstack.util.ViewUtils;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.BackstackManager;
+import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.KeyContextWrapper;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,7 +38,7 @@ import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 
 public class MainView
         extends CoordinatorLayout
-        implements StateChanger, BackPressListener {
+        implements StateChanger {
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -114,17 +114,6 @@ public class MainView
         backstackManager.setStateChanger(this);
     }
 
-    @Override
-    public boolean onBackPressed() {
-        if(root.getChildAt(0) != null && root.getChildAt(0) instanceof BackPressListener) {
-            boolean handled = ((BackPressListener) root.getChildAt(0)).onBackPressed();
-            if(handled) {
-                return true;
-            }
-        }
-        return backstackManager.getBackstack().goBack();
-    }
-
     private void exchangeViewForKey(Key newKey, int direction) {
         backstackManager.persistViewToState(root.getChildAt(0));
         View previousView = root.getChildAt(0);
@@ -148,7 +137,7 @@ public class MainView
 
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
-        // no need to setup services here, because it is handled by Composite
+        NestSupportServiceManager.get(getContext()).setupServices(stateChange, true);
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             // no-op
             completionCallback.stateChangeComplete();

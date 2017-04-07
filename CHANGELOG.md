@@ -1,8 +1,33 @@
 # Change log
 
+-Simple Stack 1.5.0 (2017-04-07)
+--------------------------------
+- Merged `zhuinden/navigator` into `zhuinden/simple-stack`.
+
+- ADDED: `Navigator` class as an optional replacement for `BackstackDelegate` (API 11+).
+
+`BackstackDelegate` had a lot of callbacks to remember (`onPause()`, `onResume()`, `onRetainCustomNonConfigurationInstance()`, `onDestroy()`),
+but more importantly you had to manage saving out the current view's state in `onSaveInstanceState()` manually.
+
+With Navigator, this is all hidden in the `BackstackHost` installed by `Navigator.install()` (or `Navigator.configure()...install()`, so this problem is solved for you.
+
+- ADDED: `DefaultStateChanger` that by default uses **`Navigator`-based installation**.
+
+To use `DefaultStateChanger` with `BackstackDelegate`, you must provide `DefaultStateChanger.configure().setStatePersistenceStrategy()` and delegate persistence calls to your delegate.
+
+- ADDED: `StateKey` interface used by `DefaultStateChanger`.
+
+- ADDED: default view change handlers for `DefaultStateChanger`.
+
+- All examples (**except** the `fragment` and `multistack` samples) were updated to use `Navigator`.
+
+- `simple-stack-example-mvp` no longer uses `square/coordinator`, it uses custom viewgroups instead.
+
+This is because `Coordinator` gets created only after `container.addView()`, which makes it hard to work with.
+
 -Simple Stack 1.4.4 (2017-03-28)
 --------------------------------
-- ADDED: `backstack.top()` method that returns `null` or the last element in the backstack
+- ADDED: `backstack.top()` method that returns the last element in the backstack or `null`
 
 -Simple Stack 1.4.3 (2017-03-25)
 --------------------------------

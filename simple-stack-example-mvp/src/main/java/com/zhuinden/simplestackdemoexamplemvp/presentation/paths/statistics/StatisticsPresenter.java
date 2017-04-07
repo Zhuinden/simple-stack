@@ -20,7 +20,7 @@ import rx.schedulers.Schedulers;
  */
 
 public class StatisticsPresenter
-        extends BasePresenter<StatisticsCoordinator, StatisticsPresenter> {
+        extends BasePresenter<StatisticsView, StatisticsPresenter> {
     @Inject
     public StatisticsPresenter() {
     }
@@ -31,7 +31,7 @@ public class StatisticsPresenter
     Subscription subscription;
 
     @Override
-    protected void onAttach(StatisticsCoordinator coordinator) {
+    protected void onAttach(StatisticsView view) {
         subscription = Observable.combineLatest(tasksRepository.getActiveTasks(), //
                 tasksRepository.getCompletedTasks(), //
                 (activeTasks, completedTasks) -> Pair.with(activeTasks, completedTasks)) //
@@ -40,14 +40,14 @@ public class StatisticsPresenter
                 .subscribe(pairOfActiveAndCompletedTasks -> {
                     List<Task> activeTasks = pairOfActiveAndCompletedTasks.getValue0();
                     List<Task> completedTasks = pairOfActiveAndCompletedTasks.getValue1();
-                    if(getCoordinator() != null) {
-                        getCoordinator().showStatistics(activeTasks.size(), completedTasks.size());
+                    if(getView() != null) {
+                        getView().showStatistics(activeTasks.size(), completedTasks.size());
                     }
                 });
     }
 
     @Override
-    protected void onDetach(StatisticsCoordinator coordinator) {
+    protected void onDetach(StatisticsView view) {
         subscription.unsubscribe();
     }
 }

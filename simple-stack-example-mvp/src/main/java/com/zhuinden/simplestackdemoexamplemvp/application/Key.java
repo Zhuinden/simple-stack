@@ -4,17 +4,14 @@ import android.os.Parcelable;
 import android.support.annotation.DrawableRes;
 import android.view.View;
 
-import com.squareup.coordinators.Coordinator;
-import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
+import com.zhuinden.simplestack.navigator.StateKey;
 
 /**
  * Created by Owner on 2017. 01. 12..
  */
 
-public interface Key extends Parcelable {
+public interface Key extends StateKey, Parcelable {
     int layout();
-
-    Coordinator newCoordinator(SingletonComponent singletonComponent);
 
     int menu();
 

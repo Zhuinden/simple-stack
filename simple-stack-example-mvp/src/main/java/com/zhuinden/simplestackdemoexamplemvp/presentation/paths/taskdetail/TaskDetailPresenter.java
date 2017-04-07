@@ -16,7 +16,7 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 
 public class TaskDetailPresenter
-        extends BasePresenter<TaskDetailCoordinator, TaskDetailPresenter> {
+        extends BasePresenter<TaskDetailView, TaskDetailPresenter> {
     @Inject
     public TaskDetailPresenter() {
     }
@@ -34,31 +34,31 @@ public class TaskDetailPresenter
     Task task;
 
     @Override
-    protected void onAttach(TaskDetailCoordinator coordinator) {
-        taskDetailKey = coordinator.getKey();
+    protected void onAttach(TaskDetailView view) {
+        taskDetailKey = Backstack.getKey(view.getContext());
         this.taskId = taskDetailKey.taskId();
         taskRepository.findTask(taskId).observeOn(AndroidSchedulers.mainThread()).subscribe(taskOptional -> {
             if(taskOptional.isPresent()) {
                 task = taskOptional.get();
-                coordinator.showTask(task);
+                view.showTask(task);
             } else {
                 task = null;
-                coordinator.showMissingTask();
+                view.showMissingTask();
             }
         });
     }
 
     @Override
-    protected void onDetach(TaskDetailCoordinator coordinator) {
+    protected void onDetach(TaskDetailView view) {
 
     }
 
     public void editTask() {
         if(Strings.isNullOrEmpty(taskId)) {
-            getCoordinator().showMissingTask();
+            getView().showMissingTask();
             return;
         }
-        backstack.goTo(AddOrEditTaskKey.createWithTaskId(getCoordinator().getKey(), taskId));
+        backstack.goTo(AddOrEditTaskKey.createWithTaskId(Backstack.getKey(getView().getContext()), taskId));
     }
 
     public void completeTask(Task task) {

@@ -17,6 +17,8 @@ import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.navigator.DefaultStateChanger;
+import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.statebundle.StateBundle;
 
 import butterknife.BindView;
@@ -34,14 +36,10 @@ public class MainActivity
 
     ServiceManager serviceManager;
 
-    BackstackDelegate backstackDelegate;
-
     public static class NonConfigurationInstance {
-        BackstackDelegate.NonConfigurationInstance backstackDelegate;
         ServiceManager serviceManager;
 
-        private NonConfigurationInstance(BackstackDelegate.NonConfigurationInstance backstackDelegate, ServiceManager serviceManager) {
-            this.backstackDelegate = backstackDelegate;
+        private NonConfigurationInstance(ServiceManager serviceManager) {
             this.serviceManager = serviceManager;
         }
     }
@@ -62,32 +60,21 @@ public class MainActivity
             serviceManager = new ServiceManager(serviceTree, TAG);
         }
 
-        backstackDelegate = new BackstackDelegate(null);
-        backstackDelegate.onCreate(savedInstanceState,
-                nonConfigurationInstance == null ? null : nonConfigurationInstance.backstackDelegate,
-                HistoryBuilder.single(A.create()));
-        if(savedInstanceState != null) {
-            serviceManager.setRestoredStates(savedInstanceState.getParcelable(ServiceManager.SERVICE_STATES));
-        } else {
-            serviceManager.setRestoredStates(new StateBundle());
-        }
-        backstackDelegate.setStateChanger(this);
+        serviceManager.setRestoredStates(savedInstanceState != null ? savedInstanceState.getParcelable(ServiceManager.SERVICE_STATES) : new StateBundle());
+
+        Navigator.configure()
+                .setStateChanger(DefaultStateChanger.configure().setExternalStateChanger(this).create(this, root))
+                .install(this, root, HistoryBuilder.single(A.create()));
     }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        return new NonConfigurationInstance(backstackDelegate.onRetainCustomNonConfigurationInstance(), serviceManager);
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
+        return new NonConfigurationInstance(serviceManager);
     }
 
     @Override
     public void onBackPressed() {
-        if(!backstackDelegate.onBackPressed()) {
+        if(!Navigator.onBackPressed(this)) {
             super.onBackPressed();
         }
     }
@@ -95,29 +82,13 @@ public class MainActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        backstackDelegate.onSaveInstanceState(outState);
         outState.putParcelable(ServiceManager.SERVICE_STATES, serviceManager.persistStates());
-    }
-
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        backstackDelegate.onDestroy();
-        super.onDestroy();
     }
 
     @Override
     public Object getSystemService(String name) {
         if(StackService.TAG.equals(name)) {
-            return backstackDelegate.getBackstack();
-        }
-        if(StackService.DELEGATE_TAG.equals(name)) {
-            return backstackDelegate;
+            return Navigator.getBackstack(this);
         }
         if(ServiceLocator.SERVICE_TREE.equals(name)) {
             return serviceTree;
@@ -128,21 +99,6 @@ public class MainActivity
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
         serviceManager.setupServices(stateChange);
-
-        if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
-            completionCallback.stateChangeComplete();
-            return;
-        }
-
-        backstackDelegate.persistViewToState(root.getChildAt(0));
-        root.removeAllViews();
-
-        Key newKey = stateChange.topNewState();
-        Context newContext = stateChange.createContext(this, newKey);
-        View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        backstackDelegate.restoreViewFromState(view);
-        root.addView(view);
         completionCallback.stateChangeComplete();
     }
-
 }

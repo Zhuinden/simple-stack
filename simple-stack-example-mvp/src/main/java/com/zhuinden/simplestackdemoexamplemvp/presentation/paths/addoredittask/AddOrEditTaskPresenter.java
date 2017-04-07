@@ -2,13 +2,13 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 
 import android.support.annotation.Nullable;
 
+import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksView;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksCoordinator;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
@@ -24,7 +24,7 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 // UNSCOPED
 public class AddOrEditTaskPresenter
-        extends BasePresenter<AddOrEditTaskCoordinator, AddOrEditTaskPresenter>
+        extends BasePresenter<AddOrEditTaskView, AddOrEditTaskPresenter>
         implements Bundleable {
     String title;
     String description;
@@ -55,8 +55,8 @@ public class AddOrEditTaskPresenter
     Task task;
 
     @Override
-    protected void onAttach(AddOrEditTaskCoordinator coordinator) {
-        AddOrEditTaskKey addOrEditTaskKey = coordinator.getKey();
+    protected void onAttach(AddOrEditTaskView view) {
+        AddOrEditTaskKey addOrEditTaskKey = Backstack.getKey(view.getContext());
         taskId = addOrEditTaskKey.taskId();
         if(!Strings.isNullOrEmpty(taskId)) {
             taskRepository.findTask(addOrEditTaskKey.taskId()).observeOn(AndroidSchedulers.mainThread()).subscribe(taskOptional -> {
@@ -65,8 +65,8 @@ public class AddOrEditTaskPresenter
                     if(this.title == null || this.description == null) {
                         this.title = task.title();
                         this.description = task.description();
-                        coordinator.setTitle(title);
-                        coordinator.setDescription(description);
+                        view.setTitle(title);
+                        view.setDescription(description);
                     }
                 }
             });
@@ -74,7 +74,7 @@ public class AddOrEditTaskPresenter
     }
 
     @Override
-    protected void onDetach(AddOrEditTaskCoordinator coordinator) {
+    protected void onDetach(AddOrEditTaskView view) {
 
     }
 
@@ -103,9 +103,9 @@ public class AddOrEditTaskPresenter
     }
 
     public void navigateBack() {
-        AddOrEditTaskKey addOrEditTaskKey = getCoordinator().getKey();
+        AddOrEditTaskKey addOrEditTaskKey = Backstack.getKey(getView().getContext());
         if(addOrEditTaskKey.parent() instanceof TasksKey) {
-            messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksCoordinator.SavedSuccessfullyMessage());
+            messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksView.SavedSuccessfullyMessage());
             backstack.goBack();
         } else {
             backstack.setHistory(HistoryBuilder.from(backstack).removeUntil(TasksKey.create()).build(), StateChange.BACKWARD);

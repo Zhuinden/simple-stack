@@ -1,10 +1,11 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.google.auto.value.AutoValue;
-import com.squareup.coordinators.Coordinator;
-import com.squareup.coordinators.Coordinators;
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
 import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
@@ -20,9 +21,10 @@ public abstract class TasksKey
         return new AutoValue_TasksKey(R.layout.path_tasks);
     }
 
+    @NonNull
     @Override
-    public Coordinator newCoordinator(SingletonComponent singletonComponent) {
-        return singletonComponent.tasksCoordinator();
+    public ViewChangeHandler viewChangeHandler() {
+        return new SegueViewChangeHandler();
     }
 
     @Override
@@ -48,8 +50,8 @@ public abstract class TasksKey
     @Override
     public View.OnClickListener fabClickListener(View view) {
         return v -> {
-            TasksCoordinator coordinator = Coordinators.getCoordinator(view);
-            coordinator.openAddNewTask();
+            TasksView tasksView = (TasksView)view;
+            tasksView.openAddNewTask();
         };
     }
 

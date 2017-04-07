@@ -5,12 +5,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestackdemonestedstack.R;
-import com.zhuinden.simplestackdemonestedstack.application.Key;
-import com.zhuinden.simplestackdemonestedstack.util.BackPressListener;
-import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
+import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
+import com.zhuinden.simplestack.Backstack;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -20,8 +17,7 @@ import butterknife.OnClick;
  */
 
 public class Internal2View
-        extends RelativeLayout
-        implements BackPressListener {
+        extends RelativeLayout {
     public Internal2View(Context context) {
         super(context);
         init(context);
@@ -43,8 +39,6 @@ public class Internal2View
         init(context);
     }
 
-    BackstackManager parentStack;
-
     Internal2Key internal2Key;
 
     private void init(Context context) {
@@ -55,18 +49,12 @@ public class Internal2View
 
     @OnClick(R.id.internal2_button)
     public void click() {
-        parentStack.getBackstack().goBack();
+        MainActivity.get(getContext()).onBackPressed();
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
-        parentStack = ServiceLocator.getService(getContext(), Key.NESTED_STACK);
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        return parentStack.getBackstack().goBack();
     }
 }

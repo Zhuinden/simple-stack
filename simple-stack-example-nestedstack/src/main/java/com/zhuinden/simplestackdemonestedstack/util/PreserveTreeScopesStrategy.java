@@ -16,8 +16,8 @@ public class PreserveTreeScopesStrategy
         implements BackstackManager.StateClearStrategy {
     private ServiceTree serviceTree;
 
-    public PreserveTreeScopesStrategy(ServiceTree tree) {
-        this.serviceTree = tree;
+    public PreserveTreeScopesStrategy(ServiceTree serviceTree) {
+        this.serviceTree = serviceTree;
     }
 
     @Override

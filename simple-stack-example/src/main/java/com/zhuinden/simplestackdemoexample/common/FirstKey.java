@@ -1,8 +1,11 @@
-package com.zhuinden.simplestackdemoexample.demo;
+package com.zhuinden.simplestackdemoexample.common;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.NoOpViewChangeHandler;
 import com.zhuinden.simplestackdemoexample.R;
 /**
  * Created by Owner on 2017. 01. 12..
@@ -39,6 +42,12 @@ public class FirstKey implements Parcelable, Key {
     @Override
     public int layout() {
         return R.layout.path_first;
+    }
+
+    @NonNull
+    @Override
+    public ViewChangeHandler viewChangeHandler() {
+        return new NoOpViewChangeHandler();
     }
 
     @Override

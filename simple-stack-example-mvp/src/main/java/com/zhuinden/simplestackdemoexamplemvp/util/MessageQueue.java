@@ -22,7 +22,7 @@ public class MessageQueue {
     }
 
     public interface Receiver {
-        public void receiveMessage(Object message);
+        void receiveMessage(Object message);
     }
 
     Map<Key, Queue<Object>> messages = new ConcurrentHashMap<>();

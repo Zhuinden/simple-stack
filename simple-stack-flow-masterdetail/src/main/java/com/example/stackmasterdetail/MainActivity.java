@@ -21,14 +21,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import com.example.stackmasterdetail.pathview.HandlesBack;
 import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.MasterDetailStateClearStrategy;
-import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.navigator.Navigator;
 
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
@@ -37,10 +38,10 @@ public class MainActivity
         implements StateChanger {
     public static final String TAG = "MainActivity";
 
-    private StateChanger container;
-    private HandlesBack containerAsBackTarget;
+    private ViewGroup container;
 
-    private BackstackDelegate backstackDelegate;
+    private StateChanger containerAsStateChanger;
+    private HandlesBack containerAsBackTarget;
 
     /**
      * Pay attention to the {@link #setContentView} call here. It's creating a responsive layout
@@ -64,58 +65,26 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
-        backstackDelegate = new BackstackDelegate(null);
-        backstackDelegate.setStateClearStrategy(new MasterDetailStateClearStrategy());
-        backstackDelegate.onCreate(savedInstanceState,
-                getLastCustomNonConfigurationInstance(),
-                HistoryBuilder.single(Paths.ConversationList.create()));
         setContentView(R.layout.root_layout);
-        container = (StateChanger) findViewById(R.id.container);
-        containerAsBackTarget = (HandlesBack) container;
-        backstackDelegate.setStateChanger(this);
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
-    }
-
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        backstackDelegate.onDestroy();
-        super.onDestroy();
-    }
-
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
+        container = (ViewGroup) findViewById(R.id.container);
+        containerAsStateChanger = (StateChanger) container;
+        containerAsBackTarget = (HandlesBack) containerAsStateChanger;
+        Navigator.configure()
+                .setStateChanger(this)
+                .setStateClearStrategy(new MasterDetailStateClearStrategy())
+                .setShouldPersistContainerChild(false)
+                .install(this, container, HistoryBuilder.single(Paths.ConversationList.create()));
     }
 
     @Override
     public Object getSystemService(String name) {
         if(name.equals(BackstackService.BACKSTACK_TAG)) {
-            return backstackDelegate.getBackstack();
-        }
-        if(name.equals(BackstackService.DELEGATE_TAG)) {
-            return backstackDelegate;
+            return Navigator.getBackstack(this);
         }
         if(name.equals(TAG)) {
             return this;
         }
         return super.getSystemService(name);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        backstackDelegate.onSaveInstanceState(outState);
     }
 
     @Override
@@ -148,7 +117,7 @@ public class MainActivity
         if(containerAsBackTarget.onBackPressed()) {
             return;
         }
-        if(backstackDelegate.onBackPressed()) {
+        if(Navigator.onBackPressed(this)) {
             return;
         }
         super.onBackPressed();
@@ -162,7 +131,7 @@ public class MainActivity
         boolean canGoBack = traversal.getNewState().size() > 1;
         actionBar.setDisplayHomeAsUpEnabled(canGoBack);
         actionBar.setHomeButtonEnabled(canGoBack);
-        container.handleStateChange(traversal, new StateChanger.Callback() {
+        containerAsStateChanger.handleStateChange(traversal, new StateChanger.Callback() {
             @Override
             public void stateChangeComplete() {
                 invalidateOptionsMenu();

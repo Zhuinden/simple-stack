@@ -44,8 +44,8 @@ public enum TasksFilterType {
         }
 
         @Override
-        public void showEmptyViews(TasksCoordinator tasksCoordinator) {
-            tasksCoordinator.showNoTasks();
+        public void showEmptyViews(TasksView tasksView) {
+            tasksView.showNoTasks();
         }
     },
 
@@ -64,8 +64,8 @@ public enum TasksFilterType {
         }
 
         @Override
-        public void showEmptyViews(TasksCoordinator tasksCoordinator) {
-            tasksCoordinator.showNoActiveTasks();
+        public void showEmptyViews(TasksView tasksView) {
+            tasksView.showNoActiveTasks();
         }
     },
 
@@ -84,8 +84,8 @@ public enum TasksFilterType {
         }
 
         @Override
-        public void showEmptyViews(TasksCoordinator tasksCoordinator) {
-            tasksCoordinator.showNoCompletedTasks();
+        public void showEmptyViews(TasksView tasksView) {
+            tasksView.showNoCompletedTasks();
         }
     };
 
@@ -93,5 +93,5 @@ public enum TasksFilterType {
 
     public abstract int getFilterText();
 
-    public abstract void showEmptyViews(TasksCoordinator tasksCoordinator);
+    public abstract void showEmptyViews(TasksView tasksView);
 }

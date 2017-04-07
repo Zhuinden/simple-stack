@@ -4,14 +4,14 @@ import android.content.res.Resources;
 import android.support.annotation.Nullable;
 
 import com.jakewharton.rxrelay.BehaviorRelay;
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
@@ -25,7 +25,7 @@ import rx.schedulers.Schedulers;
  */
 // UNSCOPED!
 public class TasksPresenter
-        extends BasePresenter<TasksCoordinator, TasksPresenter>
+        extends BasePresenter<TasksView, TasksPresenter>
         implements Bundleable {
     @Inject
     public TasksPresenter() {
@@ -48,29 +48,29 @@ public class TasksPresenter
     Subscription subscription;
 
     @Override
-    public void onAttach(TasksCoordinator tasksCoordinator) {
+    public void onAttach(TasksView view) {
         subscription = filterType.asObservable() //
-                .doOnNext(tasksFilterType -> tasksCoordinator.setFilterLabelText(tasksFilterType.getFilterText())) //
+                .doOnNext(tasksFilterType -> view.setFilterLabelText(tasksFilterType.getFilterText())) //
                 .switchMap((tasksFilterType -> tasksFilterType.filterTask(taskRepository))) //
                 .observeOn(Schedulers.computation())
-                .map(tasks -> tasksCoordinator.calculateDiff(tasks))
+                .map(tasks -> view.calculateDiff(tasks))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(pairOfDiffResultAndTasks -> {
-                    if(tasksCoordinator != null) {
-                        tasksCoordinator.showTasks(pairOfDiffResultAndTasks, filterType.getValue());
+                    if(view != null) {
+                        view.showTasks(pairOfDiffResultAndTasks, filterType.getValue());
                     }
                 });
 
-        messageQueue.requestMessages(tasksCoordinator.getKey(), tasksCoordinator);
+        messageQueue.requestMessages(Backstack.getKey(view.getContext()), view);
     }
 
     @Override
-    public void onDetach(TasksCoordinator coordinator) {
+    public void onDetach(TasksView view) {
         subscription.unsubscribe();
     }
 
     public void openAddNewTask() {
-        backstack.goTo(AddOrEditTaskKey.create(getCoordinator().getKey()));
+        backstack.goTo(AddOrEditTaskKey.create(Backstack.getKey(getView().getContext())));
     }
 
     public void openTaskDetails(Task task) {
@@ -79,17 +79,17 @@ public class TasksPresenter
 
     public void completeTask(Task task) {
         taskRepository.setTaskCompleted(task);
-        getCoordinator().showTaskMarkedComplete();
+        getView().showTaskMarkedComplete();
     }
 
     public void uncompleteTask(Task task) {
         taskRepository.setTaskActive(task);
-        getCoordinator().showTaskMarkedActive();
+        getView().showTaskMarkedActive();
     }
 
     public void deleteCompletedTasks() {
         taskRepository.deleteCompletedTasks();
-        getCoordinator().showCompletedTasksCleared();
+        getView().showCompletedTasksCleared();
     }
 
     public void setFiltering(TasksFilterType filterType) {

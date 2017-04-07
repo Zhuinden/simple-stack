@@ -1,14 +1,14 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.google.auto.value.AutoValue;
-import com.squareup.coordinators.Coordinator;
-import com.squareup.coordinators.Coordinators;
+import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Key;
-import com.zhuinden.simplestackdemoexamplemvp.application.injection.SingletonComponent;
 
 /**
  * Created by Zhuinden on 2017.01.25..
@@ -21,17 +21,18 @@ public abstract class AddOrEditTaskKey
 
     public abstract String taskId();
 
-    @Override
-    public Coordinator newCoordinator(SingletonComponent singletonComponent) {
-        return singletonComponent.addOrEditTaskCoordinator();
-    }
-
     public static Parcelable create(Key parent) {
         return createWithTaskId(parent, "");
     }
 
     public static Parcelable createWithTaskId(Key parent, String taskId) {
         return new AutoValue_AddOrEditTaskKey(R.layout.path_addoredittask, parent, taskId);
+    }
+
+    @NonNull
+    @Override
+    public ViewChangeHandler viewChangeHandler() {
+        return new SegueViewChangeHandler();
     }
 
     @Override
@@ -57,7 +58,7 @@ public abstract class AddOrEditTaskKey
     @Override
     public View.OnClickListener fabClickListener(View view) {
         return v -> {
-            AddOrEditTaskCoordinator addOrEditTaskCoordinator = Coordinators.getCoordinator(view);
+            AddOrEditTaskView addOrEditTaskCoordinator = (AddOrEditTaskView)view;
             addOrEditTaskCoordinator.saveTask();
             addOrEditTaskCoordinator.navigateBack();
         };

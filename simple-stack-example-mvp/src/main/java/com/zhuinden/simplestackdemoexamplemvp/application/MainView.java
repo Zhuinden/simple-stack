@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
@@ -49,7 +50,7 @@ public class MainView
     FloatingActionButton fabAddTask;
 
     @Inject
-    Backstack backstack;
+    BackstackHolder backstackHolder;
 
     private void setCheckedItem(int navigationItemId) {
         Menu menu = navigationView.getMenu();
@@ -88,10 +89,10 @@ public class MainView
     private final NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) item -> {
         switch(item.getItemId()) {
             case R.id.list_navigation_menu_item:
-                backstack.goTo(TasksKey.create());
+                backstackHolder.getBackstack().goTo(TasksKey.create());
                 break;
             case R.id.statistics_navigation_menu_item:
-                backstack.goTo(StatisticsKey.create());
+                backstackHolder.getBackstack().goTo(StatisticsKey.create());
             default:
                 break;
         }
@@ -145,7 +146,7 @@ public class MainView
 
     public boolean onCreateOptionsMenu(Menu menu) {
         if(root != null && root.getChildAt(0) != null) {
-            Key key = Backstack.getKey(root.getChildAt(0).getContext());
+            Key key = backstackHolder.getBackstack().getKey(root.getChildAt(0).getContext());
             MainActivity.get(getContext()).getMenuInflater().inflate(key.menu(), menu);
             return true;
         }
@@ -175,7 +176,7 @@ public class MainView
         drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                backstack.goBack();
+                backstackHolder.getBackstack().goBack();
             }
         });
         actionBar.setDisplayHomeAsUpEnabled(false);

@@ -1,33 +1,27 @@
 package com.zhuinden.simplestackdemoexamplemvp.application;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.squareup.coordinators.Coordinator;
-import com.squareup.coordinators.CoordinatorProvider;
-import com.squareup.coordinators.Coordinators;
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.navigator.DefaultStateChanger;
+import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
-import com.zhuinden.simplestackdemoexamplemvp.util.ViewUtils;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 
 import javax.inject.Inject;
 
@@ -36,7 +30,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements StateChanger, DefaultStateChanger.ViewChangeCompletionListener {
     @BindView(R.id.drawer_layout)
     MainView mainView;
 
@@ -64,8 +58,6 @@ public class MainActivity
         return mainView.onCreateOptionsMenu(menu);
     }
 
-    BackstackDelegate backstackDelegate;
-
     @Inject
     DatabaseManager databaseManager;
 
@@ -79,38 +71,32 @@ public class MainActivity
         databaseManager.init(this);
 
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        backstackDelegate = new BackstackDelegate(null /* delayed init */);
-        backstackDelegate.onCreate(savedInstanceState, //
-                getLastCustomNonConfigurationInstance(), //
-                HistoryBuilder.single(TasksKey.create()));
+        Backstack backstack = Navigator.configure()
+                .setDeferredInitialization(true)
+                .setStateChanger(DefaultStateChanger.configure()
+                        .setExternalStateChanger(this)
+                        .setViewChangeCompletionListener(this)
+                        .create(this, root))
+                .install(this, root, HistoryBuilder.single(TasksKey.create()));
+        backstackHolder.setBackstack(backstack);
 
-        backstackHolder.setBackstack(backstackDelegate.getBackstack());
-
-        MainScopeListener mainScopeListener = (MainScopeListener) getSupportFragmentManager().findFragmentByTag("MAIN_SCOPE_LISTENER");
+        MainScopeListener mainScopeListener = (MainScopeListener) getSupportFragmentManager().findFragmentByTag(
+                "MAIN_SCOPE_LISTENER");
         if(mainScopeListener == null) {
             mainScopeListener = new MainScopeListener();
             getSupportFragmentManager().beginTransaction().add(mainScopeListener, "MAIN_SCOPE_LISTENER").commit();
         }
 
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
         mainView.onCreate();
-
-        Coordinators.installBinder(root, new CoordinatorProvider() {
-            @Nullable
-            @Override
-            public Coordinator provideCoordinator(View view) {
-                Key key = Backstack.getKey(view.getContext());
-                return key.newCoordinator(CustomApplication.get(view.getContext()).getComponent());
-            }
-        });
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        backstackDelegate.setStateChanger(this);
+        Navigator.executeDeferredInitialization(this);
         mainView.onPostCreate();
     }
 
@@ -121,43 +107,13 @@ public class MainActivity
     }
 
     @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
-    }
-
-    @Override
     public void onBackPressed() {
         if(mainView.onBackPressed()) {
             return;
         }
-        if(!backstackDelegate.onBackPressed()) {
+        if(!Navigator.onBackPressed(this)) {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        backstackDelegate.persistViewToState(root.getChildAt(0));
-        backstackDelegate.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        backstackDelegate.onDestroy();
-        super.onDestroy();
     }
 
     @Override
@@ -169,59 +125,23 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(StateChange stateChange, StateChanger.Callback completionCallback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             completionCallback.stateChangeComplete();
             return;
         }
         mainView.handleStateChange(stateChange, () -> {
         });
-
-        final View previousView = root.getChildAt(0);
-        backstackDelegate.persistViewToState(previousView);
-
-        Key newKey = stateChange.topNewState();
-        Context newContext = stateChange.createContext(this, newKey);
-        View newView = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-
-        root.addView(newView);
-        backstackDelegate.restoreViewFromState(newView);
-
-        if(stateChange.getDirection() == StateChange.REPLACE) {
-            finishStateChange(previousView, newView, completionCallback);
-        } else {
-            ViewUtils.waitForMeasure(newView, (view, width, height) -> {
-                runAnimation(previousView, newView, stateChange.getDirection(), new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        finishStateChange(previousView, newView, completionCallback);
-                    }
-                });
-            });
-        }
-    }
-
-    private void finishStateChange(View previousView, View newView, Callback completionCallback) {
-        root.removeView(previousView);
-        mainView.setupViewsForKey(Backstack.getKey(newView.getContext()), newView);
         completionCallback.stateChangeComplete();
     }
 
-    // animation
-    private void runAnimation(final View previousView, final View newView, int direction, AnimatorListenerAdapter animatorListenerAdapter) {
-        Animator animator = createSegue(previousView, newView, direction);
-        animator.addListener(animatorListenerAdapter);
-        animator.start();
-    }
-
-    private Animator createSegue(View from, View to, int direction) {
-        boolean backward = direction == StateChange.BACKWARD;
-        int fromTranslation = backward ? from.getWidth() : -from.getWidth();
-        int toTranslation = backward ? -to.getWidth() : to.getWidth();
-
-        AnimatorSet set = new AnimatorSet();
-        set.play(ObjectAnimator.ofFloat(from, View.TRANSLATION_X, fromTranslation));
-        set.play(ObjectAnimator.ofFloat(to, View.TRANSLATION_X, toTranslation, 0));
-        return set;
+    @Override
+    public void handleViewChangeComplete(@NonNull StateChange stateChange, //
+                                         @NonNull ViewGroup container, //
+                                         @Nullable View previousView, //
+                                         @NonNull View newView, //
+                                         @NonNull DefaultStateChanger.ViewChangeCompletionListener.Callback completionCallback) {
+        mainView.setupViewsForKey(Backstack.getKey(newView.getContext()), newView);
+        completionCallback.viewChangeComplete();
     }
 }
