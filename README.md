@@ -2,7 +2,7 @@
 
 Similarly to [square/flow](https://github.com/square/flow), Simple Stack allows you to represent your application state in a list of immutable data classes.
 
-The library also provides you with the means of persisting the backstack easily through a delegate class, which handles both configuration change and process death.
+The library also allows easy backstack persisting through a delegate class, which handles both configuration changes and process death.
 
 If your data classes are not `Parcelable` by default, then you can specify a custom parcellation strategy using `backstackDelegate.setKeyParceler()`.
 
