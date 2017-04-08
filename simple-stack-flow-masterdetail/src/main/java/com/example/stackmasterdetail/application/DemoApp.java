@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail;
+package com.example.stackmasterdetail.application;
 
 import android.app.Application;
+
+import com.example.stackmasterdetail.DaggerSingletonComponent;
+import com.example.stackmasterdetail.SingletonComponent;
 
 public class DemoApp extends Application {
   private SingletonComponent singletonComponent;

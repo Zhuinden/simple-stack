@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail.pathview;
+package com.example.stackmasterdetail.util.pathview;
 
 import android.view.View;
 

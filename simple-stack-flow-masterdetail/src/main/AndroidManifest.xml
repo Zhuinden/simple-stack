@@ -23,12 +23,12 @@
   <application
       android:allowBackup="true"
       android:icon="@drawable/flow_icon"
-      android:name="com.example.stackmasterdetail.DemoApp"
+      android:name="com.example.stackmasterdetail.application.DemoApp"
       android:theme="@style/AppTheme"
       >
     <activity
         android:label="Flow"
-        android:name="com.example.stackmasterdetail.MainActivity"
+        android:name="com.example.stackmasterdetail.application.MainActivity"
         android:launchMode="singleTop"
         >
       <intent-filter>

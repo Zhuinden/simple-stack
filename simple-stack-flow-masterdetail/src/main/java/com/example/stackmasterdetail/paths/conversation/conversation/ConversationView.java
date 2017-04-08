@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail.view;
+package com.example.stackmasterdetail.paths.conversation.conversation;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -23,8 +23,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.stackmasterdetail.Paths;
-import com.example.stackmasterdetail.model.Conversation;
+import com.example.stackmasterdetail.data.model.Conversation;
+import com.example.stackmasterdetail.paths.conversation.message.MessagePath;
 import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.Utils;
 import com.zhuinden.simplestack.Backstack;
@@ -42,7 +42,7 @@ public class ConversationView
         super(context, attrs);
         Utils.getComponent(context).inject(this);
 
-        Paths.Conversation screen = Backstack.getKey(context);
+        ConversationPath screen = Backstack.getKey(context);
         setConversation(conversationList.get(screen.conversationIndex()));
     }
 
@@ -54,7 +54,7 @@ public class ConversationView
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int messageIndex = conversationList.indexOf(conversation);
-                BackstackService.get(getContext()).goTo(Paths.Message.create(messageIndex, position));
+                BackstackService.get(getContext()).goTo(MessagePath.create(messageIndex, position));
             }
         });
     }

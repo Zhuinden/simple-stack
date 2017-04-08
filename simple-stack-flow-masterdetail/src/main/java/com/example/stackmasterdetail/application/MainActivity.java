@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail;
+package com.example.stackmasterdetail.application;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -23,9 +23,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
-import com.example.stackmasterdetail.pathview.HandlesBack;
+import com.example.stackmasterdetail.R;
+import com.example.stackmasterdetail.paths.conversation.conversationlist.ConversationListPath;
+import com.example.stackmasterdetail.paths.friend.friendlist.FriendListPath;
 import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.MasterDetailStateClearStrategy;
+import com.example.stackmasterdetail.util.pathview.HandlesBack;
+import com.example.stackmasterdetail.util.pathview.TabletMasterDetailRoot;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
@@ -49,10 +53,10 @@ public class MainActivity
      * <p>
      * Notice that the app has two root_layout files. The main one, in {@code res/layout} is used by
      * mobile devices and by tablets in portrait orientation. It holds a generic {@link
-     * com.example.stackmasterdetail.pathview.FramePathContainerView}.
+     * com.example.stackmasterdetail.util.pathview.FramePathContainerView}.
      * <p>
      * The interesting one, loaded by tablets in landscape mode, is {@code res/layout-sw600dp-land}.
-     * It loads a {@link com.example.stackmasterdetail.view.TabletMasterDetailRoot}, with a master list on the
+     * It loads a {@link TabletMasterDetailRoot}, with a master list on the
      * left and a detail view on the right.
      * <p>
      * But this master activity knows nothing about those two view types. It only requires that
@@ -73,7 +77,7 @@ public class MainActivity
                 .setStateChanger(this)
                 .setStateClearStrategy(new MasterDetailStateClearStrategy())
                 .setShouldPersistContainerChild(false)
-                .install(this, container, HistoryBuilder.single(Paths.ConversationList.create()));
+                .install(this, container, HistoryBuilder.single(ConversationListPath.create()));
     }
 
     @Override
@@ -93,8 +97,8 @@ public class MainActivity
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 BackstackService.get(MainActivity.this).setHistory(HistoryBuilder.newBuilder() //
-                        .add(Paths.ConversationList.create()) //
-                        .add(Paths.FriendList.create()) //
+                        .add(ConversationListPath.create()) //
+                        .add(FriendListPath.create()) //
                         .build(), StateChange.FORWARD);
                 return true;
             }
@@ -125,7 +129,7 @@ public class MainActivity
 
     @Override
     public void handleStateChange(StateChange traversal, final StateChanger.Callback callback) {
-        Paths.Path path = traversal.topNewState();
+        Path path = traversal.topNewState();
         setTitle(path.getTitle());
         ActionBar actionBar = getSupportActionBar();
         boolean canGoBack = traversal.getNewState().size() > 1;

@@ -1,15 +1,14 @@
-package com.example.stackmasterdetail.pathview;
+package com.example.stackmasterdetail.util.pathview;
 
 import android.content.Context;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
-import com.example.stackmasterdetail.Paths;
+import com.example.stackmasterdetail.application.Path;
+import com.example.stackmasterdetail.paths.MasterDetailPath;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
-
-import static com.example.stackmasterdetail.Paths.MasterDetailPath;
 
 public class MasterPathContainerView
         extends FramePathContainerView {
@@ -49,7 +48,7 @@ public class MasterPathContainerView
         }
 
         @Override
-        protected Paths.Path getActiveKey(Paths.Path path) {
+        protected Path getActiveKey(Path path) {
             MasterDetailPath mdPath = (MasterDetailPath) path;
             return mdPath.getMaster();
         }

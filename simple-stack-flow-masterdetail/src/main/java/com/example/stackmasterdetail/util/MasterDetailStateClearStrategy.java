@@ -2,7 +2,7 @@ package com.example.stackmasterdetail.util;
 
 import android.support.annotation.NonNull;
 
-import com.example.stackmasterdetail.Paths;
+import com.example.stackmasterdetail.paths.MasterDetailPath;
 import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.StateChange;
@@ -21,8 +21,8 @@ public class MasterDetailStateClearStrategy
             Object key = keyIterator.next();
             boolean isMasterOf = false;
             for(Object newKey : stateChange.getNewState()) {
-                if(newKey instanceof Paths.MasterDetailPath) {
-                    if(key.equals(((Paths.MasterDetailPath) newKey).getMaster())) {
+                if(newKey instanceof MasterDetailPath) {
+                    if(key.equals(((MasterDetailPath) newKey).getMaster())) {
                         isMasterOf = true;
                         break;
                     }

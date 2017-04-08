@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.example.stackmasterdetail.view.TabletMasterDetailRoot
+<com.example.stackmasterdetail.util.pathview.TabletMasterDetailRoot
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/container"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-  <com.example.stackmasterdetail.pathview.MasterPathContainerView
+
+    <com.example.stackmasterdetail.util.pathview.MasterPathContainerView
       android:id="@+id/master"
       android:layout_weight="20"
       android:layout_width="0dp"
       android:layout_height="match_parent"
       />
 
-  <com.example.stackmasterdetail.pathview.DetailPathContainerView
+    <com.example.stackmasterdetail.util.pathview.DetailPathContainerView
       android:id="@+id/detail"
       android:layout_weight="80"
       android:layout_width="0dp"
       android:layout_height="match_parent"
       />
-</com.example.stackmasterdetail.view.TabletMasterDetailRoot>
+</com.example.stackmasterdetail.util.pathview.TabletMasterDetailRoot>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail.pathview;
+package com.example.stackmasterdetail.util.pathview;
 
 /**
  * Implemented by views that want the option to intercept back button taps. If a view has subviews

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail.model;
+package com.example.stackmasterdetail.data.model;
 
 public class User {
   public final String name;

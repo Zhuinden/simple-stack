@@ -16,19 +16,21 @@
 
 package com.example.stackmasterdetail;
 
-import com.example.stackmasterdetail.model.Conversation;
-import com.example.stackmasterdetail.model.User;
-import com.example.stackmasterdetail.view.ConversationListView;
-import com.example.stackmasterdetail.view.ConversationView;
-import com.example.stackmasterdetail.view.FriendListView;
-import com.example.stackmasterdetail.view.FriendView;
-import com.example.stackmasterdetail.view.MessageView;
+import com.example.stackmasterdetail.data.model.Conversation;
+import com.example.stackmasterdetail.data.model.User;
+import com.example.stackmasterdetail.paths.conversation.conversation.ConversationView;
+import com.example.stackmasterdetail.paths.conversation.conversationlist.ConversationListView;
+import com.example.stackmasterdetail.paths.conversation.message.MessageView;
+import com.example.stackmasterdetail.paths.friend.friend.FriendView;
+import com.example.stackmasterdetail.paths.friend.friendlist.FriendListView;
+
+import java.util.List;
+
+import javax.inject.Singleton;
 
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
-import java.util.List;
-import javax.inject.Singleton;
 
 @Component(modules = {SingletonComponent.ComponentModule.class})
 @Singleton

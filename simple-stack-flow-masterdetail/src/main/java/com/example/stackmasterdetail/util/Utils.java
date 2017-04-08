@@ -19,8 +19,9 @@ package com.example.stackmasterdetail.util;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import com.example.stackmasterdetail.DemoApp;
+
 import com.example.stackmasterdetail.SingletonComponent;
+import com.example.stackmasterdetail.application.DemoApp;
 
 public final class Utils {
   public static SingletonComponent getComponent(Context context) {

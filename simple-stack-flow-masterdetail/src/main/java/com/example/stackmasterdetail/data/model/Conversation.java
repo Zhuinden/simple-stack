@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail.model;
+package com.example.stackmasterdetail.data.model;
 
 import android.text.TextUtils;
+
 import java.util.List;
 
 public class Conversation {

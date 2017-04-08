@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 
-<com.example.stackmasterdetail.view.FriendView
+<com.example.stackmasterdetail.paths.friend.friend.FriendView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -35,4 +35,4 @@
       android:layout_height="wrap_content"
       android:minLines="2"
       />
-</com.example.stackmasterdetail.view.FriendView>
+</com.example.stackmasterdetail.paths.friend.friend.FriendView>

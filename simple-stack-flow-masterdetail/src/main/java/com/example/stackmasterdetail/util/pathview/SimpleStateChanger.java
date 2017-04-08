@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail.pathview;
+package com.example.stackmasterdetail.util.pathview;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.stackmasterdetail.Paths;
-import com.example.stackmasterdetail.util.BackstackService;
-import com.example.stackmasterdetail.util.Utils;
-import com.zhuinden.simplestack.BackstackDelegate;
+import com.example.stackmasterdetail.application.Path;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
-import com.zhuinden.simplestack.navigator.Navigator;
 
 /**
  * Provides basic right-to-left transitions. Saves and restores view state.
@@ -52,12 +41,12 @@ public class SimpleStateChanger
             return;
         }
 
-        Paths.Path newKey = stateChange.topNewState();
+        Path newKey = stateChange.topNewState();
         newKey = getActiveKey(newKey);
-        defaultStateChanger.performViewChange(stateChange.<Paths.Path>topPreviousState(), newKey, stateChange, callback);
+        defaultStateChanger.performViewChange(stateChange.<Path>topPreviousState(), newKey, stateChange, callback);
     }
 
-    protected Paths.Path getActiveKey(Paths.Path path) {
+    protected Path getActiveKey(Path path) {
         return path;
     }
 }

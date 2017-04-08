@@ -1,4 +1,4 @@
-package com.example.stackmasterdetail.view;
+package com.example.stackmasterdetail.util.pathview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,12 +6,10 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.example.stackmasterdetail.Paths;
 import com.example.stackmasterdetail.R;
-import com.example.stackmasterdetail.pathview.BackSupport;
-import com.example.stackmasterdetail.pathview.FramePathContainerView;
-import com.example.stackmasterdetail.pathview.HandlesBack;
-import com.example.stackmasterdetail.pathview.SimpleStateChanger;
+import com.example.stackmasterdetail.application.IsMasterView;
+import com.example.stackmasterdetail.application.MainActivity;
+import com.example.stackmasterdetail.paths.MasterDetailPath;
 import com.example.stackmasterdetail.util.Container;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.StateChange;
@@ -19,7 +17,7 @@ import com.zhuinden.simplestack.StateChanger;
 
 /**
  * This view is shown only in landscape orientation on tablets. See
- * the explanation in {@link com.example.stackmasterdetail.MainActivity#onCreate}.
+ * the explanation in {@link MainActivity#onCreate}.
  */
 public class TabletMasterDetailRoot
         extends LinearLayout
@@ -47,7 +45,7 @@ public class TabletMasterDetailRoot
     }
 
     public ViewGroup getCurrentChild() {
-        Paths.MasterDetailPath showing = Backstack.getKey(getContext());
+        MasterDetailPath showing = Backstack.getKey(getContext());
         return showing.isMaster() ? masterContainer.getCurrentChild() : detailContainer.getCurrentChild();
     }
 
@@ -79,7 +77,7 @@ public class TabletMasterDetailRoot
                 if(countDown == 0) {
                     disabled = false;
                     wrapped.stateChangeComplete();
-                    ((IsMasterView) masterContainer.getCurrentChild()).updateSelection(stateChange.<Paths.MasterDetailPath>topNewState());
+                    ((IsMasterView) masterContainer.getCurrentChild()).updateSelection(stateChange.<MasterDetailPath>topNewState());
                 }
             }
         }
