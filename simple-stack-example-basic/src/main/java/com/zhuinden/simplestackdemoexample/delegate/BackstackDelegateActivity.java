@@ -18,7 +18,6 @@ import com.zhuinden.simplestackdemoexample.common.BackstackService;
 import com.zhuinden.simplestackdemoexample.common.FirstKey;
 import com.zhuinden.simplestackdemoexample.common.Key;
 
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

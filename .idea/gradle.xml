@@ -9,7 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/simple-stack" />
-            <option value="$PROJECT_DIR$/simple-stack-example" />
+            <option value="$PROJECT_DIR$/simple-stack-example-basic" />
             <option value="$PROJECT_DIR$/simple-stack-example-fragments" />
             <option value="$PROJECT_DIR$/simple-stack-example-multistack" />
             <option value="$PROJECT_DIR$/simple-stack-example-mvp" />
