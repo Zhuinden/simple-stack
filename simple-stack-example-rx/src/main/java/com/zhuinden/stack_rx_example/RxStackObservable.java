@@ -1,13 +1,10 @@
 package com.zhuinden.stack_rx_example;
 
-import android.support.annotation.NonNull;
-
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.StateChange;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
 /**
@@ -30,9 +27,7 @@ public class RxStackObservable
     public void call(Subscriber<? super StateChange> subscriber) {
         final Backstack.CompletionListener completionListener = stateChange -> {
             if(!subscriber.isUnsubscribed()) {
-                if(!stateChange.topNewState().equals(stateChange.topPreviousState())) { // distinct top
-                    subscriber.onNext(stateChange);
-                }
+                subscriber.onNext(stateChange);
             }
         };
         subscriber.add(Subscriptions.create(() -> backstack.removeCompletionListener(completionListener)));
