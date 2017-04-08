@@ -16,8 +16,9 @@
 
 package com.example.stackmasterdetailfrag;
 
-import com.example.stackmasterdetailfrag.model.Conversation;
-import com.example.stackmasterdetailfrag.model.User;
+import com.example.stackmasterdetailfrag.data.model.Conversation;
+import com.example.stackmasterdetailfrag.data.model.User;
+
 import java.util.Arrays;
 import java.util.List;
 

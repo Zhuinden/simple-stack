@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag.view;
+package com.example.stackmasterdetailfrag.paths.conversation.message;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.stackmasterdetailfrag.Paths;
 import com.example.stackmasterdetailfrag.R;
-import com.example.stackmasterdetailfrag.model.User;
+import com.example.stackmasterdetailfrag.data.model.Conversation;
+import com.example.stackmasterdetailfrag.data.model.User;
+import com.example.stackmasterdetailfrag.paths.friend.friend.FriendPath;
+import com.example.stackmasterdetailfrag.util.BackstackService;
 import com.example.stackmasterdetailfrag.util.Utils;
 import com.zhuinden.simplestack.Backstack;
 
@@ -33,29 +35,48 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class FriendView
+public class MessageView
         extends LinearLayout {
     @Inject
-    List<User> friends;
+    List<Conversation> conversations;
 
-    private final User friend;
+    @Inject
+    List<User> friendList;
 
-    @BindView(R.id.friend_info)
-    TextView friendInfo;
+    private Conversation.Item message;
 
-    public FriendView(Context context, AttributeSet attrs) {
+    @BindView(R.id.user)
+    TextView userView;
+
+    @BindView(R.id.message)
+    TextView messageView;
+
+    public MessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setOrientation(VERTICAL);
         Utils.getComponent(context).inject(this);
 
-        Paths.Friend screen = Backstack.getKey(context);
-        friend = friends.get(screen.index());
+        MessagePath screen = Backstack.getKey(context);
+        message = conversations.get(screen.conversationIndex()).items.get(screen.messageId());
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
         ButterKnife.bind(this);
-        friendInfo.setText("Name: " + friend.name);
+
+        userView.setText(String.valueOf(message.from));
+        messageView.setText(String.valueOf(message.message));
+    }
+
+    @OnClick(R.id.user)
+    void userClicked() {
+        int position = friendList.indexOf(message.from);
+        if(position != -1) {
+            BackstackService.get(getContext()).goTo(FriendPath.create(position));
+        }
     }
 }

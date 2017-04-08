@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag.pathview;
+package com.example.stackmasterdetailfrag.util.pathview;
 
-import android.os.Parcelable;
 import android.view.ViewGroup;
 
-import com.example.stackmasterdetailfrag.SinglePaneFragmentStateChanger;
-import com.example.stackmasterdetailfrag.util.FragmentManagerService;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 

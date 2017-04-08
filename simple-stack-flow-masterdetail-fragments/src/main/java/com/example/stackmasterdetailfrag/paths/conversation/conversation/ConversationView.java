@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag.view;
+package com.example.stackmasterdetailfrag.paths.conversation.conversation;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -23,53 +23,46 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.stackmasterdetailfrag.Paths;
-import com.example.stackmasterdetailfrag.model.User;
+import com.example.stackmasterdetailfrag.data.model.Conversation;
+import com.example.stackmasterdetailfrag.paths.conversation.message.MessagePath;
 import com.example.stackmasterdetailfrag.util.BackstackService;
 import com.example.stackmasterdetailfrag.util.Utils;
+import com.zhuinden.simplestack.Backstack;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-public class FriendListView
-        extends ListView
-        implements IsMasterView {
+public class ConversationView
+        extends ListView {
     @Inject
-    List<User> friends;
+    List<Conversation> conversationList;
 
-    public FriendListView(Context context, AttributeSet attrs) {
+    public ConversationView(Context context, AttributeSet attrs) {
         super(context, attrs);
         Utils.getComponent(context).inject(this);
 
-        setFriends(friends);
-
-        setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        ConversationPath screen = Backstack.getKey(context);
+        setConversation(conversationList.get(screen.conversationIndex()));
     }
 
-    public void setFriends(List<User> friends) {
-        Adapter adapter = new Adapter(getContext(), friends);
+    private void setConversation(final Conversation conversation) {
+        Adapter adapter = new Adapter(getContext(), conversation.items);
 
         setAdapter(adapter);
         setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                BackstackService.get(getContext()).goTo(Paths.Friend.create(position));
+                int messageIndex = conversationList.indexOf(conversation);
+                BackstackService.get(getContext()).goTo(MessagePath.create(messageIndex, position));
             }
         });
     }
 
-    @Override
-    public void updateSelection(Paths.MasterDetailPath newPath) {
-        Paths.FriendPath screen = (Paths.FriendPath) newPath;
-        setItemChecked(screen.index(), true);
-        invalidate();
-    }
-
     private static class Adapter
-            extends ArrayAdapter<User> {
-        public Adapter(Context context, List<User> objects) {
-            super(context, android.R.layout.simple_list_item_activated_1, objects);
+            extends ArrayAdapter<Conversation.Item> {
+        public Adapter(Context context, List<Conversation.Item> objects) {
+            super(context, android.R.layout.simple_list_item_1, objects);
         }
     }
 }

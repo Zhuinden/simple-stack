@@ -1,4 +1,4 @@
-package com.example.stackmasterdetailfrag.pathview;
+package com.example.stackmasterdetailfrag.util.pathview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -8,16 +8,17 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 import com.example.stackmasterdetailfrag.MasterDetailFragmentStateChanger;
-import com.example.stackmasterdetailfrag.Paths;
 import com.example.stackmasterdetailfrag.R;
+import com.example.stackmasterdetailfrag.application.IsMasterView;
+import com.example.stackmasterdetailfrag.application.MainActivity;
+import com.example.stackmasterdetailfrag.paths.MasterDetailPath;
 import com.example.stackmasterdetailfrag.util.FragmentManagerService;
-import com.example.stackmasterdetailfrag.view.IsMasterView;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
 /**
  * This view is shown only in landscape orientation on tablets. See
- * the explanation in {@link com.example.stackmasterdetailfrag.MainActivity#onCreate}.
+ * the explanation in {@link MainActivity#onCreate}.
  */
 public class TabletMasterDetailRoot
         extends LinearLayout
@@ -57,7 +58,7 @@ public class TabletMasterDetailRoot
         FragmentManager fragmentManager = FragmentManagerService.get(getContext());
         Fragment fragment = fragmentManager.findFragmentById(R.id.master);
         if(fragment != null && fragment.getView() != null && fragment.getView() instanceof IsMasterView) {
-            ((IsMasterView) fragment.getView()).updateSelection(stateChange.<Paths.MasterDetailPath>topNewState());
+            ((IsMasterView) fragment.getView()).updateSelection(stateChange.<MasterDetailPath>topNewState());
         }
         callback.stateChangeComplete();
     }

@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail.application;
+package com.example.stackmasterdetailfrag.application;
 
 import android.app.Application;
 
-import com.example.stackmasterdetail.application.injection.DaggerSingletonComponent;
-import com.example.stackmasterdetail.application.injection.SingletonComponent;
+import com.example.stackmasterdetailfrag.application.injection.DaggerSingletonComponent;
+import com.example.stackmasterdetailfrag.application.injection.SingletonComponent;
 
-public class DemoApp extends Application {
-  private SingletonComponent singletonComponent;
+public class DemoApp
+        extends Application {
+    private SingletonComponent singletonComponent;
 
-  @Override public void onCreate() {
-    super.onCreate();
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-    singletonComponent = DaggerSingletonComponent.create();
-  }
+        singletonComponent = DaggerSingletonComponent.create();
+    }
 
-  public SingletonComponent getGlobalGraph() {
-    return singletonComponent;
-  }
+    public SingletonComponent getGlobalGraph() {
+        return singletonComponent;
+    }
 }

@@ -20,8 +20,8 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.example.stackmasterdetail.SingletonComponent;
 import com.example.stackmasterdetail.application.DemoApp;
+import com.example.stackmasterdetail.application.injection.SingletonComponent;
 
 public final class Utils {
   public static SingletonComponent getComponent(Context context) {

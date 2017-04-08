@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail;
+package com.example.stackmasterdetail.application.injection;
 
+import com.example.stackmasterdetail.SampleData;
 import com.example.stackmasterdetail.data.model.Conversation;
 import com.example.stackmasterdetail.data.model.User;
 import com.example.stackmasterdetail.paths.conversation.conversation.ConversationView;

@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
+import com.example.stackmasterdetailfrag.application.Path;
+import com.example.stackmasterdetailfrag.paths.NoDetailsPath;
 import com.zhuinden.simplestack.StateChange;
 
 /**
@@ -23,14 +25,14 @@ public class SinglePaneFragmentStateChanger {
     public void handleStateChange(StateChange stateChange) {
         FragmentTransaction fragmentTransaction = beginFragmentTransaction(stateChange);
 
-        Paths.Path noDetailKey = Paths.NoDetails.create();
+        Path noDetailKey = NoDetailsPath.create();
         Fragment noDetailsFragment = fragmentManager.findFragmentByTag(noDetailKey.getFragmentTag());
         if(noDetailsFragment != null) {
             fragmentTransaction.remove(noDetailsFragment);
         }
 
         for(Object _oldPath : stateChange.getPreviousState()) {
-            Paths.Path oldPath = (Paths.Path ) _oldPath;
+            Path oldPath = (Path) _oldPath;
             Fragment fragment = fragmentManager.findFragmentByTag(oldPath.getFragmentTag());
             if(fragment != null) {
                 if(!stateChange.getNewState().contains(oldPath)) {
@@ -42,7 +44,7 @@ public class SinglePaneFragmentStateChanger {
         }
 
         for(Object _newPath : stateChange.getNewState()) {
-            Paths.Path  newPath = (Paths.Path ) _newPath;
+            Path newPath = (Path) _newPath;
             Fragment fragment = fragmentManager.findFragmentByTag(newPath.getFragmentTag());
             if(!newPath.equals(stateChange.topNewState())) {
                 if(fragment != null && !fragment.isDetached()) {
@@ -52,7 +54,7 @@ public class SinglePaneFragmentStateChanger {
         }
         fragmentTransaction.commitNow();
 
-        Paths.Path newPath = stateChange.topNewState();
+        Path newPath = stateChange.topNewState();
         Fragment fragment = fragmentManager.findFragmentByTag(newPath.getFragmentTag());
         if(fragment != null) {
             if(fragment.isDetached() || fragment.getView() == null) {

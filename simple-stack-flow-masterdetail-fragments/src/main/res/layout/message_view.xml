@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 
-<com.example.stackmasterdetailfrag.view.MessageView
+<com.example.stackmasterdetailfrag.paths.conversation.message.MessageView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -38,4 +38,4 @@
       android:padding="16dp"
       />
 
-</com.example.stackmasterdetailfrag.view.MessageView>
+</com.example.stackmasterdetailfrag.paths.conversation.message.MessageView>

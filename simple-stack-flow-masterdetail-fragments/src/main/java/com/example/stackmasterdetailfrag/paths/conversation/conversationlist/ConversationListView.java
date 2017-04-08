@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag.view;
+package com.example.stackmasterdetailfrag.paths.conversation.conversationlist;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -23,46 +23,50 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.stackmasterdetailfrag.Paths;
-import com.example.stackmasterdetailfrag.model.Conversation;
+import com.example.stackmasterdetailfrag.application.IsMasterView;
+import com.example.stackmasterdetailfrag.data.model.Conversation;
+import com.example.stackmasterdetailfrag.paths.MasterDetailPath;
+import com.example.stackmasterdetailfrag.paths.conversation.ConversationPathRoot;
+import com.example.stackmasterdetailfrag.paths.conversation.conversation.ConversationPath;
 import com.example.stackmasterdetailfrag.util.BackstackService;
 import com.example.stackmasterdetailfrag.util.Utils;
-import com.zhuinden.simplestack.Backstack;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-public class ConversationView
-        extends ListView {
+public class ConversationListView
+        extends ListView
+        implements IsMasterView {
     @Inject
-    List<Conversation> conversationList;
+    List<Conversation> conversations;
 
-    public ConversationView(Context context, AttributeSet attrs) {
+    public ConversationListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         Utils.getComponent(context).inject(this);
 
-        Paths.Conversation screen = Backstack.getKey(context);
-        setConversation(conversationList.get(screen.conversationIndex()));
-    }
-
-    private void setConversation(final Conversation conversation) {
-        Adapter adapter = new Adapter(getContext(), conversation.items);
+        Adapter adapter = new Adapter(getContext(), conversations);
 
         setAdapter(adapter);
         setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int messageIndex = conversationList.indexOf(conversation);
-                BackstackService.get(getContext()).goTo(Paths.Message.create(messageIndex, position));
+                BackstackService.get(getContext()).goTo(ConversationPath.create(position));
             }
         });
     }
 
+    @Override
+    public void updateSelection(MasterDetailPath newPath) {
+        ConversationPathRoot path = (ConversationPathRoot) newPath;
+        setItemChecked(path.conversationIndex(), true);
+        invalidate();
+    }
+
     private static class Adapter
-            extends ArrayAdapter<Conversation.Item> {
-        public Adapter(Context context, List<Conversation.Item> objects) {
-            super(context, android.R.layout.simple_list_item_1, objects);
+            extends ArrayAdapter<Conversation> {
+        public Adapter(Context context, List<Conversation> objects) {
+            super(context, android.R.layout.simple_list_item_activated_1, objects);
         }
     }
 }

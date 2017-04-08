@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag.model;
+package com.example.stackmasterdetailfrag.data.model;
 
 import android.text.TextUtils;
+
 import java.util.List;
 
 public class Conversation {

@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag;
+package com.example.stackmasterdetailfrag.application.injection;
 
-import com.example.stackmasterdetailfrag.model.Conversation;
-import com.example.stackmasterdetailfrag.model.User;
-import com.example.stackmasterdetailfrag.view.ConversationListView;
-import com.example.stackmasterdetailfrag.view.ConversationView;
-import com.example.stackmasterdetailfrag.view.FriendListView;
-import com.example.stackmasterdetailfrag.view.FriendView;
-import com.example.stackmasterdetailfrag.view.MessageView;
+import com.example.stackmasterdetailfrag.SampleData;
+import com.example.stackmasterdetailfrag.data.model.Conversation;
+import com.example.stackmasterdetailfrag.data.model.User;
+import com.example.stackmasterdetailfrag.paths.conversation.conversation.ConversationView;
+import com.example.stackmasterdetailfrag.paths.conversation.conversationlist.ConversationListView;
+import com.example.stackmasterdetailfrag.paths.conversation.message.MessageView;
+import com.example.stackmasterdetailfrag.paths.friend.friend.FriendView;
+import com.example.stackmasterdetailfrag.paths.friend.friendlist.FriendListView;
+
+import java.util.List;
+
+import javax.inject.Singleton;
 
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
-import java.util.List;
-import javax.inject.Singleton;
 
 @Component(modules = {SingletonComponent.ComponentModule.class})
 @Singleton

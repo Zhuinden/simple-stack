@@ -4,14 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.stackmasterdetailfrag.application.Path;
 import com.zhuinden.simplestack.KeyContextWrapper;
-
-import butterknife.Unbinder;
 
 /**
  * Created by Zhuinden on 2017.02.12..
@@ -21,7 +18,7 @@ public class ViewHostFragment
         extends Fragment {
     public static final String KEY_TAG = "PATH";
 
-    private Paths.Path key;
+    private Path key;
 
     @Nullable
     @Override
@@ -35,7 +32,7 @@ public class ViewHostFragment
         return view;
     }
 
-    public final <K extends Paths.Path> K getKey() {
+    public final <K extends Path> K getKey() {
         // noinspection unchecked
         return (K) key;
     }

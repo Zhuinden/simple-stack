@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Square Inc.
+ * Copyright 2013 Square Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag;
+package com.example.stackmasterdetailfrag.data.model;
 
-import android.app.Application;
+public class User {
+  public final String name;
 
-public class DemoApp
-        extends Application {
-    private SingletonComponent singletonComponent;
+  public User(String name) {
+    this.name = name;
+  }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        singletonComponent = DaggerSingletonComponent.create();
-    }
-
-    public SingletonComponent getGlobalGraph() {
-        return singletonComponent;
-    }
+  @Override public String toString() {
+    return name;
+  }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetailfrag.view;
+package com.example.stackmasterdetailfrag.paths.friend.friendlist;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -23,8 +23,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.stackmasterdetailfrag.Paths;
-import com.example.stackmasterdetailfrag.model.Conversation;
+import com.example.stackmasterdetailfrag.application.IsMasterView;
+import com.example.stackmasterdetailfrag.data.model.User;
+import com.example.stackmasterdetailfrag.paths.MasterDetailPath;
+import com.example.stackmasterdetailfrag.paths.friend.FriendPathRoot;
+import com.example.stackmasterdetailfrag.paths.friend.friend.FriendPath;
 import com.example.stackmasterdetailfrag.util.BackstackService;
 import com.example.stackmasterdetailfrag.util.Utils;
 
@@ -32,37 +35,43 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ConversationListView
+public class FriendListView
         extends ListView
         implements IsMasterView {
     @Inject
-    List<Conversation> conversations;
+    List<User> friends;
 
-    public ConversationListView(Context context, AttributeSet attrs) {
+    public FriendListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         Utils.getComponent(context).inject(this);
 
-        Adapter adapter = new Adapter(getContext(), conversations);
+        setFriends(friends);
+
+        setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    }
+
+    public void setFriends(List<User> friends) {
+        Adapter adapter = new Adapter(getContext(), friends);
 
         setAdapter(adapter);
         setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                BackstackService.get(getContext()).goTo(Paths.Conversation.create(position));
+                BackstackService.get(getContext()).goTo(FriendPath.create(position));
             }
         });
     }
 
     @Override
-    public void updateSelection(Paths.MasterDetailPath newPath) {
-        Paths.ConversationPath path = (Paths.ConversationPath) newPath;
-        setItemChecked(path.conversationIndex(), true);
+    public void updateSelection(MasterDetailPath newPath) {
+        FriendPathRoot screen = (FriendPathRoot) newPath;
+        setItemChecked(screen.index(), true);
         invalidate();
     }
 
     private static class Adapter
-            extends ArrayAdapter<Conversation> {
-        public Adapter(Context context, List<Conversation> objects) {
+            extends ArrayAdapter<User> {
+        public Adapter(Context context, List<User> objects) {
             super(context, android.R.layout.simple_list_item_activated_1, objects);
         }
     }

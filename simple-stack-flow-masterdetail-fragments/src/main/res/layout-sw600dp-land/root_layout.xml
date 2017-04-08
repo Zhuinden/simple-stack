@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.example.stackmasterdetailfrag.pathview.TabletMasterDetailRoot
+<com.example.stackmasterdetailfrag.util.pathview.TabletMasterDetailRoot
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/container"
     android:orientation="horizontal"
@@ -19,4 +19,4 @@
       android:layout_width="0dp"
       android:layout_height="match_parent"
       />
-</com.example.stackmasterdetailfrag.pathview.TabletMasterDetailRoot>
+</com.example.stackmasterdetailfrag.util.pathview.TabletMasterDetailRoot>
