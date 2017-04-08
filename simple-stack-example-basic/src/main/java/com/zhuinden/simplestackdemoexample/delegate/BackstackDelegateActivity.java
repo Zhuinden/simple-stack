@@ -1,29 +1,23 @@
 package com.zhuinden.simplestackdemoexample.delegate;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
 import com.zhuinden.simplestackdemoexample.R;
 import com.zhuinden.simplestackdemoexample.common.BackstackService;
 import com.zhuinden.simplestackdemoexample.common.FirstKey;
-import com.zhuinden.simplestackdemoexample.common.Key;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class BackstackDelegateActivity
-        extends AppCompatActivity
-        implements StateChanger {
+        extends AppCompatActivity {
     @BindView(R.id.root)
     RelativeLayout root;
 
@@ -99,22 +93,5 @@ public class BackstackDelegateActivity
             return backstackDelegate.getBackstack();
         }
         return super.getSystemService(name);
-    }
-
-    @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
-        if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
-            // no-op
-            completionCallback.stateChangeComplete();
-            return;
-        }
-        backstackDelegate.persistViewToState(root.getChildAt(0));
-        root.removeAllViews();
-        Key newKey = stateChange.topNewState();
-        Context newContext = stateChange.createContext(this, newKey);
-        View view = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false);
-        backstackDelegate.restoreViewFromState(view);
-        root.addView(view);
-        completionCallback.stateChangeComplete();
     }
 }
