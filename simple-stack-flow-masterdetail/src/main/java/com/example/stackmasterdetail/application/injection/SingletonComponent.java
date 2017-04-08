@@ -16,7 +16,7 @@
 
 package com.example.stackmasterdetail.application.injection;
 
-import com.example.stackmasterdetail.SampleData;
+import com.example.stackmasterdetail.data.SampleData;
 import com.example.stackmasterdetail.data.model.Conversation;
 import com.example.stackmasterdetail.data.model.User;
 import com.example.stackmasterdetail.paths.conversation.conversation.ConversationView;

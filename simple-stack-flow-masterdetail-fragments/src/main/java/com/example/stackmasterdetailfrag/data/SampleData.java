@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.example.stackmasterdetail;
+package com.example.stackmasterdetailfrag.data;
 
-import com.example.stackmasterdetail.data.model.Conversation;
-import com.example.stackmasterdetail.data.model.User;
+import com.example.stackmasterdetailfrag.data.model.Conversation;
+import com.example.stackmasterdetailfrag.data.model.User;
 
 import java.util.Arrays;
 import java.util.List;

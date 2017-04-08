@@ -16,7 +16,7 @@
 
 package com.example.stackmasterdetailfrag.application.injection;
 
-import com.example.stackmasterdetailfrag.SampleData;
+import com.example.stackmasterdetailfrag.data.SampleData;
 import com.example.stackmasterdetailfrag.data.model.Conversation;
 import com.example.stackmasterdetailfrag.data.model.User;
 import com.example.stackmasterdetailfrag.paths.conversation.conversation.ConversationView;
