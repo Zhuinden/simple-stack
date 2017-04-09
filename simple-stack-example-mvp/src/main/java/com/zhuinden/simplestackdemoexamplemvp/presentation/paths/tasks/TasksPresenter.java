@@ -3,22 +3,22 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
 
-import com.jakewharton.rxrelay.BehaviorRelay;
+import com.jakewharton.rxrelay2.BehaviorRelay;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskKey;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Owner on 2017. 01. 27..
@@ -43,13 +43,13 @@ public class TasksPresenter
     @Inject
     Resources resources;
 
-    BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.create(TasksFilterType.ALL_TASKS);
+    BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.createDefault(TasksFilterType.ALL_TASKS);
 
-    Subscription subscription;
+    Disposable disposable;
 
     @Override
     public void onAttach(TasksView view) {
-        subscription = filterType.asObservable() //
+        disposable = filterType //
                 .doOnNext(tasksFilterType -> view.setFilterLabelText(tasksFilterType.getFilterText())) //
                 .switchMap((tasksFilterType -> tasksFilterType.filterTask(taskRepository))) //
                 .observeOn(Schedulers.computation())
@@ -66,7 +66,7 @@ public class TasksPresenter
 
     @Override
     public void onDetach(TasksView view) {
-        subscription.unsubscribe();
+        disposable.dispose();
     }
 
     public void openAddNewTask() {
@@ -93,7 +93,7 @@ public class TasksPresenter
     }
 
     public void setFiltering(TasksFilterType filterType) {
-        this.filterType.call(filterType);
+        this.filterType.accept(filterType);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class TasksPresenter
     @Override
     public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
-            filterType.call(TasksFilterType.valueOf(bundle.getString("FILTERING")));
+            filterType.accept(TasksFilterType.valueOf(bundle.getString("FILTERING")));
         }
     }
 }

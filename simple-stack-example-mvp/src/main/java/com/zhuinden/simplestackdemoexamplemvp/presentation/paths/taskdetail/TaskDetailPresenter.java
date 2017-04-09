@@ -9,7 +9,7 @@ import com.zhuinden.simplestackdemoexamplemvp.util.Strings;
 
 import javax.inject.Inject;
 
-import rx.android.schedulers.AndroidSchedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Owner on 2017. 01. 27..

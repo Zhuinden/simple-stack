@@ -8,13 +8,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -37,32 +37,29 @@ public class DatabaseManager {
         Realm.setDefaultConfiguration(realmConfiguration);
     }
 
-    Subscription subscription;
+    Disposable disposable;
 
     public void openDatabase() {
-        subscription = Observable.create(new Observable.OnSubscribe<Realm>() {
-            @Override
-            public void call(final Subscriber<? super Realm> subscriber) {
-                final Realm observableRealm = Realm.getDefaultInstance();
-                final RealmChangeListener<Realm> listener = realm -> {
-                    if(!subscriber.isUnsubscribed()) {
-                        subscriber.onNext(observableRealm);
-                    }
-                };
-                observableRealm.addChangeListener(listener);
-                subscriber.add(Subscriptions.create(() -> {
-                    observableRealm.removeChangeListener(listener);
-                    observableRealm.close();
-                }));
-                subscriber.onNext(observableRealm);
-            }
+        disposable = Observable.create((ObservableOnSubscribe<Realm>) emitter -> {
+            final Realm observableRealm = Realm.getDefaultInstance();
+            final RealmChangeListener<Realm> listener = realm -> {
+                if(!emitter.isDisposed()) {
+                    emitter.onNext(observableRealm);
+                }
+            };
+            observableRealm.addChangeListener(listener);
+            emitter.setDisposable(Disposables.fromAction(() -> {
+                observableRealm.removeChangeListener(listener);
+                observableRealm.close();
+            }));
+            emitter.onNext(observableRealm);
         }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler()).subscribe();
     }
 
     public void closeDatabase() {
-        if(subscription != null && !subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
-            subscription = null;
+        if(disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            disposable = null;
         }
     }
 }

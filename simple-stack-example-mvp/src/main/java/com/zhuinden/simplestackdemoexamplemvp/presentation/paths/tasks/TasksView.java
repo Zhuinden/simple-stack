@@ -16,15 +16,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector;
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue;
 import com.zhuinden.simplestackdemoexamplemvp.util.ScrollChildSwipeRefreshLayout;
-import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.statebundle.StateBundle;
 
 import org.javatuples.Pair;
@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Single;
+import io.reactivex.Single;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -114,19 +114,19 @@ public class TasksView
     }
 
     @BindView(R.id.noTasks)
-    View mNoTasksView;
+    View noTasksView;
 
     @BindView(R.id.noTasksIcon)
-    ImageView mNoTaskIcon;
+    ImageView noTaskIcon;
 
     @BindView(R.id.noTasksMain)
-    TextView mNoTaskMainView;
+    TextView noTaskMainView;
 
     @BindView(R.id.noTasksAdd)
-    TextView mNoTaskAddView;
+    TextView noTaskAddView;
 
     @BindView(R.id.tasksLL)
-    LinearLayout mTasksView;
+    LinearLayout tasksView;
 
     @BindView(R.id.filteringLabel)
     TextView filterLabel;
@@ -198,8 +198,8 @@ public class TasksView
     }
 
     public void hideEmptyViews() {
-        mTasksView.setVisibility(View.VISIBLE);
-        mNoTasksView.setVisibility(View.GONE);
+        tasksView.setVisibility(View.VISIBLE);
+        noTasksView.setVisibility(View.GONE);
     }
 
     public void showTasks(Pair<DiffUtil.DiffResult, List<Task>> pairOfDiffResultAndTasks, TasksFilterType filterType) {
@@ -245,10 +245,10 @@ public class TasksView
     }
 
     public void refresh() {
-        ((TasksView) this).setRefreshing(true);
+        setRefreshing(true);
         Single.just("").delay(2500, TimeUnit.MILLISECONDS).subscribe(ignored -> { // TODO: do something useful
             if(this != null) {
-                ((TasksView) this).setRefreshing(false);
+                setRefreshing(false);
             }
         });
     }
@@ -290,12 +290,12 @@ public class TasksView
     }
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
-        mTasksView.setVisibility(View.GONE);
-        mNoTasksView.setVisibility(View.VISIBLE);
+        tasksView.setVisibility(View.GONE);
+        noTasksView.setVisibility(View.VISIBLE);
 
-        mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(resources.getDrawable(iconRes));
-        mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+        noTaskMainView.setText(mainText);
+        noTaskIcon.setImageDrawable(resources.getDrawable(iconRes));
+        noTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
     public void setFilterLabelText(int filterText) {

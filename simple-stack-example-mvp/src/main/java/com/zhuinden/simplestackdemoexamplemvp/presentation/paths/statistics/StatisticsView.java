@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,7 +14,6 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * Created by Zhuinden on 2017.01.26..
@@ -57,28 +55,28 @@ public class StatisticsView
     StatisticsPresenter statisticsPresenter;
 
     @BindView(R.id.statistics)
-    TextView mStatisticsTV;
+    TextView statisticsText;
 
     public void setProgressIndicator(boolean active) {
         if(active) {
-            mStatisticsTV.setText(resources.getString(R.string.loading));
+            statisticsText.setText(resources.getString(R.string.loading));
         } else {
-            mStatisticsTV.setText("");
+            statisticsText.setText("");
         }
     }
 
     public void showStatistics(int numberOfIncompleteTasks, int numberOfCompletedTasks) {
         if(numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0) {
-            mStatisticsTV.setText(resources.getString(R.string.statistics_no_tasks));
+            statisticsText.setText(resources.getString(R.string.statistics_no_tasks));
         } else {
             String displayString = resources.getString(R.string.statistics_active_tasks) + " " + numberOfIncompleteTasks + "\n" + resources.getString(
                     R.string.statistics_completed_tasks) + " " + numberOfCompletedTasks;
-            mStatisticsTV.setText(displayString);
+            statisticsText.setText(displayString);
         }
     }
 
     public void showLoadingStatisticsError() {
-        mStatisticsTV.setText(resources.getString(R.string.statistics_error));
+        statisticsText.setText(resources.getString(R.string.statistics_error));
     }
 
     @Override

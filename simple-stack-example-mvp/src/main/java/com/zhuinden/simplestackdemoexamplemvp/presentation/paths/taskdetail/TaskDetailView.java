@@ -56,13 +56,13 @@ public class TaskDetailView
     }
 
     @BindView(R.id.task_detail_title)
-    TextView mDetailTitle;
+    TextView detailTitle;
 
     @BindView(R.id.task_detail_description)
     TextView mDetailDescription;
 
     @BindView(R.id.task_detail_complete)
-    CheckBox mDetailCompleteStatus;
+    CheckBox detailCompleteStatus;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -83,12 +83,12 @@ public class TaskDetailView
     }
 
     public void showTitle(@NonNull String title) {
-        mDetailTitle.setVisibility(View.VISIBLE);
-        mDetailTitle.setText(title);
+        detailTitle.setVisibility(View.VISIBLE);
+        detailTitle.setText(title);
     }
 
     public void hideTitle() {
-        mDetailTitle.setVisibility(View.GONE);
+        detailTitle.setVisibility(View.GONE);
     }
 
     public void showDescription(@NonNull String description) {
@@ -101,7 +101,7 @@ public class TaskDetailView
     }
 
     public void showMissingTask() {
-        mDetailTitle.setText("");
+        detailTitle.setText("");
         mDetailDescription.setText(getContext().getString(R.string.no_data));
     }
 
@@ -124,8 +124,8 @@ public class TaskDetailView
     }
 
     private void showCompletionStatus(Task task, boolean completed) {
-        mDetailCompleteStatus.setChecked(completed);
-        mDetailCompleteStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        detailCompleteStatus.setChecked(completed);
+        detailCompleteStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked) {
                 taskDetailPresenter.completeTask(task);
             } else {
