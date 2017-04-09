@@ -4,7 +4,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.jakewharton.rxrelay.BehaviorRelay;
+import com.jakewharton.rxrelay2.BehaviorRelay;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplefragments.application.Key;
@@ -17,9 +17,10 @@ import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 
 /**
  * Created by Owner on 2017. 01. 27..
@@ -41,13 +42,13 @@ public class TasksPresenter
     @Inject
     Resources resources;
 
-    BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.create(TasksFilterType.ALL_TASKS);
+    BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.createDefault(TasksFilterType.ALL_TASKS);
 
-    Subscription subscription;
+    Disposable subscription;
 
     @Override
     public void onAttach(TasksFragment tasksFragment) {
-        subscription = filterType.asObservable() //
+        subscription = filterType //
                 .doOnNext(tasksFilterType -> tasksFragment.setFilterLabelText(tasksFilterType.getFilterText())) //
                 .switchMap((tasksFilterType -> tasksFilterType.filterTask(taskRepository))) //
                 .observeOn(Schedulers.computation())
@@ -62,7 +63,7 @@ public class TasksPresenter
 
     @Override
     public void onDetach(TasksFragment Fragment) {
-        subscription.unsubscribe();
+        subscription.dispose();
     }
 
     public void openAddNewTask() {
@@ -91,7 +92,7 @@ public class TasksPresenter
     }
 
     public void setFiltering(TasksFilterType filterType) {
-        this.filterType.call(filterType);
+        this.filterType.accept(filterType);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class TasksPresenter
     @Override
     public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
-            filterType.call(TasksFilterType.valueOf(bundle.getString("FILTERING")));
+            filterType.accept(TasksFilterType.valueOf(bundle.getString("FILTERING")));
         }
     }
 }

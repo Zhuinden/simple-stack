@@ -12,7 +12,7 @@ import com.zhuinden.simplestackdemoexamplefragments.util.SchedulerHolder;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import rx.android.schedulers.AndroidSchedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Owner on 2017. 01. 26..

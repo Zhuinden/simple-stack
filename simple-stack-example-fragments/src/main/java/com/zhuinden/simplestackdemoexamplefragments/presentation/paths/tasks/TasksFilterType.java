@@ -23,7 +23,8 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Observable;
+
 
 /**
  * Used with the filter spinner in the tasks list.

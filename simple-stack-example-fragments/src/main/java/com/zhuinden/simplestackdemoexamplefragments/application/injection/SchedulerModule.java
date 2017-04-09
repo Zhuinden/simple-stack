@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import rx.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Owner on 2017. 01. 26..

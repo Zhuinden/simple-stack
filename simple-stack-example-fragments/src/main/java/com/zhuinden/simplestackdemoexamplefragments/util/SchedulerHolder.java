@@ -2,7 +2,8 @@ package com.zhuinden.simplestackdemoexamplefragments.util;
 
 import javax.inject.Inject;
 
-import rx.Scheduler;
+import io.reactivex.Scheduler;
+
 
 /**
  * Created by Owner on 2017. 01. 26..

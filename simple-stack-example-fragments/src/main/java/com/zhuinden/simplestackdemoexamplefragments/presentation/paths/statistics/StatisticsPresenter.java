@@ -13,10 +13,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Owner on 2017. 01. 27..
@@ -31,11 +31,11 @@ public class StatisticsPresenter
     @Inject
     TaskRepository tasksRepository;
 
-    Subscription subscription;
+    Disposable disposable;
 
     @Override
     protected void onAttach(StatisticsFragment coordinator) {
-        subscription = Observable.combineLatest(tasksRepository.getActiveTasks(), //
+        disposable = Observable.combineLatest(tasksRepository.getActiveTasks(), //
                 tasksRepository.getCompletedTasks(), //
                 (activeTasks, completedTasks) -> Pair.with(activeTasks, completedTasks)) //
                 .subscribeOn(Schedulers.computation())
@@ -51,7 +51,7 @@ public class StatisticsPresenter
 
     @Override
     protected void onDetach(StatisticsFragment coordinator) {
-        subscription.unsubscribe();
+        disposable.dispose();
     }
 
     @Override

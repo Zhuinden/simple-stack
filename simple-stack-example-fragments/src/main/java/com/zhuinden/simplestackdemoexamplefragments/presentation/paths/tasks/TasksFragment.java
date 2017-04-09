@@ -37,7 +37,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import rx.Single;
+import io.reactivex.Single;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -67,19 +67,19 @@ public class TasksFragment
     }
 
     @BindView(R.id.noTasks)
-    View mNoTasksView;
+    View noTasksView;
 
     @BindView(R.id.noTasksIcon)
-    ImageView mNoTaskIcon;
+    ImageView noTaskIcon;
 
     @BindView(R.id.noTasksMain)
-    TextView mNoTaskMainView;
+    TextView noTaskMainView;
 
     @BindView(R.id.noTasksAdd)
-    TextView mNoTaskAddView;
+    TextView noTaskAddView;
 
     @BindView(R.id.tasksLL)
-    LinearLayout mTasksView;
+    LinearLayout tasksView;
 
     @BindView(R.id.filteringLabel)
     TextView filterLabel;
@@ -172,8 +172,8 @@ public class TasksFragment
     }
 
     public void hideEmptyViews() {
-        mTasksView.setVisibility(View.VISIBLE);
-        mNoTasksView.setVisibility(View.GONE);
+        tasksView.setVisibility(View.VISIBLE);
+        noTasksView.setVisibility(View.GONE);
     }
 
     public void showTasks(Pair<DiffUtil.DiffResult, List<Task>> pairOfDiffResultAndTasks, TasksFilterType filterType) {
@@ -265,12 +265,12 @@ public class TasksFragment
     }
 
     private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
-        mTasksView.setVisibility(View.GONE);
-        mNoTasksView.setVisibility(View.VISIBLE);
+        tasksView.setVisibility(View.GONE);
+        noTasksView.setVisibility(View.VISIBLE);
 
-        mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(resources.getDrawable(iconRes));
-        mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+        noTaskMainView.setText(mainText);
+        noTaskIcon.setImageDrawable(resources.getDrawable(iconRes));
+        noTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
     public void setFilterLabelText(int filterText) {
