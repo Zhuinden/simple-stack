@@ -14,8 +14,6 @@ import com.zhuinden.simplestackdemoexamplemvp.application.MainView;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.mapper.TaskMapper;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.first.FirstView;
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondView;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder;
 
@@ -57,10 +55,6 @@ public interface SingletonComponent {
     void inject(MainScopeListener mainScopeListener);
 
     void inject(MainView mainView);
-
-    void inject(FirstView firstView);
-
-    void inject(SecondView secondView);
 
     void inject(TaskDetailView taskDetailView);
 

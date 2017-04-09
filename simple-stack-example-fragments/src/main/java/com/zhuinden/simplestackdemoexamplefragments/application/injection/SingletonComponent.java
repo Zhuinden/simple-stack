@@ -11,8 +11,6 @@ import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.mapper.TaskMapper;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskFragment;
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.first.FirstFragment;
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.second.SecondFragment;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics.StatisticsFragment;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail.TaskDetailFragment;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksFragment;
@@ -59,10 +57,6 @@ public interface SingletonComponent {
     void inject(MainView mainView);
 
     void inject(AddOrEditTaskFragment addOrEditTaskFragment);
-
-    void inject(FirstFragment firstFragment);
-
-    void inject(SecondFragment secondFragment);
 
     void inject(StatisticsFragment statisticsFragment);
 
