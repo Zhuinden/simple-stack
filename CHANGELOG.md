@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.5.3 (2017-04-21)
+--------------------------------
+- Bump `state-bundle` version to `1.1.4`
+
 -Simple Stack 1.5.2 (2017-04-12)
 --------------------------------
 - Bump `state-bundle` version to `1.1.0`
