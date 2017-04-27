@@ -47,7 +47,7 @@ dependencies {
 
     compile project(':simple-stack')
 
-    compile 'com.github.Zhuinden:service-tree:1.4.0'
+    compile 'com.github.Zhuinden:service-tree:1.5.0'
 
     compile 'com.android.support:appcompat-v7:25.1.1'
     testCompile 'junit:junit:4.12'
