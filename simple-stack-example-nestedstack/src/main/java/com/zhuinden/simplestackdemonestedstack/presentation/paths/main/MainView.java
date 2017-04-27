@@ -14,6 +14,7 @@ import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
 import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.simplestackdemonestedstack.application.Key;
+import com.zhuinden.simplestackdemonestedstack.application.MainActivity;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.chromecast.ChromeCastKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.CloudSyncKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.list.ListKey;
@@ -87,7 +88,12 @@ public class MainView
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
-        defaultStateChanger = DefaultStateChanger.create(getContext(), root);
+        defaultStateChanger = DefaultStateChanger.configure()
+                .setViewChangeCompletionListener((stateChange, container, previousView, newView, completionCallback) -> {
+                    MainActivity.get(getContext()).setAnimating(false);
+                    completionCallback.viewChangeComplete();
+                })
+                .create(getContext(), root);
 
         bottomNavigation.setOnMenuItemClickListener(new BottomNavigation.OnMenuItemSelectionListener() {
             @Override
@@ -128,6 +134,7 @@ public class MainView
                 direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
             }
         }
+        MainActivity.get(getContext()).setAnimating(true);
         defaultStateChanger.performViewChange(previousKey, newKey, stateChange, direction, completionCallback);
     }
 }

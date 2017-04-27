@@ -5,8 +5,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
+import com.zhuinden.servicetree.ServiceTree;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestackdemonestedstack.R;
@@ -15,11 +21,6 @@ import com.zhuinden.simplestackdemonestedstack.presentation.paths.other.OtherKey
 import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.PreserveTreeScopesStrategy;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
-import com.zhuinden.servicetree.ServiceTree;
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.statebundle.StateBundle;
 
 import butterknife.BindView;
@@ -39,6 +40,12 @@ public class MainActivity
     FrameLayout root;
 
     Backstack backstack;
+
+    private boolean isAnimating;
+
+    public void setAnimating(boolean animating) {
+        this.isAnimating = animating;
+    }
 
     static class NonConfigurationInstance {
         NestSupportServiceManager serviceManager;
@@ -123,5 +130,10 @@ public class MainActivity
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
         serviceManager.setupServices(stateChange);
         completionCallback.stateChangeComplete();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return !isAnimating && super.dispatchTouchEvent(ev);
     }
 }
