@@ -11,14 +11,14 @@ import com.zhuinden.simplestack.navigator.Navigator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Subscription;
+import io.reactivex.disposables.Disposable;
 
 public class MainActivity
         extends AppCompatActivity {
     @BindView(R.id.root)
     FrameLayout root;
 
-    Subscription subscription;
+    Disposable disposable;
 
     DefaultStateChanger defaultStateChanger;
 
@@ -33,7 +33,7 @@ public class MainActivity
                 .setStateChanger(new NoOpStateChanger())
                 .setDeferredInitialization(true)
                 .install(this, root, HistoryBuilder.single(FirstKey.create()));
-        subscription = RxStackObservable.create(backstack).subscribe(stateChange -> {
+        disposable = RxStackObservable.create(backstack).subscribe(stateChange -> {
             if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
                 return;
             }
@@ -55,9 +55,9 @@ public class MainActivity
 
     @Override
     protected void onDestroy() {
-        if(subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
+        if(disposable != null) {
+            disposable.dispose();
+            disposable = null;
         }
         super.onDestroy();
     }
