@@ -186,7 +186,7 @@ public class FirstView
 
 ## More information
 
-For more information, check the wiki page.
+For more information, check the [wiki page](https://github.com/Zhuinden/simple-stack/wiki).
 
 
 ## License
