@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.6.0 (2017-05-XX)
+--------------------------------
+- Added `stateChange.backstack()` which returns the backstack this state change was executed by.
+
 -Simple Stack 1.5.3 (2017-04-21)
 --------------------------------
 - Bump `state-bundle` version to `1.1.4`
