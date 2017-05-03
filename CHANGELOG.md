@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 1.6.0 (2017-05-XX)
+-Simple Stack 1.6.0 (2017-05-03)
 --------------------------------
 - Added `KeyFilter` to allow clearing out keys on process death that should not be restored.
 - Added `stateChange.backstack()` which returns the backstack this state change was executed by.
