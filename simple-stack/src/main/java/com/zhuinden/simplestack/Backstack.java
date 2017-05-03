@@ -288,7 +288,7 @@ public class Backstack {
             previousState = new ArrayList<>();
             previousState.addAll(stack);
         }
-        final StateChange stateChange = new StateChange(Collections.unmodifiableList(previousState),
+        final StateChange stateChange = new StateChange(this, Collections.unmodifiableList(previousState),
                 Collections.unmodifiableList(newHistory),
                 direction);
         StateChanger.Callback completionCallback = new StateChanger.Callback() {

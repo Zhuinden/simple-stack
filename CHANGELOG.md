@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stack 1.6.0 (2017-05-03)
+--------------------------------
+- Added `KeyFilter` to allow clearing out keys on process death that should not be restored.
+- Added `stateChange.backstack()` which returns the backstack this state change was executed by.
+- Added `DefaultStateChanger.ViewChangeStartListener` for *before* the view change, but *after* the state restore
+- Added `DefaultStateChanger.LayoutInflationStrategy` to support asynchronous layout inflation (if you need it) or hopefully Anko
+
 -Simple Stack 1.5.3 (2017-04-21)
 --------------------------------
 - Bump `state-bundle` version to `1.1.4`

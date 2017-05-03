@@ -24,6 +24,7 @@ import android.view.View;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +75,26 @@ public class BackstackManager
         }
     };
 
+    private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
+
+    /**
+     * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
+     *
+     * If used, this method must be called before {@link BackstackManager#setup(List)} .
+     *
+     * @param keyFilter The custom {@link KeyFilter}.
+     */
+    public void setKeyFilter(KeyFilter keyFilter) {
+        if(backstack != null) {
+            throw new IllegalStateException("Custom key filter should be set before calling `setup()`");
+        }
+        if(keyFilter == null) {
+            throw new IllegalArgumentException("The key filter cannot be null!");
+        }
+        this.keyFilter = keyFilter;
+    }
 
     /**
      * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
@@ -258,14 +277,21 @@ public class BackstackManager
                     keys.add(keyParceler.fromParcelable(parcelledKey));
                 }
             }
+            keys = keyFilter.filterHistory(new ArrayList<>(keys));
+            if(keys == null) {
+                keys = Collections.emptyList(); // lenient against null
+            }
             if(!keys.isEmpty()) {
                 backstack.setInitialParameters(keys);
             }
             List<ParcelledState> savedStates = stateBundle.getParcelableArrayList(getStatesTag());
             if(savedStates != null) {
                 for(ParcelledState parcelledState : savedStates) {
-                    SavedState savedState = SavedState.builder()
-                            .setKey(keyParceler.fromParcelable(parcelledState.parcelableKey))
+                    Object key = keyParceler.fromParcelable(parcelledState.parcelableKey);
+                    if(!keys.contains(key)) {
+                        continue;
+                    }
+                    SavedState savedState = SavedState.builder().setKey(key)
                             .setViewHierarchyState(parcelledState.viewHierarchyState)
                             .setBundle(parcelledState.bundle)
                             .build();

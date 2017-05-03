@@ -38,15 +38,27 @@ public class StateChange {
     public static final int BACKWARD = -1;
     public static final int FORWARD = 1;
 
-    StateChange(List<Object> previousState, List<Object> newState, @StateChangeDirection int direction) {
+    StateChange(Backstack backstack, List<Object> previousState, List<Object> newState, @StateChangeDirection int direction) {
+        this.backstack = backstack;
         this.previousState = previousState;
         this.newState = newState;
         this.direction = direction;
     }
 
+    Backstack backstack;
     List<Object> previousState;
     List<Object> newState;
     int direction;
+
+    /**
+     * The backstack this state change was executed by.
+     *
+     * @return the backstack
+     */
+    @NonNull
+    public Backstack backstack() {
+        return backstack;
+    }
 
     /**
      * The previous state from before the new keys were set.
