@@ -37,6 +37,20 @@ public class BackstackDelegate {
     private String persistenceTag = UNINITIALIZED;
 
     /**
+     * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
+     *
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     *
+     * @param keyFilter The custom {@link KeyFilter}.
+     */
+    public void setKeyFilter(KeyFilter keyFilter) {
+        if(keyFilter == null) {
+            throw new IllegalArgumentException("Specified custom key filter should not be null!");
+        }
+        this.keyFilter = keyFilter;
+    }
+
+    /**
      * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
      *
      * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
@@ -69,6 +83,7 @@ public class BackstackDelegate {
 
     private StateChanger stateChanger;
 
+    private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
 
@@ -132,6 +147,7 @@ public class BackstackDelegate {
         }
         if(backstackManager == null) {
             backstackManager = new BackstackManager();
+            backstackManager.setKeyFilter(keyFilter);
             backstackManager.setKeyParceler(keyParceler);
             backstackManager.setStateClearStrategy(stateClearStrategy);
             backstackManager.setup(initialKeys);

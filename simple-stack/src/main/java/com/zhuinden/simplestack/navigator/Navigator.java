@@ -27,8 +27,10 @@ import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackManager;
+import com.zhuinden.simplestack.DefaultKeyFilter;
 import com.zhuinden.simplestack.DefaultKeyParceler;
 import com.zhuinden.simplestack.DefaultStateClearStrategy;
+import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.StateChanger;
@@ -52,8 +54,9 @@ public class Navigator {
     @TargetApi(11)
     public static class Installer {
         StateChanger stateChanger;
-        BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
+        KeyFilter keyFilter = new DefaultKeyFilter();
         KeyParceler keyParceler = new DefaultKeyParceler();
+        BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
         boolean isInitializeDeferred = false;
         boolean shouldPersistContainerChild = true;
 
@@ -70,6 +73,20 @@ public class Navigator {
                 throw new IllegalArgumentException("If set, StateChanger cannot be null!");
             }
             this.stateChanger = stateChanger;
+            return this;
+        }
+
+        /**
+         * Sets the key filter for filtering the state keys to be restored after process death.
+         *
+         * @param keyFilter cannot be null if set
+         * @return the installer
+         */
+        public Installer setKeyFilter(@NonNull KeyFilter keyFilter) {
+            if(keyFilter == null) {
+                throw new IllegalArgumentException("If set, KeyFilter cannot be null!");
+            }
+            this.keyFilter = keyFilter;
             return this;
         }
 
@@ -179,6 +196,7 @@ public class Navigator {
             activity.getFragmentManager().executePendingTransactions();
         }
         backstackHost.stateChanger = installer.stateChanger;
+        backstackHost.keyFilter = installer.keyFilter;
         backstackHost.keyParceler = installer.keyParceler;
         backstackHost.stateClearStrategy = installer.stateClearStrategy;
         backstackHost.shouldPersistContainerChild = installer.shouldPersistContainerChild;
