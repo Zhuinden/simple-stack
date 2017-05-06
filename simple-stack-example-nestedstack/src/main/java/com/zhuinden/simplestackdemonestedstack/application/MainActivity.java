@@ -21,7 +21,6 @@ import com.zhuinden.simplestackdemonestedstack.presentation.paths.other.OtherKey
 import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.PreserveTreeScopesStrategy;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
-import com.zhuinden.statebundle.StateBundle;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,13 +62,11 @@ public class MainActivity
         NonConfigurationInstance nonConfigurationInstance = (NonConfigurationInstance) getLastCustomNonConfigurationInstance();
         if(nonConfigurationInstance != null) {
             serviceManager = nonConfigurationInstance.serviceManager;
-            serviceTree = serviceManager.getServiceTree();
         } else {
-            serviceTree = new ServiceTree();
-            serviceTree.createRootNode(TAG);
-            serviceManager = new NestSupportServiceManager(serviceTree, TAG);
-            serviceManager.setRestoredStates(savedInstanceState != null ? savedInstanceState.getParcelable("SERVICE_BUNDLE") : new StateBundle());
+            serviceManager = new NestSupportServiceManager(savedInstanceState != null ? savedInstanceState.getParcelable(
+                    NestSupportServiceManager.SERVICE_STATES) : null);
         }
+        serviceTree = serviceManager.getServiceTree();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -86,7 +83,7 @@ public class MainActivity
 
     @Override
     public void onBackPressed() {
-        if(!serviceManager.handleBack(this)) {
+        if(!serviceManager.handleBack(Navigator.getBackstack(this))) {
             super.onBackPressed();
         }
     }
@@ -94,7 +91,7 @@ public class MainActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("SERVICE_BUNDLE", serviceManager.persistStates());
+        outState.putParcelable(NestSupportServiceManager.SERVICE_STATES, serviceManager.persistStates());
     }
 
     @Override
@@ -103,7 +100,7 @@ public class MainActivity
             return this;
         }
         if(ServiceLocator.SERVICE_TREE.equals(name)) {
-            return serviceTree;
+            return serviceManager.getServiceTree();
         }
         if(NestSupportServiceManager.SERVICE_MANAGER.equals(name)) {
             return serviceManager;

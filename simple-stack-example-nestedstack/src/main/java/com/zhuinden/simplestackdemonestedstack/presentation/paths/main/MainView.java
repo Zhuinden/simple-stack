@@ -118,7 +118,7 @@ public class MainView
 
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
-        NestSupportServiceManager.get(getContext()).setupServices(stateChange, true);
+        NestSupportServiceManager.get(getContext()).setupServices(stateChange);
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             // no-op
             completionCallback.stateChangeComplete();
