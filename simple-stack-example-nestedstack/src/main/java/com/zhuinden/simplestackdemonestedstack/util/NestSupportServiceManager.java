@@ -2,13 +2,13 @@ package com.zhuinden.simplestackdemonestedstack.util;
 
 import android.content.Context;
 
-import com.zhuinden.simplestack.navigator.Navigator;
-import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.navigator.Navigator;
+import com.zhuinden.simplestackdemonestedstack.application.Key;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
@@ -140,9 +140,6 @@ public class NestSupportServiceManager {
         }
         Cancellation cancellation = new Cancellation();
         serviceTree.traverseChain(serviceTree.getNode(lastKey), (node, cancellationToken) -> {
-            if(node.getParent() == null) {
-                return;
-            }
             Object _key = node.getKey();
             if(_key instanceof Key) { // ROOT is defined by Activity's TAG
                 Key key = (Key) _key;
