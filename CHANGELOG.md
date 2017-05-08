@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.6.1 (2017-05-08)
+--------------------------------
+- Added `GetPreviousViewStrategy` to `DefaultStateChanger` as per request (#36).
+
 -Simple Stack 1.6.0 (2017-05-03)
 --------------------------------
 - Added `KeyFilter` to allow clearing out keys on process death that should not be restored.
