@@ -32,7 +32,6 @@ import com.zhuinden.simplestack.navigator.changehandlers.NoOpViewChangeHandler;
  *
  * To work, all keys must implement {@link StateKey}, which specifies a layout, and a {@link ViewChangeHandler}.
  */
-@TargetApi(11)
 public final class DefaultStateChanger
         implements StateChanger {
     private static class NoOpStateChanger
@@ -90,6 +89,15 @@ public final class DefaultStateChanger
         }
     }
 
+    private static class DefaultContextCreationStrategy
+            implements ContextCreationStrategy {
+        @NonNull
+        @Override
+        public Context createContext(@NonNull Context baseContext, @NonNull Object newKey, @NonNull ViewGroup container, @NonNull StateChange stateChange) {
+            return stateChange.createContext(baseContext, newKey);
+        }
+    }
+
     /**
      * Allows the possibility of listening to when the view change is to start, after the views are inflated and state is restored, but before view change is started.
      */
@@ -137,9 +145,33 @@ public final class DefaultStateChanger
     }
 
     /**
+     * Allows the possibility of creating a custom context.
+     */
+    public interface ContextCreationStrategy {
+        /**
+         * Creates the context used by layout inflation.
+         *
+         * @param baseContext the base context
+         * @param newKey      the new key
+         * @param stateChange the state change
+         * @return the new context
+         */
+        @NonNull
+        Context createContext(@NonNull Context baseContext, @NonNull Object newKey, @NonNull ViewGroup container, @NonNull StateChange stateChange);
+    }
+
+    /**
      * Allows defining a custom way of determining what the previous view is.
      */
     public interface GetPreviousViewStrategy {
+        /**
+         * Gets the previous view from the container.
+         *
+         * @param container   the container
+         * @param stateChange the state change
+         * @param previousKey the previous key
+         * @return the previous view
+         */
         @Nullable
         View getPreviousView(@NonNull ViewGroup container, @NonNull StateChange stateChange, @Nullable Object previousKey);
     }
@@ -198,6 +230,7 @@ public final class DefaultStateChanger
     private LayoutInflationStrategy layoutInflationStrategy;
     private StatePersistenceStrategy statePersistenceStrategy;
     private GetPreviousViewStrategy getPreviousViewStrategy;
+    private ContextCreationStrategy contextCreationStrategy;
 
     /**
      * Used to configure the instance of the {@link DefaultStateChanger}.
@@ -212,6 +245,7 @@ public final class DefaultStateChanger
         LayoutInflationStrategy layoutInflationStrategy = null;
         StatePersistenceStrategy statePersistenceStrategy = null;
         GetPreviousViewStrategy getPreviousViewStrategy = null;
+        ContextCreationStrategy contextCreationStrategy = null;
 
         private Configurer() {
         }
@@ -301,6 +335,20 @@ public final class DefaultStateChanger
         }
 
         /**
+         * Sets the {@link ContextCreationStrategy}. It is used to create the new context for the new view.
+         *
+         * @param contextCreationStrategy the create context strategy
+         * @return the configurer
+         */
+        public Configurer setContextCreationStrategy(ContextCreationStrategy contextCreationStrategy) {
+            if(contextCreationStrategy == null) {
+                throw new NullPointerException("If set, create context strategy cannot be null!");
+            }
+            this.contextCreationStrategy = contextCreationStrategy;
+            return this;
+        }
+
+        /**
          * Creates the {@link DefaultStateChanger} with the specified parameters.
          *
          * @param baseContext the base context used to inflate the views
@@ -315,7 +363,8 @@ public final class DefaultStateChanger
                     viewChangeCompletionListener,
                     layoutInflationStrategy,
                     statePersistenceStrategy,
-                    getPreviousViewStrategy);
+                    getPreviousViewStrategy,
+                    contextCreationStrategy);
         }
     }
 
@@ -339,10 +388,10 @@ public final class DefaultStateChanger
      * @return the state changer
      */
     public static DefaultStateChanger create(Context baseContext, ViewGroup container) {
-        return new DefaultStateChanger(baseContext, container, null, null, null, null, null, null);
+        return new DefaultStateChanger(baseContext, container, null, null, null, null, null, null, null);
     }
 
-    DefaultStateChanger(@NonNull Context baseContext, @NonNull ViewGroup container, @Nullable StateChanger externalStateChanger, ViewChangeStartListener viewChangeStartListener, @Nullable ViewChangeCompletionListener viewChangeCompletionListener, @Nullable LayoutInflationStrategy layoutInflationStrategy, @Nullable StatePersistenceStrategy statePersistenceStrategy, @Nullable GetPreviousViewStrategy getPreviousViewStrategy) {
+    DefaultStateChanger(@NonNull Context baseContext, @NonNull ViewGroup container, @Nullable StateChanger externalStateChanger, ViewChangeStartListener viewChangeStartListener, @Nullable ViewChangeCompletionListener viewChangeCompletionListener, @Nullable LayoutInflationStrategy layoutInflationStrategy, @Nullable StatePersistenceStrategy statePersistenceStrategy, @Nullable GetPreviousViewStrategy getPreviousViewStrategy, @Nullable ContextCreationStrategy contextCreationStrategy) {
         if(baseContext == null) {
             throw new NullPointerException("baseContext cannot be null");
         }
@@ -375,6 +424,10 @@ public final class DefaultStateChanger
             getPreviousViewStrategy = new DefaultGetPreviousViewStrategy();
         }
         this.getPreviousViewStrategy = getPreviousViewStrategy;
+        if(contextCreationStrategy == null) {
+            contextCreationStrategy = new DefaultContextCreationStrategy();
+        }
+        this.contextCreationStrategy = contextCreationStrategy;
     }
 
     private void finishStateChange(StateChange stateChange, ViewGroup container, View previousView, View newView, final Callback completionCallback) {
@@ -436,7 +489,7 @@ public final class DefaultStateChanger
         if(previousView != null && previousKey != null) {
             statePersistenceStrategy.persistViewToState(previousKey, previousView);
         }
-        Context newContext = stateChange.createContext(baseContext, newKey);
+        Context newContext = contextCreationStrategy.createContext(stateChange.createContext(baseContext, newKey), newKey, container, stateChange);
         layoutInflationStrategy.inflateLayout(stateChange,
                 newKey,
                 newContext,

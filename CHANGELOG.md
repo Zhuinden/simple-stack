@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.6.2 (2017-05-12)
+--------------------------------
+- Added `ContextCreationStrategy` to `DefaultStateChanger` to support Mortar scopes, or anything similar in design.
+
 -Simple Stack 1.6.1 (2017-05-08)
 --------------------------------
 - Added `GetPreviousViewStrategy` to `DefaultStateChanger` as per request (#36).
