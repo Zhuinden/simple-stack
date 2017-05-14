@@ -47,7 +47,7 @@ public class NodeStateManager {
         StateBundle rootBundle = serviceTree.getRootService(SERVICE_STATES);
         StateBundle localBundle = rootBundle.getBundle(newKey.toString());
         ServiceTree.Node node = serviceTree.getNode(newKey);
-        Log.i(TAG, "Restoring state for [" + node.getKey().toString() + "]");
+        Log.i(TAG, "Restoring state for [" + node.getKey().toString() + "] with bundle [" + localBundle + "]");
         for(ServiceTree.Node.Entry entry : node.getBoundServices()) {
             Log.i(TAG, "Restoring state for service [" + entry.getName() + "]");
             if(entry.getService() instanceof Bundleable) {
