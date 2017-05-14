@@ -34,7 +34,7 @@ public abstract class ViewPresenter<V>
 
     @NonNull
     @Override
-    public StateBundle toBundle() {
+    public final StateBundle toBundle() {
         StateBundle stateBundle = new StateBundle();
         onSave(stateBundle);
         this.stateBundle = new StateBundle(stateBundle);
@@ -45,12 +45,12 @@ public abstract class ViewPresenter<V>
         return view != null;
     }
 
-    public void takeView(V view) {
+    public final void takeView(V view) {
         this.view = view;
         onLoad(this.stateBundle);
     }
 
-    public void dropView(V view) {
+    public final void dropView(V view) {
         this.stateBundle = toBundle(); // make sure ViewPresenter state is not stale on back navigation:
         // this is what Mortar never bothered to fix and it was super-clunky
 

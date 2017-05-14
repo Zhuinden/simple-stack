@@ -16,6 +16,7 @@
 package com.example.mortar.android;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.example.mortar.util.ViewPresenter;
 import com.zhuinden.statebundle.StateBundle;
@@ -78,7 +79,7 @@ public class ActionBarOwner
     }
 
     @Override
-    public void onLoad(StateBundle savedInstanceState) {
+    public void onLoad(@Nullable StateBundle savedInstanceState) {
         if(config != null) {
             update();
         }

@@ -15,6 +15,7 @@
  */
 package com.example.mortar.screen;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.mortar.R;
@@ -119,7 +120,7 @@ public class ChatScreen
         }
 
         @Override
-        public void onLoad(StateBundle savedInstanceState) {
+        public void onLoad(@Nullable StateBundle savedInstanceState) {
             if(!hasView()) {
                 return;
             }

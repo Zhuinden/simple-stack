@@ -15,6 +15,8 @@
  */
 package com.example.mortar.screen;
 
+import android.support.annotation.Nullable;
+
 import com.example.mortar.R;
 import com.example.mortar.core.SingletonComponent;
 import com.example.mortar.model.Chats;
@@ -80,7 +82,7 @@ public class FriendListScreen
         }
 
         @Override
-        public void onLoad(StateBundle savedInstanceState) {
+        public void onLoad(@Nullable StateBundle savedInstanceState) {
             super.onLoad(savedInstanceState);
             if(!hasView()) {
                 return;
