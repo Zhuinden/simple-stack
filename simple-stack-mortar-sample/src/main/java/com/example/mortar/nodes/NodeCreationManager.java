@@ -41,7 +41,7 @@ public class NodeCreationManager
             if(newKey instanceof Key) {
                 ((Key) newKey).bindServices(node);
             }
-            nodeStateManager.restoreStatesForKey(newKey);
+            nodeStateManager.restoreStatesForNode(node);
         }
         return new NodeContextWrapper(stateChange.createContext(baseContext, newKey), node);
     }

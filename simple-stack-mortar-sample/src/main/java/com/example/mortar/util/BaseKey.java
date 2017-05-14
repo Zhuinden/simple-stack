@@ -18,6 +18,6 @@ public abstract class BaseKey implements Key {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && obj.getClass().isAssignableFrom(getClass());
+        return obj != null && obj.getClass().isAssignableFrom(getClass()) && obj.toString().equals(toString());
     }
 }

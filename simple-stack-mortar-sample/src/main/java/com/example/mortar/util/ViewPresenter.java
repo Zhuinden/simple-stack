@@ -34,7 +34,7 @@ public abstract class ViewPresenter<V>
 
     @NonNull
     @Override
-    public StateBundle toBundle() {
+    public final StateBundle toBundle() {
         StateBundle stateBundle = new StateBundle();
         onSave(stateBundle);
         this.stateBundle = new StateBundle(stateBundle);
