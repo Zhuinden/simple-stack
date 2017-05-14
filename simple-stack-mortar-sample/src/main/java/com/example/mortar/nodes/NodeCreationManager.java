@@ -43,6 +43,6 @@ public class NodeCreationManager
             }
             nodeStateManager.restoreStatesForNode(node);
         }
-        return new NodeContextWrapper(stateChange.createContext(baseContext, newKey), node);
+        return new NodeContextWrapper(baseContext, node);
     }
 }
