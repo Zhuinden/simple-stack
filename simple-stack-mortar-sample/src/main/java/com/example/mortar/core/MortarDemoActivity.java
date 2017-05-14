@@ -58,6 +58,7 @@ import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 public class MortarDemoActivity
         extends AppCompatActivity
         implements ActionBarOwner.Activity, StateChanger {
+    private static boolean DID_RESTORE_AFTER_PROCESS_DEATH = false;
 
     private ServiceTree.Node activityScope;
     private ActionBarOwner.MenuAction actionBarMenuAction;
@@ -99,14 +100,21 @@ public class MortarDemoActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState != null) {
+        if(savedInstanceState == null) {
+            DID_RESTORE_AFTER_PROCESS_DEATH = true; // no need to restore if no process death could have occurred
+        }
+        if(savedInstanceState != null && !DID_RESTORE_AFTER_PROCESS_DEATH) {
+            DID_RESTORE_AFTER_PROCESS_DEATH = true;
             StateBundle rootBundle = savedInstanceState.getParcelable(NodeStateManager.SERVICE_STATES);
             if(rootBundle != null) { // global service state is restored after process death
                 SingletonComponent singletonComponent = DaggerService.get(this); // not yet injected by field injection
                 ServiceTree _serviceTree = singletonComponent.serviceTree();
+                NodeStateManager _nodeStateManager = singletonComponent.nodeStateManager();
                 _serviceTree.registerRootService(NodeStateManager.SERVICE_STATES, rootBundle);
+                _nodeStateManager.restoreStatesForNode(_serviceTree.getTreeRoot()); // root services should be restored after process death
             }
         }
+
         ServiceTree.Node parentScope = TreeNodes.getNode(getApplication());
 
         String scopeName = getLocalClassName() + "-task-" + getTaskId();

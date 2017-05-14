@@ -43,10 +43,9 @@ public class NodeStateManager {
         return rootBundle;
     }
 
-    public void restoreStatesForKey(Object newKey) {
+    public void restoreStatesForNode(ServiceTree.Node node) {
         StateBundle rootBundle = serviceTree.getRootService(SERVICE_STATES);
-        StateBundle localBundle = rootBundle.getBundle(newKey.toString());
-        ServiceTree.Node node = serviceTree.getNode(newKey);
+        StateBundle localBundle = rootBundle.getBundle(node.getKey().toString());
         Log.i(TAG, "Restoring state for [" + node.getKey().toString() + "] with bundle [" + localBundle + "]");
         for(ServiceTree.Node.Entry entry : node.getBoundServices()) {
             Log.i(TAG, "Restoring state for service [" + entry.getName() + "]");
