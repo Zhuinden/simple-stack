@@ -1,0 +1,14 @@
+# IntelliJ IDEA
+.idea
+*.iml
+gen
+
+# Maven
+target/
+pom.xml.versionsBackup
+
+# Gradle
+.gradle
+gradlew.bat
+build
+local.properties

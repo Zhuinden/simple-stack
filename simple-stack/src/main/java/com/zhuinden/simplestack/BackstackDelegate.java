@@ -23,6 +23,8 @@ import android.view.View;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A delegate class that manages the {@link Backstack}'s Activity lifecycle integration,
@@ -43,7 +45,10 @@ public class BackstackDelegate {
      *
      * @param keyFilter The custom {@link KeyFilter}.
      */
-    public void setKeyFilter(KeyFilter keyFilter) {
+    public void setKeyFilter(@NonNull KeyFilter keyFilter) {
+        if(backstackManager != null && backstackManager.getBackstack() != null) {
+            throw new IllegalStateException("If set, key filter must be set before calling `onCreate()`");
+        }
         if(keyFilter == null) {
             throw new IllegalArgumentException("Specified custom key filter should not be null!");
         }
@@ -57,7 +62,10 @@ public class BackstackDelegate {
      *
      * @param keyParceler The custom {@link KeyParceler}.
      */
-    public void setKeyParceler(KeyParceler keyParceler) {
+    public void setKeyParceler(@NonNull KeyParceler keyParceler) {
+        if(backstackManager != null && backstackManager.getBackstack() != null) {
+            throw new IllegalStateException("If set, key parceler must set before calling `onCreate()`");
+        }
         if(keyParceler == null) {
             throw new IllegalArgumentException("Specified custom key parceler should not be null!");
         }
@@ -72,11 +80,30 @@ public class BackstackDelegate {
      *
      * @param stateClearStrategy The custom {@link BackstackManager.StateClearStrategy}.
      */
-    public void setStateClearStrategy(BackstackManager.StateClearStrategy stateClearStrategy) {
+    public void setStateClearStrategy(@NonNull BackstackManager.StateClearStrategy stateClearStrategy) {
+        if(backstackManager != null && backstackManager.getBackstack() != null) {
+            throw new IllegalStateException("If set, state clear strategy must be set before calling `onCreate()`");
+        }
         if(stateClearStrategy == null) {
             throw new IllegalArgumentException("Specified state clear strategy should not be null!");
         }
         this.stateClearStrategy = stateClearStrategy;
+    }
+
+    /**
+     * Adds a {@link BackstackManager.StateChangeCompletionListener}, which will be added to the {@link BackstackManager} when it is initialized.
+     * Please note that this should not be an anonymous inner class, because this is kept across configuration changes.
+     *
+     * @param stateChangeCompletionListener the state change completion listener
+     */
+    public void addStateChangeCompletionListener(@NonNull BackstackManager.StateChangeCompletionListener stateChangeCompletionListener) {
+        if(backstackManager != null && backstackManager.getBackstack() != null) {
+            throw new IllegalStateException("If adding, completion listener must be added before calling `onCreate()`");
+        }
+        if(stateChangeCompletionListener == null) {
+            throw new IllegalArgumentException("Specified state change completion listener should not be null!");
+        }
+        this.stateChangeCompletionListeners.add(stateChangeCompletionListener);
     }
 
     private static final String HISTORY = "simplestack.HISTORY";
@@ -86,6 +113,7 @@ public class BackstackDelegate {
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
+    private List<BackstackManager.StateChangeCompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
     /**
      * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
@@ -150,6 +178,9 @@ public class BackstackDelegate {
             backstackManager.setKeyFilter(keyFilter);
             backstackManager.setKeyParceler(keyParceler);
             backstackManager.setStateClearStrategy(stateClearStrategy);
+            for(BackstackManager.StateChangeCompletionListener completionListener : stateChangeCompletionListeners) {
+                backstackManager.addStateChangeCompletionListener(completionListener);
+            }
             backstackManager.setup(initialKeys);
             if(savedInstanceState != null) {
                 backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable(getHistoryTag()));
