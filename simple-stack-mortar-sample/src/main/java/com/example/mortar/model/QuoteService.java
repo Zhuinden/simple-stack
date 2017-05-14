@@ -15,18 +15,13 @@
  */
 package com.example.mortar.model;
 
+import com.example.mortar.model.quotes.Quotes;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface QuoteService {
-    class Quote {
-        public final String quote;
-
-        public Quote(String quote) {
-            this.quote = quote;
-        }
-    }
-
-    @GET("/random?format=json&source=zippy&show_permalink=false&show_source=false")
-    Call<Quote> getQuote();
+    @GET("qod.json?category=inspire")
+        // GET /quote/random needs API key
+    Call<Quotes> getQuote();
 }

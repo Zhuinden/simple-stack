@@ -15,18 +15,17 @@
  */
 package com.example.mortar.screen;
 
-import android.os.Bundle;
-
 import com.example.mortar.R;
 import com.example.mortar.core.SingletonComponent;
 import com.example.mortar.model.Chats;
 import com.example.mortar.model.User;
-import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.BaseKey;
+import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.FriendView;
 import com.zhuinden.servicetree.ServiceTree;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 
@@ -48,6 +47,7 @@ public class FriendScreen
                         .singletonComponent(singletonComponent) //
                         .module(new Module(index)) //
                         .build());
+        node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
 
     @Override
@@ -89,12 +89,17 @@ public class FriendScreen
         }
 
         @Override
-        public void onLoad(Bundle savedInstanceState) {
+        public void onLoad(StateBundle savedInstanceState) {
             super.onLoad(savedInstanceState);
             if(!hasView()) {
                 return;
             }
             getView().setText(friend.name);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FriendScreen{" + "index=" + index + '}';
     }
 }

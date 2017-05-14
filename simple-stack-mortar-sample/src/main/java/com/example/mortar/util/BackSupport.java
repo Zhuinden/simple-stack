@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.example.mortar.screen;
+package com.example.mortar.util;
 
 import android.view.View;
 
-import com.example.mortar.util.HandlesBack;
 import com.zhuinden.simplestack.navigator.Navigator;
 
 /**
  * Support for {@link HandlesBack}.
  */
 public class BackSupport {
-
     public static boolean onBackPressed(View childView) {
         if(childView instanceof HandlesBack) {
             if(((HandlesBack) childView).onBackPressed()) {

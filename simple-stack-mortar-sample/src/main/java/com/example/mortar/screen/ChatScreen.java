@@ -15,7 +15,6 @@
  */
 package com.example.mortar.screen;
 
-import android.os.Bundle;
 import android.util.Log;
 
 import com.example.mortar.R;
@@ -24,14 +23,15 @@ import com.example.mortar.core.SingletonComponent;
 import com.example.mortar.model.Chat;
 import com.example.mortar.model.Chats;
 import com.example.mortar.model.Message;
-import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.BaseKey;
+import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.ChatView;
 import com.example.mortar.view.Confirmation;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.navigator.Navigator;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 
@@ -58,6 +58,7 @@ public class ChatScreen
                         .singletonComponent(singletonComponent) //
                         .module(new Module(conversationIndex)) //
                         .build());
+        node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
 
     @Override
@@ -118,7 +119,7 @@ public class ChatScreen
         }
 
         @Override
-        public void onLoad(Bundle savedInstanceState) {
+        public void onLoad(StateBundle savedInstanceState) {
             if(!hasView()) {
                 return;
             }
@@ -181,5 +182,10 @@ public class ChatScreen
         private void ensureStopped() {
             running.dispose();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ChatScreen{" + "conversationIndex=" + conversationIndex + '}';
     }
 }

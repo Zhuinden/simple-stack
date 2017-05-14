@@ -17,24 +17,24 @@ package com.example.mortar.core;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.example.mortar.R;
 import com.example.mortar.android.ActionBarOwner;
-import com.example.mortar.nodes.NodeContextCreationStrategy;
+import com.example.mortar.nodes.NodeClearManager;
+import com.example.mortar.nodes.NodeCreationManager;
+import com.example.mortar.nodes.NodeStateManager;
 import com.example.mortar.nodes.TreeNodes;
-import com.example.mortar.screen.BackSupport;
 import com.example.mortar.screen.ChatListScreen;
 import com.example.mortar.screen.FriendListScreen;
+import com.example.mortar.util.BackSupport;
 import com.example.mortar.util.DaggerService;
+import com.example.mortar.util.NodePrinter;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.KeyParceler;
@@ -43,6 +43,7 @@ import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestack.navigator.StateKey;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 
@@ -60,7 +61,6 @@ public class MortarDemoActivity
 
     private ServiceTree.Node activityScope;
     private ActionBarOwner.MenuAction actionBarMenuAction;
-    private DefaultStateChanger defaultStateChanger;
 
     @Inject
     ActionBarOwner actionBarOwner;
@@ -70,6 +70,9 @@ public class MortarDemoActivity
 
     @Inject
     ServiceTree serviceTree;
+
+    @Inject
+    NodeStateManager nodeStateManager;
 
     private FrameLayout container;
 
@@ -96,6 +99,14 @@ public class MortarDemoActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState != null) {
+            StateBundle rootBundle = savedInstanceState.getParcelable(NodeStateManager.SERVICE_STATES);
+            if(rootBundle != null) { // global service state is restored after process death
+                SingletonComponent singletonComponent = DaggerService.get(this); // not yet injected by field injection
+                ServiceTree _serviceTree = singletonComponent.serviceTree();
+                _serviceTree.registerRootService(NodeStateManager.SERVICE_STATES, rootBundle);
+            }
+        }
         ServiceTree.Node parentScope = TreeNodes.getNode(getApplication());
 
         String scopeName = getLocalClassName() + "-task-" + getTaskId();
@@ -112,11 +123,21 @@ public class MortarDemoActivity
         container = (FrameLayout) findViewById(R.id.container);
         Navigator.configure()
                 .setKeyParceler(keyParceler)
+                .addStateChangeCompletionListener(new NodeClearManager(serviceTree,
+                        nodeStateManager)) // to delete un-used mortar scopes
                 .setStateChanger(DefaultStateChanger.configure()
                         .setExternalStateChanger(this)
-                        .setContextCreationStrategy(new NodeContextCreationStrategy(serviceTree, activityScope))
+                        .setContextCreationStrategy(new NodeCreationManager(serviceTree,
+                                activityScope,
+                                nodeStateManager))
                         .create(this, container))
                 .install(this, container, HistoryBuilder.single(new ChatListScreen()));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(NodeStateManager.SERVICE_STATES, nodeStateManager.persistStates());
     }
 
     @Override
@@ -179,7 +200,7 @@ public class MortarDemoActivity
         menu.add("Log Scope Hierarchy").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // TODO: log service tree hierarchy
+                Log.i("MORTAR", NodePrinter.scopeHierarchyToString(activityScope));
                 return true;
             }
         });

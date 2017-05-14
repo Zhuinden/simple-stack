@@ -18,6 +18,7 @@ package com.example.mortar.core;
 import com.example.mortar.android.ActionBarOwner;
 import com.example.mortar.model.Chats;
 import com.example.mortar.model.QuoteService;
+import com.example.mortar.nodes.NodeStateManager;
 import com.example.mortar.util.GsonParceler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -57,7 +58,7 @@ public class RootModule {
     @Provides
     @Singleton
     Retrofit retrofit(Gson gson) {
-        return new Retrofit.Builder().baseUrl("http://www.iheartquotes.com/api/v1/")
+        return new Retrofit.Builder().baseUrl("http://quotes.rest/")
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
@@ -71,5 +72,11 @@ public class RootModule {
     @Provides
     ServiceTree serviceTree() {
         return serviceTree;
+    }
+
+    @Provides
+    @Singleton
+    NodeStateManager nodeStateManager(ServiceTree serviceTree) {
+        return new NodeStateManager(serviceTree);
     }
 }

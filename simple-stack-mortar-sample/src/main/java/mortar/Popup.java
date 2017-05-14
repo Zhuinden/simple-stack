@@ -21,8 +21,8 @@ import android.os.Parcelable;
 /**
  * Implemented by classes that run a popup display for a view, typically a dialog.
  *
- * @see PopupPresenter
  * @param <D> info to display
+ * @see PopupPresenter
  */
 public interface Popup<D extends Parcelable, R> {
     /**

@@ -17,9 +17,11 @@ package com.example.mortar.core;
 
 import android.app.Application;
 
+import com.example.mortar.nodes.NodeStateManager;
 import com.example.mortar.nodes.TreeNodes;
 import com.example.mortar.util.DaggerService;
 import com.zhuinden.servicetree.ServiceTree;
+import com.zhuinden.statebundle.StateBundle;
 
 public class MortarDemoApplication
         extends Application {
@@ -30,6 +32,7 @@ public class MortarDemoApplication
         if(serviceTree == null) {
             serviceTree = new ServiceTree();
             serviceTree.registerRootService(DaggerService.SERVICE_NAME, DaggerSingletonComponent.builder().rootModule(new RootModule(serviceTree)).build());
+            serviceTree.registerRootService(NodeStateManager.SERVICE_STATES, new StateBundle());
             // MortarScope.buildRootScope()
             //.withService(ObjectGraphService.SERVICE_NAME, ObjectGraph.create(new RootModule()))
             //.build("Root");

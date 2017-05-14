@@ -3,6 +3,7 @@ package com.example.mortar.core;
 import com.example.mortar.android.ActionBarOwner;
 import com.example.mortar.model.Chats;
 import com.example.mortar.model.QuoteService;
+import com.example.mortar.nodes.NodeStateManager;
 import com.google.gson.Gson;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.KeyParceler;
@@ -24,6 +25,8 @@ public interface SingletonComponent {
     KeyParceler keyParceler();
 
     ServiceTree serviceTree();
+
+    NodeStateManager nodeStateManager();
 
     ActionBarOwner actionBarOwner();
 

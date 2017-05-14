@@ -17,7 +17,7 @@ public class TreeNodes {
     public static ServiceTree.Node getNode(Context context) {
         ServiceTree.Node node = NodeContextWrapper.get(context);
         if(node == null) {
-            node = NodeContextWrapper.get(context.getApplicationContext());
+            node = NodeContextWrapper.get(context.getApplicationContext()); // <-- workaround also in Mortar
         }
         if(node == null) {
             throw new IllegalStateException("No node was found in context [" + context + "]");

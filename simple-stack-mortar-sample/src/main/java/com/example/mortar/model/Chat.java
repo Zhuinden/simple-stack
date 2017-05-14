@@ -17,6 +17,9 @@ package com.example.mortar.model;
 
 import android.text.TextUtils;
 
+import com.example.mortar.model.quotes.Quote;
+import com.example.mortar.model.quotes.Quotes;
+
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -64,12 +67,14 @@ public class Chat {
                     if(random.nextInt(PROBABILITY) == 0) {
                         try {
                             User from = users.get(random.nextInt(users.size()));
-                            Response<QuoteService.Quote> response = chats.service.getQuote().execute();
-                            QuoteService.Quote quote = response.body();
-                            if(quote == null) {
-                                throw new Exception("Could not download quotes [" + response.errorBody() + "]");
+                            Response<Quotes> response = chats.service.getQuote().execute();
+                            Quotes quotes = response.body();
+                            if(quotes == null) {
+                                throw new Exception("Could not download quotes [" + response.errorBody()
+                                        .string() + "] ");
                             }
-                            Message next = new Message(from, quote.quote);
+                            Quote quote = quotes.getContents().getQuotes().get(0);
+                            Message next = new Message(from, quote.getQuote());
                             messages.add(next);
                             if(!emitter.isDisposed()) {
                                 emitter.onNext(next);

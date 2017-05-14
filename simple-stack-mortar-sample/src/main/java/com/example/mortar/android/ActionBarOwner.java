@@ -16,10 +16,9 @@
 package com.example.mortar.android;
 
 import android.content.Context;
-import android.os.Bundle;
 
 import com.example.mortar.util.ViewPresenter;
-import com.example.mortar.util.Subscope;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Singleton;
 
@@ -79,7 +78,7 @@ public class ActionBarOwner
     }
 
     @Override
-    public void onLoad(Bundle savedInstanceState) {
+    public void onLoad(StateBundle savedInstanceState) {
         if(config != null) {
             update();
         }

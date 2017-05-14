@@ -2,8 +2,6 @@ package com.example.mortar.util;
 
 import android.content.Context;
 
-import com.example.mortar.core.MortarDemoActivity;
-import com.example.mortar.core.SingletonComponent;
 import com.zhuinden.servicetree.ServiceTree;
 
 /**
@@ -20,6 +18,13 @@ public class DaggerService {
     @SuppressWarnings("unchecked")
     public static <T> T get(Context context) {
         // noinspection ResourceType
-        return (T)context.getSystemService(SERVICE_NAME);
+        T t = (T) context.getSystemService(SERVICE_NAME);
+
+        // Mortar workaround
+        if(t == null) { // <-- activity base context is not yet set, and we need to look this up from application
+            // noinspection ResourceType
+            t = (T) context.getApplicationContext().getSystemService(SERVICE_NAME); // <-- workaround also in mortar
+        }
+        return t;
     }
 }

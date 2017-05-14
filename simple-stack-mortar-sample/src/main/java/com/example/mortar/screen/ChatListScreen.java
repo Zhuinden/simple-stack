@@ -15,19 +15,18 @@
  */
 package com.example.mortar.screen;
 
-import android.os.Bundle;
-
 import com.example.mortar.R;
 import com.example.mortar.core.SingletonComponent;
 import com.example.mortar.model.Chat;
 import com.example.mortar.model.Chats;
-import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.BaseKey;
+import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.ChatListView;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.navigator.Navigator;
+import com.zhuinden.statebundle.StateBundle;
 
 import java.util.List;
 
@@ -44,6 +43,7 @@ public class ChatListScreen
                 DaggerChatListScreen_Component.builder() //
                         .singletonComponent(singletonComponent) //
                         .build());
+        node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ChatListScreen
         }
 
         @Override
-        public void onLoad(Bundle savedInstanceState) {
+        public void onLoad(StateBundle savedInstanceState) {
             super.onLoad(savedInstanceState);
             if(!hasView()) {
                 return;
@@ -90,5 +90,10 @@ public class ChatListScreen
         public void onConversationSelected(int position) {
             Navigator.getBackstack(getView().getContext()).goTo(new ChatScreen(position));
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ChatListScreen{}";
     }
 }

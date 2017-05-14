@@ -15,20 +15,22 @@
  */
 package mortar;
 
-import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.example.mortar.util.ViewPresenter;
+import com.zhuinden.statebundle.StateBundle;
 
 /**
  * @param <D> the type of info this dialog displays. D must provide value-based implementations
- * of {@link #hashCode()} and {@link #equals(Object)} in order for debouncing code in {@link #show}
- * to work properly.
+ *            of {@link #hashCode()} and {@link #equals(Object)} in order for debouncing code in {@link #show}
+ *            to work properly.
  *
- * When using multiple {@link PopupPresenter}s of the same type in the same view, construct them
- * with {@link #PopupPresenter(String)} to give them a name to distinguish them.
+ *            When using multiple {@link PopupPresenter}s of the same type in the same view, construct them
+ *            with {@link #PopupPresenter(String)} to give them a name to distinguish them.
  */
-public abstract class PopupPresenter<D extends Parcelable, R> extends ViewPresenter<Popup<D, R>> {
+public abstract class PopupPresenter<D extends Parcelable, R>
+        extends ViewPresenter<Popup<D, R>> {
     private static final boolean WITH_FLOURISH = true;
 
     private final String whatToShowKey;
@@ -37,7 +39,7 @@ public abstract class PopupPresenter<D extends Parcelable, R> extends ViewPresen
 
     /**
      * @param customStateKey custom key name for saving state, useful when you have multiple instance
-     * of the same PopupPresenter class tied to a view.
+     *                       of the same PopupPresenter class tied to a view.
      */
     protected PopupPresenter(String customStateKey) {
         this.whatToShowKey = getClass().getName() + customStateKey;
@@ -52,23 +54,29 @@ public abstract class PopupPresenter<D extends Parcelable, R> extends ViewPresen
     }
 
     public void show(D info) {
-        if (whatToShow == info || whatToShow != null && whatToShow.equals(info)) {
+        if(whatToShow == info || whatToShow != null && whatToShow.equals(info)) {
             // It's very likely this is a button bounce
             // http://stackoverflow.com/questions/2886407/dealing-with-rapid-tapping-on-buttons
             return;
         }
 
         whatToShow = info;
-        if (!hasView()) return;
+        if(!hasView()) {
+            return;
+        }
         getView().show(whatToShow, WITH_FLOURISH, this);
     }
 
     public void dismiss() {
-        if (whatToShow != null) {
+        if(whatToShow != null) {
             whatToShow = null;
-            if (!hasView()) return;
+            if(!hasView()) {
+                return;
+            }
             Popup<D, R> popUp = getView();
-            if (popUp.isShowing()) popUp.dismiss(WITH_FLOURISH);
+            if(popUp.isShowing()) {
+                popUp.dismiss(WITH_FLOURISH);
+            }
         }
     }
 
@@ -83,35 +91,47 @@ public abstract class PopupPresenter<D extends Parcelable, R> extends ViewPresen
 //        return BundleService.getBundleService(view.getContext());
 //    }
 
-    @Override public void dropView(Popup<D, R> view) {
+    @Override
+    public void dropView(Popup<D, R> view) {
         Popup<D, R> oldView = getView();
-        if (oldView == view && oldView.isShowing()) oldView.dismiss(!WITH_FLOURISH);
+        if(oldView == view && oldView.isShowing()) {
+            oldView.dismiss(!WITH_FLOURISH);
+        }
         super.dropView(view);
     }
 
-    @Override public void onLoad(Bundle savedInstanceState) {
-        if (whatToShow == null && savedInstanceState != null) {
+    @Override
+    public void onLoad(StateBundle savedInstanceState) {
+        if(whatToShow == null && savedInstanceState != null) {
             whatToShow = savedInstanceState.getParcelable(whatToShowKey);
         }
 
-        if (whatToShow == null) return;
+        if(whatToShow == null) {
+            return;
+        }
 
-        if (!hasView()) return;
+        if(!hasView()) {
+            return;
+        }
         Popup<D, R> view = getView();
 
-        if (!view.isShowing()) {
+        if(!view.isShowing()) {
             view.show(whatToShow, !WITH_FLOURISH, this);
         }
     }
 
-    @Override public void onSave(Bundle outState) {
-        if (whatToShow != null) {
+    @Override
+    public void onSave(@NonNull StateBundle outState) {
+        if(whatToShow != null) {
             outState.putParcelable(whatToShowKey, whatToShow);
         }
     }
 
-    @Override public void onExitScope() {
+    @Override
+    public void onExitScope() {
         Popup<D, R> popUp = getView();
-        if (popUp != null && popUp.isShowing()) popUp.dismiss(!WITH_FLOURISH);
+        if(popUp != null && popUp.isShowing()) {
+            popUp.dismiss(!WITH_FLOURISH);
+        }
     }
 } 

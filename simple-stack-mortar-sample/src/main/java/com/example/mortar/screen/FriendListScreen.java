@@ -15,19 +15,18 @@
  */
 package com.example.mortar.screen;
 
-import android.os.Bundle;
-
 import com.example.mortar.R;
 import com.example.mortar.core.SingletonComponent;
 import com.example.mortar.model.Chats;
 import com.example.mortar.model.User;
-import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.BaseKey;
+import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.FriendListView;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.navigator.Navigator;
+import com.zhuinden.statebundle.StateBundle;
 
 import java.util.List;
 
@@ -45,6 +44,7 @@ public class FriendListScreen
                 DaggerFriendListScreen_Component.builder() //
                         .singletonComponent(singletonComponent) //
                         .build());
+        node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
 
     @Override
@@ -55,6 +55,8 @@ public class FriendListScreen
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
     @Subscope
     public interface Component {
+        Presenter presenter();
+
         void inject(FriendListView friendListView);
     }
 
@@ -78,7 +80,7 @@ public class FriendListScreen
         }
 
         @Override
-        public void onLoad(Bundle savedInstanceState) {
+        public void onLoad(StateBundle savedInstanceState) {
             super.onLoad(savedInstanceState);
             if(!hasView()) {
                 return;
@@ -89,5 +91,10 @@ public class FriendListScreen
         public void onFriendSelected(int position) {
             Navigator.getBackstack(getView().getContext()).goTo(new FriendScreen(position));
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FriendListScreen{}";
     }
 }
