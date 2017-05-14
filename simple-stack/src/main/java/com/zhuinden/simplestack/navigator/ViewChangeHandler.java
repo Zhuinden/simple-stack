@@ -22,7 +22,7 @@ import android.view.ViewGroup;
 /**
  * An interface that represents the view change when a state change occurs.
  *
- * Specified in {@link StateKey}, if {@link DefaultStateChanger} is used.
+ * Specified in {@link StateKey}, if {@link DefaultStateChanger} is used with default {@link DefaultStateChanger.GetViewChangeHandlerStrategy}.
  */
 public interface ViewChangeHandler {
     /**

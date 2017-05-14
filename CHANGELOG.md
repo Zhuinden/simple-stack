@@ -1,8 +1,24 @@
 # Change log
 
--Simple Stack 1.6.2 (2017-05-12)
+-Simple Stack 1.6.2 (2017-05-14)
 --------------------------------
+- MINOR CHANGE: `DefaultStateChanger` no longer explicitly demands a `StateKey`, because both `LayoutInflationStrategy` and `GetViewChangeHandlerStrategy` can be re-defined for custom behavior.
+
+- Added `GetViewChangeHandlerStrategy` to `DefaultStateChanger` to allow re-defining the view change handler behavior.
+
 - Added `ContextCreationStrategy` to `DefaultStateChanger` to support Mortar scopes, or anything similar in design.
+
+- Added `BackstackManager.StateChangeCompletionListener` to add a hook where you can listen for the completion of state changes reliably - even if they were forced to execute.
+
+Also added `addStateChangeCompletionListener` to `BackstackDelegate` and `Navigator.Installer` accordingly. 
+
+Please make sure it does not retain a reference to enclosing Activity, to avoid memory leaks.
+
+- Minor fix: `setKeyFilter()`, `setKeyParceler()`, and `setStateClearStrategy()` in `BackstackDelegate` now throw if they are set after calling `onCreate()`, as per docs.
+
+- Bump `state-bundle` version to `1.1.5`
+
+- ADDED: `simple-stack-mortar-sample`, which is based on `mortar-sample` from `square/mortar`, but using `Simple-Stack` and `Service-Tree`.
 
 -Simple Stack 1.6.1 (2017-05-08)
 --------------------------------

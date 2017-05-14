@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -126,5 +127,35 @@ public class BackstackManagerTest {
         } catch(IllegalStateException e) {
             // OK!
         }
+    }
+
+    @Test
+    public void stateChangeCompletionListenerIsCalledCorrectly() {
+        final TestKey initial = new TestKey("initial");
+        final TestKey other = new TestKey("other");
+        final AtomicInteger atomicInteger = new AtomicInteger(0);
+        final List<Integer> integers = new ArrayList<>();
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setup(HistoryBuilder.single(initial));
+        BackstackManager.StateChangeCompletionListener stateChangeCompletionListener = new BackstackManager.StateChangeCompletionListener() {
+            @Override
+            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+                integers.add(atomicInteger.getAndIncrement());
+            }
+        };
+        backstackManager.addStateChangeCompletionListener(stateChangeCompletionListener);
+        backstackManager.setStateChanger(stateChanger);
+        backstackManager.getBackstack().goTo(other);
+        backstackManager.getBackstack().goBack();
+        assertThat(integers).containsExactly(0, 1, 2);
+        backstackManager.removeStateChangeCompletionListener(stateChangeCompletionListener);
+        backstackManager.getBackstack().setHistory(HistoryBuilder.single(other), StateChange.REPLACE);
+        assertThat(integers).containsExactly(0, 1, 2);
+        backstackManager.addStateChangeCompletionListener(stateChangeCompletionListener);
+        backstackManager.getBackstack().setHistory(HistoryBuilder.single(initial), StateChange.REPLACE);
+        assertThat(integers).containsExactly(0, 1, 2, 3);
+        backstackManager.removeStateChangeCompletionListener(stateChangeCompletionListener);
+        backstackManager.getBackstack().goTo(other);
+        assertThat(integers).containsExactly(0, 1, 2, 3);
     }
 }

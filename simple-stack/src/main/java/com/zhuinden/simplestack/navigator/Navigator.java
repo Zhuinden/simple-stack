@@ -35,6 +35,7 @@ import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.StateChanger;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -59,11 +60,12 @@ public class Navigator {
         BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
         boolean isInitializeDeferred = false;
         boolean shouldPersistContainerChild = true;
+        List<BackstackManager.StateChangeCompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
         /**
          * Sets the state changer used by the navigator's backstack.
          *
-         * If not set, then {@link DefaultStateChanger} is used, which requires keys to be {@link StateKey}.
+         * If not set, then {@link DefaultStateChanger} is used, which by default behavior requires keys to be {@link StateKey}.
          *
          * @param stateChanger if set, cannot be null.
          * @return the installer
@@ -142,6 +144,20 @@ public class Navigator {
         }
 
         /**
+         * Adds a {@link BackstackManager.StateChangeCompletionListener}, which will be added to the {@link BackstackManager} when it is initialized.
+         *
+         * @param stateChangeCompletionListener the state change completion listener
+         * @return the installer
+         */
+        public Installer addStateChangeCompletionListener(@NonNull BackstackManager.StateChangeCompletionListener stateChangeCompletionListener) {
+            if(stateChangeCompletionListener == null) {
+                throw new IllegalArgumentException("If added, state change completion listener cannot be null!");
+            }
+            this.stateChangeCompletionListeners.add(stateChangeCompletionListener);
+            return this;
+        }
+
+        /**
          * Installs the {@link BackstackHost}.
          *
          * @param activity    the activity
@@ -171,8 +187,8 @@ public class Navigator {
      *
      * This means that {@link DefaultStateChanger} and DefaultStateClearStrategy are used.
      *
-     * @param activity the activity which will host the backstack
-     * @param container the container in which custom viewgroups are hosted (to save its child's state in onSaveInstanceState())
+     * @param activity    the activity which will host the backstack
+     * @param container   the container in which custom viewgroups are hosted (to save its child's state in onSaveInstanceState())
      * @param initialKeys the keys used to initialize the backstack
      */
     public static void install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<Object> initialKeys) {
@@ -199,6 +215,7 @@ public class Navigator {
         backstackHost.keyFilter = installer.keyFilter;
         backstackHost.keyParceler = installer.keyParceler;
         backstackHost.stateClearStrategy = installer.stateClearStrategy;
+        backstackHost.stateChangeCompletionListeners = installer.stateChangeCompletionListeners;
         backstackHost.shouldPersistContainerChild = installer.shouldPersistContainerChild;
         backstackHost.container = container;
         backstackHost.initialKeys = initialKeys;

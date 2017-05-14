@@ -15,7 +15,6 @@
  */
 package com.zhuinden.simplestack.navigator;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,7 +29,9 @@ import com.zhuinden.simplestack.navigator.changehandlers.NoOpViewChangeHandler;
 /**
  * A default state changer that handles view changes, and allows an optional external state changer (which is executed before the view change).
  *
- * To work, all keys must implement {@link StateKey}, which specifies a layout, and a {@link ViewChangeHandler}.
+ * For the default behavior to work, all keys must implement {@link StateKey}, which specifies a layout, and a {@link ViewChangeHandler}.
+ *
+ * But if {@link LayoutInflationStrategy} and {@link GetViewChangeHandlerStrategy} are re-defined, then this is no longer necessary.
  */
 public final class DefaultStateChanger
         implements StateChanger {
@@ -61,8 +62,8 @@ public final class DefaultStateChanger
     private static class DefaultLayoutInflationStrategy
             implements LayoutInflationStrategy {
         @Override
-        public void inflateLayout(StateChange stateChange, StateKey key, Context context, ViewGroup container, Callback callback) {
-            final View newView = LayoutInflater.from(context).inflate(key.layout(), container, false);
+        public void inflateLayout(StateChange stateChange, Object key, Context context, ViewGroup container, Callback callback) {
+            final View newView = LayoutInflater.from(context).inflate(((StateKey) key).layout(), container, false);
             callback.layoutInflationComplete(newView);
         }
     }
@@ -95,6 +96,22 @@ public final class DefaultStateChanger
         @Override
         public Context createContext(@NonNull Context baseContext, @NonNull Object newKey, @NonNull ViewGroup container, @NonNull StateChange stateChange) {
             return stateChange.createContext(baseContext, newKey);
+        }
+    }
+
+    private static class DefaultGetViewChangeHandlerStrategy
+            implements GetViewChangeHandlerStrategy {
+        @Override
+        public ViewChangeHandler getViewChangeHandler(@NonNull StateChange stateChange, @NonNull ViewGroup container, @NonNull Object previousKey, @NonNull Object newKey, @NonNull View previousView, @NonNull View newView, int direction) {
+            ViewChangeHandler viewChangeHandler;
+            if(direction == StateChange.FORWARD) {
+                viewChangeHandler = ((StateKey) newKey).viewChangeHandler();
+            } else if(previousKey != null && direction == StateChange.BACKWARD) {
+                viewChangeHandler = ((StateKey) previousKey).viewChangeHandler();
+            } else {
+                viewChangeHandler = NO_OP_VIEW_CHANGE_HANDLER;
+            }
+            return viewChangeHandler;
         }
     }
 
@@ -161,6 +178,25 @@ public final class DefaultStateChanger
     }
 
     /**
+     * Allows specifying a custom way to obtain the view change handler for the view change.
+     */
+    public interface GetViewChangeHandlerStrategy {
+        /**
+         * Gets the view change handler used for the view change, between the given keys and with specified direction.
+         *
+         * @param stateChange  the state change
+         * @param container    the container
+         * @param previousKey  the previous key
+         * @param newKey       the new key
+         * @param previousView the previous view
+         * @param newView      the new view
+         * @param direction    the direction
+         * @return the view change handler
+         */
+        ViewChangeHandler getViewChangeHandler(@NonNull StateChange stateChange, @NonNull ViewGroup container, @NonNull Object previousKey, @NonNull Object newKey, @NonNull View previousView, @NonNull View newView, int direction);
+    }
+
+    /**
      * Allows defining a custom way of determining what the previous view is.
      */
     public interface GetPreviousViewStrategy {
@@ -189,14 +225,13 @@ public final class DefaultStateChanger
 
         /**
          * This method needs to inflate the new view, preferably using the provided context.
-         *
-         * @param stateChange the state change
+         *  @param stateChange the state change
          * @param key         the new key this view is inflated for
          * @param context     the context the layout inflater is originally acquired from
          * @param container   the container
          * @param callback    the inflation callback that must be called when layout inflation is complete
          */
-        void inflateLayout(StateChange stateChange, StateKey key, Context context, ViewGroup container, Callback callback);
+        void inflateLayout(StateChange stateChange, Object key, Context context, ViewGroup container, Callback callback);
     }
 
     /**
@@ -229,6 +264,7 @@ public final class DefaultStateChanger
     private ViewChangeCompletionListener viewChangeCompletionListener;
     private LayoutInflationStrategy layoutInflationStrategy;
     private StatePersistenceStrategy statePersistenceStrategy;
+    private GetViewChangeHandlerStrategy getViewChangeHandlerStrategy;
     private GetPreviousViewStrategy getPreviousViewStrategy;
     private ContextCreationStrategy contextCreationStrategy;
 
@@ -246,6 +282,7 @@ public final class DefaultStateChanger
         StatePersistenceStrategy statePersistenceStrategy = null;
         GetPreviousViewStrategy getPreviousViewStrategy = null;
         ContextCreationStrategy contextCreationStrategy = null;
+        GetViewChangeHandlerStrategy getViewChangeHandlerStrategy = null;
 
         private Configurer() {
         }
@@ -349,6 +386,20 @@ public final class DefaultStateChanger
         }
 
         /**
+         * Sets the {@link GetViewChangeHandlerStrategy}. It is used to obtain the view change handler for a view change.
+         *
+         * @param getViewChangeHandlerStrategy the get view change handler strategy
+         * @return the configurer
+         */
+        public Configurer setGetViewChangeHandlerStrategy(GetViewChangeHandlerStrategy getViewChangeHandlerStrategy) {
+            if(getViewChangeHandlerStrategy == null) {
+                throw new NullPointerException("If set, get view change handler strategy cannot be null!");
+            }
+            this.getViewChangeHandlerStrategy = getViewChangeHandlerStrategy;
+            return this;
+        }
+
+        /**
          * Creates the {@link DefaultStateChanger} with the specified parameters.
          *
          * @param baseContext the base context used to inflate the views
@@ -363,8 +414,7 @@ public final class DefaultStateChanger
                     viewChangeCompletionListener,
                     layoutInflationStrategy,
                     statePersistenceStrategy,
-                    getPreviousViewStrategy,
-                    contextCreationStrategy);
+                    getPreviousViewStrategy, contextCreationStrategy, getViewChangeHandlerStrategy);
         }
     }
 
@@ -388,10 +438,10 @@ public final class DefaultStateChanger
      * @return the state changer
      */
     public static DefaultStateChanger create(Context baseContext, ViewGroup container) {
-        return new DefaultStateChanger(baseContext, container, null, null, null, null, null, null, null);
+        return new DefaultStateChanger(baseContext, container, null, null, null, null, null, null, null, null);
     }
 
-    DefaultStateChanger(@NonNull Context baseContext, @NonNull ViewGroup container, @Nullable StateChanger externalStateChanger, ViewChangeStartListener viewChangeStartListener, @Nullable ViewChangeCompletionListener viewChangeCompletionListener, @Nullable LayoutInflationStrategy layoutInflationStrategy, @Nullable StatePersistenceStrategy statePersistenceStrategy, @Nullable GetPreviousViewStrategy getPreviousViewStrategy, @Nullable ContextCreationStrategy contextCreationStrategy) {
+    DefaultStateChanger(@NonNull Context baseContext, @NonNull ViewGroup container, @Nullable StateChanger externalStateChanger, ViewChangeStartListener viewChangeStartListener, @Nullable ViewChangeCompletionListener viewChangeCompletionListener, @Nullable LayoutInflationStrategy layoutInflationStrategy, @Nullable StatePersistenceStrategy statePersistenceStrategy, @Nullable GetPreviousViewStrategy getPreviousViewStrategy, @Nullable ContextCreationStrategy contextCreationStrategy, GetViewChangeHandlerStrategy getViewChangeHandlerStrategy) {
         if(baseContext == null) {
             throw new NullPointerException("baseContext cannot be null");
         }
@@ -428,6 +478,10 @@ public final class DefaultStateChanger
             contextCreationStrategy = new DefaultContextCreationStrategy();
         }
         this.contextCreationStrategy = contextCreationStrategy;
+        if(getViewChangeHandlerStrategy == null) {
+            getViewChangeHandlerStrategy = new DefaultGetViewChangeHandlerStrategy();
+        }
+        this.getViewChangeHandlerStrategy = getViewChangeHandlerStrategy;
     }
 
     private void finishStateChange(StateChange stateChange, ViewGroup container, View previousView, View newView, final Callback completionCallback) {
@@ -452,9 +506,10 @@ public final class DefaultStateChanger
                     completionCallback.stateChangeComplete();
                     return;
                 }
-                StateKey previousKey = stateChange.topPreviousState();
-                StateKey newKey = stateChange.topNewState();
-                performViewChange(previousKey, newKey, stateChange, completionCallback);
+                performViewChange(stateChange.topPreviousState(),
+                        stateChange.topNewState(),
+                        stateChange,
+                        completionCallback);
             }
         });
     }
@@ -466,10 +521,8 @@ public final class DefaultStateChanger
      * @param newKey             the new key
      * @param stateChange        the state change
      * @param completionCallback the completion callback
-     * @param <T>                the type of the previous key
-     * @param <U>                the type of the new key
      */
-    public final <T extends StateKey, U extends StateKey> void performViewChange(T previousKey, U newKey, final StateChange stateChange, final Callback completionCallback) {
+    public final void performViewChange(Object previousKey, Object newKey, final StateChange stateChange, final Callback completionCallback) {
         performViewChange(previousKey, newKey, stateChange, stateChange.getDirection(), completionCallback);
     }
 
@@ -481,10 +534,8 @@ public final class DefaultStateChanger
      * @param stateChange        the state change
      * @param direction          the direction
      * @param completionCallback the completion callback
-     * @param <T>                the type of the previous key
-     * @param <U>                the type of the new key
      */
-    public final <T extends StateKey, U extends StateKey> void performViewChange(final T previousKey, final U newKey, final StateChange stateChange, final int direction, final Callback completionCallback) {
+    public void performViewChange(final Object previousKey, final Object newKey, final StateChange stateChange, final int direction, final Callback completionCallback) {
         final View previousView = getPreviousViewStrategy.getPreviousView(container, stateChange, previousKey);
         if(previousView != null && previousKey != null) {
             statePersistenceStrategy.persistViewToState(previousKey, previousView);
@@ -513,14 +564,13 @@ public final class DefaultStateChanger
                                                     newView,
                                                     completionCallback);
                                         } else {
-                                            final ViewChangeHandler viewChangeHandler;
-                                            if(direction == StateChange.FORWARD) {
-                                                viewChangeHandler = newKey.viewChangeHandler();
-                                            } else if(previousKey != null && direction == StateChange.BACKWARD) {
-                                                viewChangeHandler = previousKey.viewChangeHandler();
-                                            } else {
-                                                viewChangeHandler = NO_OP_VIEW_CHANGE_HANDLER;
-                                            }
+                                            final ViewChangeHandler viewChangeHandler = getViewChangeHandlerStrategy.getViewChangeHandler(
+                                                    stateChange,
+                                                    container,
+                                                    previousKey,
+                                                    newKey,
+                                                    previousView,
+                                                    newView, direction);
                                             viewChangeHandler.performViewChange(container,
                                                     previousView,
                                                     newView,

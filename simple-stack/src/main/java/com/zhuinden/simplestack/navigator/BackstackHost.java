@@ -42,10 +42,11 @@ public final class BackstackHost
     }
 
     StateChanger stateChanger;
-
     KeyFilter keyFilter;
     KeyParceler keyParceler;
     BackstackManager.StateClearStrategy stateClearStrategy;
+    List<BackstackManager.StateChangeCompletionListener> stateChangeCompletionListeners;
+
     boolean shouldPersistContainerChild;
 
     BackstackManager backstackManager;
@@ -67,6 +68,9 @@ public final class BackstackHost
             backstackManager.setKeyFilter(keyFilter);
             backstackManager.setKeyParceler(keyParceler);
             backstackManager.setStateClearStrategy(stateClearStrategy);
+            for(BackstackManager.StateChangeCompletionListener completionListener : stateChangeCompletionListeners) {
+                backstackManager.addStateChangeCompletionListener(completionListener);
+            }
             backstackManager.setup(initialKeys);
             if(savedInstanceState != null) {
                 backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable("NAVIGATOR_STATE_BUNDLE"));
