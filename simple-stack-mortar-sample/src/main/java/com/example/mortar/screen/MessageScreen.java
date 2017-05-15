@@ -66,7 +66,7 @@ public class MessageScreen
 
     @Override
     public int hashCode() {
-        return MessageScreen.class.hashCode();
+        return 37 + MessageScreen.class.hashCode() + 37 * chatId + 37 * messageId;
     }
 
     @Override

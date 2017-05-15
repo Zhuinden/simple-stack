@@ -59,7 +59,7 @@ public class FriendScreen
 
     @Override
     public int hashCode() {
-        return FriendScreen.class.hashCode();
+        return 37 + FriendScreen.class.hashCode() + 37 * index;
     }
 
     @Override

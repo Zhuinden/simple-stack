@@ -55,7 +55,7 @@ public class ChatListScreen
 
     @Override
     public int hashCode() {
-        return ChatListScreen.class.hashCode();
+        return 37 + ChatListScreen.class.hashCode();
     }
 
     @Override
