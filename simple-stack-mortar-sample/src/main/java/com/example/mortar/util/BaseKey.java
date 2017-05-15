@@ -15,9 +15,4 @@ public abstract class BaseKey implements Key {
     public ViewChangeHandler viewChangeHandler() {
         return new SegueViewChangeHandler();
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && obj.getClass().isAssignableFrom(getClass()) && obj.toString().equals(toString());
-    }
 }

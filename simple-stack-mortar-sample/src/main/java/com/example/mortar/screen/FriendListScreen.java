@@ -54,6 +54,21 @@ public class FriendListScreen
         return R.layout.friend_list_view;
     }
 
+    @Override
+    public int hashCode() {
+        return FriendListScreen.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof FriendListScreen;
+    }
+
+    @Override
+    public String toString() {
+        return "FriendListScreen{}";
+    }
+
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
     @Subscope
     public interface Component {
@@ -93,10 +108,5 @@ public class FriendListScreen
         public void onFriendSelected(int position) {
             Navigator.getBackstack(getView().getContext()).goTo(new FriendScreen(position));
         }
-    }
-
-    @Override
-    public String toString() {
-        return "FriendListScreen{}";
     }
 }

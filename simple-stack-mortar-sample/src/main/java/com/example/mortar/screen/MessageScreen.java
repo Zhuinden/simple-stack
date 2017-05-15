@@ -58,9 +58,25 @@ public class MessageScreen
         node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
 
+
     @Override
     public int layout() {
         return R.layout.message_view;
+    }
+
+    @Override
+    public int hashCode() {
+        return MessageScreen.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof MessageScreen && ((MessageScreen) obj).chatId == chatId && ((MessageScreen) obj).messageId == messageId;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageScreen{" + "chatId=" + chatId + ", messageId=" + messageId + '}';
     }
 
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
@@ -130,11 +146,6 @@ public class MessageScreen
                 Navigator.getBackstack(getView().getContext()).goTo(new FriendScreen(position));
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return "MessageScreen{" + "chatId=" + chatId + ", messageId=" + messageId + '}';
     }
 }
 

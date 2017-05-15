@@ -53,6 +53,16 @@ public class ChatListScreen
         return R.layout.chat_list_view;
     }
 
+    @Override
+    public int hashCode() {
+        return ChatListScreen.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof ChatListScreen;
+    }
+
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
     @Subscope
     public interface Component extends SingletonComponent {

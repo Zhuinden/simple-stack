@@ -57,6 +57,21 @@ public class FriendScreen
         return R.layout.friend_view;
     }
 
+    @Override
+    public int hashCode() {
+        return FriendScreen.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof FriendScreen && ((FriendScreen) obj).index == index;
+    }
+
+    @Override
+    public String toString() {
+        return "FriendScreen{" + "index=" + index + '}';
+    }
+
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
     @Subscope
     public interface Component extends SingletonComponent {
@@ -98,10 +113,5 @@ public class FriendScreen
             }
             getView().setText(friend.name);
         }
-    }
-
-    @Override
-    public String toString() {
-        return "FriendScreen{" + "index=" + index + '}';
     }
 }

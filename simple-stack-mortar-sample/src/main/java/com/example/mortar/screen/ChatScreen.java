@@ -89,6 +89,21 @@ public class ChatScreen
         }
     }
 
+    @Override
+    public int hashCode() {
+        return ChatScreen.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof ChatScreen && ((ChatScreen) obj).conversationIndex == conversationIndex;
+    }
+
+    @Override
+    public String toString() {
+        return "ChatScreen{" + "conversationIndex=" + conversationIndex + '}';
+    }
+
     @Subscope
     public static class Presenter
             extends ViewPresenter<ChatView>
@@ -183,10 +198,5 @@ public class ChatScreen
         private void ensureStopped() {
             running.dispose();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "ChatScreen{" + "conversationIndex=" + conversationIndex + '}';
     }
 }
