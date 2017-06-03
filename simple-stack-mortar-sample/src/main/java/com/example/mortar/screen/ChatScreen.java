@@ -30,6 +30,7 @@ import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.ChatView;
 import com.example.mortar.view.Confirmation;
+import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.statebundle.StateBundle;
@@ -43,12 +44,13 @@ import io.reactivex.functions.Action;
 import io.reactivex.observers.DisposableObserver;
 import mortar.PopupPresenter;
 
-public class ChatScreen
+@AutoValue
+public abstract class ChatScreen
         extends BaseKey {
-    private final int conversationIndex;
+    public abstract int conversationIndex();
 
-    public ChatScreen(int conversationIndex) {
-        this.conversationIndex = conversationIndex;
+    public static ChatScreen create(int conversationIndex) {
+        return new AutoValue_ChatScreen(conversationIndex);
     }
 
     @Override
@@ -57,7 +59,7 @@ public class ChatScreen
         node.bindService(DaggerService.SERVICE_NAME, //
                 DaggerChatScreen_Component.builder() //
                         .singletonComponent(singletonComponent) //
-                        .module(new Module(conversationIndex)) //
+                        .module(new Module(conversationIndex())) //
                         .build());
         node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
@@ -87,21 +89,6 @@ public class ChatScreen
         Chat conversation(Chats chats) {
             return chats.getChat(conversationIndex);
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return 37 + ChatScreen.class.hashCode() + 37 * conversationIndex;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && obj instanceof ChatScreen && ((ChatScreen) obj).conversationIndex == conversationIndex;
-    }
-
-    @Override
-    public String toString() {
-        return "ChatScreen{" + "conversationIndex=" + conversationIndex + '}';
     }
 
     @Subscope
@@ -186,7 +173,7 @@ public class ChatScreen
         }
 
         public void onConversationSelected(int position) {
-            Navigator.getBackstack(getView().getContext()).goTo(new MessageScreen(chat.getId(), position));
+            Navigator.getBackstack(getView().getContext()).goTo(MessageScreen.create(chat.getId(), position));
         }
 
         public void visibilityChanged(boolean visible) {
@@ -198,5 +185,10 @@ public class ChatScreen
         private void ensureStopped() {
             running.dispose();
         }
+    }
+
+    @Override
+    public String title() {
+        return "Chat";
     }
 }

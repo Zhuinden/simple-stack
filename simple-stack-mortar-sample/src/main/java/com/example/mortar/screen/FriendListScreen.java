@@ -26,6 +26,7 @@ import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.FriendListView;
+import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.statebundle.StateBundle;
@@ -36,8 +37,12 @@ import javax.inject.Inject;
 
 import dagger.Provides;
 
-public class FriendListScreen
+@AutoValue
+public abstract class FriendListScreen
         extends BaseKey {
+    public static FriendListScreen create() {
+        return new AutoValue_FriendListScreen();
+    }
 
     @Override
     public void bindServices(ServiceTree.Node node) {
@@ -52,21 +57,6 @@ public class FriendListScreen
     @Override
     public int layout() {
         return R.layout.friend_list_view;
-    }
-
-    @Override
-    public int hashCode() {
-        return 37 + FriendListScreen.class.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && obj instanceof FriendListScreen;
-    }
-
-    @Override
-    public String toString() {
-        return "FriendListScreen{}";
     }
 
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
@@ -106,7 +96,12 @@ public class FriendListScreen
         }
 
         public void onFriendSelected(int position) {
-            Navigator.getBackstack(getView().getContext()).goTo(new FriendScreen(position));
+            Navigator.getBackstack(getView().getContext()).goTo(FriendScreen.create(position));
         }
+    }
+
+    @Override
+    public String title() {
+        return "Friend List";
     }
 }

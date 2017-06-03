@@ -19,10 +19,10 @@ import com.example.mortar.android.ActionBarOwner;
 import com.example.mortar.model.Chats;
 import com.example.mortar.model.QuoteService;
 import com.example.mortar.nodes.NodeStateManager;
-import com.example.mortar.util.GsonParceler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zhuinden.servicetree.ServiceTree;
+import com.zhuinden.simplestack.DefaultKeyParceler;
 import com.zhuinden.simplestack.KeyParceler;
 
 import javax.inject.Singleton;
@@ -52,7 +52,8 @@ public class RootModule {
     @Provides
     @Singleton
     KeyParceler keyParceler(Gson gson) {
-        return new GsonParceler(gson);
+        //return new GsonParceler(gson); // removed to support seamless auto-parcel integration
+        return new DefaultKeyParceler();
     }
 
     @Provides

@@ -33,6 +33,7 @@ import com.example.mortar.nodes.TreeNodes;
 import com.example.mortar.screen.ChatListScreen;
 import com.example.mortar.screen.FriendListScreen;
 import com.example.mortar.util.BackSupport;
+import com.example.mortar.util.BaseKey;
 import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.NodePrinter;
 import com.zhuinden.servicetree.ServiceTree;
@@ -42,7 +43,6 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
-import com.zhuinden.simplestack.navigator.StateKey;
 import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
@@ -84,13 +84,13 @@ public class MortarDemoActivity
 
     @Override
     public void handleStateChange(StateChange stateChange, Callback completionCallback) {
-        StateKey newScreen = stateChange.topNewState();
-        String title = newScreen.getClass().getSimpleName();
+        BaseKey newScreen = stateChange.topNewState();
+        String title = newScreen.title();
         ActionBarOwner.MenuAction menu = new ActionBarOwner.MenuAction("Friends", new Action() {
             @Override
             public void run()
                     throws Exception {
-                Navigator.getBackstack(MortarDemoActivity.this).goTo(new FriendListScreen());
+                Navigator.getBackstack(MortarDemoActivity.this).goTo(FriendListScreen.create());
             }
         });
         actionBarOwner.setConfig(new ActionBarOwner.Config(false, !(newScreen instanceof ChatListScreen), title, menu));
@@ -137,9 +137,8 @@ public class MortarDemoActivity
                         .setExternalStateChanger(this)
                         .setContextCreationStrategy(new NodeCreationManager(serviceTree,
                                 activityScope,
-                                nodeStateManager))
-                        .create(this, container))
-                .install(this, container, HistoryBuilder.single(new ChatListScreen()));
+                                nodeStateManager)).create(this, container))
+                .install(this, container, HistoryBuilder.single(ChatListScreen.create()));
     }
 
     @Override

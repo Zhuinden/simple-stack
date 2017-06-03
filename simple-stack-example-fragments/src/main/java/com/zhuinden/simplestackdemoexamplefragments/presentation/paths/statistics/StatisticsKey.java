@@ -1,6 +1,5 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics;
 
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -20,7 +19,7 @@ public abstract class StatisticsKey
         return new StatisticsFragment();
     }
 
-    public static Parcelable create() {
+    public static StatisticsKey create() {
         return new AutoValue_StatisticsKey(R.layout.path_statistics);
     }
 

@@ -26,6 +26,7 @@ import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.ChatListView;
+import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.statebundle.StateBundle;
@@ -36,8 +37,13 @@ import javax.inject.Inject;
 
 import dagger.Provides;
 
-public class ChatListScreen
+@AutoValue
+public abstract class ChatListScreen
         extends BaseKey {
+    public static ChatListScreen create() {
+        return new AutoValue_ChatListScreen();
+    }
+
     @Override
     public void bindServices(ServiceTree.Node node) {
         SingletonComponent singletonComponent = DaggerService.get(node);
@@ -51,16 +57,6 @@ public class ChatListScreen
     @Override
     public int layout() {
         return R.layout.chat_list_view;
-    }
-
-    @Override
-    public int hashCode() {
-        return 37 + ChatListScreen.class.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && obj instanceof ChatListScreen;
     }
 
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
@@ -100,12 +96,12 @@ public class ChatListScreen
         }
 
         public void onConversationSelected(int position) {
-            Navigator.getBackstack(getView().getContext()).goTo(new ChatScreen(position));
+            Navigator.getBackstack(getView().getContext()).goTo(ChatScreen.create(position));
         }
     }
 
     @Override
-    public String toString() {
-        return "ChatListScreen{}";
+    public String title() {
+        return "Chat List";
     }
 }

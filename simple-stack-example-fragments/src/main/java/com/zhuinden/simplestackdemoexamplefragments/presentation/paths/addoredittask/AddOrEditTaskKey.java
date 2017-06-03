@@ -1,6 +1,5 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask;
 
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -25,11 +24,11 @@ public abstract class AddOrEditTaskKey
         return new AddOrEditTaskFragment();
     }
 
-    public static Parcelable create(Key parent) {
+    public static AddOrEditTaskKey create(Key parent) {
         return createWithTaskId(parent, "");
     }
 
-    public static Parcelable createWithTaskId(Key parent, String taskId) {
+    public static AddOrEditTaskKey createWithTaskId(Key parent, String taskId) {
         return new AutoValue_AddOrEditTaskKey(R.layout.path_addoredittask, parent, taskId);
     }
 

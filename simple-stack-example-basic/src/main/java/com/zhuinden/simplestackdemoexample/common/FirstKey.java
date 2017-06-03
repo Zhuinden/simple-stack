@@ -1,9 +1,8 @@
 package com.zhuinden.simplestackdemoexample.common;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestack.navigator.ViewChangeHandler;
 import com.zhuinden.simplestack.navigator.changehandlers.NoOpViewChangeHandler;
 import com.zhuinden.simplestackdemoexample.R;
@@ -11,32 +10,11 @@ import com.zhuinden.simplestackdemoexample.R;
  * Created by Owner on 2017. 01. 12..
  */
 
-public class FirstKey implements Parcelable, Key {
-    public FirstKey() {
-    }
-
-    protected FirstKey(Parcel in) {
-    }
-
-    public static final Creator<FirstKey> CREATOR = new Creator<FirstKey>() {
-        @Override
-        public FirstKey createFromParcel(Parcel in) {
-            return new FirstKey(in);
-        }
-
-        @Override
-        public FirstKey[] newArray(int size) {
-            return new FirstKey[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
+@AutoValue // parcelable, hashcode, equals, toString
+public abstract class FirstKey
+        implements Key {
+    public static FirstKey create() {
+        return new AutoValue_FirstKey();
     }
 
     @Override
@@ -48,18 +26,5 @@ public class FirstKey implements Parcelable, Key {
     @Override
     public ViewChangeHandler viewChangeHandler() {
         return new NoOpViewChangeHandler();
-    }
-
-    @Override
-    public int hashCode() {
-        return FirstKey.class.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(obj == null) {
-            return false;
-        }
-        return obj instanceof FirstKey;
     }
 }

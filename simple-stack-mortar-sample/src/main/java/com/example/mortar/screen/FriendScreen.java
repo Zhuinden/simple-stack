@@ -26,6 +26,7 @@ import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.FriendView;
+import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.statebundle.StateBundle;
 
@@ -33,12 +34,13 @@ import javax.inject.Inject;
 
 import dagger.Provides;
 
-public class FriendScreen
+@AutoValue
+public abstract class FriendScreen
         extends BaseKey {
-    private final int index;
+    public abstract int index();
 
-    public FriendScreen(int index) {
-        this.index = index;
+    public static FriendScreen create(int index) {
+        return new AutoValue_FriendScreen(index);
     }
 
     @Override
@@ -47,7 +49,7 @@ public class FriendScreen
         node.bindService(DaggerService.SERVICE_NAME, //
                 DaggerFriendScreen_Component.builder() //
                         .singletonComponent(singletonComponent) //
-                        .module(new Module(index)) //
+                        .module(new Module(index())) //
                         .build());
         node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
@@ -55,21 +57,6 @@ public class FriendScreen
     @Override
     public int layout() {
         return R.layout.friend_view;
-    }
-
-    @Override
-    public int hashCode() {
-        return 37 + FriendScreen.class.hashCode() + 37 * index;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && obj instanceof FriendScreen && ((FriendScreen) obj).index == index;
-    }
-
-    @Override
-    public String toString() {
-        return "FriendScreen{" + "index=" + index + '}';
     }
 
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
@@ -113,5 +100,10 @@ public class FriendScreen
             }
             getView().setText(friend.name);
         }
+    }
+
+    @Override
+    public String title() {
+        return "Friend";
     }
 }

@@ -15,4 +15,6 @@ public abstract class BaseKey implements Key {
     public ViewChangeHandler viewChangeHandler() {
         return new SegueViewChangeHandler();
     }
+
+    public abstract String title();
 }

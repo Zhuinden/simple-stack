@@ -26,6 +26,7 @@ import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.Subscope;
 import com.example.mortar.util.ViewPresenter;
 import com.example.mortar.view.MessageView;
+import com.google.auto.value.AutoValue;
 import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.statebundle.StateBundle;
@@ -37,14 +38,15 @@ import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 
-public class MessageScreen
+@AutoValue
+public abstract class MessageScreen
         extends BaseKey {
-    private final int chatId;
-    private final int messageId;
+    public abstract int chatId();
 
-    public MessageScreen(int chatId, int messageId) {
-        this.chatId = chatId;
-        this.messageId = messageId;
+    public abstract int messageId();
+
+    public static MessageScreen create(int chatId, int messageId) {
+        return new AutoValue_MessageScreen(chatId, messageId);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class MessageScreen
         node.bindService(DaggerService.SERVICE_NAME, //
                 DaggerMessageScreen_Component.builder() //
                         .singletonComponent(singletonComponent) //
-                        .module(new Module(chatId, messageId)) //
+                        .module(new Module(chatId(), messageId())) //
                         .build());
         node.bindService("PRESENTER", DaggerService.<Component>get(node).presenter()); // <-- for Bundleable callback
     }
@@ -62,21 +64,6 @@ public class MessageScreen
     @Override
     public int layout() {
         return R.layout.message_view;
-    }
-
-    @Override
-    public int hashCode() {
-        return 37 + MessageScreen.class.hashCode() + 37 * chatId + 37 * messageId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && obj instanceof MessageScreen && ((MessageScreen) obj).chatId == chatId && ((MessageScreen) obj).messageId == messageId;
-    }
-
-    @Override
-    public String toString() {
-        return "MessageScreen{" + "chatId=" + chatId + ", messageId=" + messageId + '}';
     }
 
     @dagger.Component(dependencies = {SingletonComponent.class}, modules = {Module.class})
@@ -143,9 +130,14 @@ public class MessageScreen
             }
             int position = message.from.id;
             if(position != -1) {
-                Navigator.getBackstack(getView().getContext()).goTo(new FriendScreen(position));
+                Navigator.getBackstack(getView().getContext()).goTo(FriendScreen.create(position));
             }
         }
+    }
+
+    @Override
+    public String title() {
+        return "Message";
     }
 }
 

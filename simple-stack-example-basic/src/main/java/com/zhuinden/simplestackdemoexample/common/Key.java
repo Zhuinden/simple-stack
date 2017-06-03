@@ -8,5 +8,6 @@ import com.zhuinden.simplestack.navigator.StateKey;
  * Created by Owner on 2017. 01. 12..
  */
 
-public interface Key extends StateKey, Parcelable { // StateKey needed for Navigator example
+public interface Key
+        extends StateKey, Parcelable { // StateKey used by Navigator
 }

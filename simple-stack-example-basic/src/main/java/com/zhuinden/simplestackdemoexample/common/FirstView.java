@@ -58,7 +58,7 @@ public class FirstView
 
     @OnClick(R.id.first_button)
     public void clickButton(View view) {
-        backstack.goTo(new SecondKey());
+        backstack.goTo(SecondKey.create());
     }
 
     @Override

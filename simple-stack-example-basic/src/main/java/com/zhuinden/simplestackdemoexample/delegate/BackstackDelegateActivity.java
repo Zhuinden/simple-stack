@@ -33,7 +33,7 @@ public class BackstackDelegateActivity
         backstackDelegate = new BackstackDelegate(null);
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
-                HistoryBuilder.single(new FirstKey()));
+                HistoryBuilder.single(FirstKey.create()));
         defaultStateChanger = DefaultStateChanger.configure()
                 .setStatePersistenceStrategy(new DefaultStateChanger.StatePersistenceStrategy() {
                     @Override
