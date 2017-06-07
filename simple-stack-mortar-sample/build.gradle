@@ -91,7 +91,7 @@ dependencies {
 
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.github.Zhuinden:service-tree:1.6.0'
+    compile 'com.github.Zhuinden:service-tree:1.6.1'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.0"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'

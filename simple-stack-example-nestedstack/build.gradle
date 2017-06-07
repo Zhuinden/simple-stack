@@ -39,7 +39,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
-    compile 'com.github.Zhuinden:service-tree:1.6.0'
+    compile 'com.github.Zhuinden:service-tree:1.6.1'
 
     annotationProcessor 'frankiesardo:auto-parcel:1.0.3'
 
