@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 25
@@ -18,6 +20,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+kapt {
+    generateStubs = true
 }
 
 dependencies {
@@ -31,6 +40,11 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    annotationProcessor 'frankiesardo:auto-parcel:1.0.3'
+    kapt 'com.jakewharton:butterknife-compiler:8.5.1'
+
+    compile 'nz.bradcampbell:paperparcel:2.0.1'
+    compile 'nz.bradcampbell:paperparcel-kotlin:2.0.1' // Optional
+    kapt 'nz.bradcampbell:paperparcel-compiler:2.0.1'
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-3"
 }
