@@ -19,6 +19,7 @@ import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.chromecas
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsync.CloudSyncKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.list.ListKey;
 import com.zhuinden.simplestackdemonestedstack.presentation.paths.main.mail.MailKey;
+import com.zhuinden.simplestackdemonestedstack.util.BackstackManagerPersistenceStrategy;
 import com.zhuinden.simplestackdemonestedstack.util.NestSupportServiceManager;
 import com.zhuinden.simplestackdemonestedstack.util.ServiceLocator;
 
@@ -88,7 +89,9 @@ public class MainView
     protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.bind(this);
+        backstackManager = ServiceLocator.getService(getContext(), Key.NESTED_STACK);
         defaultStateChanger = DefaultStateChanger.configure()
+                .setStatePersistenceStrategy(new BackstackManagerPersistenceStrategy(backstackManager))
                 .setViewChangeCompletionListener((stateChange, container, previousView, newView, completionCallback) -> {
                     MainActivity.get(getContext()).setAnimating(false);
                     completionCallback.viewChangeComplete();
@@ -112,7 +115,6 @@ public class MainView
 
             }
         });
-        backstackManager = ServiceLocator.getService(getContext(), Key.NESTED_STACK);
         backstackManager.setStateChanger(this);
     }
 

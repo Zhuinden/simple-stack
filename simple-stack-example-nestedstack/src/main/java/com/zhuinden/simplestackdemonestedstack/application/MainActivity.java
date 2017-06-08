@@ -67,7 +67,7 @@ public class MainActivity
         } else {
             serviceTree = new ServiceTree();
             serviceTree.createRootNode(TAG);
-            serviceManager = new NestSupportServiceManager(serviceTree, TAG);
+            serviceManager = new NestSupportServiceManager(serviceTree);
             serviceManager.setRestoredStates(savedInstanceState != null ? savedInstanceState.getParcelable("SERVICE_BUNDLE") : new StateBundle());
         }
         super.onCreate(savedInstanceState);

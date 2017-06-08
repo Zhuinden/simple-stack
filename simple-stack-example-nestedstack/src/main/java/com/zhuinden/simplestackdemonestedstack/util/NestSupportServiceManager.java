@@ -23,13 +23,11 @@ public class NestSupportServiceManager {
     }
 
     private final ServiceTree serviceTree;
-    private final Object rootKey;
 
     private final List<Object> activeKeys = new ArrayList<>();
 
-    public NestSupportServiceManager(ServiceTree serviceTree, Object rootKey) {
+    public NestSupportServiceManager(ServiceTree serviceTree) {
         this.serviceTree = serviceTree;
-        this.rootKey = rootKey;
     }
 
     public static final String SERVICE_STATES = "SERVICE_BUNDLE";
@@ -55,7 +53,7 @@ public class NestSupportServiceManager {
     }
 
     public void setupServices(StateChange stateChange, boolean isFromCompositeKey) {
-        StateBundle states = serviceTree.getNode(rootKey).getService(SERVICE_STATES);
+        StateBundle states = serviceTree.getRootService(SERVICE_STATES);
         for(Object _previousKey : stateChange.getPreviousState()) {
             Key previousKey = (Key) _previousKey;
             if(!stateChange.getNewState().contains(previousKey)) {
@@ -85,8 +83,9 @@ public class NestSupportServiceManager {
 
     private void buildServices(StateBundle states, Key newKey) {
         if(!serviceTree.hasNodeWithKey(newKey)) {
-            ServiceTree.Node node = serviceTree.createChildNode(serviceTree.getNode(newKey instanceof Child ? ((Child) newKey).parent() : rootKey),
-                    newKey);
+            ServiceTree.Node node = newKey instanceof Child ? serviceTree.createChildNode(serviceTree.getNode(((Child) newKey).parent()),
+                    newKey) //
+                    : serviceTree.createRootNode(newKey);
             buildServicesForKey(states, newKey, node);
         }
     }
@@ -99,12 +98,6 @@ public class NestSupportServiceManager {
                 Key nestedKey = (Key) _nestedKey;
                 ServiceTree.Node nestedNode = serviceTree.createChildNode(node, nestedKey);
                 buildServicesForKey(states, (Key) _nestedKey, nestedNode);
-            }
-        }
-        if(newKey.hasNestedStack()) {
-            Backstack nestedStack = serviceTree.getNode(newKey).<BackstackManager>getService(Key.NESTED_STACK).getBackstack();
-            for(Object _childKey : nestedStack.getInitialParameters()) {
-                buildServices(states, (Key) _childKey);
             }
         }
     }
@@ -124,7 +117,7 @@ public class NestSupportServiceManager {
     }
 
     public void setRestoredStates(StateBundle states) {
-        serviceTree.getNode(rootKey).bindService(SERVICE_STATES, states);
+        serviceTree.registerRootService(SERVICE_STATES, states);
     }
 
     public ServiceTree getServiceTree() {

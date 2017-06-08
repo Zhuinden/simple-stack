@@ -5,11 +5,16 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestackdemonestedstack.R;
 import com.zhuinden.statebundle.StateBundle;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by Owner on 2017. 01. 12..
@@ -45,18 +50,29 @@ public class ChromeCastView
         }
     }
 
+    @BindView(R.id.second_edittext)
+    EditText editText;
+
     ChromeCastKey chromeCastKey;
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        ButterKnife.bind(this);
+    }
 
     @NonNull
     @Override
     public StateBundle toBundle() {
         StateBundle stateBundle = new StateBundle();
+        stateBundle.putString("text", editText.getText().toString());
         return stateBundle;
     }
 
     @Override
     public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
+            editText.setText(bundle.getString("text"));
         }
     }
 }
