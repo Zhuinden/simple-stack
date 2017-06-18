@@ -15,13 +15,9 @@ import paperparcel.PaperParcelable
 @PaperParcel
 data class FirstKey protected constructor(protected val tag: String = FirstKey::javaClass.name) //
     : PaperParcelable, Key {
-    override fun layout(): Int {
-        return R.layout.path_first
-    }
+    override fun layout(): Int = R.layout.path_first
 
-    override fun viewChangeHandler(): ViewChangeHandler {
-        return NoOpViewChangeHandler()
-    }
+    override fun viewChangeHandler(): ViewChangeHandler = NoOpViewChangeHandler()
 
     companion object {
         @JvmField val CREATOR = PaperParcelFirstKey.CREATOR

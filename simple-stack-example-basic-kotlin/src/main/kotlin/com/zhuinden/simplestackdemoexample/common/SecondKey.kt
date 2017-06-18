@@ -12,13 +12,9 @@ import paperparcel.PaperParcelable
 @PaperParcel
 data class SecondKey protected constructor(protected val tag: String = SecondKey::javaClass.name) //
     : PaperParcelable, Key {
-    override fun layout(): Int {
-        return R.layout.path_second
-    }
+    override fun layout(): Int = R.layout.path_second
 
-    override fun viewChangeHandler(): ViewChangeHandler {
-        return NoOpViewChangeHandler()
-    }
+    override fun viewChangeHandler(): ViewChangeHandler = NoOpViewChangeHandler()
 
     companion object {
         @JvmField val CREATOR = PaperParcelSecondKey.CREATOR
