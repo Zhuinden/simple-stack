@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.zhuinden.statebundle.StateBundle;
@@ -60,7 +61,7 @@ public class BackstackDelegateTest {
 
     StateChanger stateChanger = new StateChanger() {
         @Override
-        public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
             completionCallback.stateChangeComplete();
         }
     };

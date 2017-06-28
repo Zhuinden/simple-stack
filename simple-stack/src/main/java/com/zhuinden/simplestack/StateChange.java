@@ -125,7 +125,7 @@ public class StateChange {
      * @return the context to use used with LayoutInflater.from().
      */
     @NonNull
-    public Context createContext(Context base, Object key) {
+    public Context createContext(@NonNull Context base, @NonNull Object key) {
         return new KeyContextWrapper(base, key);
     }
 }

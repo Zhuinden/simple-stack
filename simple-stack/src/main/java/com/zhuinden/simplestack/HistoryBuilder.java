@@ -40,6 +40,7 @@ public class HistoryBuilder
      * @param backstack the {@link Backstack}.
      * @return the newly created {@link HistoryBuilder}.
      */
+    @NonNull
     public static HistoryBuilder from(@NonNull Backstack backstack) {
         if(backstack == null) {
             throw new IllegalArgumentException("Backstack cannot be null!");
@@ -53,6 +54,7 @@ public class HistoryBuilder
      * @param backstackDelegate the {@link BackstackDelegate}.
      * @return the newly created {@link HistoryBuilder}.
      */
+    @NonNull
     public static HistoryBuilder from(@NonNull BackstackDelegate backstackDelegate) {
         if(backstackDelegate == null) {
             throw new IllegalArgumentException("BackstackDelegate cannot be null!");
@@ -66,6 +68,7 @@ public class HistoryBuilder
      * @param keys
      * @return the newly created {@link HistoryBuilder}.
      */
+    @NonNull
     public static HistoryBuilder from(Object... keys) {
         return from(Arrays.asList(keys));
     }
@@ -76,6 +79,7 @@ public class HistoryBuilder
      * @param keys
      * @return the newly created {@link HistoryBuilder}.
      */
+    @NonNull
     public static HistoryBuilder from(@NonNull List<?> keys) {
         return newBuilder().addAll(keys);
     }
@@ -85,6 +89,7 @@ public class HistoryBuilder
      *
      * @return the newly created {@link HistoryBuilder}.
      */
+    @NonNull
     public static HistoryBuilder newBuilder() {
         return new HistoryBuilder();
     }
@@ -95,6 +100,7 @@ public class HistoryBuilder
      * @param key
      * @return an array list of object that contains the key.
      */
+    @NonNull
     public static ArrayList<Object> single(@NonNull Object key) {
         return newBuilder()
                 .add(key)
@@ -107,6 +113,7 @@ public class HistoryBuilder
      * @param keys
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder addAll(@NonNull List<?> keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Provided collection cannot be null");
@@ -122,6 +129,7 @@ public class HistoryBuilder
      * @param index
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder addAllAt(@NonNull List<?> keys, int index) {
         if(keys == null) {
             throw new IllegalArgumentException("Provided collection cannot be null");
@@ -135,6 +143,7 @@ public class HistoryBuilder
      *
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder clear() {
         list.clear();
         return this;
@@ -179,6 +188,7 @@ public class HistoryBuilder
      * @param key
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder remove(@NonNull Object key) {
         checkKey(key);
         list.remove(key);
@@ -191,6 +201,7 @@ public class HistoryBuilder
      * @param index
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder removeAt(int index) {
         list.remove(index);
         return this;
@@ -202,6 +213,7 @@ public class HistoryBuilder
      * @param keys
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder retainAll(@NonNull Collection<?> keys) {
         checkKeys(keys);
         list.retainAll(keys);
@@ -223,6 +235,7 @@ public class HistoryBuilder
      *
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder removeLast() {
         if(list.isEmpty()) {
             throw new IllegalStateException("Cannot remove element from empty builder");
@@ -238,6 +251,7 @@ public class HistoryBuilder
      * @param key
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder removeUntil(@NonNull Object key) {
         checkKey(key);
         while(!list.isEmpty() && !getLast().equals(key)) {
@@ -266,7 +280,8 @@ public class HistoryBuilder
      * @param index
      * @return the key at the given index
      */
-    public <T extends Object> T get(int index) {
+    @Nullable
+    public <T> T get(int index) {
         // noinspection unchecked
         return (T) list.get(index);
     }
@@ -278,7 +293,7 @@ public class HistoryBuilder
      * @return the key at the last index
      */
     @Nullable
-    public <T extends Object> T getLast() {
+    public <T> T getLast() {
         // noinspection unchecked
         return (T)(list.isEmpty() ? null : list.get(list.size() - 1));
     }
@@ -289,6 +304,7 @@ public class HistoryBuilder
      * @param key
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder add(@NonNull Object key) {
         checkKey(key);
         list.add(key);
@@ -302,6 +318,7 @@ public class HistoryBuilder
      * @param index
      * @return the current builder.
      */
+    @NonNull
     public HistoryBuilder add(@NonNull Object key, int index) {
         checkKey(key);
         list.add(index, key);
@@ -313,6 +330,7 @@ public class HistoryBuilder
      *
      * @return the iterator
      */
+    @NonNull
     @Override
     public Iterator<Object> iterator() {
         return list.iterator();
@@ -323,6 +341,7 @@ public class HistoryBuilder
      *
      * @return the built history.
      */
+    @NonNull
     public ArrayList<Object> build() {
         return new ArrayList<>(this.list);
     }

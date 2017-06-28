@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -81,7 +82,7 @@ public class TasksView
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         // hack fix from  http://stackoverflow.com/a/27073879/2413303 to fix view staying on screen
         setRefreshing(false);
         destroyDrawingCache();

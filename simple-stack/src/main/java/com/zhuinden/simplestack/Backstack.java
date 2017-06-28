@@ -36,7 +36,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * {@link Backstack#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link Backstack#REATTACH} does not.
  */
 public class Backstack {
-    public static <T> T getKey(Context context) {
+    public static <T> T getKey(@NonNull Context context) {
         return KeyContextWrapper.getKey(context);
     }
 

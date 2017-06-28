@@ -2,6 +2,7 @@ package com.example.stackmasterdetailfrag.util.pathview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
@@ -60,7 +61,7 @@ public class SinglePaneRoot extends FrameLayout implements HandlesBack, StateCha
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         singlePaneFragmentStateChanger.handleStateChange(stateChange);
         FragmentManager fragmentManager = FragmentManagerService.get(getContext());
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);

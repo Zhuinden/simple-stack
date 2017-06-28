@@ -36,10 +36,12 @@ public class SavedState {
     private SavedState() {
     }
 
+    @NonNull
     public Object getKey() {
         return key;
     }
 
+    @NonNull
     public SparseArray<Parcelable> getViewHierarchyState() {
         return viewHierarchyState;
     }
@@ -48,11 +50,12 @@ public class SavedState {
         this.viewHierarchyState = viewHierarchyState;
     }
 
+    @Nullable
     public StateBundle getBundle() {
         return bundle;
     }
 
-    public void setBundle(StateBundle bundle) {
+    public void setBundle(@Nullable StateBundle bundle) {
         this.bundle = bundle;
     }
 

@@ -17,6 +17,7 @@ package com.example.mortar.core;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -83,7 +84,7 @@ public class MortarDemoActivity
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         BaseKey newScreen = stateChange.topNewState();
         String title = newScreen.title();
         ActionBarOwner.MenuAction menu = new ActionBarOwner.MenuAction("Friends", new Action() {

@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.6.3 (2017-06-28)
+--------------------------------
+- Added missing `@NonNull` and `@Nullable` annotations where applicable.
+
 -Simple Stack 1.6.2 (2017-05-14)
 --------------------------------
 - MINOR CHANGE: `DefaultStateChanger` no longer explicitly demands a `StateKey`, because both `LayoutInflationStrategy` and `GetViewChangeHandlerStrategy` can be re-defined for custom behavior.

@@ -1,6 +1,7 @@
 package com.example.stackmasterdetail.util.pathview;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
@@ -60,7 +61,7 @@ public class TabletMasterDetailRoot
     }
 
     @Override
-    public void handleStateChange(final StateChange stateChange, StateChanger.Callback callback) {
+    public void handleStateChange(@NonNull final StateChange stateChange, @NonNull StateChanger.Callback callback) {
 
         class CountdownCallback
                 implements StateChanger.Callback {

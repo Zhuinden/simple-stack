@@ -38,7 +38,7 @@ public final class DefaultStateChanger
     private static class NoOpStateChanger
             implements StateChanger {
         @Override
-        public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
             completionCallback.stateChangeComplete();
         }
     }
@@ -62,7 +62,7 @@ public final class DefaultStateChanger
     private static class DefaultLayoutInflationStrategy
             implements LayoutInflationStrategy {
         @Override
-        public void inflateLayout(StateChange stateChange, Object key, Context context, ViewGroup container, Callback callback) {
+        public void inflateLayout(@NonNull StateChange stateChange, @NonNull Object key, @NonNull Context context, @NonNull ViewGroup container, @NonNull Callback callback) {
             final View newView = LayoutInflater.from(context).inflate(((StateKey) key).layout(), container, false);
             callback.layoutInflationComplete(newView);
         }
@@ -102,6 +102,7 @@ public final class DefaultStateChanger
     private static class DefaultGetViewChangeHandlerStrategy
             implements GetViewChangeHandlerStrategy {
         @Override
+        @NonNull
         public ViewChangeHandler getViewChangeHandler(@NonNull StateChange stateChange, @NonNull ViewGroup container, @NonNull Object previousKey, @NonNull Object newKey, @NonNull View previousView, @NonNull View newView, int direction) {
             ViewChangeHandler viewChangeHandler;
             if(direction == StateChange.FORWARD) {
@@ -193,6 +194,7 @@ public final class DefaultStateChanger
          * @param direction    the direction
          * @return the view change handler
          */
+        @NonNull
         ViewChangeHandler getViewChangeHandler(@NonNull StateChange stateChange, @NonNull ViewGroup container, @NonNull Object previousKey, @NonNull Object newKey, @NonNull View previousView, @NonNull View newView, int direction);
     }
 
@@ -220,18 +222,19 @@ public final class DefaultStateChanger
          * This callback must be called to provide the inflated view.
          */
         public interface Callback {
-            void layoutInflationComplete(View view);
+            void layoutInflationComplete(@NonNull View view);
         }
 
         /**
          * This method needs to inflate the new view, preferably using the provided context.
-         *  @param stateChange the state change
+         *
+         * @param stateChange the state change
          * @param key         the new key this view is inflated for
          * @param context     the context the layout inflater is originally acquired from
          * @param container   the container
          * @param callback    the inflation callback that must be called when layout inflation is complete
          */
-        void inflateLayout(StateChange stateChange, Object key, Context context, ViewGroup container, Callback callback);
+        void inflateLayout(@NonNull StateChange stateChange, @NonNull Object key, @NonNull Context context, @NonNull ViewGroup container, @NonNull Callback callback);
     }
 
     /**
@@ -293,6 +296,7 @@ public final class DefaultStateChanger
          * @param stateChanger the state changer
          * @return the configurer
          */
+        @NonNull
         public Configurer setExternalStateChanger(@NonNull StateChanger stateChanger) {
             if(stateChanger == null) {
                 throw new NullPointerException("If set, external state changer cannot be null!");
@@ -307,6 +311,7 @@ public final class DefaultStateChanger
          * @param viewChangeStartListener the view change start listener
          * @return the configurer
          */
+        @NonNull
         public Configurer setViewChangeStartListener(@NonNull ViewChangeStartListener viewChangeStartListener) {
             if(viewChangeStartListener == null) {
                 throw new NullPointerException("If set, view change start listener cannot be null!");
@@ -321,6 +326,7 @@ public final class DefaultStateChanger
          * @param viewChangeCompletionListener the view change completion listener
          * @return the configurer
          */
+        @NonNull
         public Configurer setViewChangeCompletionListener(@NonNull ViewChangeCompletionListener viewChangeCompletionListener) {
             if(viewChangeCompletionListener == null) {
                 throw new NullPointerException("If set, view change completion listener cannot be null!");
@@ -335,6 +341,7 @@ public final class DefaultStateChanger
          * @param statePersistenceStrategy the state persistence strategy
          * @return the configurer
          */
+        @NonNull
         public Configurer setStatePersistenceStrategy(@NonNull StatePersistenceStrategy statePersistenceStrategy) {
             if(statePersistenceStrategy == null) {
                 throw new NullPointerException("If set, state persistence strategy cannot be null!");
@@ -349,6 +356,7 @@ public final class DefaultStateChanger
          * @param layoutInflationStrategy the layout inflation strategy
          * @return the configurer
          */
+        @NonNull
         public Configurer setLayoutInflationStrategy(@NonNull LayoutInflationStrategy layoutInflationStrategy) {
             if(layoutInflationStrategy == null) {
                 throw new NullPointerException("If set, layout inflation strategy cannot be null!");
@@ -363,6 +371,7 @@ public final class DefaultStateChanger
          * @param getPreviousViewStrategy the previous view strategy
          * @return the configurer
          */
+        @NonNull
         public Configurer setGetPreviousViewStrategy(GetPreviousViewStrategy getPreviousViewStrategy) {
             if(getPreviousViewStrategy == null) {
                 throw new NullPointerException("If set, get previous view strategy cannot be null!");
@@ -377,6 +386,7 @@ public final class DefaultStateChanger
          * @param contextCreationStrategy the create context strategy
          * @return the configurer
          */
+        @NonNull
         public Configurer setContextCreationStrategy(ContextCreationStrategy contextCreationStrategy) {
             if(contextCreationStrategy == null) {
                 throw new NullPointerException("If set, create context strategy cannot be null!");
@@ -391,6 +401,7 @@ public final class DefaultStateChanger
          * @param getViewChangeHandlerStrategy the get view change handler strategy
          * @return the configurer
          */
+        @NonNull
         public Configurer setGetViewChangeHandlerStrategy(GetViewChangeHandlerStrategy getViewChangeHandlerStrategy) {
             if(getViewChangeHandlerStrategy == null) {
                 throw new NullPointerException("If set, get view change handler strategy cannot be null!");
@@ -406,7 +417,8 @@ public final class DefaultStateChanger
          * @param container   the container into which views are added and removed from
          * @return the new {@link DefaultStateChanger}
          */
-        public DefaultStateChanger create(Context baseContext, ViewGroup container) {
+        @NonNull
+        public DefaultStateChanger create(@NonNull Context baseContext, @NonNull ViewGroup container) {
             return new DefaultStateChanger(baseContext,
                     container,
                     externalStateChanger,
@@ -414,7 +426,9 @@ public final class DefaultStateChanger
                     viewChangeCompletionListener,
                     layoutInflationStrategy,
                     statePersistenceStrategy,
-                    getPreviousViewStrategy, contextCreationStrategy, getViewChangeHandlerStrategy);
+                    getPreviousViewStrategy,
+                    contextCreationStrategy,
+                    getViewChangeHandlerStrategy);
         }
     }
 
@@ -437,6 +451,7 @@ public final class DefaultStateChanger
      * @param container   the container into which views are added to or removed from
      * @return the state changer
      */
+    @NonNull
     public static DefaultStateChanger create(Context baseContext, ViewGroup container) {
         return new DefaultStateChanger(baseContext, container, null, null, null, null, null, null, null, null);
     }
@@ -498,7 +513,7 @@ public final class DefaultStateChanger
     }
 
     @Override
-    public final void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
+    public final void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
         externalStateChanger.handleStateChange(stateChange, new Callback() {
             @Override
             public void stateChangeComplete() {
@@ -522,7 +537,7 @@ public final class DefaultStateChanger
      * @param stateChange        the state change
      * @param completionCallback the completion callback
      */
-    public final void performViewChange(Object previousKey, Object newKey, final StateChange stateChange, final Callback completionCallback) {
+    public final void performViewChange(@Nullable Object previousKey, @NonNull Object newKey, @NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
         performViewChange(previousKey, newKey, stateChange, stateChange.getDirection(), completionCallback);
     }
 
@@ -535,19 +550,22 @@ public final class DefaultStateChanger
      * @param direction          the direction
      * @param completionCallback the completion callback
      */
-    public void performViewChange(final Object previousKey, final Object newKey, final StateChange stateChange, final int direction, final Callback completionCallback) {
+    public void performViewChange(@Nullable final Object previousKey, @NonNull final Object newKey, @NonNull final StateChange stateChange, final int direction, @NonNull final Callback completionCallback) {
         final View previousView = getPreviousViewStrategy.getPreviousView(container, stateChange, previousKey);
         if(previousView != null && previousKey != null) {
             statePersistenceStrategy.persistViewToState(previousKey, previousView);
         }
-        Context newContext = contextCreationStrategy.createContext(stateChange.createContext(baseContext, newKey), newKey, container, stateChange);
+        Context newContext = contextCreationStrategy.createContext(stateChange.createContext(baseContext, newKey),
+                newKey,
+                container,
+                stateChange);
         layoutInflationStrategy.inflateLayout(stateChange,
                 newKey,
                 newContext,
                 container,
                 new LayoutInflationStrategy.Callback() {
                     @Override
-                    public void layoutInflationComplete(final View newView) {
+                    public void layoutInflationComplete(@NonNull final View newView) {
                         statePersistenceStrategy.restoreViewFromState(newKey, newView);
                         viewChangeStartListener.handleViewChangeStart(stateChange,
                                 container,
@@ -569,8 +587,7 @@ public final class DefaultStateChanger
                                                     container,
                                                     previousKey,
                                                     newKey,
-                                                    previousView,
-                                                    newView, direction);
+                                                    previousView, newView, direction);
                                             viewChangeHandler.performViewChange(container,
                                                     previousView,
                                                     newView,

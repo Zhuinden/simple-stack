@@ -18,6 +18,7 @@ package com.example.stackmasterdetail.util.pathview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
@@ -82,7 +83,7 @@ public class FramePathContainerView
     }
 
     @Override
-    public void handleStateChange(StateChange traversal, final StateChanger.Callback callback) {
+    public void handleStateChange(@NonNull StateChange traversal, @NonNull final StateChanger.Callback callback) {
         disabled = true;
         container.handleStateChange(traversal, new StateChanger.Callback() {
             @Override

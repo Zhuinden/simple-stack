@@ -70,6 +70,7 @@ public class Navigator {
          * @param stateChanger if set, cannot be null.
          * @return the installer
          */
+        @NonNull
         public Installer setStateChanger(@NonNull StateChanger stateChanger) {
             if(stateChanger == null) {
                 throw new IllegalArgumentException("If set, StateChanger cannot be null!");
@@ -84,6 +85,7 @@ public class Navigator {
          * @param keyFilter cannot be null if set
          * @return the installer
          */
+        @NonNull
         public Installer setKeyFilter(@NonNull KeyFilter keyFilter) {
             if(keyFilter == null) {
                 throw new IllegalArgumentException("If set, KeyFilter cannot be null!");
@@ -98,6 +100,7 @@ public class Navigator {
          * @param keyParceler cannot be null if set
          * @return the installer
          */
+        @NonNull
         public Installer setKeyParceler(@NonNull KeyParceler keyParceler) {
             if(keyParceler == null) {
                 throw new IllegalArgumentException("If set, KeyParceler cannot be null!");
@@ -112,6 +115,7 @@ public class Navigator {
          * @param stateClearStrategy if set, it cannot be null
          * @return the installer
          */
+        @NonNull
         public Installer setStateClearStrategy(@NonNull BackstackManager.StateClearStrategy stateClearStrategy) {
             if(stateClearStrategy == null) {
                 throw new IllegalArgumentException("If set, StateClearStrategy cannot be null!");
@@ -127,6 +131,7 @@ public class Navigator {
          * @param isInitializeDeferred if call to executing deferred initialization is needed
          * @return the installer
          */
+        @NonNull
         public Installer setDeferredInitialization(boolean isInitializeDeferred) {
             this.isInitializeDeferred = isInitializeDeferred;
             return this;
@@ -138,6 +143,7 @@ public class Navigator {
          * @param shouldPersistContainerChild if the container's first child's state should be persisted
          * @return the installer
          */
+        @NonNull
         public Installer setShouldPersistContainerChild(boolean shouldPersistContainerChild) {
             this.shouldPersistContainerChild = shouldPersistContainerChild;
             return this;
@@ -149,6 +155,7 @@ public class Navigator {
          * @param stateChangeCompletionListener the state change completion listener
          * @return the installer
          */
+        @NonNull
         public Installer addStateChangeCompletionListener(@NonNull BackstackManager.StateChangeCompletionListener stateChangeCompletionListener) {
             if(stateChangeCompletionListener == null) {
                 throw new IllegalArgumentException("If added, state change completion listener cannot be null!");
@@ -165,6 +172,7 @@ public class Navigator {
          * @param initialKeys the initial keys.
          * @return
          */
+        @NonNull
         public Backstack install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<Object> initialKeys) {
             if(stateChanger == null) {
                 stateChanger = DefaultStateChanger.create(activity, container);
@@ -178,6 +186,7 @@ public class Navigator {
      *
      * @return the installer
      */
+    @NonNull
     public static Installer configure() {
         return new Installer();
     }
@@ -191,6 +200,7 @@ public class Navigator {
      * @param container   the container in which custom viewgroups are hosted (to save its child's state in onSaveInstanceState())
      * @param initialKeys the keys used to initialize the backstack
      */
+    @NonNull
     public static void install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<Object> initialKeys) {
         configure().install(activity, container, initialKeys);
     }
@@ -260,6 +270,7 @@ public class Navigator {
      *
      * @return the managed backstack manager that belongs to the {@link BackstackHost} inside the activity.
      */
+    @NonNull
     public static BackstackManager getManager(Context context) {
         BackstackHost backstackHost = getBackstackHost(context);
         return backstackHost.getBackstackManager();
@@ -299,6 +310,7 @@ public class Navigator {
      * @param key     the key
      * @return the saved state
      */
+    @NonNull
     public static SavedState getSavedState(@NonNull Context context, @NonNull Object key) {
         if(context == null) {
             throw new NullPointerException("context cannot be null");

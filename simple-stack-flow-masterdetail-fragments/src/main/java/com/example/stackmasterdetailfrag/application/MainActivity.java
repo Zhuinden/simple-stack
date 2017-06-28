@@ -17,6 +17,7 @@
 package com.example.stackmasterdetailfrag.application;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -162,7 +163,7 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(StateChange traversal, final StateChanger.Callback callback) {
+    public void handleStateChange(@NonNull StateChange traversal, @NonNull final StateChanger.Callback callback) {
         Path path = traversal.topNewState();
         setTitle(path.getTitle());
         ActionBar actionBar = getSupportActionBar();

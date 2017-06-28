@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -175,7 +176,7 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             // no-op
             completionCallback.stateChangeComplete();

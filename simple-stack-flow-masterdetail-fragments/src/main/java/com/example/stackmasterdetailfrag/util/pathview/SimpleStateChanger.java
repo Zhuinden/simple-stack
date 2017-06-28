@@ -16,6 +16,7 @@
 
 package com.example.stackmasterdetailfrag.util.pathview;
 
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.StateChange;
@@ -38,7 +39,7 @@ public class SimpleStateChanger
     }
 
     @Override
-    public void handleStateChange(final StateChange stateChange, final StateChanger.Callback callback) {
+    public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final StateChanger.Callback callback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             callback.stateChangeComplete();
             return;

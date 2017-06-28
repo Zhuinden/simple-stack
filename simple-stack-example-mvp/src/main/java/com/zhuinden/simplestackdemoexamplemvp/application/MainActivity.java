@@ -12,16 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
-import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.HistoryBuilder;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 
 import javax.inject.Inject;
 
@@ -125,7 +125,7 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, StateChanger.Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback completionCallback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             completionCallback.stateChangeComplete();
             return;

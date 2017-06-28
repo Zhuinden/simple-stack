@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemonestedstack.presentation.paths.main;
 
 import android.content.Context;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
@@ -119,7 +120,7 @@ public class MainView
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         NestSupportServiceManager.get(getContext()).setupServices(stateChange, true);
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             // no-op

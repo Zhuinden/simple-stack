@@ -2,6 +2,7 @@ package com.example.stackmasterdetailfrag.util.pathview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
@@ -53,7 +54,7 @@ public class TabletMasterDetailRoot
     }
 
     @Override
-    public void handleStateChange(final StateChange stateChange, StateChanger.Callback callback) {
+    public void handleStateChange(@NonNull final StateChange stateChange, @NonNull StateChanger.Callback callback) {
         masterDetailFragmentStateChanger.handleStateChange(stateChange);
         FragmentManager fragmentManager = FragmentManagerService.get(getContext());
         Fragment fragment = fragmentManager.findFragmentById(R.id.master);

@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemonestedstack.presentation.paths.main.cloudsyn
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -85,7 +86,7 @@ public class AnotherView
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         NestSupportServiceManager.get(getContext()).setupServices(stateChange);
         completionCallback.stateChangeComplete();
     }

@@ -1,6 +1,7 @@
 package com.zhuinden.demo;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -83,7 +84,7 @@ public class DemoActivity
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
             completionCallback.stateChangeComplete();
             return;

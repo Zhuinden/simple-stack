@@ -1,10 +1,8 @@
 package com.zhuinden.simpleservicesexample.application;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.servicetree.ServiceTree;
@@ -13,7 +11,6 @@ import com.zhuinden.simpleservicesexample.presentation.paths.a.A;
 import com.zhuinden.simpleservicesexample.utils.ServiceLocator;
 import com.zhuinden.simpleservicesexample.utils.ServiceManager;
 import com.zhuinden.simpleservicesexample.utils.StackService;
-import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
@@ -97,7 +94,7 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         serviceManager.setupServices(stateChange);
         completionCallback.stateChangeComplete();
     }

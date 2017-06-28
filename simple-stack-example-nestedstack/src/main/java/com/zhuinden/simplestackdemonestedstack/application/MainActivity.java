@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemonestedstack.application;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -127,7 +128,7 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         serviceManager.setupServices(stateChange);
         completionCallback.stateChangeComplete();
     }

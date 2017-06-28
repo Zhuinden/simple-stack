@@ -72,7 +72,7 @@ public class BackstackManager
 
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
-        public void handleStateChange(final StateChange stateChange, final Callback completionCallback) {
+        public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
             stateChanger.handleStateChange(stateChange, new Callback() {
                 @Override
                 public void stateChangeComplete() {
@@ -101,7 +101,7 @@ public class BackstackManager
      *
      * @param keyFilter The custom {@link KeyFilter}.
      */
-    public void setKeyFilter(KeyFilter keyFilter) {
+    public void setKeyFilter(@NonNull KeyFilter keyFilter) {
         if(backstack != null) {
             throw new IllegalStateException("Custom key filter should be set before calling `setup()`");
         }
@@ -118,7 +118,7 @@ public class BackstackManager
      *
      * @param keyParceler The custom {@link KeyParceler}.
      */
-    public void setKeyParceler(KeyParceler keyParceler) {
+    public void setKeyParceler(@NonNull KeyParceler keyParceler) {
         if(backstack != null) {
             throw new IllegalStateException("Custom key parceler should be set before calling `setup()`");
         }
@@ -136,7 +136,7 @@ public class BackstackManager
      *
      * @param stateClearStrategy The custom {@link StateClearStrategy}.
      */
-    public void setStateClearStrategy(StateClearStrategy stateClearStrategy) {
+    public void setStateClearStrategy(@NonNull StateClearStrategy stateClearStrategy) {
         if(backstack != null) {
             throw new IllegalStateException("Custom state clear strategy should be set before calling `setup()`");
         }
@@ -285,7 +285,10 @@ public class BackstackManager
      *
      * @param stateChangeCompletionListener the state change completion listener.
      */
-    public void addStateChangeCompletionListener(StateChangeCompletionListener stateChangeCompletionListener) {
+    public void addStateChangeCompletionListener(@NonNull StateChangeCompletionListener stateChangeCompletionListener) {
+        if(stateChangeCompletionListener == null) {
+            throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
+        }
         this.stateChangeCompletionListeners.add(stateChangeCompletionListener);
     }
 
@@ -294,7 +297,10 @@ public class BackstackManager
      *
      * @param stateChangeCompletionListener the state change completion listener.
      */
-    public void removeStateChangeCompletionListener(StateChangeCompletionListener stateChangeCompletionListener) {
+    public void removeStateChangeCompletionListener(@NonNull StateChangeCompletionListener stateChangeCompletionListener) {
+        if(stateChangeCompletionListener == null) {
+            throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
+        }
         this.stateChangeCompletionListeners.remove(stateChangeCompletionListener);
     }
 

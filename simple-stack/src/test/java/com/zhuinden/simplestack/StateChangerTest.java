@@ -17,6 +17,7 @@ package com.zhuinden.simplestack;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class StateChangerTest {
         private List<Object> newState;
 
         @Override
-        public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
             originalState = stateChange.getPreviousState();
             newState = stateChange.getNewState();
             completionCallback.stateChangeComplete();

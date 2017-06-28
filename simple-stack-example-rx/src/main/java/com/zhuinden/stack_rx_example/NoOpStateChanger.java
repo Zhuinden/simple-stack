@@ -1,5 +1,7 @@
 package com.zhuinden.stack_rx_example;
 
+import android.support.annotation.NonNull;
+
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
@@ -9,7 +11,7 @@ import com.zhuinden.simplestack.StateChanger;
 
 public class NoOpStateChanger implements StateChanger {
     @Override
-    public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
         completionCallback.stateChangeComplete();
     }
 }

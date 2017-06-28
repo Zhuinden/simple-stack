@@ -16,6 +16,7 @@
 package com.zhuinden.simplestack;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -105,7 +106,7 @@ public class BackstackTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
         }, Backstack.INITIALIZE);
@@ -124,7 +125,7 @@ public class BackstackTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
         }, Backstack.INITIALIZE);
@@ -141,7 +142,7 @@ public class BackstackTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 assertThat(stateChange.topPreviousState()).isNull();
                 callback = completionCallback;
             }
@@ -158,7 +159,7 @@ public class BackstackTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 if(!stateChange.getPreviousState().isEmpty()) {
                     assertThat(stateChange.topPreviousState()).isEqualTo(bye);
                 }
@@ -202,7 +203,7 @@ public class BackstackTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
         };
@@ -246,7 +247,7 @@ public class BackstackTest {
         Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(StateChange _stateChange, Callback completionCallback) {
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -268,7 +269,7 @@ public class BackstackTest {
         Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(StateChange _stateChange, Callback completionCallback) {
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }

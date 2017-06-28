@@ -2,6 +2,7 @@ package com.example.stackmasterdetail.util.pathview;
 
 import android.content.Context;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
@@ -17,7 +18,7 @@ public class MasterPathContainerView
     }
 
     @Override
-    public void handleStateChange(StateChange stateChange, final StateChanger.Callback callback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull final StateChanger.Callback callback) {
         Parcelable previousKey = stateChange.topPreviousState();
         MasterDetailPath currentMaster = previousKey != null ? ((MasterDetailPath) previousKey).getMaster() : null;
 

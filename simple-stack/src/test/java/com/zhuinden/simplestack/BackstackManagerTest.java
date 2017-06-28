@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BackstackManagerTest {
     StateChanger stateChanger = new StateChanger() {
         @Override
-        public void handleStateChange(StateChange stateChange, Callback completionCallback) {
+        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
             completionCallback.stateChangeComplete();
         }
     };

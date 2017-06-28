@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemoexamplemvp.application;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,13 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
-import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsKey;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
+import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 
 import javax.inject.Inject;
 
@@ -199,7 +199,7 @@ public class MainView
         return false;
     }
 
-    public void handleStateChange(StateChange stateChange, StateChanger.Callback callback) {
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback callback) {
         if(root != null && root.getChildAt(0) != null) {
             if(root.getChildAt(0) instanceof StateChanger) {
                 ((StateChanger) root.getChildAt(0)).handleStateChange(stateChange, callback);
