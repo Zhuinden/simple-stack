@@ -52,12 +52,12 @@ public class TaskRepository {
         }
         return tasks;
     }
-    
+
     public Observable<List<Task>> getTasks() {
         return Observable.create((ObservableOnSubscribe<List<Task>>) emitter -> {
             Realm realm = Realm.getDefaultInstance();
-            final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
-                    .findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
+            realm.refresh();
+            final RealmResults<DbTask> dbTasks = realm.where(DbTask.class).findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
             final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
                 if(!emitter.isDisposed()) {
                     List<Task> tasks = mapFrom(element);
@@ -80,6 +80,7 @@ public class TaskRepository {
     public Observable<List<Task>> getCompletedTasks() {
         return Observable.create((ObservableOnSubscribe<List<Task>>) emitter -> {
             Realm realm = Realm.getDefaultInstance();
+            realm.refresh();
             final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
                     .equalTo(DbTaskFields.COMPLETED, true)
                     .findAllSorted(DbTaskFields.ID, Sort.ASCENDING);
@@ -105,6 +106,7 @@ public class TaskRepository {
     public Observable<List<Task>> getActiveTasks() {
         return Observable.create((ObservableOnSubscribe<List<Task>>) emitter -> {
             Realm realm = Realm.getDefaultInstance();
+            realm.refresh();
             final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
                     .equalTo(DbTaskFields.COMPLETED, false)
                     .findAllSorted(DbTaskFields.ID, Sort.ASCENDING);

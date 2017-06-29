@@ -38,6 +38,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -219,7 +220,11 @@ public class TasksFragment
 
     public void refresh() {
         swipeRefreshLayout.setRefreshing(true);
-        Single.just("").delay(2500, TimeUnit.MILLISECONDS).subscribe(ignored -> { // TODO: do something useful
+        Single.just("")
+                .delay(2500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(ignored -> {
             if(swipeRefreshLayout != null) {
                 swipeRefreshLayout.setRefreshing(false);
             }

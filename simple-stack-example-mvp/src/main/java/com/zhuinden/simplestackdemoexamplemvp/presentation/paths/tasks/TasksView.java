@@ -40,6 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -165,8 +166,7 @@ public class TasksView
         listView.setAdapter(tasksAdapter);
         listView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
-        setColorSchemeColors(ContextCompat.getColor(this.getContext(),
-                R.color.colorPrimary),
+        setColorSchemeColors(ContextCompat.getColor(this.getContext(), R.color.colorPrimary),
                 ContextCompat.getColor(this.getContext(), R.color.colorAccent),
                 ContextCompat.getColor(this.getContext(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
@@ -218,8 +218,7 @@ public class TasksView
     }
 
     public void showFilteringPopupMenu() {
-        PopupMenu popup = new PopupMenu(this.getContext(),
-                MainActivity.get(this.getContext()).findViewById(R.id.menu_filter));
+        PopupMenu popup = new PopupMenu(this.getContext(), MainActivity.get(this.getContext()).findViewById(R.id.menu_filter));
         popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
 
         popup.setOnMenuItemClickListener(item -> {
@@ -247,11 +246,13 @@ public class TasksView
 
     public void refresh() {
         setRefreshing(true);
-        Single.just("").delay(2500, TimeUnit.MILLISECONDS).subscribe(ignored -> { // TODO: do something useful
-            if(this != null) {
-                setRefreshing(false);
-            }
-        });
+        Single.just("")
+                .delay(2500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(ignored -> {
+                    setRefreshing(false);
+                });
     }
 
     public void showNoActiveTasks() {
