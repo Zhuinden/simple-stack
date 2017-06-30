@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhuinden.navigationexampleview.HomeView xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+        <TextView
+            android:layout_margin="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textSize="28sp" />
+        
+        <EditText
+            android:id="@+id/home_edittext"
+            android:gravity="center"
+            android:hint="Type some text here"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8"/>
+        <Button
+            android:id="@+id/home_button"
+            android:layout_margin="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go to Other View"/>
+    </LinearLayout>
+
+</com.zhuinden.navigationexampleview.HomeView>
