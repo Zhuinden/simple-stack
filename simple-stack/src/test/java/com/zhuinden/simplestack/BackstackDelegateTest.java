@@ -32,6 +32,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -265,4 +267,57 @@ public class BackstackDelegateTest {
         }
     }
 
+    @Test
+    public void addStateChangeListenerAddsCompletionListener() {
+        TestKey testKey = new TestKey("hello");
+        final List<StateChange> called = new LinkedList<>();
+        Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
+            @Override
+            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+                called.add(stateChange);
+            }
+        };
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.addStateChangeCompletionListener(completionListener);
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
+        backstackDelegate.setStateChanger(stateChanger);
+
+        assertThat(called.get(0).topNewState()).isSameAs(testKey);
+    }
+
+    @Test
+    public void addStateChangeListenerAfterOnCreateThrows() {
+        TestKey testKey = new TestKey("hello");
+        Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
+            @Override
+            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+                // do nothing
+            }
+        };
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
+        try {
+            backstackDelegate.addStateChangeCompletionListener(completionListener);
+        } catch(IllegalStateException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void getManagerReturnsBackstackManager() {
+        TestKey testKey = new TestKey("Hello");
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
+        assertThat(backstackDelegate.getManager()).isNotNull();
+    }
+
+    @Test
+    public void getManagerBeforeOnCreateThrows() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.getManager();
+        } catch(IllegalStateException e) {
+            // OK
+        }
+    }
 }

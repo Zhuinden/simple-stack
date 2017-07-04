@@ -60,7 +60,7 @@ public class Navigator {
         BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
         boolean isInitializeDeferred = false;
         boolean shouldPersistContainerChild = true;
-        List<BackstackManager.StateChangeCompletionListener> stateChangeCompletionListeners = new LinkedList<>();
+        List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
         /**
          * Sets the state changer used by the navigator's backstack.
@@ -150,13 +150,14 @@ public class Navigator {
         }
 
         /**
-         * Adds a {@link BackstackManager.StateChangeCompletionListener}, which will be added to the {@link BackstackManager} when it is initialized.
+         * Adds a {@link Backstack.CompletionListener}, which will be added to the {@link BackstackManager} when it is initialized.
+         * As it is added only on initialization, these are added to the Backstack only once.
          *
          * @param stateChangeCompletionListener the state change completion listener
          * @return the installer
          */
         @NonNull
-        public Installer addStateChangeCompletionListener(@NonNull BackstackManager.StateChangeCompletionListener stateChangeCompletionListener) {
+        public Installer addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
             if(stateChangeCompletionListener == null) {
                 throw new IllegalArgumentException("If added, state change completion listener cannot be null!");
             }

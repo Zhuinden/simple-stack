@@ -91,12 +91,16 @@ public class BackstackDelegate {
     }
 
     /**
-     * Adds a {@link BackstackManager.StateChangeCompletionListener}, which will be added to the {@link BackstackManager} when it is initialized.
+     * Adds a {@link Backstack.CompletionListener}, which will be added to the {@link Backstack} when it is initialized.
+     * As it is added only on initialization, these are added to the Backstack only once.
+     *
      * Please note that this should not be an anonymous inner class, because this is kept across configuration changes.
+     *
+     * This can only be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
      *
      * @param stateChangeCompletionListener the state change completion listener
      */
-    public void addStateChangeCompletionListener(@NonNull BackstackManager.StateChangeCompletionListener stateChangeCompletionListener) {
+    public void addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
         if(backstackManager != null && backstackManager.getBackstack() != null) {
             throw new IllegalStateException("If adding, completion listener must be added before calling `onCreate()`");
         }
@@ -113,7 +117,7 @@ public class BackstackDelegate {
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
-    private List<BackstackManager.StateChangeCompletionListener> stateChangeCompletionListeners = new LinkedList<>();
+    private List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
     /**
      * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
@@ -158,7 +162,6 @@ public class BackstackDelegate {
      * It initializes the backstack from either the non-configuration instance, the saved state, or creates a new one.
      * Restores the {@link SavedState} that belongs to persisted view state.
      * Begins an initialize {@link StateChange} if the {@link StateChanger} is set.
-     * Also registers a {@link Backstack.CompletionListener} that must be unregistered with {@link BackstackDelegate#onDestroy()}.
      *
      * @param savedInstanceState       The Activity saved instance state bundle.
      * @param nonConfigurationInstance The {@link NonConfigurationInstance} that is typically obtained with getLastCustomNonConfigurationInstance().
@@ -178,10 +181,10 @@ public class BackstackDelegate {
             backstackManager.setKeyFilter(keyFilter);
             backstackManager.setKeyParceler(keyParceler);
             backstackManager.setStateClearStrategy(stateClearStrategy);
-            for(BackstackManager.StateChangeCompletionListener completionListener : stateChangeCompletionListeners) {
+            backstackManager.setup(initialKeys);
+            for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
                 backstackManager.addStateChangeCompletionListener(completionListener);
             }
-            backstackManager.setup(initialKeys);
             if(savedInstanceState != null) {
                 backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable(getHistoryTag()));
             }
@@ -322,6 +325,19 @@ public class BackstackDelegate {
             throw new IllegalStateException("You can call this method only after `onCreate()`");
         }
         return backstackManager.getSavedState(key);
+    }
+
+    /**
+     * Returns the backstack manager. If called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}, it throws an exception.
+     *
+     * @return the backstack manager
+     */
+    @NonNull
+    public BackstackManager getManager() {
+        if(backstackManager == null) {
+            throw new IllegalStateException("The backstack manager within the delegate must be initialized by `onCreate()`");
+        }
+        return backstackManager;
     }
 
     /**

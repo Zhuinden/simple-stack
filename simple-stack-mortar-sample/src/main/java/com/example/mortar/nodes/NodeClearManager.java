@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.zhuinden.servicetree.ServiceTree;
-import com.zhuinden.simplestack.BackstackManager;
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.StateChange;
 
 /**
@@ -12,7 +12,7 @@ import com.zhuinden.simplestack.StateChange;
  */
 
 public class NodeClearManager
-        implements BackstackManager.StateChangeCompletionListener {
+        implements Backstack.CompletionListener {
     private static final String TAG = "NodeClearManager";
 
     private final ServiceTree serviceTree;

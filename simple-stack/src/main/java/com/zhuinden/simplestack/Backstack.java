@@ -361,6 +361,13 @@ public class Backstack {
         completionListeners.remove(completionListener);
     }
 
+    /**
+     * Unregisters all {@link Backstack.CompletionListener}s.
+     */
+    public void removeCompletionListeners() {
+        completionListeners.clear();
+    }
+
     private void notifyCompletionListeners(StateChange stateChange) {
         for(CompletionListener completionListener : completionListeners) {
             completionListener.stateChangeCompleted(stateChange);

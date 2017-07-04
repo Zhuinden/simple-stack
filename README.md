@@ -60,7 +60,7 @@ In order to use Simple Stack, you need to add jitpack to your project root gradl
 
 and add the compile dependency to your module level gradle.
 
-    compile 'com.github.Zhuinden:simple-stack:1.6.3'
+    compile 'com.github.Zhuinden:simple-stack:1.7.0'
 
 ## How does it work?
 
@@ -78,6 +78,28 @@ Afterwards, the [Backstack](https://github.com/Zhuinden/simple-stack/blob/master
 
 ## Example code
 
+### Fragments
+
+Check out [simple-stack-example-basic-fragment](https://github.com/Zhuinden/simple-stack/tree/master/simple-stack-example-basic-fragment) to see how to make Simple-Stack work with Fragments (or the relevant wiki page).
+
+In the end, navigation can be as simple as
+
+``` java
+    public void navigateTo(Object key) {
+        backstackDelegate.getBackstack().goTo(key);
+    }
+```
+
+and
+
+``` java
+    @OnClick(R.id.home_button)
+    public void goToOtherView(View view) {
+        MainActivity.get(view.getContext()).navigateTo(OtherKey.create());
+    }
+```
+
+### Custom Views
 
 - **Activity**
 

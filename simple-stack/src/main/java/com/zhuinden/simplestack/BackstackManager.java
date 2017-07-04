@@ -26,7 +26,6 @@ import com.zhuinden.statebundle.StateBundle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,15 +49,6 @@ public class BackstackManager
         void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange);
     }
 
-    public interface StateChangeCompletionListener {
-        /**
-         * Called when the state change for the {@link Backstack} is completed, before the state is cleared by {@link StateClearStrategy}..
-         *
-         * @param stateChange the state change
-         */
-        void stateChangeCompleted(@NonNull StateChange stateChange);
-    }
-
     private static final String HISTORY_TAG = "HISTORY";
     private static final String STATES_TAG = "STATES";
 
@@ -77,9 +67,6 @@ public class BackstackManager
                 @Override
                 public void stateChangeComplete() {
                     completionCallback.stateChangeComplete();
-                    for(StateChangeCompletionListener stateChangeCompletionListener : stateChangeCompletionListeners) {
-                        stateChangeCompletionListener.stateChangeCompleted(stateChange);
-                    }
                     if(!backstack.isStateChangePending()) {
                         stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
                     }
@@ -91,8 +78,6 @@ public class BackstackManager
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
-
-    private List<StateChangeCompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
     /**
      * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
@@ -276,39 +261,43 @@ public class BackstackManager
     }
 
     /**
-     * Allows adding a {@link StateChangeCompletionListener} that is called when the state change is completed, but before the state is cleared.
+     * Allows adding a {@link Backstack.CompletionListener} to the internal {@link Backstack} that is called when the state change is completed, but before the state is cleared.
      *
-     * Please note that a strong reference is kept to the listener, and the {@link BackstackManager} is typically preserved across configuration change.
+     * Please note that a strong reference is kept to the listener, and the {@link Backstack} is typically preserved across configuration change.
      * It is recommended that it is NOT an anonymous inner class or normal inner class in an Activity,
-     * because that could cause memory leaks, unless the listener is removed in onDestroy().
+     * because that could cause memory leaks.
+     *
      * Instead, it should be a class, or a static inner class.
      *
      * @param stateChangeCompletionListener the state change completion listener.
      */
-    public void addStateChangeCompletionListener(@NonNull StateChangeCompletionListener stateChangeCompletionListener) {
+    public void addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
+        checkBackstack("A backstack must be set up before a state change completion listener is added to it.");
         if(stateChangeCompletionListener == null) {
             throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
         }
-        this.stateChangeCompletionListeners.add(stateChangeCompletionListener);
+        this.backstack.addCompletionListener(stateChangeCompletionListener);
     }
 
     /**
-     * Removes the provided {@link StateChangeCompletionListener}.
+     * Removes the provided {@link Backstack.CompletionListener}.
      *
      * @param stateChangeCompletionListener the state change completion listener.
      */
-    public void removeStateChangeCompletionListener(@NonNull StateChangeCompletionListener stateChangeCompletionListener) {
+    public void removeStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
+        checkBackstack("A backstack must be set up before a state change completion listener is removed from it.");
         if(stateChangeCompletionListener == null) {
             throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
         }
-        this.stateChangeCompletionListeners.remove(stateChangeCompletionListener);
+        this.backstack.removeCompletionListener(stateChangeCompletionListener);
     }
 
     /**
-     * Removes all {@link StateChangeCompletionListener}s added to the {@link BackstackManager}.
+     * Removes all {@link Backstack.CompletionListener}s added to the {@link Backstack}.
      */
     public void removeAllStateChangeCompletionListeners() {
-        this.stateChangeCompletionListeners.clear();
+        checkBackstack("A backstack must be set up before state change completion listeners are removed from it.");
+        this.backstack.removeCompletionListeners();
     }
 
     /**

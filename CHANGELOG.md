@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 1.7.0 (2017-07-04)
+--------------------------------
+- REMOVED: `BackstackManager.StateChangeCompletionListener`. It is replaced by `Backstack.CompletionListener`, which was added back in 0.9.1 (and is more reliable).
+
+This also fixes a possible bug with incorrect call order of state change completion listeners.
+
+The API is otherwise exactly the same, `StateChangeCompletionListener` should have been `Backstack.CompletionListener` from the start.
+
+- ADDED: `backstackDelegate.getManager()`, just to make sure its API mirrors `Navigator`.
+
 -Simple Stack 1.6.3 (2017-06-28)
 --------------------------------
 - Added missing `@NonNull` and `@Nullable` annotations where applicable.
