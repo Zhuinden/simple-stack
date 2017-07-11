@@ -101,6 +101,7 @@ and
 
 - **Activity**
 
+``` java
 public class MainActivity
         extends AppCompatActivity
         implements StateChanger {
