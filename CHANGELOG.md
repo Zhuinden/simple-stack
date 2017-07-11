@@ -1,5 +1,18 @@
 # Change log
 
+-Simple Stack 1.7.1 (2017-07-11)
+--------------------------------
+- ADDED: `BackstackDelegate.registerForLifecycleCallbacks(Activity)` convenience method (API 14+).
+
+This method allows you to call this after `BackstackDelegate.onCreate()`, after which the following 4 methods no longer need to be called manually:
+
+    - `onPostResume()`
+    - `onPause()`
+    - `onSaveInstanceState(Bundle)`
+    - `onDestroy()`
+
+Therefore the callbacks that ought to be called remain as `onCreate()`, `onRetainCustomNonConfigurationInstance()`, and of course `onBackPressed()`.
+
 -Simple Stack 1.7.0 (2017-07-04)
 --------------------------------
 - REMOVED: `BackstackManager.StateChangeCompletionListener`. It is replaced by `Backstack.CompletionListener`, which was added back in 0.9.1 (and is more reliable).

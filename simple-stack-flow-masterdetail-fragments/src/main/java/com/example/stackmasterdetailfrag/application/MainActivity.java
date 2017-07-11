@@ -74,28 +74,11 @@ public class MainActivity
         backstackDelegate.setStateClearStrategy(new MasterDetailStateClearStrategy());
         backstackDelegate.onCreate(savedInstanceState,
                 getLastCustomNonConfigurationInstance(), HistoryBuilder.single(ConversationListPath.create()));
+        backstackDelegate.registerForLifecycleCallbacks(this);
         setContentView(R.layout.root_layout);
         container = (StateChanger) findViewById(R.id.container);
         containerAsBackTarget = (HandlesBack) container;
         backstackDelegate.setStateChanger(this);
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
-    }
-
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        backstackDelegate.onDestroy();
-        super.onDestroy();
     }
 
     @Override
@@ -118,12 +101,6 @@ public class MainActivity
             return this;
         }
         return super.getSystemService(name);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        backstackDelegate.onSaveInstanceState(outState);
     }
 
     @Override

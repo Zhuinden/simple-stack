@@ -3,19 +3,15 @@ package com.zhuinden.navigationexamplefrag;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
-import com.zhuinden.simplestack.navigator.Navigator;
 
 import java.util.Arrays;
 
@@ -42,6 +38,7 @@ public class MainActivity
         backstackDelegate.onCreate(savedInstanceState,
                 getLastCustomNonConfigurationInstance(),
                 HistoryBuilder.single(HomeKey.create()));
+        backstackDelegate.registerForLifecycleCallbacks(this);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -64,6 +61,11 @@ public class MainActivity
         Log.i(TAG, "History [" + Arrays.toString(backstackDelegate.getBackstack().getHistory().toArray()) + "]");
         fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.root);
         backstackDelegate.setStateChanger(this);
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return backstackDelegate.onRetainCustomNonConfigurationInstance();
     }
 
     @Override
@@ -104,35 +106,5 @@ public class MainActivity
         }
         fragmentStateChanger.handleStateChange(stateChange);
         completionCallback.stateChangeComplete();
-    }
-
-    // lifecycle integration
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        backstackDelegate.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
-    }
-
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        backstackDelegate.onDestroy();
-        super.onDestroy();
     }
 }

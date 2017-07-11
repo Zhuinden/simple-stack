@@ -298,7 +298,20 @@ public class BackstackDelegateTest {
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
         try {
             backstackDelegate.addStateChangeCompletionListener(completionListener);
+            Assert.fail();
         } catch(IllegalStateException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void addNullStateChangeListenerThrows() {
+        TestKey testKey = new TestKey("hello");
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.addStateChangeCompletionListener(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
             // OK
         }
     }
@@ -316,6 +329,7 @@ public class BackstackDelegateTest {
         BackstackDelegate backstackDelegate = new BackstackDelegate(null);
         try {
             backstackDelegate.getManager();
+            Assert.fail();
         } catch(IllegalStateException e) {
             // OK
         }

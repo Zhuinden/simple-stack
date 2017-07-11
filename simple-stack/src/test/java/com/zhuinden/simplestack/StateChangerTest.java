@@ -15,12 +15,14 @@
  */
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +37,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StateChangerTest {
     private static class TestStateChanger
             implements StateChanger {
+        private StateChange stateChange;
         private List<Object> originalState;
         private List<Object> newState;
 
         @Override
         public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            this.stateChange = stateChange;
             originalState = stateChange.getPreviousState();
             newState = stateChange.getNewState();
             completionCallback.stateChangeComplete();
@@ -272,6 +276,17 @@ public class StateChangerTest {
         backstack.setStateChanger(testStateChanger, Backstack.INITIALIZE);
     }
 
+    @Test
+    public void stateChangeExposesBackstack() {
+        assertThat(testStateChanger.stateChange.backstack()).isSameAs(backstack);
+    }
+
+    @Test
+    public void stateChangeCreatesContextThatExposesKey() {
+        Context context = Mockito.mock(Context.class);
+        Context newContext = testStateChanger.stateChange.createContext(context, testStateChanger.stateChange.topNewState());
+        assertThat(Backstack.getKey(newContext)).isSameAs(testStateChanger.stateChange.topNewState());
+    }
 
     @Test
     public void initialStateIsABCD()

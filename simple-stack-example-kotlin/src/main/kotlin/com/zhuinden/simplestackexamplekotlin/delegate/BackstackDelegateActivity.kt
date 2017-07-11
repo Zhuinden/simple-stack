@@ -29,6 +29,7 @@ class BackstackDelegateActivity : AppCompatActivity() {
         backstackDelegate.onCreate(savedInstanceState, //
                 lastCustomNonConfigurationInstance, //
                 HistoryBuilder.single(FirstKey.create()))
+        backstackDelegate.registerForLifecycleCallbacks(this)
         defaultStateChanger = DefaultStateChanger.configure()
                 .setStatePersistenceStrategy(object : DefaultStateChanger.StatePersistenceStrategy {
                     override fun persistViewToState(previousKey: Any, previousView: View) {
@@ -47,31 +48,15 @@ class BackstackDelegateActivity : AppCompatActivity() {
         return backstackDelegate.onRetainCustomNonConfigurationInstance()
     }
 
-    override fun onPostResume() {
-        super.onPostResume()
-        backstackDelegate.onPostResume()
-    }
-
     override fun onBackPressed() {
         if (!backstackDelegate.onBackPressed()) {
             super.onBackPressed()
         }
     }
 
-    override fun onPause() {
-        backstackDelegate.onPause()
-        super.onPause()
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         backstackDelegate.persistViewToState(root.getChildAt(0))
-        backstackDelegate.onSaveInstanceState(outState)
-    }
-
-    override fun onDestroy() {
-        backstackDelegate.onDestroy()
-        super.onDestroy()
     }
 
     override fun getSystemService(name: String): Any {

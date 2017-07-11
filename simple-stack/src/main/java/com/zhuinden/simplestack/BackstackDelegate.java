@@ -15,6 +15,9 @@
  */
 package com.zhuinden.simplestack;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -158,6 +161,79 @@ public class BackstackDelegate {
     }
 
     /**
+     * Convenience method that automatically handles calling the following methods:
+     * - {@link BackstackDelegate#onPostResume()}
+     * - {@link BackstackDelegate#onPause()}
+     * - {@link BackstackDelegate#onSaveInstanceState(Bundle)}
+     * - {@link BackstackDelegate#onDestroy()}.
+     *
+     * This method can only be called after {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     *
+     * Note: This method cannot handle {@link BackstackDelegate#onRetainCustomNonConfigurationInstance()}, so that must still be called manually.
+     *
+     * @param activity the Activity whose callbacks we register for.
+     */
+    @TargetApi(14)
+    public void registerForLifecycleCallbacks(@NonNull final Activity activity) {
+        if(activity == null) {
+            throw new NullPointerException("Activity is null");
+        }
+        if(backstackManager == null) {
+            throw new IllegalStateException("You can register for lifecycle callbacks only after calling `onCreate()`.");
+        }
+        final Application application = activity.getApplication();
+        application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity a, Bundle savedInstanceState) {
+                // this is executed too late. do nothing.
+            }
+
+            @Override
+            public void onActivityStarted(Activity a) {
+                if(activity == a) {
+                    // do nothing
+                }
+            }
+
+            @Override
+            public void onActivityResumed(Activity a) {
+                if(activity == a) {
+                    onPostResume();
+                }
+            }
+
+            @Override
+            public void onActivityPaused(Activity a) {
+                if(activity == a) {
+                    onPause();
+                }
+            }
+
+            @Override
+            public void onActivityStopped(Activity a) {
+                if(activity == a) {
+                    // do nothing
+                }
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity a, Bundle outState) {
+                if(activity == a) {
+                    onSaveInstanceState(outState);
+                }
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity a) {
+                if(activity == a) {
+                    onDestroy();
+                    application.unregisterActivityLifecycleCallbacks(this);
+                }
+            }
+        });
+    }
+
+    /**
      * The onCreate() delegate for the Activity.
      * It initializes the backstack from either the non-configuration instance, the saved state, or creates a new one.
      * Restores the {@link SavedState} that belongs to persisted view state.
@@ -207,7 +283,7 @@ public class BackstackDelegate {
      * The onRetainCustomNonConfigurationInstance() delegate for the Activity.
      * This is required to make sure that the Backstack survives configuration change.
      *
-     * @return a {@link NonConfigurationInstance} that contains the internal backstack instance.
+     * @return a {@link NonConfigurationInstance} that contains the internal {@link BackstackManager}.
      */
     public NonConfigurationInstance onRetainCustomNonConfigurationInstance() {
         return new NonConfigurationInstance(backstackManager);
@@ -328,7 +404,7 @@ public class BackstackDelegate {
     }
 
     /**
-     * Returns the backstack manager. If called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}, it throws an exception.
+     * Returns the {@link BackstackManager}. If called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}, it throws an exception.
      *
      * @return the backstack manager
      */

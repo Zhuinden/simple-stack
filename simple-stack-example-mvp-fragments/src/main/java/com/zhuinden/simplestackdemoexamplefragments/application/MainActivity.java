@@ -64,6 +64,8 @@ public class MainActivity
                 getLastCustomNonConfigurationInstance(), //
                 HistoryBuilder.single(TasksKey.create()));
 
+        backstackDelegate.registerForLifecycleCallbacks(this);
+
         backstackHolder.setBackstack(backstackDelegate.getBackstack());
 
         super.onCreate(savedInstanceState);
@@ -100,12 +102,6 @@ public class MainActivity
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        backstackDelegate.onPostResume();
-    }
-
-    @Override
     public void onBackPressed() {
         if(mainView.onBackPressed()) {
             return;
@@ -113,24 +109,6 @@ public class MainActivity
         if(!backstackDelegate.onBackPressed()) {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        backstackDelegate.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        backstackDelegate.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        backstackDelegate.onDestroy();
-        super.onDestroy();
     }
 
     @Override

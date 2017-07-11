@@ -60,7 +60,7 @@ In order to use Simple Stack, you need to add jitpack to your project root gradl
 
 and add the compile dependency to your module level gradle.
 
-    compile 'com.github.Zhuinden:simple-stack:1.7.0'
+    compile 'com.github.Zhuinden:simple-stack:1.7.1'
 
 ## How does it work?
 
@@ -80,9 +80,9 @@ Afterwards, the [Backstack](https://github.com/Zhuinden/simple-stack/blob/master
 
 ### Fragments
 
-Check out [simple-stack-example-basic-fragment](https://github.com/Zhuinden/simple-stack/tree/master/simple-stack-example-basic-fragment) to see how to make Simple-Stack work with Fragments (or the relevant wiki page).
+Check out the details in [simple-stack-example-basic-fragment](https://github.com/Zhuinden/simple-stack/tree/master/simple-stack-example-basic-fragment) to see how to make Simple-Stack work with Fragments (or the relevant wiki page).
 
-In the end, navigation can be as simple as
+- **End result**
 
 ``` java
     public void navigateTo(Object key) {
@@ -95,9 +95,66 @@ and
 ``` java
     @OnClick(R.id.home_button)
     public void goToOtherView(View view) {
-        MainActivity.get(view.getContext()).navigateTo(OtherKey.create());
+        MainActivity.get(view.getContext()).navigateTo(OtherKey.create()); // using getSystemService()
     }
 ```
+
+- **Activity**
+
+public class MainActivity
+        extends AppCompatActivity
+        implements StateChanger {
+    private static final String TAG = "MainActivity";
+
+    @BindView(R.id.root)
+    ViewGroup root;
+
+    BackstackDelegate backstackDelegate;
+    FragmentStateChanger fragmentStateChanger;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(),
+                                   HistoryBuilder.single(HomeKey.create()));
+        backstackDelegate.registerForLifecycleCallbacks(this);
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        // ...
+        fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.root);
+        backstackDelegate.setStateChanger(this);
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return backstackDelegate.onRetainCustomNonConfigurationInstance();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!backstackDelegate.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
+
+    // ...
+
+    @Override
+    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+        if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
+            completionCallback.stateChangeComplete();
+            return;
+        }
+        fragmentStateChanger.handleStateChange(stateChange);
+        completionCallback.stateChangeComplete();
+    }
+}
+```
+
+For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/caf4579b7994f0dee3b4d2153265c5c91a71b3f2/simple-stack-example-basic-fragment/src/main/java/com/zhuinden/navigationexamplefrag/FragmentStateChanger.java).
 
 ### Custom Views
 
