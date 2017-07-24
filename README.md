@@ -155,7 +155,7 @@ public class MainActivity
 }
 ```
 
-For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/caf4579b7994f0dee3b4d2153265c5c91a71b3f2/simple-stack-example-basic-fragment/src/main/java/com/zhuinden/navigationexamplefrag/FragmentStateChanger.java).
+For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/504b2c44295c77a960ca34add68fdc685c3dbc19/simple-stack-example-basic-fragment/src/main/java/com/zhuinden/navigationexamplefrag/FragmentStateChanger.java).
 
 ### Custom Views
 
