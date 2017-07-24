@@ -1,5 +1,32 @@
 # Change log
 
+-Simple Stack 1.7.2 (2017-07-24)
+--------------------------------
+- MINOR CHANGE + ENHANCEMENT: `StateChange.getNewState()` and `StateChange.getPreviousState()` return a copy of the list (it was already a copy, don't worry), where each item is casted to `<T>` specified as generic parameter.
+
+For example, the following can be changed from:
+
+``` java
+for(Object _newKey : stateChange.getNewState()) {
+    Key newKey = (Key)_newKey;
+    // ...
+}
+```
+
+to:
+
+``` java
+for(Key newKey : stateChange.<Key>getNewState()) {
+   // ...
+}
+```
+
+And the following works now as well:
+
+``` java
+List<Key> newKeys = stateChange.getNewState(); // used to return List<Object>
+```
+
 -Simple Stack 1.7.1 (2017-07-11)
 --------------------------------
 - ADDED: `BackstackDelegate.registerForLifecycleCallbacks(Activity)` convenience method (API 14+).

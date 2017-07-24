@@ -27,8 +27,7 @@ public class FragmentStateChanger {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        for(Object _oldKey : stateChange.getPreviousState()) {
-            BaseKey oldKey = (BaseKey) _oldKey;
+        for(BaseKey oldKey : stateChange.<BaseKey>getPreviousState()) {
             Fragment fragment = fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
                 if(!stateChange.getNewState().contains(oldKey)) {
@@ -38,8 +37,7 @@ public class FragmentStateChanger {
                 }
             }
         }
-        for(Object _newKey : stateChange.getNewState()) {
-            BaseKey newKey = (BaseKey) _newKey;
+        for(BaseKey newKey : stateChange.<BaseKey>getNewState()) {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {

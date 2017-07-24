@@ -97,8 +97,7 @@ public class DemoActivity
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        for(Object _oldKey : stateChange.getPreviousState()) {
-            Key oldKey = (Key) _oldKey;
+        for(Key oldKey : stateChange.<Key>getPreviousState()) {
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
                 if(!stateChange.getNewState().contains(oldKey)) {
@@ -110,8 +109,7 @@ public class DemoActivity
                 }
             }
         }
-        for(Object _newKey : stateChange.getNewState()) {
-            Key newKey = (Key) _newKey;
+        for(Key newKey : stateChange.<Key>getNewState()) {
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {

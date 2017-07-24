@@ -31,8 +31,7 @@ public class SinglePaneFragmentStateChanger {
             fragmentTransaction.remove(noDetailsFragment);
         }
 
-        for(Object _oldPath : stateChange.getPreviousState()) {
-            Path oldPath = (Path) _oldPath;
+        for(Path oldPath : stateChange.<Path>getPreviousState()) {
             Fragment fragment = fragmentManager.findFragmentByTag(oldPath.getFragmentTag());
             if(fragment != null) {
                 if(!stateChange.getNewState().contains(oldPath)) {
@@ -43,8 +42,7 @@ public class SinglePaneFragmentStateChanger {
             }
         }
 
-        for(Object _newPath : stateChange.getNewState()) {
-            Path newPath = (Path) _newPath;
+        for(Path newPath : stateChange.<Path>getNewState()) {
             Fragment fragment = fragmentManager.findFragmentByTag(newPath.getFragmentTag());
             if(!newPath.equals(stateChange.topNewState())) {
                 if(fragment != null && !fragment.isDetached()) {
