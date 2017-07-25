@@ -21,7 +21,7 @@
 
         <variable
             name="stats"
-            type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel" />
+            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.statistics.StatisticsViewModel"/>
     </data>
 
     <LinearLayout

@@ -29,30 +29,27 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import static com.example.android.architecture.blueprints.todoapp.util.Preconditions.checkNotNull;
 
 
 /**
  * Concrete implementation of a data source as a db.
  */
+@Singleton
 public class TasksLocalDataSource
         implements TasksDataSource {
 
     private static TasksLocalDataSource INSTANCE;
 
-    private TasksDbHelper mDbHelper;
+    private DatabaseManager databaseManager;
 
-    // Prevent direct instantiation.
-    private TasksLocalDataSource(@NonNull Context context) {
+    @Inject
+    TasksLocalDataSource(@NonNull Context context) {
         checkNotNull(context);
-        mDbHelper = new TasksDbHelper(context);
-    }
-
-    public static TasksLocalDataSource getInstance(@NonNull Context context) {
-        if(INSTANCE == null) {
-            INSTANCE = new TasksLocalDataSource(context);
-        }
-        return INSTANCE;
+        databaseManager = new DatabaseManager(context);
     }
 
     /**
@@ -62,7 +59,7 @@ public class TasksLocalDataSource
     @Override
     public void getTasks(@NonNull LoadTasksCallback callback) {
         List<Task> tasks = new ArrayList<Task>();
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = databaseManager.getReadableDatabase();
 
         String[] projection = {TaskEntry.COLUMN_NAME_ENTRY_ID, TaskEntry.COLUMN_NAME_TITLE, TaskEntry.COLUMN_NAME_DESCRIPTION, TaskEntry.COLUMN_NAME_COMPLETED};
 
@@ -99,7 +96,7 @@ public class TasksLocalDataSource
      */
     @Override
     public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = databaseManager.getReadableDatabase();
 
         String[] projection = {TaskEntry.COLUMN_NAME_ENTRY_ID, TaskEntry.COLUMN_NAME_TITLE, TaskEntry.COLUMN_NAME_DESCRIPTION, TaskEntry.COLUMN_NAME_COMPLETED};
 
@@ -134,7 +131,7 @@ public class TasksLocalDataSource
     @Override
     public void saveTask(@NonNull Task task) {
         checkNotNull(task);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
@@ -149,7 +146,7 @@ public class TasksLocalDataSource
 
     @Override
     public void completeTask(@NonNull Task task) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
@@ -170,7 +167,7 @@ public class TasksLocalDataSource
 
     @Override
     public void activateTask(@NonNull Task task) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
@@ -191,7 +188,7 @@ public class TasksLocalDataSource
 
     @Override
     public void clearCompletedTasks() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
 
         String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
         String[] selectionArgs = {"1"};
@@ -209,7 +206,7 @@ public class TasksLocalDataSource
 
     @Override
     public void deleteAllTasks() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
 
         db.delete(TaskEntry.TABLE_NAME, null, null);
 
@@ -218,7 +215,7 @@ public class TasksLocalDataSource
 
     @Override
     public void deleteTask(@NonNull String taskId) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};

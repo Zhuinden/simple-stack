@@ -19,7 +19,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TaskItemViewModel" />
+            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks.TaskItemViewModel"/>
     </data>
 
     <LinearLayout

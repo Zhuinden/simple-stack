@@ -27,13 +27,15 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
+@Singleton
 public class TasksRemoteDataSource
         implements TasksDataSource {
-
-    private static TasksRemoteDataSource INSTANCE;
 
     private static final int SERVICE_LATENCY_IN_MILLIS = 2000;
 
@@ -59,15 +61,8 @@ public class TasksRemoteDataSource
         addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!", "18");
     }
 
-    public static TasksRemoteDataSource getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new TasksRemoteDataSource();
-        }
-        return INSTANCE;
-    }
-
-    // Prevent direct instantiation.
-    private TasksRemoteDataSource() {
+    @Inject
+    TasksRemoteDataSource() {
     }
 
     private static void addTask(String title, String description, String id) {

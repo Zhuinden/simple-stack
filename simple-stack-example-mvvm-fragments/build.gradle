@@ -65,12 +65,25 @@ android {
 }
 
 dependencies {
+    compile project(':simple-stack')
+
     // App's dependencies, including test
     compile "com.android.support:appcompat-v7:25.3.1"
     compile "com.android.support:cardview-v7:25.3.1"
     compile "com.android.support:design:25.3.1"
     compile "com.android.support:recyclerview-v7:25.3.1"
     compile "com.android.support:support-v4:25.3.1"
+
+    // useful stuff
+    compile 'com.jakewharton:butterknife:8.7.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
+    provided "com.google.auto.value:auto-value:1.2"
+    annotationProcessor "com.google.auto.value:auto-value:1.2"
+    compile 'nz.bradcampbell:paperparcel:2.0.1'
+    annotationProcessor 'nz.bradcampbell:paperparcel-compiler:2.0.1'
+    annotationProcessor 'com.github.reggar:auto-value-ignore-hash-equals:1.1.4'
+    compile 'com.google.dagger:dagger:2.11'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
 
     // Dependencies for local unit tests
     testCompile 'junit:junit:4.12'

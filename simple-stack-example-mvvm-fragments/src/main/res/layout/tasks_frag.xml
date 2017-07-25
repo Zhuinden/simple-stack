@@ -22,11 +22,11 @@
 
         <variable
             name="view"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksFragment" />
+            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks.TasksFragment"/>
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
+            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks.TasksViewModel"/>
 
     </data>
 

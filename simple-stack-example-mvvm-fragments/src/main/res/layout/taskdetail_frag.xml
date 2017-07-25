@@ -22,7 +22,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel" />
+            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.taskdetail.TaskDetailViewModel"/>
     </data>
 
     <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
