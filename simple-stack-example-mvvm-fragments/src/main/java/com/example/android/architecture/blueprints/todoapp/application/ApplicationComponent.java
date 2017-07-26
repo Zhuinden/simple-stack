@@ -10,6 +10,7 @@ import com.example.android.architecture.blueprints.todoapp.presentation.paths.st
 import com.example.android.architecture.blueprints.todoapp.presentation.paths.taskdetail.TaskDetailViewModel;
 import com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks.TaskItemViewModel;
 import com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks.TasksViewModel;
+import com.zhuinden.simplestack.Backstack;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,8 +22,12 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {AndroidModule.class, DataModule.class})
+@Component(modules = {AndroidModule.class, BackstackModule.class, DataModule.class})
 public interface ApplicationComponent {
+    Backstack backstack();
+
+    BackstackHolder backstackHolder();
+
     TasksViewModel tasksViewModel();
 
     StatisticsViewModel statisticsViewModel();

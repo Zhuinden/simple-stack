@@ -17,11 +17,15 @@
 package com.example.android.architecture.blueprints.todoapp.presentation.paths.taskdetail;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.presentation.common.SingleTaskViewModel;
+import com.example.android.architecture.blueprints.todoapp.presentation.paths.addedittask.AddEditTaskKey;
 import com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks.TasksFragment;
+import com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks.TasksKey;
+import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.StateChange;
 
 import javax.inject.Inject;
 
@@ -33,21 +37,12 @@ import javax.inject.Inject;
 // UNSCOPED
 public class TaskDetailViewModel
         extends SingleTaskViewModel {
-    @Nullable
-    private TaskDetailNavigator taskDetailNavigator;
+    private final Backstack backstack;
 
     @Inject
-    TaskDetailViewModel(Context context, TasksRepository tasksRepository) {
+    TaskDetailViewModel(Context context, TasksRepository tasksRepository, Backstack backstack) {
         super(context, tasksRepository);
-    }
-
-    public void setNavigator(TaskDetailNavigator taskDetailNavigator) {
-        this.taskDetailNavigator = taskDetailNavigator;
-    }
-
-    public void onActivityDestroyed() {
-        // Clear references to avoid potential memory leaks.
-        taskDetailNavigator = null;
+        this.backstack = backstack;
     }
 
     /**
@@ -55,14 +50,11 @@ public class TaskDetailViewModel
      */
     public void deleteTask() {
         super.deleteTask();
-        if(taskDetailNavigator != null) {
-            taskDetailNavigator.onTaskDeleted();
-        }
+        // TODO: send message that task was deleted
+        backstack.setHistory(HistoryBuilder.single(TasksKey.create()), StateChange.BACKWARD);
     }
 
     public void startEditTask() {
-        if(taskDetailNavigator != null) {
-            taskDetailNavigator.onStartEditTask();
-        }
+        backstack.goTo(AddEditTaskKey.create(getTaskId()));
     }
 }

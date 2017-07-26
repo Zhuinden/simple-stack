@@ -38,7 +38,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:checked="@={viewmodel.completed}" />
+            android:onClick="@{() -> viewmodel.checkBoxClicked()}"
+            android:checked="@{viewmodel.completed}" />
 
         <TextView
             android:id="@+id/title"

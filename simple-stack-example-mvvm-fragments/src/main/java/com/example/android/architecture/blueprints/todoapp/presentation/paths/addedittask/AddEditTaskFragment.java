@@ -18,18 +18,14 @@ package com.example.android.architecture.blueprints.todoapp.presentation.paths.a
 
 import android.databinding.Observable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.application.BaseFragment;
-import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
+import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragmentBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
 
 import static com.example.android.architecture.blueprints.todoapp.util.Preconditions.checkNotNull;
@@ -38,52 +34,21 @@ import static com.example.android.architecture.blueprints.todoapp.util.Precondit
  * Main UI for the add task screen. Users can enter a task title and description.
  */
 public class AddEditTaskFragment
-        extends BaseFragment {
-
-    public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
-
+        extends BaseFragment<AddEditTaskViewModel> {
     private AddEditTaskViewModel viewModel;
-
-    private AddtaskFragBinding viewDataBinding;
-
+    private AddtaskFragmentBinding viewDataBinding;
     private Observable.OnPropertyChangedCallback snackbarCallback;
-
-    public static AddEditTaskFragment newInstance() {
-        return new AddEditTaskFragment();
-    }
 
     public AddEditTaskFragment() {
         // Required empty public constructor
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(getArguments() != null) {
-            viewModel.start(getArguments().getString(ARGUMENT_EDIT_TASK_ID));
-        } else {
-            viewModel.start(null);
-        }
-    }
-
-    public void setViewModel(@NonNull AddEditTaskViewModel viewModel) {
-        this.viewModel = checkNotNull(viewModel);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setupFab();
-        setupSnackbar();
-        setupActionBar();
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View root = inflater.inflate(R.layout.addtask_frag, container, false);
+        final View root = inflater.inflate(R.layout.addtask_fragment, container, false);
         if(viewDataBinding == null) {
-            viewDataBinding = AddtaskFragBinding.bind(root);
+            viewDataBinding = AddtaskFragmentBinding.bind(root);
         }
 
         viewDataBinding.setViewmodel(viewModel);
@@ -95,6 +60,12 @@ public class AddEditTaskFragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.start(this.<AddEditTaskKey>getKey().taskId());
+    }
+
+    @Override
     public void onDestroy() {
         if(snackbarCallback != null) {
             viewModel.snackbarText.removeOnPropertyChangedCallback(snackbarCallback);
@@ -102,7 +73,14 @@ public class AddEditTaskFragment
         super.onDestroy();
     }
 
-    private void setupSnackbar() {
+    public void saveTask() {
+        viewModel.saveTask();
+    }
+
+    @Override
+    public void bindViewModel(AddEditTaskViewModel viewModel) {
+        checkNotNull(viewModel);
+        this.viewModel = viewModel;
         snackbarCallback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
@@ -110,20 +88,5 @@ public class AddEditTaskFragment
             }
         };
         viewModel.snackbarText.addOnPropertyChangedCallback(snackbarCallback);
-    }
-
-    private void setupFab() {
-        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
-        fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(v -> viewModel.saveTask());
-    }
-
-    private void setupActionBar() {
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if(getArguments() != null) {
-            actionBar.setTitle(R.string.edit_task);
-        } else {
-            actionBar.setTitle(R.string.add_task);
-        }
     }
 }

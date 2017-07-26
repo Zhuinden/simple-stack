@@ -25,46 +25,44 @@ import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.application.BaseFragment;
-import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding;
+import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragmentBinding;
+
+import static com.example.android.architecture.blueprints.todoapp.util.Preconditions.checkNotNull;
 
 /**
  * Main UI for the statistics screen.
  */
 public class StatisticsFragment
-        extends BaseFragment {
+        extends BaseFragment<StatisticsViewModel> {
 
-    private StatisticsFragBinding mViewDataBinding;
+    private StatisticsFragmentBinding viewDataBinding;
 
-    private StatisticsViewModel mStatisticsViewModel;
-
-    public static StatisticsFragment newInstance() {
-        return new StatisticsFragment();
-    }
+    private StatisticsViewModel statisticsViewModel;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mViewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container, false);
-        return mViewDataBinding.getRoot();
+        viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_fragment, container, false);
+        setViewModelForView();
+        return viewDataBinding.getRoot();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewDataBinding.setStats(mStatisticsViewModel);
+    private void setViewModelForView() {
+        if(viewDataBinding != null && statisticsViewModel != null) {
+            viewDataBinding.setStats(statisticsViewModel);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mStatisticsViewModel.start();
+        statisticsViewModel.start();
     }
 
-    public void setViewModel(StatisticsViewModel statisticsViewModel) {
-        mStatisticsViewModel = statisticsViewModel;
-    }
-
-    public boolean isActive() {
-        return isAdded();
+    @Override
+    public void bindViewModel(StatisticsViewModel viewModel) {
+        checkNotNull(viewModel);
+        this.statisticsViewModel = viewModel;
+        setViewModelForView();
     }
 }

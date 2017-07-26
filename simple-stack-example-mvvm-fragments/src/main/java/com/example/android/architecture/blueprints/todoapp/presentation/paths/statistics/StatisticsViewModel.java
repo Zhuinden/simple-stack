@@ -45,14 +45,13 @@ public class StatisticsViewModel
         extends BaseObservable {
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
-
     final ObservableBoolean error = new ObservableBoolean(false);
 
     @VisibleForTesting
-    int mNumberOfActiveTasks = 0;
+    int numberOfActiveTasks = 0;
 
     @VisibleForTesting
-    int mNumberOfCompletedTasks = 0;
+    int numberOfCompletedTasks = 0;
 
     private Context context;
 
@@ -101,7 +100,7 @@ public class StatisticsViewModel
      */
     @Bindable
     public String getNumberOfActiveTasks() {
-        return context.getString(R.string.statistics_active_tasks, mNumberOfActiveTasks);
+        return context.getString(R.string.statistics_active_tasks, numberOfActiveTasks);
     }
 
     /**
@@ -109,7 +108,7 @@ public class StatisticsViewModel
      */
     @Bindable
     public String getNumberOfCompletedTasks() {
-        return context.getString(R.string.statistics_completed_tasks, mNumberOfCompletedTasks);
+        return context.getString(R.string.statistics_completed_tasks, numberOfCompletedTasks);
     }
 
     /**
@@ -117,7 +116,7 @@ public class StatisticsViewModel
      */
     @Bindable
     public boolean isEmpty() {
-        return mNumberOfActiveTasks + mNumberOfCompletedTasks == 0;
+        return numberOfActiveTasks + numberOfCompletedTasks == 0;
     }
 
     /**
@@ -134,8 +133,8 @@ public class StatisticsViewModel
                 active += 1;
             }
         }
-        mNumberOfActiveTasks = active;
-        mNumberOfCompletedTasks = completed;
+        numberOfActiveTasks = active;
+        numberOfCompletedTasks = completed;
 
         // There are multiple @Bindable fields in this ViewModel, calling notifyChange() will
         // update all the UI elements that depend on them.

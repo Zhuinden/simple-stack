@@ -27,9 +27,8 @@ import java.util.List;
  * Contains {@link BindingAdapter}s for the {@link Task} list.
  */
 public class TasksListBindings {
-
     @SuppressWarnings("unchecked")
-    @BindingAdapter("app:items")
+    @BindingAdapter("items")
     public static void setItems(ListView listView, List<Task> items) {
         TasksFragment.TasksAdapter adapter = (TasksFragment.TasksAdapter) listView.getAdapter();
         if(adapter != null) {

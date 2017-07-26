@@ -17,12 +17,11 @@
 package com.example.android.architecture.blueprints.todoapp.presentation.paths.tasks;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.presentation.common.SingleTaskViewModel;
-
-import java.lang.ref.WeakReference;
+import com.example.android.architecture.blueprints.todoapp.presentation.paths.taskdetail.TaskDetailKey;
+import com.zhuinden.simplestack.Backstack;
 
 import javax.inject.Inject;
 
@@ -34,20 +33,12 @@ import javax.inject.Inject;
 // UNSCOPED
 public class TaskItemViewModel
         extends SingleTaskViewModel {
-
-    // TODO: replace this with an @Inject-ed backstack
-    // This navigator is s wrapped in a WeakReference to avoid leaks because it has references to an
-    // activity. There's no straightforward way to clear it for each item in a list adapter.
-    @Nullable
-    private WeakReference<TaskItemNavigator> navigator;
+    private final Backstack backstack;
 
     @Inject
-    TaskItemViewModel(Context context, TasksRepository tasksRepository) {
+    TaskItemViewModel(Context context, TasksRepository tasksRepository, Backstack backstack) {
         super(context, tasksRepository);
-    }
-
-    public void setNavigator(TaskItemNavigator navigator) {
-        this.navigator = new WeakReference<>(navigator);
+        this.backstack = backstack;
     }
 
     /**
@@ -59,8 +50,6 @@ public class TaskItemViewModel
             // Click happened before task was loaded, no-op.
             return;
         }
-        if(navigator != null && navigator.get() != null) {
-            navigator.get().openTaskDetails(taskId);
-        }
+        backstack.goTo(TaskDetailKey.create(taskId));
     }
 }

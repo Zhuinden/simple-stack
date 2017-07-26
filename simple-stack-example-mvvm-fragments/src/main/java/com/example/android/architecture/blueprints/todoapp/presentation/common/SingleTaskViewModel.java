@@ -35,17 +35,12 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 public abstract class SingleTaskViewModel
         extends BaseObservable
         implements TasksDataSource.GetTaskCallback {
-
     public final ObservableField<String> snackbarText = new ObservableField<>();
-
     public final ObservableField<String> title = new ObservableField<>();
-
     public final ObservableField<String> description = new ObservableField<>();
-
-    private final ObservableField<Task> taskObservable = new ObservableField<>();
+    final ObservableField<Task> taskObservable = new ObservableField<>();
 
     private final TasksRepository tasksRepository;
-
     private final Context context;
 
     private boolean isDataLoading;
@@ -88,7 +83,11 @@ public abstract class SingleTaskViewModel
         return taskObservable.get().isCompleted();
     }
 
-    public void setCompleted(boolean completed) {
+    public void checkBoxClicked() {
+        setTaskCompleted(!getCompleted());
+    }
+
+    private void setTaskCompleted(boolean completed) {
         if(isDataLoading) {
             return;
         }
@@ -104,6 +103,7 @@ public abstract class SingleTaskViewModel
             tasksRepository.activateTask(task);
             snackbarText.set(context.getResources().getString(R.string.task_marked_active));
         }
+        taskObservable.notifyChange();
     }
 
     @Bindable

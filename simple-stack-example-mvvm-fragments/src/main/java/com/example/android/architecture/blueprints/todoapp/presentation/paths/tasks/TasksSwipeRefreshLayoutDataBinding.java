@@ -22,7 +22,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout;
 
 public class TasksSwipeRefreshLayoutDataBinding {
-
     /**
      * Reloads the data when the pull-to-refresh is triggered.
      * <p>
@@ -32,5 +31,4 @@ public class TasksSwipeRefreshLayoutDataBinding {
     public static void setSwipeRefreshLayoutOnRefreshListener(ScrollChildSwipeRefreshLayout view, final TasksViewModel viewModel) {
         view.setOnRefreshListener(() -> viewModel.loadTasks(true));
     }
-
 }

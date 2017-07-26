@@ -30,9 +30,9 @@ import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.presentation.paths.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.presentation.paths.taskdetail.TaskDetailActivity;
+import com.example.android.architecture.blueprints.todoapp.presentation.paths.addedittask.AddEditTaskKey;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.zhuinden.simplestack.Backstack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,48 +49,28 @@ import javax.inject.Inject;
 // UNSCOPED
 public class TasksViewModel
         extends BaseObservable {
-
     // These observable fields will update Views automatically
     public final ObservableList<Task> items = new ObservableArrayList<>();
-
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
-
     public final ObservableField<String> currentFilteringLabel = new ObservableField<>();
-
     public final ObservableField<String> noTasksLabel = new ObservableField<>();
-
     public final ObservableField<Drawable> noTaskIconRes = new ObservableField<>();
-
     public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
-
     final ObservableField<String> snackbarText = new ObservableField<>();
+    private final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
 
     private TasksFilterType selectedFilter = TasksFilterType.ALL_TASKS;
-
     private final TasksRepository tasksRepository;
-
-    private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
-
-    private Context context; // To avoid leaks, this must be an Application Context.
-
-    private TasksNavigator navigator;
+    private final Context context; // To avoid leaks, this must be an Application Context.
+    private final Backstack backstack;
 
     @Inject
-    public TasksViewModel(TasksRepository tasksRepository, Context context) {
+    public TasksViewModel(TasksRepository tasksRepository, Context context, Backstack backstack) {
         this.context = context.getApplicationContext(); // Force use of Application Context.
         this.tasksRepository = tasksRepository;
-
+        this.backstack = backstack;
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS);
-    }
-
-    void setNavigator(TasksNavigator navigator) {
-        this.navigator = navigator;
-    }
-
-    void onActivityDestroyed() {
-        // Clear references to avoid potential memory leaks.
-        navigator = null;
     }
 
     public void start() {
@@ -153,25 +133,24 @@ public class TasksViewModel
      * Called by the Data Binding library and the FAB's click listener.
      */
     public void addNewTask() {
-        if(navigator != null) {
-            navigator.addNewTask();
-        }
+        backstack.goTo(AddEditTaskKey.create());
     }
 
-    void handleActivityResult(int requestCode, int resultCode) {
-        if(AddEditTaskActivity.REQUEST_CODE == requestCode) {
-            switch(resultCode) {
-                case TaskDetailActivity.EDIT_RESULT_OK:
-                    snackbarText.set(context.getString(R.string.successfully_saved_task_message));
-                    break;
-                case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-                    snackbarText.set(context.getString(R.string.successfully_added_task_message));
-                    break;
-                case TaskDetailActivity.DELETE_RESULT_OK:
-                    snackbarText.set(context.getString(R.string.successfully_deleted_task_message));
-                    break;
-            }
-        }
+    // TODO
+    private void handleActivityResult(int requestCode, int resultCode) {
+//        if(AddEditTaskActivity.REQUEST_CODE == requestCode) {
+//            switch(resultCode) {
+//                case TaskDetailActivity.EDIT_RESULT_OK:
+//                    snackbarText.set(context.getString(R.string.successfully_saved_task_message));
+//                    break;
+//                case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
+//                    snackbarText.set(context.getString(R.string.successfully_added_task_message));
+//                    break;
+//                case TaskDetailActivity.DELETE_RESULT_OK:
+//                    snackbarText.set(context.getString(R.string.successfully_deleted_task_message));
+//                    break;
+//            }
+//        }
     }
 
     /**
@@ -226,7 +205,7 @@ public class TasksViewModel
                 if(showLoadingUI) {
                     dataLoading.set(false);
                 }
-                mIsDataLoadingError.set(false);
+                isDataLoadingError.set(false);
 
                 items.clear();
                 items.addAll(tasksToShow);
@@ -235,7 +214,7 @@ public class TasksViewModel
 
             @Override
             public void onDataNotAvailable() {
-                mIsDataLoadingError.set(true);
+                isDataLoadingError.set(true);
             }
         });
     }

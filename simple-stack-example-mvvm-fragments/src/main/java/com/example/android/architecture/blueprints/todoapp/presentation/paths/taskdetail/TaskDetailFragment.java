@@ -19,7 +19,6 @@ package com.example.android.architecture.blueprints.todoapp.presentation.paths.t
 import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,98 +28,62 @@ import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.application.BaseFragment;
-import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
+import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragmentBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+
+import static com.example.android.architecture.blueprints.todoapp.util.Preconditions.checkNotNull;
 
 
 /**
  * Main UI for the task detail screen.
  */
 public class TaskDetailFragment
-        extends BaseFragment {
-
-    public static final String ARGUMENT_TASK_ID = "TASK_ID";
-
-    public static final int REQUEST_EDIT_TASK = 1;
-
-    private TaskDetailViewModel mViewModel;
-    private Observable.OnPropertyChangedCallback mSnackbarCallback;
-
-    public static TaskDetailFragment newInstance(String taskId) {
-        Bundle arguments = new Bundle();
-        arguments.putString(ARGUMENT_TASK_ID, taskId);
-        TaskDetailFragment fragment = new TaskDetailFragment();
-        fragment.setArguments(arguments);
-        return fragment;
-    }
-
-    public void setViewModel(TaskDetailViewModel taskViewModel) {
-        mViewModel = taskViewModel;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setupFab();
-
-        setupSnackbar();
-    }
-
-    @Override
-    public void onDestroy() {
-        if(mSnackbarCallback != null) {
-            mViewModel.snackbarText.removeOnPropertyChangedCallback(mSnackbarCallback);
-        }
-        super.onDestroy();
-    }
+        extends BaseFragment<TaskDetailViewModel> {
+    private TaskDetailViewModel viewModel;
+    private Observable.OnPropertyChangedCallback snackbarCallback;
 
     private void setupSnackbar() {
-        mSnackbarCallback = new Observable.OnPropertyChangedCallback() {
+        snackbarCallback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), mViewModel.getSnackbarText());
+                SnackbarUtils.showSnackbar(getView(), viewModel.getSnackbarText());
             }
         };
-        mViewModel.snackbarText.addOnPropertyChangedCallback(mSnackbarCallback);
-    }
-
-    private void setupFab() {
-        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.startEditTask();
-            }
-        });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mViewModel.start(getArguments().getString(ARGUMENT_TASK_ID));
+        viewModel.snackbarText.addOnPropertyChangedCallback(snackbarCallback);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.taskdetail_frag, container, false);
+        View view = inflater.inflate(R.layout.taskdetail_fragment, container, false);
 
-        TaskdetailFragBinding viewDataBinding = TaskdetailFragBinding.bind(view);
-        viewDataBinding.setViewmodel(mViewModel);
+        TaskdetailFragmentBinding viewDataBinding = TaskdetailFragmentBinding.bind(view);
+        viewDataBinding.setViewmodel(viewModel);
 
         setHasOptionsMenu(true);
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.start(this.<TaskDetailKey>getKey().taskId());
+    }
+
+    @Override
+    public void onDestroy() {
+        if(snackbarCallback != null) {
+            viewModel.snackbarText.removeOnPropertyChangedCallback(snackbarCallback);
+        }
+        super.onDestroy();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_delete:
-                mViewModel.deleteTask();
+                viewModel.deleteTask();
                 return true;
         }
         return false;
@@ -129,5 +92,16 @@ public class TaskDetailFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
+    }
+
+    public void startEditTask() {
+        viewModel.startEditTask();
+    }
+
+    @Override
+    public void bindViewModel(TaskDetailViewModel viewModel) {
+        checkNotNull(viewModel);
+        this.viewModel = viewModel;
+        setupSnackbar();
     }
 }

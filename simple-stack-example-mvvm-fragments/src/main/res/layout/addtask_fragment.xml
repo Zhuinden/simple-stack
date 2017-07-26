@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -23,15 +22,12 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.addedittask.AddEditTaskViewModel"/>
+            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.addedittask.AddEditTaskViewModel" />
     </data>
 
-    <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
-        android:id="@+id/refresh_layout"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:enabled="@{viewmodel.dataLoading}"
-        app:refreshing="@{viewmodel.dataLoading}">
+        android:layout_height="match_parent">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -66,5 +62,5 @@
 
             </LinearLayout>
         </ScrollView>
-    </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
+    </FrameLayout>
 </layout>

@@ -13,8 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -22,15 +21,12 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.taskdetail.TaskDetailViewModel"/>
+            type="com.example.android.architecture.blueprints.todoapp.presentation.paths.taskdetail.TaskDetailViewModel" />
     </data>
 
-    <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
-        android:id="@+id/refresh_layout"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:onRefreshListener="@{viewmodel.onRefresh}"
-        app:refreshing="@{viewmodel.dataLoading}">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,26 +70,27 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
-                    android:checked="@={viewmodel.completed}" />
+                    android:onClick="@{() -> viewmodel.checkBoxClicked()}"
+                    android:checked="@{viewmodel.completed}" />
 
                 <TextView
                     android:id="@+id/task_detail_title"
-                    android:layout_toRightOf="@id/task_detail_complete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/task_detail_complete"
                     android:text="@{viewmodel.title}"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView
                     android:id="@+id/task_detail_description"
-                    android:layout_toRightOf="@id/task_detail_complete"
-                    android:layout_below="@id/task_detail_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/task_detail_title"
+                    android:layout_toRightOf="@id/task_detail_complete"
                     android:text="@{viewmodel.description}"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
             </RelativeLayout>
         </LinearLayout>
-    </com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout>
+    </FrameLayout>
 </layout>

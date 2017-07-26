@@ -19,12 +19,15 @@ package com.example.android.architecture.blueprints.todoapp.presentation.paths.a
 import android.content.Context;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
 
@@ -37,7 +40,7 @@ import javax.inject.Inject;
  * how to deal with more complex scenarios.
  */
 public class AddEditTaskViewModel
-        implements TasksDataSource.GetTaskCallback {
+        implements TasksDataSource.GetTaskCallback, Bundleable {
 
     public final ObservableField<String> title = new ObservableField<>();
 
@@ -58,21 +61,10 @@ public class AddEditTaskViewModel
 
     private boolean isDataLoaded = false;
 
-    private AddEditTaskNavigator addEditTaskNavigator;
-
     @Inject
     AddEditTaskViewModel(Context context, TasksRepository tasksRepository) {
         this.context = context.getApplicationContext(); // Force use of Application Context.
         this.tasksRepository = tasksRepository;
-    }
-
-    void onActivityCreated(AddEditTaskNavigator navigator) {
-        addEditTaskNavigator = navigator;
-    }
-
-    void onActivityDestroyed() {
-        // Clear references to avoid potential memory leaks.
-        addEditTaskNavigator = null;
     }
 
     public void start(String taskId) {
@@ -148,8 +140,24 @@ public class AddEditTaskViewModel
     }
 
     private void navigateOnTaskSaved() {
-        if(addEditTaskNavigator != null) {
-            addEditTaskNavigator.onTaskSaved();
+        // TODO
+    }
+
+    @NonNull
+    @Override
+    public StateBundle toBundle() {
+        StateBundle bundle = new StateBundle();
+        bundle.putString("title", title.get());
+        bundle.putString("description", description.get());
+        return bundle;
+    }
+
+    @Override
+    public void fromBundle(@Nullable StateBundle bundle) {
+        if(bundle != null) {
+            title.set(bundle.getString("title"));
+            description.set(bundle.getString("description"));
+            isDataLoaded = true;
         }
     }
 }

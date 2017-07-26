@@ -42,8 +42,6 @@ import static com.example.android.architecture.blueprints.todoapp.util.Precondit
 public class TasksLocalDataSource
         implements TasksDataSource {
 
-    private static TasksLocalDataSource INSTANCE;
-
     private DatabaseManager databaseManager;
 
     @Inject
@@ -58,7 +56,7 @@ public class TasksLocalDataSource
      */
     @Override
     public void getTasks(@NonNull LoadTasksCallback callback) {
-        List<Task> tasks = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<>();
         SQLiteDatabase db = databaseManager.getReadableDatabase();
 
         String[] projection = {TaskEntry.COLUMN_NAME_ENTRY_ID, TaskEntry.COLUMN_NAME_TITLE, TaskEntry.COLUMN_NAME_DESCRIPTION, TaskEntry.COLUMN_NAME_COMPLETED};
