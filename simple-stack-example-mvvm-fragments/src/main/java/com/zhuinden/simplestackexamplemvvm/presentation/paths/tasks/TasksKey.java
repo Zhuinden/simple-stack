@@ -7,7 +7,7 @@ import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.BaseFragment;
 import com.zhuinden.simplestackexamplemvvm.application.BaseKey;
-import com.zhuinden.simplestackexamplemvvm.application.Injection;
+import com.zhuinden.simplestackexamplemvvm.application.injection.Injection;
 import com.zhuinden.simplestackexamplemvvm.core.viewmodels.ViewModelLifecycleHelper;
 
 /**

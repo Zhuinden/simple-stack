@@ -34,7 +34,7 @@ import android.widget.ListView;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.ScrollChildSwipeRefreshLayout;
 import com.zhuinden.simplestackexamplemvvm.application.BaseFragment;
-import com.zhuinden.simplestackexamplemvvm.application.Injection;
+import com.zhuinden.simplestackexamplemvvm.application.injection.Injection;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.databinding.TaskItemBinding;
 import com.zhuinden.simplestackexamplemvvm.databinding.TasksFragmentBinding;

@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackexamplemvvm.application;
+package com.zhuinden.simplestackexamplemvvm.application.injection;
 
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
 import com.zhuinden.simplestackexamplemvvm.data.source.local.TasksLocalDataSource;

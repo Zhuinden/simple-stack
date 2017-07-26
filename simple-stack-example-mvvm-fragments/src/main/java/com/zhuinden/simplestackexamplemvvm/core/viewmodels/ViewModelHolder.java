@@ -10,9 +10,8 @@ import com.zhuinden.simplestack.Bundleable;
 import static com.zhuinden.simplestackexamplemvvm.util.Preconditions.checkNotNull;
 
 /**
- * Created by Owner on 2017. 07. 26..
+ * This retained fragment holds a ViewModel, and persists/restores its state if implements Bundleable.
  */
-
 public class ViewModelHolder
         extends Fragment {
     public ViewModelHolder() {

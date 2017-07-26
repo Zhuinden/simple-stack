@@ -21,6 +21,7 @@ import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackexamplemvvm.R;
+import com.zhuinden.simplestackexamplemvvm.application.injection.Injection;
 import com.zhuinden.simplestackexamplemvvm.core.viewmodels.ViewModelLifecycleHelper;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.statistics.StatisticsKey;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;

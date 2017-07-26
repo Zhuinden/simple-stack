@@ -1,6 +1,7 @@
-package com.zhuinden.simplestackexamplemvvm.application;
+package com.zhuinden.simplestackexamplemvvm.application.injection;
 
 import com.zhuinden.simplestack.Backstack;
+import com.zhuinden.simplestackexamplemvvm.application.BackstackHolder;
 
 import dagger.Module;
 import dagger.Provides;
