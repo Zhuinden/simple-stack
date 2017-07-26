@@ -10,7 +10,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     defaultConfig {
-        applicationId "com.example.android.architecture.blueprints.tododatabinding"
+        applicationId "com.zhuinden.simplestackexamplemvvm"
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1

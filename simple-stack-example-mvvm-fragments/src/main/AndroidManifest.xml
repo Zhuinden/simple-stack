@@ -14,8 +14,8 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.example.android.architecture.blueprints.todoapp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="com.zhuinden.simplestackexamplemvvm"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:name=".application.CustomApplication"
