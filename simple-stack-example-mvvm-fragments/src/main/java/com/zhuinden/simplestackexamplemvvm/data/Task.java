@@ -26,19 +26,21 @@ import java.util.UUID;
 
 /**
  * Immutable model class for a Task.
+ *
+ * TODO: make into AutoValue class
  */
 public final class Task {
 
     @NonNull
-    private final String mId;
+    private final String id;
 
     @Nullable
-    private final String mTitle;
+    private final String title;
 
     @Nullable
-    private final String mDescription;
+    private final String description;
 
-    private boolean mCompleted;
+    private boolean completed;
 
     /**
      * Use this constructor to create a new active Task.
@@ -83,50 +85,50 @@ public final class Task {
      * @param completed   true if the task is completed, false if it's active
      */
     public Task(@Nullable String title, @Nullable String description, @NonNull String id, boolean completed) {
-        mId = id;
-        mTitle = title;
-        mDescription = description;
-        mCompleted = completed;
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.completed = completed;
     }
 
     @NonNull
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Nullable
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     @Nullable
     public String getTitleForList() {
-        if(!Strings.isNullOrEmpty(mTitle)) {
-            return mTitle;
+        if(!Strings.isNullOrEmpty(title)) {
+            return title;
         } else {
-            return mDescription;
+            return description;
         }
     }
 
     @Nullable
     public String getDescription() {
-        return mDescription;
+        return description;
     }
 
     public boolean isCompleted() {
-        return mCompleted;
+        return completed;
     }
 
     public void setCompleted(boolean completed) {
-        mCompleted = completed;
+        this.completed = completed;
     }
 
     public boolean isActive() {
-        return !mCompleted;
+        return !completed;
     }
 
     public boolean isEmpty() {
-        return Strings.isNullOrEmpty(mTitle) && Strings.isNullOrEmpty(mDescription);
+        return Strings.isNullOrEmpty(title) && Strings.isNullOrEmpty(description);
     }
 
     @Override
@@ -138,16 +140,17 @@ public final class Task {
             return false;
         }
         Task task = (Task) o;
-        return Objects.equal(mId, task.mId) && Objects.equal(mTitle, task.mTitle) && Objects.equal(mDescription, task.mDescription);
+        return Objects.equal(id, task.id) && Objects.equal(title, task.title) && Objects.equal(description,
+                task.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mId, mTitle, mDescription);
+        return Objects.hashCode(id, title, description);
     }
 
     @Override
     public String toString() {
-        return "Task with title " + mTitle;
+        return "Task with title " + title;
     }
 }

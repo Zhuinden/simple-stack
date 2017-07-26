@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+// TODO: destroy garbage data layer code
 @Singleton
 public class DatabaseManager
         extends SQLiteOpenHelper {

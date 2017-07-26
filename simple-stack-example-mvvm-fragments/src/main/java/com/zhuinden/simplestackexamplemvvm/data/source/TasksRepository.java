@@ -39,6 +39,8 @@ import static com.zhuinden.simplestackexamplemvvm.util.Preconditions.checkNotNul
  * For simplicity, this implements a dumb synchronisation between locally persisted data and data
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
+ *
+ * TODO: destroy garbage data layer code
  */
 @Singleton
 public class TasksRepository

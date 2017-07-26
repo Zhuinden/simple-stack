@@ -37,6 +37,8 @@ import static com.zhuinden.simplestackexamplemvvm.util.Preconditions.checkNotNul
 
 /**
  * Concrete implementation of a data source as a db.
+ *
+ * TODO: destroy garbage data layer code
  */
 @Singleton
 public class TasksLocalDataSource

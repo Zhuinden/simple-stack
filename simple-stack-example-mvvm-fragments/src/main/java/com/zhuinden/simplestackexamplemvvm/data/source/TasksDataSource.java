@@ -29,21 +29,21 @@ public interface TasksDataSource {
 
     interface LoadTasksCallback {
 
-        void onTasksLoaded(List<Task> tasks);
+        void onTasksLoaded(List<Task> tasks); // TODO: destroy garbage data layer code
 
-        void onDataNotAvailable();
+        void onDataNotAvailable(); // TODO: destroy garbage data layer code
     }
 
     interface GetTaskCallback {
 
-        void onTaskLoaded(Task task);
+        void onTaskLoaded(Task task); // TODO: destroy garbage data layer code
 
-        void onDataNotAvailable();
+        void onDataNotAvailable(); // TODO: destroy garbage data layer code
     }
 
-    void getTasks(@NonNull LoadTasksCallback callback);
+    void getTasks(@NonNull LoadTasksCallback callback); // TODO: destroy garbage data layer code
 
-    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
+    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);  // TODO: destroy garbage data layer code
 
     void saveTask(@NonNull Task task);
 

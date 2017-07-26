@@ -32,6 +32,8 @@ import javax.inject.Singleton;
 
 /**
  * Implementation of the data source that adds a latency simulating network.
+ *
+ * TODO: destroy garbage data layer code
  */
 @Singleton
 public class TasksRemoteDataSource

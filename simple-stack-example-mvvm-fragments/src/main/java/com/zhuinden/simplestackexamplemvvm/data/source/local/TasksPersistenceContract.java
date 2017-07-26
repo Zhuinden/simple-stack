@@ -20,6 +20,8 @@ import android.provider.BaseColumns;
 
 /**
  * The contract used for the db to save the tasks locally.
+ *
+ * TODO: destroy garbage data layer code
  */
 public final class TasksPersistenceContract {
 
