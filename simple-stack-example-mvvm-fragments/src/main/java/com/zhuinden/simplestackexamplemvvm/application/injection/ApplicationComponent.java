@@ -23,7 +23,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {AndroidModule.class, BackstackModule.class, DataModule.class})
+@Component(modules = {AndroidModule.class, BackstackModule.class, DataModule.class, TableModule.class})
 public interface ApplicationComponent {
     Backstack backstack();
 

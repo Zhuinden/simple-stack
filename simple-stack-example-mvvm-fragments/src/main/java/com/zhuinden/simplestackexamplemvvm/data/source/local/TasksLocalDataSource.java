@@ -16,18 +16,15 @@
 
 package com.zhuinden.simplestackexamplemvvm.data.source.local;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestackexamplemvvm.core.database.DatabaseManager;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
-import com.zhuinden.simplestackexamplemvvm.data.source.local.TasksPersistenceContract.TaskEntry;
+import com.zhuinden.simplestackexamplemvvm.data.tables.TaskTable;
+import com.zhuinden.simplestackexamplemvvm.util.Strings;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -45,11 +42,15 @@ import static com.zhuinden.simplestackexamplemvvm.util.Preconditions.checkNotNul
 public class TasksLocalDataSource
         implements TasksDataSource {
     private final DatabaseManager databaseManager;
+    private final TaskTable taskTable;
+    private final DatabaseManager.Mapper<Task> taskMapper;
 
     @Inject
-    TasksLocalDataSource(@NonNull Context context, DatabaseManager databaseManager) {
+    TasksLocalDataSource(@NonNull Context context, DatabaseManager databaseManager, TaskTable taskTable) {
         checkNotNull(context);
         this.databaseManager = databaseManager;
+        this.taskTable = taskTable;
+        this.taskMapper = taskTable;
     }
 
     /**
@@ -58,36 +59,20 @@ public class TasksLocalDataSource
      */
     @Override
     public void getTasks(@NonNull LoadTasksCallback callback) {
-        List<Task> tasks = new ArrayList<>();
-        SQLiteDatabase db = databaseManager.getReadableDatabase();
-
-        String[] projection = {TaskEntry.COLUMN_NAME_ENTRY_ID, TaskEntry.COLUMN_NAME_TITLE, TaskEntry.COLUMN_NAME_DESCRIPTION, TaskEntry.COLUMN_NAME_COMPLETED};
-
-        Cursor c = db.query(TaskEntry.TABLE_NAME, projection, null, null, null, null, null);
-
-        if(c != null && c.getCount() > 0) {
-            while(c.moveToNext()) {
-                String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-                String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-                String description = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-                boolean completed = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-                Task task = Task.createCompletedTaskWithId(title, description, itemId, completed);
-                tasks.add(task);
-            }
-        }
-        if(c != null) {
-            c.close();
-        }
-
-        db.close();
-
+        List<Task> tasks = databaseManager.findAll(taskTable, taskMapper);
         if(tasks.isEmpty()) {
             // This will be called if the table is new or just empty.
             callback.onDataNotAvailable();
         } else {
             callback.onTasksLoaded(tasks);
         }
+    }
 
+    private Task getTask(String taskId) {
+        return databaseManager.findOne(taskTable, taskMapper, (database, table) -> database.rawQuery( //
+                " SELECT " + Strings.join(taskTable.getAllQueryFields()) + " FROM " + table.getTableName() + //
+                        " WHERE " + TaskTable.$ENTRY_ID + " LIKE ? " + " LIMIT 1 ", //
+                new String[]{taskId}));
     }
 
     /**
@@ -96,31 +81,7 @@ public class TasksLocalDataSource
      */
     @Override
     public void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback) {
-        SQLiteDatabase db = databaseManager.getReadableDatabase();
-
-        String[] projection = {TaskEntry.COLUMN_NAME_ENTRY_ID, TaskEntry.COLUMN_NAME_TITLE, TaskEntry.COLUMN_NAME_DESCRIPTION, TaskEntry.COLUMN_NAME_COMPLETED};
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {taskId};
-
-        Cursor c = db.query(TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-
-        Task task = null;
-
-        if(c != null && c.getCount() > 0) {
-            c.moveToFirst();
-            String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-            String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-            String description = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-            boolean completed = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-            task = Task.createCompletedTaskWithId(title, description, itemId, completed);
-        }
-        if(c != null) {
-            c.close();
-        }
-
-        db.close();
-
+        Task task = getTask(taskId);
         if(task != null) {
             callback.onTaskLoaded(task);
         } else {
@@ -131,97 +92,62 @@ public class TasksLocalDataSource
     @Override
     public void saveTask(@NonNull Task task) {
         checkNotNull(task);
-        SQLiteDatabase db = databaseManager.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.id());
-        values.put(TaskEntry.COLUMN_NAME_TITLE, task.title());
-        values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.description());
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
-
-        db.insert(TaskEntry.TABLE_NAME, null, values);
-
-        db.close();
+        databaseManager.insert(taskTable, taskMapper, task);
     }
 
     @Override
     public void completeTask(@NonNull Task task) {
-        SQLiteDatabase db = databaseManager.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {task.id()};
-
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-
-        db.close();
+        checkNotNull(task);
+        databaseManager.insert(taskTable, taskMapper, task.toBuilder().setCompleted(true).build());
     }
 
     @Override
     public void completeTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+        checkNotNull(taskId);
+        Task task = getTask(taskId);
+        if(task != null) {
+            completeTask(task);
+        }
     }
 
     @Override
     public void activateTask(@NonNull Task task) {
-        SQLiteDatabase db = databaseManager.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {task.id()};
-
-        db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-
-        db.close();
+        checkNotNull(task);
+        databaseManager.insert(taskTable, taskMapper, task.toBuilder().setCompleted(false).build());
     }
 
     @Override
     public void activateTask(@NonNull String taskId) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+        checkNotNull(taskId);
+        Task task = getTask(taskId);
+        if(task != null) {
+            activateTask(task);
+        }
     }
 
     @Override
     public void clearCompletedTasks() {
-        SQLiteDatabase db = databaseManager.getWritableDatabase();
-
-        String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
-        String[] selectionArgs = {"1"};
-
-        db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
-
-        db.close();
+        List<Task> list = databaseManager.findAll(taskTable,
+                taskMapper,
+                (database, table) -> database.rawQuery(" SELECT " + Strings.join(table.getAllQueryFields()) + " FROM " + table
+                                .getTableName() + " WHERE " + TaskTable.$COMPLETED + " LIKE ?",
+                        new String[]{String.valueOf(1)}));
+        databaseManager.delete(taskTable, list);
     }
 
     @Override
     public void refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
+        // Not possible because Task objects are immutable and non-reactive.
     }
 
     @Override
     public void deleteAllTasks() {
-        SQLiteDatabase db = databaseManager.getWritableDatabase();
-
-        db.delete(TaskEntry.TABLE_NAME, null, null);
-
-        db.close();
+        databaseManager.deleteAll(taskTable);
     }
 
     @Override
     public void deleteTask(@NonNull String taskId) {
-        SQLiteDatabase db = databaseManager.getWritableDatabase();
-
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {taskId};
-
-        db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
-
-        db.close();
+        Task task = getTask(taskId);
+        databaseManager.delete(taskTable, task);
     }
 }

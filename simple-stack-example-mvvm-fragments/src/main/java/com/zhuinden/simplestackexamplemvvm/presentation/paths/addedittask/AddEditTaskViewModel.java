@@ -22,11 +22,15 @@ import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
+import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
+import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
 import com.zhuinden.statebundle.StateBundle;
 
 import javax.inject.Inject;
@@ -50,6 +54,8 @@ public class AddEditTaskViewModel
 
     public final ObservableField<String> snackbarText = new ObservableField<>();
 
+    private final Backstack backstack;
+
     private final TasksRepository tasksRepository;
 
     private final Context context;  // To avoid leaks, this must be an Application Context.
@@ -62,9 +68,10 @@ public class AddEditTaskViewModel
     private boolean isDataLoaded = false;
 
     @Inject
-    AddEditTaskViewModel(Context context, TasksRepository tasksRepository) {
+    AddEditTaskViewModel(Context context, TasksRepository tasksRepository, Backstack backstack) {
         this.context = context.getApplicationContext(); // Force use of Application Context.
         this.tasksRepository = tasksRepository;
+        this.backstack = backstack;
     }
 
     public void start(String taskId) {
@@ -140,7 +147,7 @@ public class AddEditTaskViewModel
     }
 
     private void navigateOnTaskSaved() {
-        // TODO
+        backstack.setHistory(HistoryBuilder.single(TasksKey.create()), StateChange.BACKWARD);
     }
 
     @NonNull

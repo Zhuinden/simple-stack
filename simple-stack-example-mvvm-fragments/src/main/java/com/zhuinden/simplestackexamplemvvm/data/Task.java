@@ -20,7 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
-import com.zhuinden.simplestackexamplemvvm.util.Objects;
 import com.zhuinden.simplestackexamplemvvm.util.Strings;
 
 import java.util.UUID;
@@ -54,11 +53,16 @@ public abstract class Task {
     }
 
     public static Task createCompletedTaskWithId(String title, String description, String id, boolean completed) {
-        return new AutoValue_Task.Builder().setId(id)
-                .setTitle(title)
-                .setDescription(description)
-                .setCompleted(completed)
+        return new AutoValue_Task.Builder() //
+                .setId(id) //
+                .setTitle(title) //
+                .setDescription(description) //
+                .setCompleted(completed) //
                 .build();
+    }
+
+    public static Builder newBuilder() {
+        return new AutoValue_Task.Builder();
     }
 
     public Builder toBuilder() {

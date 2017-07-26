@@ -16,43 +16,187 @@
 
 package com.zhuinden.simplestackexamplemvvm.core.database;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.zhuinden.simplestackexamplemvvm.data.source.local.TasksPersistenceContract;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-// TODO: destroy garbage data layer code
 @Singleton
-public class DatabaseManager
+public final class DatabaseManager
         extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Tasks.db";
+    public interface Table {
+        interface WithId<T> {
+            String getId(T t);
 
-    // TODO: remove garbage
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String BOOLEAN_TYPE = " INTEGER";
-    private static final String COMMA_SEP = ",";
+            String getIdFieldName();
+        }
 
-    private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + TasksPersistenceContract.TaskEntry.TABLE_NAME + " (" + TasksPersistenceContract.TaskEntry._ID + TEXT_TYPE + " PRIMARY KEY," + TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP + TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP + TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + COMMA_SEP + TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + BOOLEAN_TYPE + " )";
+        String getTableName();
+
+        Fields[] getFields();
+
+        String[] getAllQueryFields();
+
+        void onCreate(SQLiteDatabase database);
+
+        void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion);
+    }
+
+    public static final class Fields {
+        private String fieldName;
+        private String fieldType;
+        private String fieldAdditional;
+
+        public Fields(String fieldName, String fieldType, String fieldAdditional) {
+            this.fieldName = fieldName;
+            this.fieldType = fieldType;
+            this.fieldAdditional = fieldAdditional;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+
+        public String getFieldType() {
+            return fieldType;
+        }
+
+        public String getFieldAdditional() {
+            return fieldAdditional;
+        }
+    }
+
+    public interface QueryDefinition {
+        Cursor query(SQLiteDatabase database, Table table);
+    }
+
+    private static final String DATABASE_NAME = "tasks.db";
+
+    private static final int DATABASE_VERSION = 1;
+
+    private final List<Table> tables;
+
+    private SQLiteDatabase database;
 
     @Inject
-    DatabaseManager(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    public DatabaseManager(Context appContext, List<Table> tables) {
+        super(appContext, DATABASE_NAME, null, DATABASE_VERSION);
+        this.tables = tables;
+        this.database = getWritableDatabase();
     }
 
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_ENTRIES);
+    @Override
+    public void onCreate(SQLiteDatabase database) {
+        for(Table table : tables) {
+            table.onCreate(database);
+        }
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Not required as at version 1
+    @Override
+    public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+        for(Table table : tables) {
+            table.onUpgrade(database, oldVersion, newVersion);
+        }
     }
 
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Not required as at version 1
+    public interface Transaction {
+        void execute(SQLiteDatabase sqLiteDatabase);
+    }
+
+    public interface Mapper<T> {
+        T from(Cursor cursor);
+
+        ContentValues from(ContentValues contentValues, T t);
+    }
+
+    public void executeTransaction(Transaction transaction) {
+        try {
+            database.beginTransaction();
+            transaction.execute(database);
+            database.setTransactionSuccessful();
+        } finally {
+            if(database.inTransaction()) {
+                database.endTransaction();
+            }
+        }
+    }
+
+    private <T> List<T> collectObjectFromCursor(Mapper<T> mapper, Cursor cursor) {
+        List<T> list = new LinkedList<>();
+        if(cursor.moveToFirst()) {
+            do {
+                T object = mapper.from(cursor);
+                list.add(object);
+            } while(cursor.moveToNext());
+        }
+        return new ArrayList<>(list);
+    }
+
+    public <T> List<T> findAll(Table table, Mapper<T> mapper) {
+        return findAll(table,
+                mapper,
+                (database, _table) -> database.query(table.getTableName(),
+                        table.getAllQueryFields(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null));
+    }
+
+    public <T> List<T> findAll(Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
+        Cursor cursor = queryDefinition.query(database, table);
+        List<T> list = collectObjectFromCursor(mapper, cursor);
+        cursor.close();
+        return list;
+    }
+
+    public <T> T findOne(Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
+        List<T> list = findAll(table, mapper, queryDefinition);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    public <T> void insert(Table table, Mapper<T> mapper, T element) {
+        insert(table, mapper, Collections.singletonList(element));
+    }
+
+    public <T> void insert(Table table, Mapper<T> mapper, List<T> elements) {
+        executeTransaction(sqLiteDatabase -> {
+            ContentValues contentValues = new ContentValues();
+            for(T t : elements) {
+                contentValues = mapper.from(contentValues, t);
+                sqLiteDatabase.insertWithOnConflict(table.getTableName(),
+                        null,
+                        contentValues,
+                        SQLiteDatabase.CONFLICT_REPLACE);
+            }
+        });
+    }
+
+    public <ID_TABLE extends Table & Table.WithId<T>, T> void delete(ID_TABLE table, T element) {
+        delete(table, Collections.singletonList(element));
+    }
+
+    public <ID_TABLE extends Table & Table.WithId<T>, T> void delete(ID_TABLE table, List<T> elements) {
+        executeTransaction(sqLiteDatabase -> {
+            for(T t : elements) {
+                sqLiteDatabase.delete(table.getTableName(),
+                        table.getIdFieldName() + " = ?",
+                        new String[]{table.getId(t)});
+            }
+        });
+    }
+
+    public void deleteAll(Table table) {
+        executeTransaction(sqLiteDatabase -> sqLiteDatabase.delete(table.getTableName(), null, null));
     }
 }
