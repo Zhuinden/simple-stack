@@ -55,8 +55,8 @@ public abstract class SingleTaskViewModel
             public void onPropertyChanged(Observable observable, int i) {
                 Task task = taskObservable.get();
                 if(task != null) {
-                    title.set(task.getTitle());
-                    description.set(task.getDescription());
+                    title.set(task.title());
+                    description.set(task.description());
                 } else {
                     title.set(SingleTaskViewModel.this.context.getString(R.string.no_data));
                     description.set(SingleTaskViewModel.this.context.getString(R.string.no_data_description));
@@ -93,7 +93,7 @@ public abstract class SingleTaskViewModel
         }
         Task task = taskObservable.get();
         // Update the entity
-        task.setCompleted(completed);
+        task = task.toBuilder().setCompleted(completed).build();
 
         // Notify repository and user
         if(completed) {
@@ -103,7 +103,7 @@ public abstract class SingleTaskViewModel
             tasksRepository.activateTask(task);
             snackbarText.set(context.getResources().getString(R.string.task_marked_active));
         }
-        taskObservable.notifyChange();
+        taskObservable.set(task);
     }
 
     @Bindable
@@ -140,13 +140,13 @@ public abstract class SingleTaskViewModel
 
     public void deleteTask() {
         if(taskObservable.get() != null) {
-            tasksRepository.deleteTask(taskObservable.get().getId());
+            tasksRepository.deleteTask(taskObservable.get().id());
         }
     }
 
     public void onRefresh() {
         if(taskObservable.get() != null) {
-            start(taskObservable.get().getId());
+            start(taskObservable.get().id());
         }
     }
 
@@ -156,6 +156,6 @@ public abstract class SingleTaskViewModel
 
     @Nullable
     protected String getTaskId() {
-        return taskObservable.get().getId();
+        return taskObservable.get().id();
     }
 }

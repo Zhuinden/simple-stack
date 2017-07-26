@@ -89,8 +89,8 @@ public class AddEditTaskViewModel
 
     @Override
     public void onTaskLoaded(Task task) {
-        title.set(task.getTitle());
-        description.set(task.getDescription());
+        title.set(task.title());
+        description.set(task.description());
         dataLoading.set(false);
         isDataLoaded = true;
 
@@ -122,7 +122,7 @@ public class AddEditTaskViewModel
     }
 
     private void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
+        Task newTask = Task.createNewActiveTask(title, description);
         if(newTask.isEmpty()) {
             snackbarText.set(context.getString(R.string.empty_task_message));
         } else {
@@ -135,7 +135,7 @@ public class AddEditTaskViewModel
         if(isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        tasksRepository.saveTask(new Task(title, description, taskId));
+        tasksRepository.saveTask(Task.createActiveTaskWithId(title, description, taskId));
         navigateOnTaskSaved(); // After an edit, go back to the list.
     }
 

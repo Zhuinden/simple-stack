@@ -114,7 +114,7 @@ public class TasksRepository
         if(cachedTask == null) {
             cachedTask = new LinkedHashMap<>();
         }
-        cachedTask.put(task.getId(), task);
+        cachedTask.put(task.id(), task);
     }
 
     @Override
@@ -123,13 +123,13 @@ public class TasksRepository
         tasksRemoteDataSource.completeTask(task);
         tasksLocalDataSource.completeTask(task);
 
-        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+        Task completedTask = Task.createCompletedTaskWithId(task.title(), task.description(), task.id(), true);
 
         // Do in memory cache update to keep the app UI up to date
         if(cachedTask == null) {
             cachedTask = new LinkedHashMap<>();
         }
-        cachedTask.put(task.getId(), completedTask);
+        cachedTask.put(task.id(), completedTask);
     }
 
     @Override
@@ -144,13 +144,13 @@ public class TasksRepository
         tasksRemoteDataSource.activateTask(task);
         tasksLocalDataSource.activateTask(task);
 
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+        Task activeTask = Task.createActiveTaskWithId(task.title(), task.description(), task.id());
 
         // Do in memory cache update to keep the app UI up to date
         if(cachedTask == null) {
             cachedTask = new LinkedHashMap<>();
         }
-        cachedTask.put(task.getId(), activeTask);
+        cachedTask.put(task.id(), activeTask);
     }
 
     @Override
@@ -207,7 +207,7 @@ public class TasksRepository
                 if(TasksRepository.this.cachedTask == null) {
                     TasksRepository.this.cachedTask = new LinkedHashMap<>();
                 }
-                TasksRepository.this.cachedTask.put(task.getId(), task);
+                TasksRepository.this.cachedTask.put(task.id(), task);
                 callback.onTaskLoaded(task);
             }
 
@@ -220,7 +220,7 @@ public class TasksRepository
                         if(TasksRepository.this.cachedTask == null) {
                             TasksRepository.this.cachedTask = new LinkedHashMap<>();
                         }
-                        TasksRepository.this.cachedTask.put(task.getId(), task);
+                        TasksRepository.this.cachedTask.put(task.id(), task);
                         callback.onTaskLoaded(task);
                     }
 
@@ -279,7 +279,7 @@ public class TasksRepository
         }
         cachedTask.clear();
         for(Task task : tasks) {
-            cachedTask.put(task.getId(), task);
+            cachedTask.put(task.id(), task);
         }
         cacheIsDirty = false;
     }

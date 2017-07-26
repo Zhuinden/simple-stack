@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
+import com.zhuinden.simplestackexamplemvvm.core.database.DatabaseManager;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
 import com.zhuinden.simplestackexamplemvvm.data.source.local.TasksPersistenceContract.TaskEntry;
@@ -43,13 +44,12 @@ import static com.zhuinden.simplestackexamplemvvm.util.Preconditions.checkNotNul
 @Singleton
 public class TasksLocalDataSource
         implements TasksDataSource {
-
-    private DatabaseManager databaseManager;
+    private final DatabaseManager databaseManager;
 
     @Inject
-    TasksLocalDataSource(@NonNull Context context) {
+    TasksLocalDataSource(@NonNull Context context, DatabaseManager databaseManager) {
         checkNotNull(context);
-        databaseManager = new DatabaseManager(context);
+        this.databaseManager = databaseManager;
     }
 
     /**
@@ -71,7 +71,7 @@ public class TasksLocalDataSource
                 String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
                 String description = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
                 boolean completed = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-                Task task = new Task(title, description, itemId, completed);
+                Task task = Task.createCompletedTaskWithId(title, description, itemId, completed);
                 tasks.add(task);
             }
         }
@@ -113,7 +113,7 @@ public class TasksLocalDataSource
             String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
             String description = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
             boolean completed = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-            task = new Task(title, description, itemId, completed);
+            task = Task.createCompletedTaskWithId(title, description, itemId, completed);
         }
         if(c != null) {
             c.close();
@@ -134,9 +134,9 @@ public class TasksLocalDataSource
         SQLiteDatabase db = databaseManager.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
-        values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
-        values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
+        values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.id());
+        values.put(TaskEntry.COLUMN_NAME_TITLE, task.title());
+        values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.description());
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
 
         db.insert(TaskEntry.TABLE_NAME, null, values);
@@ -152,7 +152,7 @@ public class TasksLocalDataSource
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {task.getId()};
+        String[] selectionArgs = {task.id()};
 
         db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
 
@@ -173,7 +173,7 @@ public class TasksLocalDataSource
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {task.getId()};
+        String[] selectionArgs = {task.id()};
 
         db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
 

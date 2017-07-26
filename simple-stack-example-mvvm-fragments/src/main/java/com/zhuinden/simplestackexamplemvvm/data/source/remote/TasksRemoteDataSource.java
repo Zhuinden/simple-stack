@@ -68,8 +68,8 @@ public class TasksRemoteDataSource
     }
 
     private static void addTask(String title, String description, String id) {
-        Task newTask = new Task(title, description, id);
-        TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
+        Task newTask = Task.createActiveTaskWithId(title, description, id);
+        TASKS_SERVICE_DATA.put(newTask.id(), newTask);
     }
 
     /**
@@ -110,13 +110,13 @@ public class TasksRemoteDataSource
 
     @Override
     public void saveTask(@NonNull Task task) {
-        TASKS_SERVICE_DATA.put(task.getId(), task);
+        TASKS_SERVICE_DATA.put(task.id(), task);
     }
 
     @Override
     public void completeTask(@NonNull Task task) {
-        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
-        TASKS_SERVICE_DATA.put(task.getId(), completedTask);
+        Task completedTask = Task.createCompletedTaskWithId(task.title(), task.description(), task.id(), true);
+        TASKS_SERVICE_DATA.put(task.id(), completedTask);
     }
 
     @Override
@@ -127,8 +127,8 @@ public class TasksRemoteDataSource
 
     @Override
     public void activateTask(@NonNull Task task) {
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
-        TASKS_SERVICE_DATA.put(task.getId(), activeTask);
+        Task activeTask = Task.createActiveTaskWithId(task.title(), task.description(), task.id());
+        TASKS_SERVICE_DATA.put(task.id(), activeTask);
     }
 
     @Override

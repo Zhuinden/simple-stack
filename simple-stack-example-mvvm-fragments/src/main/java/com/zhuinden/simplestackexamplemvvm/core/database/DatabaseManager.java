@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.zhuinden.simplestackexamplemvvm.data.source.local;
+package com.zhuinden.simplestackexamplemvvm.core.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.zhuinden.simplestackexamplemvvm.data.source.local.TasksPersistenceContract;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,13 +30,11 @@ import javax.inject.Singleton;
 public class DatabaseManager
         extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
-
     public static final String DATABASE_NAME = "Tasks.db";
 
+    // TODO: remove garbage
     private static final String TEXT_TYPE = " TEXT";
-
     private static final String BOOLEAN_TYPE = " INTEGER";
-
     private static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + TasksPersistenceContract.TaskEntry.TABLE_NAME + " (" + TasksPersistenceContract.TaskEntry._ID + TEXT_TYPE + " PRIMARY KEY," + TasksPersistenceContract.TaskEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP + TasksPersistenceContract.TaskEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP + TasksPersistenceContract.TaskEntry.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + COMMA_SEP + TasksPersistenceContract.TaskEntry.COLUMN_NAME_COMPLETED + BOOLEAN_TYPE + " )";
