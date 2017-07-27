@@ -52,10 +52,7 @@ public class AddEditTaskFragment
         }
 
         viewDataBinding.setViewmodel(viewModel);
-
         setHasOptionsMenu(true);
-        setRetainInstance(false);
-
         return viewDataBinding.getRoot();
     }
 
