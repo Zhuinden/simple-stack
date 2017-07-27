@@ -16,7 +16,8 @@
 
 package com.zhuinden.simplestackexamplemvvm.presentation.paths.addedittask;
 
-import android.content.Context;
+import android.arch.lifecycle.Observer;
+import android.content.res.Resources;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
@@ -27,11 +28,13 @@ import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.R;
+import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
-import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
 import com.zhuinden.statebundle.StateBundle;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -44,75 +47,60 @@ import javax.inject.Inject;
  * how to deal with more complex scenarios.
  */
 public class AddEditTaskViewModel
-        implements TasksDataSource.GetTaskCallback, Bundleable {
+        implements Bundleable, Observer<List<Task>> {
 
     public final ObservableField<String> title = new ObservableField<>();
-
     public final ObservableField<String> description = new ObservableField<>();
-
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
-
     public final ObservableField<String> snackbarText = new ObservableField<>();
 
-    private final Backstack backstack;
+    final ObservableField<Task> taskObservable = new ObservableField<>();
 
+    LiveResults<Task> liveTask;
+
+    private final Resources resources;
     private final TasksRepository tasksRepository;
-
-    private final Context context;  // To avoid leaks, this must be an Application Context.
+    private final Backstack backstack;
 
     @Nullable
     private String taskId;
 
-    private boolean isNewTask;
-
-    private boolean isDataLoaded = false;
+    boolean isDataLoaded;
 
     @Inject
-    AddEditTaskViewModel(Context context, TasksRepository tasksRepository, Backstack backstack) {
-        this.context = context.getApplicationContext(); // Force use of Application Context.
+    AddEditTaskViewModel(Resources resources, TasksRepository tasksRepository, Backstack backstack) {
+        this.resources = resources;
         this.tasksRepository = tasksRepository;
         this.backstack = backstack;
     }
 
-    public void start(String taskId) {
-        if(dataLoading.get()) {
-            // Already loading, ignore.
-            return;
-        }
+    public void start(@Nullable String taskId) {
         this.taskId = taskId;
-        if(taskId == null) {
-            // No need to populate, it's a new task
-            isNewTask = true;
-            return;
-        }
-        if(isDataLoaded) {
-            // No need to populate, already have data.
-            return;
-        }
-        isNewTask = false;
-        dataLoading.set(true);
-        tasksRepository.getTask(taskId, this);
+        liveTask = tasksRepository.getTask(taskId);
+        liveTask.observeForever(this);
     }
 
-    @Override
+    public void stop() {
+        liveTask.removeObserver(this);
+    }
+
     public void onTaskLoaded(Task task) {
         title.set(task.title());
         description.set(task.description());
+        taskObservable.set(task);
         dataLoading.set(false);
         isDataLoaded = true;
-
         // Note that there's no need to notify that the values changed because we're using
         // ObservableFields.
     }
 
-    @Override
     public void onDataNotAvailable() {
         dataLoading.set(false);
     }
 
     // Called when clicking on fab.
     public void saveTask() {
-        if(isNewTask()) {
+        if(taskId == null) {
             createTask(title.get(), description.get());
         } else {
             updateTask(title.get(), description.get());
@@ -124,14 +112,10 @@ public class AddEditTaskViewModel
         return snackbarText.get();
     }
 
-    private boolean isNewTask() {
-        return isNewTask;
-    }
-
     private void createTask(String title, String description) {
         Task newTask = Task.createNewActiveTask(title, description);
         if(newTask.isEmpty()) {
-            snackbarText.set(context.getString(R.string.empty_task_message));
+            snackbarText.set(resources.getString(R.string.empty_task_message));
         } else {
             tasksRepository.saveTask(newTask);
             navigateOnTaskSaved();
@@ -139,10 +123,7 @@ public class AddEditTaskViewModel
     }
 
     private void updateTask(String title, String description) {
-        if(isNewTask()) {
-            throw new RuntimeException("updateTask() was called but task is new.");
-        }
-        tasksRepository.saveTask(Task.createActiveTaskWithId(title, description, taskId));
+        tasksRepository.saveTask(Task.createTaskWithId(title, description, taskId, taskObservable.get().completed()));
         navigateOnTaskSaved(); // After an edit, go back to the list.
     }
 
@@ -166,5 +147,18 @@ public class AddEditTaskViewModel
             description.set(bundle.getString("description"));
             isDataLoaded = true;
         }
+    }
+
+    @Override
+    public void onChanged(@Nullable List<Task> tasks) {
+        if(tasks == null) {
+            return; // loading...
+        }
+        if(tasks.isEmpty()) {
+            onDataNotAvailable();
+        } else {
+            onTaskLoaded(tasks.get(0));
+        }
+        isDataLoaded = true;
     }
 }

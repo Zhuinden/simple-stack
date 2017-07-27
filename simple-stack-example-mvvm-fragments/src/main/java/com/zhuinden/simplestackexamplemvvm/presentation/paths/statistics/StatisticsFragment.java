@@ -54,9 +54,15 @@ public class StatisticsFragment
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         statisticsViewModel.start();
+    }
+
+    @Override
+    public void onStop() {
+        statisticsViewModel.stop();
+        super.onStop();
     }
 
     @Override

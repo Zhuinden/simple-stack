@@ -54,6 +54,14 @@ public class TasksFragment
     private TasksFragmentBinding viewBinding;
     private TasksAdapter adapter;
     private Observable.OnPropertyChangedCallback snackbarCallback;
+    private Observable.OnPropertyChangedCallback fabCallback = new Observable.OnPropertyChangedCallback() {
+        @Override
+        public void onPropertyChanged(Observable sender, int propertyId) {
+            View fab = getActivity().findViewById(R.id.fab);
+            boolean visible = tasksViewModel.tasksAddViewVisible.get();
+            fab.setVisibility(visible ? View.VISIBLE : View.GONE); // TODO: why doesn't this work?
+        }
+    };
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -76,6 +84,7 @@ public class TasksFragment
         setupSnackbar();
         setupListAdapter();
         setupRefreshLayout();
+
     }
 
     @Override
@@ -94,7 +103,7 @@ public class TasksFragment
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                tasksViewModel.loadTasks(true);
+                tasksViewModel.refresh();
                 break;
         }
         return true;
@@ -111,15 +120,11 @@ public class TasksFragment
         swipeRefreshLayout.setRefreshing(false);
         swipeRefreshLayout.destroyDrawingCache();
         swipeRefreshLayout.clearAnimation();
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy() {
         if(snackbarCallback != null) {
             tasksViewModel.snackbarText.removeOnPropertyChangedCallback(snackbarCallback);
         }
-        super.onDestroy();
+        tasksViewModel.tasksAddViewVisible.removeOnPropertyChangedCallback(fabCallback);
+        super.onDestroyView();
     }
 
     private void setupSnackbar() {
@@ -148,7 +153,7 @@ public class TasksFragment
                     tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
                     break;
             }
-            tasksViewModel.loadTasks(false);
+            tasksViewModel.reloadTasks();
             return true;
         });
 

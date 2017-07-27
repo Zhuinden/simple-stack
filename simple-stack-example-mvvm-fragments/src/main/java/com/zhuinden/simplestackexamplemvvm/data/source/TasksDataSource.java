@@ -17,43 +17,24 @@
 package com.zhuinden.simplestackexamplemvvm.data.source;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
-
-import java.util.List;
 
 /**
  * Main entry point for accessing tasks data.
  */
 public interface TasksDataSource {
+    LiveResults<Task> getTasksWithChanges();
 
-    interface LoadTasksCallback {
-
-        void onTasksLoaded(List<Task> tasks); // TODO: destroy garbage data layer code
-
-        void onDataNotAvailable(); // TODO: destroy garbage data layer code
-    }
-
-    interface GetTaskCallback {
-
-        void onTaskLoaded(Task task); // TODO: destroy garbage data layer code
-
-        void onDataNotAvailable(); // TODO: destroy garbage data layer code
-    }
-
-    void getTasks(@NonNull LoadTasksCallback callback); // TODO: destroy garbage data layer code
-
-    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);  // TODO: destroy garbage data layer code
+    LiveResults<Task> getTaskWithChanges(@Nullable String taskId);
 
     void saveTask(@NonNull Task task);
 
     void completeTask(@NonNull Task task);
 
-    void completeTask(@NonNull String taskId);
-
     void activateTask(@NonNull Task task);
-
-    void activateTask(@NonNull String taskId);
 
     void clearCompletedTasks();
 
@@ -62,4 +43,8 @@ public interface TasksDataSource {
     void deleteAllTasks();
 
     void deleteTask(@NonNull String taskId);
+
+    LiveResults<Task> getActiveTasksWithChanges();
+
+    LiveResults<Task> getCompletedTasksWithChanges();
 }

@@ -72,6 +72,11 @@ public final class DatabaseManager
         public String getFieldAdditional() {
             return fieldAdditional;
         }
+
+        @Override
+        public String toString() {
+            return fieldName;
+        }
     }
 
     public interface QueryDefinition {

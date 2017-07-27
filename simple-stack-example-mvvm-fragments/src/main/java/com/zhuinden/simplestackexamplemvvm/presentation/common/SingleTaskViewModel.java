@@ -16,17 +16,20 @@
 
 package com.zhuinden.simplestackexamplemvvm.presentation.common;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.databinding.Observable;
 import android.databinding.ObservableField;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestackexamplemvvm.R;
+import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
-import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
+
+import java.util.List;
 
 
 /**
@@ -34,11 +37,14 @@ import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
  */
 public abstract class SingleTaskViewModel
         extends BaseObservable
-        implements TasksDataSource.GetTaskCallback {
+        implements Observer<List<Task>> {
     public final ObservableField<String> snackbarText = new ObservableField<>();
     public final ObservableField<String> title = new ObservableField<>();
     public final ObservableField<String> description = new ObservableField<>();
+
     final ObservableField<Task> taskObservable = new ObservableField<>();
+
+    LiveResults<Task> liveTask;
 
     private final TasksRepository tasksRepository;
     private final Context context;
@@ -48,39 +54,25 @@ public abstract class SingleTaskViewModel
     public SingleTaskViewModel(Context context, TasksRepository tasksRepository) {
         this.context = context.getApplicationContext(); // Force use of Application Context.
         this.tasksRepository = tasksRepository;
-
-        // Exposed observables depend on the taskObservable observable:
-        taskObservable.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                Task task = taskObservable.get();
-                if(task != null) {
-                    title.set(task.title());
-                    description.set(task.description());
-                } else {
-                    title.set(SingleTaskViewModel.this.context.getString(R.string.no_data));
-                    description.set(SingleTaskViewModel.this.context.getString(R.string.no_data_description));
-                }
-            }
-        });
     }
 
     public void start(String taskId) {
         if(taskId != null) {
             isDataLoading = true;
-            tasksRepository.getTask(taskId, this);
+            liveTask = tasksRepository.getTask(taskId);
+            liveTask.observeForever(this);
         }
     }
 
-    public void setTask(Task task) {
-        taskObservable.set(task);
+    public void stop() {
+        liveTask.removeObserver(this);
     }
 
     // "completed" is two-way bound, so in order to intercept the new value, use a @Bindable
     // annotation and process it in the setter.
     @Bindable
     public boolean getCompleted() {
-        return taskObservable.get().isCompleted();
+        return taskObservable.get() != null && taskObservable.get().isCompleted();
     }
 
     public void checkBoxClicked() {
@@ -125,14 +117,14 @@ public abstract class SingleTaskViewModel
         return taskObservable.get().getTitleForList();
     }
 
-    @Override
-    public void onTaskLoaded(Task task) {
+    public void onTaskLoaded(@NonNull Task task) {
+        title.set(task.title());
+        description.set(task.description());
         taskObservable.set(task);
         isDataLoading = false;
         notifyChange(); // For the @Bindable properties
     }
 
-    @Override
     public void onDataNotAvailable() {
         taskObservable.set(null);
         isDataLoading = false;
@@ -157,5 +149,21 @@ public abstract class SingleTaskViewModel
     @Nullable
     protected String getTaskId() {
         return taskObservable.get().id();
+    }
+
+    @Override
+    public void onChanged(@Nullable List<Task> tasks) {
+        if(tasks == null) {
+            return; // loading
+        }
+        if(tasks.isEmpty()) {
+            onDataNotAvailable();
+        } else {
+            onTaskLoaded(tasks.get(0));
+        }
+    }
+
+    public void setTask(Task task) {
+        taskObservable.set(task);
     }
 }

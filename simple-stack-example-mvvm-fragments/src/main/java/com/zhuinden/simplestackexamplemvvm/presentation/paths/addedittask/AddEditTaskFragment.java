@@ -57,9 +57,15 @@ public class AddEditTaskFragment
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         viewModel.start(this.<AddEditTaskKey>getKey().taskId());
+    }
+
+    @Override
+    public void onStop() {
+        viewModel.stop();
+        super.onStop();
     }
 
     @Override

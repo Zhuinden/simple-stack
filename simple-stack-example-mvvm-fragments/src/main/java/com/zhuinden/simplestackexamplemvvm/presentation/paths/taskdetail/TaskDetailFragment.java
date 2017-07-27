@@ -60,23 +60,34 @@ public class TaskDetailFragment
 
         TaskdetailFragmentBinding viewDataBinding = TaskdetailFragmentBinding.bind(view);
         viewDataBinding.setViewmodel(viewModel);
-
         setHasOptionsMenu(true);
         return view;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupSnackbar();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         viewModel.start(this.<TaskDetailKey>getKey().taskId());
     }
 
     @Override
-    public void onDestroy() {
+    public void onStop() {
+        viewModel.stop();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
         if(snackbarCallback != null) {
             viewModel.snackbarText.removeOnPropertyChangedCallback(snackbarCallback);
         }
-        super.onDestroy();
+        super.onDestroyView();
     }
 
     @Override
@@ -102,6 +113,5 @@ public class TaskDetailFragment
     public void bindViewModel(TaskDetailViewModel viewModel) {
         checkNotNull(viewModel);
         this.viewModel = viewModel;
-        setupSnackbar();
     }
 }

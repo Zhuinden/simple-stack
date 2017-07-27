@@ -41,18 +41,14 @@ public abstract class Task {
     public abstract boolean completed();
 
     public static Task createNewActiveTask(String title, String description) {
-        return createCompletedTaskWithId(title, description, UUID.randomUUID().toString(), false);
+        return createTaskWithId(title, description, UUID.randomUUID().toString(), false);
     }
 
     public static Task createActiveTaskWithId(String title, String description, String id) {
-        return createCompletedTaskWithId(title, description, id, false);
+        return createTaskWithId(title, description, id, false);
     }
 
-    public static Task createCompletedTask(String title, String description, boolean completed) {
-        return createCompletedTaskWithId(title, description, UUID.randomUUID().toString(), completed);
-    }
-
-    public static Task createCompletedTaskWithId(String title, String description, String id, boolean completed) {
+    public static Task createTaskWithId(String title, String description, String id, boolean completed) {
         return new AutoValue_Task.Builder() //
                 .setId(id) //
                 .setTitle(title) //

@@ -16,18 +16,19 @@
 
 package com.zhuinden.simplestackexamplemvvm.presentation.paths.statistics;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import com.zhuinden.simplestackexamplemvvm.R;
+import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
-import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
-import com.zhuinden.simplestackexamplemvvm.util.EspressoIdlingResource;
 
 import java.util.List;
 
@@ -42,7 +43,8 @@ import javax.inject.Inject;
  * preferable to having logic in the XML layout.
  */
 public class StatisticsViewModel
-        extends BaseObservable {
+        extends BaseObservable
+        implements Observer<List<Task>> {
 
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
     final ObservableBoolean error = new ObservableBoolean(false);
@@ -54,6 +56,8 @@ public class StatisticsViewModel
     int numberOfCompletedTasks = 0;
 
     private Context context;
+
+    private LiveResults<Task> liveResults;
 
     private final TasksRepository tasksRepository;
 
@@ -67,32 +71,14 @@ public class StatisticsViewModel
         loadStatistics();
     }
 
-    public void loadStatistics() {
+    public void stop() {
+        liveResults.removeObserver(this);
+    }
+
+    private void loadStatistics() {
         dataLoading.set(true);
-
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
-        EspressoIdlingResource.increment(); // App is busy until further notice
-
-        tasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if(!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
-
-                computeStats(tasks);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                error.set(true);
-            }
-        });
+        liveResults = tasksRepository.getTasks();
+        liveResults.observeForever(this);
     }
 
     /**
@@ -146,5 +132,12 @@ public class StatisticsViewModel
         // Observable fields don't need to be notified. set() will trigger an update.
         dataLoading.set(false);
         error.set(false);
+    }
+
+    @Override
+    public void onChanged(@Nullable List<Task> tasks) {
+        if(tasks != null) {
+            computeStats(tasks);
+        }
     }
 }

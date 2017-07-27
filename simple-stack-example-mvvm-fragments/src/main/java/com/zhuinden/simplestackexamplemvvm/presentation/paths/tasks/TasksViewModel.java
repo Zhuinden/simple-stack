@@ -16,7 +16,7 @@
 
 package com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks;
 
-import android.content.Context;
+import android.arch.lifecycle.Observer;
 import android.content.res.Resources;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -28,18 +28,16 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackexamplemvvm.BR;
-import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackexamplemvvm.R;
+import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
-import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.addedittask.AddEditTaskKey;
-import com.zhuinden.simplestackexamplemvvm.util.EspressoIdlingResource;
 import com.zhuinden.statebundle.StateBundle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -54,7 +52,7 @@ import javax.inject.Inject;
 // UNSCOPED
 public class TasksViewModel
         extends BaseObservable
-        implements Bundleable {
+        implements Bundleable, Observer<List<Task>> {
     // These observable fields will update Views automatically
     public final ObservableList<Task> items = new ObservableArrayList<>();
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
@@ -64,6 +62,8 @@ public class TasksViewModel
     public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
     final ObservableField<String> snackbarText = new ObservableField<>();
     private final ObservableBoolean isDataLoadingError = new ObservableBoolean(false);
+
+    private LiveResults<Task> liveResults;
 
     private TasksFilterType selectedFilter = TasksFilterType.ALL_TASKS;
     private final Resources resources;
@@ -75,21 +75,24 @@ public class TasksViewModel
         this.resources = resources;
         this.tasksRepository = tasksRepository;
         this.backstack = backstack;
+
+        tasksRepository.refreshTasks(); // force a download when this scope is created.
+
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS);
     }
 
     public void start() {
-        loadTasks(false);
+        reloadTasks();
+    }
+
+    public void stop() {
+        liveResults.removeObserver(this);
     }
 
     @Bindable
     public boolean isEmpty() {
         return items.isEmpty();
-    }
-
-    public void loadTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate, true);
     }
 
     /**
@@ -128,7 +131,6 @@ public class TasksViewModel
     public void clearCompletedTasks() {
         tasksRepository.clearCompletedTasks();
         snackbarText.set(resources.getString(R.string.completed_tasks_cleared));
-        loadTasks(false, false);
     }
 
     public String getSnackbarText() {
@@ -159,70 +161,28 @@ public class TasksViewModel
 //        }
     }
 
+    private LiveResults<Task> getFilteredResults() {
+        switch(selectedFilter) {
+            case ALL_TASKS:
+                return tasksRepository.getTasks();
+            case ACTIVE_TASKS:
+                return tasksRepository.getActiveTasks();
+            case COMPLETED_TASKS:
+                return tasksRepository.getCompletedTasks();
+            default:
+                throw new IllegalArgumentException("Invalid filter type [" + selectedFilter + "]");
+        }
+    }
+
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
-     * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
-    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
-        if(showLoadingUI) {
-            dataLoading.set(true);
+    public void reloadTasks() {
+        if(liveResults != null) {
+            liveResults.removeObserver(this);
         }
-        if(forceUpdate) {
-            tasksRepository.refreshTasks();
-        }
-
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
-        EspressoIdlingResource.increment(); // App is busy until further notice
-
-        tasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                List<Task> tasksToShow = new ArrayList<>();
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-                if(!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
-
-                // We filter the tasks based on the requestType
-                for(Task task : tasks) {
-                    switch(selectedFilter) {
-                        case ALL_TASKS:
-                            tasksToShow.add(task);
-                            break;
-                        case ACTIVE_TASKS:
-                            if(task.isActive()) {
-                                tasksToShow.add(task);
-                            }
-                            break;
-                        case COMPLETED_TASKS:
-                            if(task.isCompleted()) {
-                                tasksToShow.add(task);
-                            }
-                            break;
-                        default:
-                            tasksToShow.add(task);
-                            break;
-                    }
-                }
-                if(showLoadingUI) {
-                    dataLoading.set(false);
-                }
-                isDataLoadingError.set(false);
-
-                items.clear();
-                items.addAll(tasksToShow);
-                notifyPropertyChanged(BR.empty); // It's a @Bindable so update manually
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                isDataLoadingError.set(true);
-            }
-        });
+        dataLoading.set(true);
+        liveResults = getFilteredResults();
+        liveResults.observeForever(this);
     }
 
     @NonNull
@@ -238,5 +198,20 @@ public class TasksViewModel
         if(bundle != null) {
             setFiltering(TasksFilterType.valueOf(bundle.getString("filterType")));
         }
+    }
+
+    @Override
+    public void onChanged(@Nullable List<Task> tasks) {
+        if(tasks == null) {
+            return; // loading...
+        }
+        items.clear();
+        items.addAll(tasks);
+        notifyPropertyChanged(BR.empty); // It's a @Bindable so update manually
+        dataLoading.set(false);
+    }
+
+    public void refresh() {
+        tasksRepository.refreshTasks();
     }
 }
