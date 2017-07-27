@@ -21,11 +21,13 @@ import android.content.Context;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.common.SingleTaskViewModel;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.addedittask.AddEditTaskKey;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksFragment;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
+import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksViewModel;
 
 import javax.inject.Inject;
 
@@ -38,11 +40,13 @@ import javax.inject.Inject;
 public class TaskDetailViewModel
         extends SingleTaskViewModel {
     private final Backstack backstack;
+    private final MessageQueue messageQueue;
 
     @Inject
-    TaskDetailViewModel(Context context, TasksRepository tasksRepository, Backstack backstack) {
+    TaskDetailViewModel(Context context, TasksRepository tasksRepository, Backstack backstack, MessageQueue messageQueue) {
         super(context, tasksRepository);
         this.backstack = backstack;
+        this.messageQueue = messageQueue;
     }
 
     /**
@@ -50,7 +54,7 @@ public class TaskDetailViewModel
      */
     public void deleteTask() {
         super.deleteTask();
-        // TODO: send message that task was deleted
+        messageQueue.pushMessageTo(TasksKey.create(), new TasksViewModel.DeletedTaskMessage());
         backstack.setHistory(HistoryBuilder.single(TasksKey.create()), StateChange.BACKWARD);
     }
 

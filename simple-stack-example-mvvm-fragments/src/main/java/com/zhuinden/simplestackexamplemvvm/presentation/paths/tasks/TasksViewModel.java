@@ -32,6 +32,7 @@ import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackexamplemvvm.BR;
 import com.zhuinden.simplestackexamplemvvm.R;
+import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
 import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
@@ -52,7 +53,7 @@ import javax.inject.Inject;
 // UNSCOPED
 public class TasksViewModel
         extends BaseObservable
-        implements Bundleable, Observer<List<Task>> {
+        implements Bundleable, Observer<List<Task>>, MessageQueue.Receiver {
     // These observable fields will update Views automatically
     public final ObservableList<Task> items = new ObservableArrayList<>();
     public final ObservableBoolean dataLoading = new ObservableBoolean(false);
@@ -69,12 +70,14 @@ public class TasksViewModel
     private final Resources resources;
     private final TasksRepository tasksRepository;
     private final Backstack backstack;
+    private final MessageQueue messageQueue;
 
     @Inject
-    public TasksViewModel(TasksRepository tasksRepository, Resources resources, Backstack backstack) {
+    public TasksViewModel(TasksRepository tasksRepository, Resources resources, Backstack backstack, MessageQueue messageQueue) {
         this.resources = resources;
         this.tasksRepository = tasksRepository;
         this.backstack = backstack;
+        this.messageQueue = messageQueue;
 
         tasksRepository.refreshTasks(); // force a download when this scope is created.
 
@@ -84,6 +87,7 @@ public class TasksViewModel
 
     public void start() {
         reloadTasks();
+        messageQueue.requestMessages(TasksKey.create(), this);
     }
 
     public void stop() {
@@ -144,23 +148,6 @@ public class TasksViewModel
         backstack.goTo(AddEditTaskKey.create());
     }
 
-    // TODO
-    private void handleActivityResult(int requestCode, int resultCode) {
-//        if(AddEditTaskActivity.REQUEST_CODE == requestCode) {
-//            switch(resultCode) {
-//                case TaskDetailActivity.EDIT_RESULT_OK:
-//                    snackbarText.set(resources.getString(R.string.successfully_saved_task_message));
-//                    break;
-//                case AddEditTaskActivity.ADD_EDIT_RESULT_OK:
-//                    snackbarText.set(resources.getString(R.string.successfully_added_task_message));
-//                    break;
-//                case TaskDetailActivity.DELETE_RESULT_OK:
-//                    snackbarText.set(resources.getString(R.string.successfully_deleted_task_message));
-//                    break;
-//            }
-//        }
-    }
-
     private LiveResults<Task> getFilteredResults() {
         switch(selectedFilter) {
             case ALL_TASKS:
@@ -213,5 +200,26 @@ public class TasksViewModel
 
     public void refresh() {
         tasksRepository.refreshTasks();
+    }
+
+    public static class SavedTaskMessage {
+    }
+
+    public static class AddedTaskMessage {
+    }
+
+    public static class DeletedTaskMessage {
+    }
+
+    @Override
+    public void receiveMessage(Object message) {
+        if(message instanceof DeletedTaskMessage) {
+            snackbarText.set(resources.getString(R.string.successfully_deleted_task_message));
+        } else if(message instanceof AddedTaskMessage) {
+            snackbarText.set(resources.getString(R.string.successfully_added_task_message));
+        } else if(message instanceof SavedTaskMessage) {
+            snackbarText.set(resources.getString(R.string.successfully_saved_task_message));
+        }
+        snackbarText.set("");
     }
 }

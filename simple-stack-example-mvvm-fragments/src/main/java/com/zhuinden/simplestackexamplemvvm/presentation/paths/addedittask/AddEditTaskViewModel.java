@@ -28,10 +28,12 @@ import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.R;
+import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
 import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
+import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksViewModel;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.List;
@@ -61,6 +63,7 @@ public class AddEditTaskViewModel
     private final Resources resources;
     private final TasksRepository tasksRepository;
     private final Backstack backstack;
+    private final MessageQueue messageQueue;
 
     @Nullable
     private String taskId;
@@ -68,10 +71,11 @@ public class AddEditTaskViewModel
     boolean isDataLoaded;
 
     @Inject
-    AddEditTaskViewModel(Resources resources, TasksRepository tasksRepository, Backstack backstack) {
+    AddEditTaskViewModel(Resources resources, TasksRepository tasksRepository, Backstack backstack, MessageQueue messageQueue) {
         this.resources = resources;
         this.tasksRepository = tasksRepository;
         this.backstack = backstack;
+        this.messageQueue = messageQueue;
     }
 
     public void start(@Nullable String taskId) {
@@ -118,12 +122,14 @@ public class AddEditTaskViewModel
             snackbarText.set(resources.getString(R.string.empty_task_message));
         } else {
             tasksRepository.saveTask(newTask);
+            messageQueue.pushMessageTo(TasksKey.create(), new TasksViewModel.AddedTaskMessage());
             navigateOnTaskSaved();
         }
     }
 
     private void updateTask(String title, String description) {
         tasksRepository.saveTask(Task.createTaskWithId(title, description, taskId, taskObservable.get().completed()));
+        messageQueue.pushMessageTo(TasksKey.create(), new TasksViewModel.SavedTaskMessage());
         navigateOnTaskSaved(); // After an edit, go back to the list.
     }
 

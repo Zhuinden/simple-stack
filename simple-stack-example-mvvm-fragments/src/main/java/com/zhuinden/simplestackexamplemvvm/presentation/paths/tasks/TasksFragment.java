@@ -39,6 +39,7 @@ import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.databinding.TaskItemBinding;
 import com.zhuinden.simplestackexamplemvvm.databinding.TasksFragmentBinding;
 import com.zhuinden.simplestackexamplemvvm.util.SnackbarUtils;
+import com.zhuinden.simplestackexamplemvvm.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,14 @@ public class TasksFragment
     private TasksViewModel tasksViewModel;
     private TasksFragmentBinding viewBinding;
     private TasksAdapter adapter;
-    private Observable.OnPropertyChangedCallback snackbarCallback;
+    private Observable.OnPropertyChangedCallback snackbarCallback = new Observable.OnPropertyChangedCallback() {
+        @Override
+        public void onPropertyChanged(Observable observable, int i) {
+            if(!Strings.isNullOrEmpty(tasksViewModel.getSnackbarText())) {
+                SnackbarUtils.showSnackbar(getView(), tasksViewModel.getSnackbarText());
+            }
+        }
+    };
     private Observable.OnPropertyChangedCallback fabCallback = new Observable.OnPropertyChangedCallback() {
         @Override
         public void onPropertyChanged(Observable sender, int propertyId) {
@@ -81,16 +89,21 @@ public class TasksFragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupSnackbar();
+        tasksViewModel.snackbarText.addOnPropertyChangedCallback(snackbarCallback);
         setupListAdapter();
         setupRefreshLayout();
-
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         tasksViewModel.start();
+    }
+
+    @Override
+    public void onStop() {
+        tasksViewModel.stop();
+        super.onStop();
     }
 
     @Override
@@ -120,21 +133,9 @@ public class TasksFragment
         swipeRefreshLayout.setRefreshing(false);
         swipeRefreshLayout.destroyDrawingCache();
         swipeRefreshLayout.clearAnimation();
-        if(snackbarCallback != null) {
-            tasksViewModel.snackbarText.removeOnPropertyChangedCallback(snackbarCallback);
-        }
+        tasksViewModel.snackbarText.removeOnPropertyChangedCallback(snackbarCallback);
         tasksViewModel.tasksAddViewVisible.removeOnPropertyChangedCallback(fabCallback);
         super.onDestroyView();
-    }
-
-    private void setupSnackbar() {
-        snackbarCallback = new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                SnackbarUtils.showSnackbar(getView(), tasksViewModel.getSnackbarText());
-            }
-        };
-        tasksViewModel.snackbarText.addOnPropertyChangedCallback(snackbarCallback);
     }
 
     private void showFilteringPopUpMenu() {
