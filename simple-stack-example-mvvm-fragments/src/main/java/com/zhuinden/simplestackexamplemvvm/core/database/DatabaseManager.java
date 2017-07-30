@@ -142,7 +142,7 @@ public final class DatabaseManager
                 list.add(object);
             } while(cursor.moveToNext());
         }
-        return new ArrayList<>(list);
+        return Collections.unmodifiableList(new ArrayList<>(list));
     }
 
     public <T> List<T> findAll(Table table, Mapper<T> mapper) {
