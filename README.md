@@ -155,6 +155,25 @@ public class MainActivity
 }
 ```
 
+- **Key** for Fragments
+
+``` java
+@AutoValue
+public abstract class HomeKey 
+      extends BaseKey { // see sample for BaseKey/BaseFragment
+    public static HomeKey create() {
+        return new AutoValue_HomeKey();
+    }
+
+    @Override
+    protected BaseFragment createFragment() {
+        return new HomeFragment();
+    }
+}
+```
+
+- **FragmentStateChanger**
+
 For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/504b2c44295c77a960ca34add68fdc685c3dbc19/simple-stack-example-basic-fragment/src/main/java/com/zhuinden/navigationexamplefrag/FragmentStateChanger.java).
 
 ### Custom Views
