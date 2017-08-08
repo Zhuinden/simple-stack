@@ -8,6 +8,8 @@ import android.view.View;
 
 import com.google.auto.value.AutoValue;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by Owner on 2017. 08. 08..
  */
@@ -15,12 +17,16 @@ import com.google.auto.value.AutoValue;
 public abstract class DetailsKey
         extends BaseKey
         implements HasSharedElement {
-    private transient Pair<View, String> sharedElement;
+    private transient Pair<WeakReference<View>, String> sharedElement;
 
     @Override
     @Nullable
     public Pair<View, String> sharedElement() {
-        return sharedElement;
+        View view = sharedElement.first.get();
+        if(view == null) {
+            return null;
+        }
+        return Pair.create(view, sharedElement.second);
     }
 
     @Override
@@ -30,7 +36,8 @@ public abstract class DetailsKey
 
     public static DetailsKey create(Pair<View, String> sharedElement, @IntRange(from = 1, to = 6) int kittenNumber) {
         DetailsKey detailsKey = new AutoValue_DetailsKey(ViewCompat.getTransitionName(sharedElement.first), kittenNumber);
-        detailsKey.sharedElement = sharedElement; // see https://github.com/google/auto/blob/4016d8dbbe4de668a1849e95223d1f2447b647bc/value/userguide/howto.md#ignore
+        detailsKey.sharedElement = Pair.create(new WeakReference<>(sharedElement.first),
+                sharedElement.second); // see https://github.com/google/auto/blob/4016d8dbbe4de668a1849e95223d1f2447b647bc/value/userguide/howto.md#ignore
         return detailsKey;
     }
 
