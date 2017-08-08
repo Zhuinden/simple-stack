@@ -22,6 +22,9 @@ public abstract class DetailsKey
     @Override
     @Nullable
     public Pair<View, String> sharedElement() {
+        if(sharedElement == null) {
+            return null;
+        }
         View view = sharedElement.first.get();
         if(view == null) {
             return null;
