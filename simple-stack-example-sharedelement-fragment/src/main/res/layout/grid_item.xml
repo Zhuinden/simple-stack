@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="@dimen/kitten_preview_padding"
+    android:clipToPadding="false">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="@dimen/kitten_preview_size"
+        android:layout_height="@dimen/kitten_preview_size"
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription" />
+
+</LinearLayout>
