@@ -2,6 +2,8 @@ package com.example.fragmenttransitions;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +18,8 @@ import butterknife.ButterKnife;
  * @author bherbst
  */
 public class DetailsFragment
-        extends BaseFragment {
+        extends BaseFragment
+        implements HasSharedElement.Target {
     @BindView(R.id.image)
     ImageView image;
 
@@ -54,5 +57,18 @@ public class DetailsFragment
                 image.setImageResource(R.drawable.placekitten_6);
                 break;
         }
+    }
+
+    @Override
+    public Pair<View, String> sharedElement() {
+        DetailsKey detailsKey = getKey();
+        Pair<View, String> sharedElement = detailsKey.sharedElement();
+        if(sharedElement == null) {
+            return null; // View cannot be preserved across process death.
+        }
+        if(image == null) {
+            return null; // View is not yet initialized.
+        }
+        return Pair.create(image, ViewCompat.getTransitionName(sharedElement.first));
     }
 }

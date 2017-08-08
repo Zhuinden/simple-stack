@@ -42,9 +42,13 @@ public class FragmentStateChanger {
             }
             topNewFragment.setEnterTransition(new Fade());
 
-            if(topNewKey instanceof DetailsKey) {
+            if(topNewKey instanceof HasSharedElement || topPreviousFragment instanceof HasSharedElement.Target) {
                 topNewFragment.setSharedElementEnterTransition(new DetailsTransition());
                 topNewFragment.setSharedElementReturnTransition(new DetailsTransition());
+                if(topPreviousFragment != null) {
+                    topPreviousFragment.setSharedElementEnterTransition(new DetailsTransition());
+                    topPreviousFragment.setSharedElementReturnTransition(new DetailsTransition());
+                }
             }
         }
 
@@ -55,6 +59,13 @@ public class FragmentStateChanger {
                 fragmentTransaction.addSharedElement(elementKey.sharedElement().first, elementKey.sharedElement().second);
             }
         }
+        if(topPreviousFragment != null && topPreviousFragment instanceof HasSharedElement.Target) {
+            HasSharedElement.Target target = (HasSharedElement.Target) topPreviousFragment;
+            if(target.sharedElement() != null) {
+                fragmentTransaction.addSharedElement(target.sharedElement().first, target.sharedElement().second);
+            }
+        }
+
         for(BaseKey previousKey : previousState) {
             if(!newState.contains(previousKey) && !previousKey.equals(topPreviousKey)) {
                 Fragment fragment = fragmentManager.findFragmentByTag(previousKey.getFragmentTag());

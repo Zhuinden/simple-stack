@@ -9,4 +9,8 @@ import android.view.View;
 
 public interface HasSharedElement {
     Pair<View, String> sharedElement();
+
+    interface Target
+            extends HasSharedElement {
+    }
 }
