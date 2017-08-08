@@ -91,6 +91,6 @@ public class FragmentStateChanger {
             }
         }
 
-        fragmentTransaction.commit();
+        fragmentTransaction.commitNow();
     }
 }
