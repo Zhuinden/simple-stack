@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-mvp-fragments/simple-stack-example-mvp-fragments.iml" filepath="$PROJECT_DIR$/simple-stack-example-mvp-fragments/simple-stack-example-mvp-fragments.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-mvp-view/simple-stack-example-mvp-view.iml" filepath="$PROJECT_DIR$/simple-stack-example-mvp-view/simple-stack-example-mvp-view.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-example-mvvm-fragments/simple-stack-example-mvvm-fragments.iml" filepath="$PROJECT_DIR$/simple-stack-example-mvvm-fragments/simple-stack-example-mvvm-fragments.iml" />
+      <module fileurl="file://$PROJECT_DIR$/simple-stack-example-sharedelement-fragment/simple-stack-example-sharedelement-fragment.iml" filepath="$PROJECT_DIR$/simple-stack-example-sharedelement-fragment/simple-stack-example-sharedelement-fragment.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-flow-masterdetail/simple-stack-flow-masterdetail.iml" filepath="$PROJECT_DIR$/simple-stack-flow-masterdetail/simple-stack-flow-masterdetail.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-flow-masterdetail-fragments/simple-stack-flow-masterdetail-fragments.iml" filepath="$PROJECT_DIR$/simple-stack-flow-masterdetail-fragments/simple-stack-flow-masterdetail-fragments.iml" />
       <module fileurl="file://$PROJECT_DIR$/simple-stack-mortar-sample/simple-stack-mortar-sample.iml" filepath="$PROJECT_DIR$/simple-stack-mortar-sample/simple-stack-mortar-sample.iml" />

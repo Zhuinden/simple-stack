@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen margins -->
+    <dimen name="screen_padding_sides">16dp</dimen>
+
+    <!-- Preview (grid item) dimensions -->
+    <dimen name="kitten_preview_size">120dp</dimen>
+    <dimen name="kitten_preview_padding">16dp</dimen>
+
+    <!-- Details dimensions -->
+    <dimen name="details_image_size">240dp</dimen>
+    <dimen name="details_top_spacing">48dp</dimen>
+</resources>
