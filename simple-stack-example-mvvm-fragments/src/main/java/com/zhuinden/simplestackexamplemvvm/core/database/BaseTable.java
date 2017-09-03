@@ -19,6 +19,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by Zhuinden on 2017.07.26..
  */
@@ -49,6 +52,42 @@ public abstract class BaseTable
         }
         stringBuilder.append(");");
         database.execSQL(stringBuilder.toString());
+
+        buildIndexes(database);
+    }
+
+    @Override
+    public List<List<DatabaseManager.Fields>> getIndexedFields() {
+        return Collections.emptyList();
+    }
+
+    private void buildIndexes(SQLiteDatabase database) {
+        for(List<DatabaseManager.Fields> indexedFields : getIndexedFields()) {
+            StringBuilder indexBuilder = new StringBuilder();
+            indexBuilder.append("CREATE INDEX index_");
+            indexBuilder.append(getTableName());
+            indexBuilder.append("_");
+            for(int i = 0, size = indexedFields.size(); i < size; i++) {
+                DatabaseManager.Fields indexedField = indexedFields.get(i);
+                indexBuilder.append(indexedField.getFieldName());
+                if(i < size - 1) {
+                    indexBuilder.append("_");
+                }
+            }
+            indexBuilder.append(" ON ");
+            indexBuilder.append(getTableName());
+            indexBuilder.append(" (");
+            for(int i = 0, size = indexedFields.size(); i < size; i++) {
+                DatabaseManager.Fields indexedField = indexedFields.get(i);
+                indexBuilder.append(indexedField.getFieldName());
+                if(i < size - 1) {
+                    indexBuilder.append(", ");
+                }
+            }
+            indexBuilder.append(");");
+            String indexSql = indexBuilder.toString();
+            database.execSQL(indexSql);
+        }
     }
 
     @Override

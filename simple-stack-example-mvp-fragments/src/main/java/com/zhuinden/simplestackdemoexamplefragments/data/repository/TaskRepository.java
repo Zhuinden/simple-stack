@@ -16,14 +16,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposables;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmModel;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -55,10 +54,14 @@ public class TaskRepository {
         return tasks;
     }
 
-    public Observable<List<Task>> getTasks() {
+    private interface QuerySelector<E extends RealmModel> {
+        RealmResults<E> createQuery(Realm realm);
+    }
+
+    private Observable<List<Task>> createResults(QuerySelector<DbTask> querySelector) {
         return Observable.create((ObservableOnSubscribe<List<Task>>) emitter -> {
             Realm realm = Realm.getDefaultInstance();
-            final RealmResults<DbTask> dbTasks = realm.where(DbTask.class).findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING);
+            final RealmResults<DbTask> dbTasks = querySelector.createQuery(realm);
             final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
                 if(element.isLoaded() && !emitter.isDisposed()) {
                     List<Task> tasks = mapFrom(element);
@@ -75,56 +78,24 @@ public class TaskRepository {
             }));
             dbTasks.addChangeListener(realmChangeListener);
         }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
+    }
+
+    public Observable<List<Task>> getTasks() {
+        return createResults((realm) -> realm.where(DbTask.class).findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
     }
 
     public Observable<List<Task>> getCompletedTasks() {
-        return Observable.create((ObservableOnSubscribe<List<Task>>) emitter -> {
-            Realm realm = Realm.getDefaultInstance();
-            final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
-                    .equalTo(DbTaskFields.COMPLETED, true).findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING);
-            final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
-                if(element.isLoaded() && !emitter.isDisposed()) {
-                    List<Task> tasks = mapFrom(element);
-                    if(!emitter.isDisposed()) {
-                        emitter.onNext(tasks);
-                    }
-                }
-            };
-            emitter.setDisposable(Disposables.fromAction(() -> {
-                if(dbTasks.isValid()) {
-                    dbTasks.removeChangeListener(realmChangeListener);
-                }
-                realm.close();
-            }));
-            dbTasks.addChangeListener(realmChangeListener);
-        }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
+        return createResults((realm) -> realm
+                .where(DbTask.class)
+                .equalTo(DbTaskFields.COMPLETED, true)
+                .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
     }
 
     public Observable<List<Task>> getActiveTasks() {
-        return Observable.create(new ObservableOnSubscribe<List<Task>>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<List<Task>> emitter)
-                    throws Exception {
-                Realm realm = Realm.getDefaultInstance();
-                final RealmResults<DbTask> dbTasks = realm.where(DbTask.class)
-                        .equalTo(DbTaskFields.COMPLETED, false).findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING);
-                final RealmChangeListener<RealmResults<DbTask>> realmChangeListener = element -> {
-                    if(element.isLoaded() && !emitter.isDisposed()) {
-                        List<Task> tasks = mapFrom(element);
-                        if(!emitter.isDisposed()) {
-                            emitter.onNext(tasks);
-                        }
-                    }
-                };
-                emitter.setDisposable(Disposables.fromAction(() -> {
-                    if(dbTasks.isValid()) {
-                        dbTasks.removeChangeListener(realmChangeListener);
-                    }
-                    realm.close();
-                }));
-                dbTasks.addChangeListener(realmChangeListener);
-            }
-        }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
+        return createResults((realm) -> realm
+                .where(DbTask.class)
+                .equalTo(DbTaskFields.COMPLETED, false)
+                .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
     }
 
     @SuppressWarnings("NewApi")
@@ -167,17 +138,13 @@ public class TaskRepository {
 
     @SuppressWarnings("NewApi")
     public Single<Optional<Task>> findTask(String taskId) {
-        return Single.fromCallable(new Callable<Optional<Task>>() {
-            @Override
-            public Optional<Task> call()
-                    throws Exception {
-                try(Realm realm = Realm.getDefaultInstance()) {
-                    RealmResults<DbTask> tasks = realm.where(DbTask.class).equalTo(DbTaskFields.ID, taskId).findAll();
-                    if(tasks.size() > 0) {
-                        return Optional.of(taskMapper.fromRealm(tasks.get(0)));
-                    } else {
-                        return Optional.absent();
-                    }
+        return Single.fromCallable((Callable<Optional<Task>>) () -> {
+            try(Realm realm = Realm.getDefaultInstance()) {
+                RealmResults<DbTask> tasks = realm.where(DbTask.class).equalTo(DbTaskFields.ID, taskId).findAll();
+                if(tasks.size() > 0) {
+                    return Optional.of(taskMapper.fromRealm(tasks.get(0)));
+                } else {
+                    return Optional.absent();
                 }
             }
         }).subscribeOn(looperScheduler.getScheduler());

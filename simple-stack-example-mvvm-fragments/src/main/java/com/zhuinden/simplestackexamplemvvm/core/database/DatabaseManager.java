@@ -45,6 +45,8 @@ public final class DatabaseManager
 
         String[] getAllQueryFields();
 
+        List<List<Fields>> getIndexedFields();
+
         void onCreate(SQLiteDatabase database);
 
         void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion);
@@ -110,6 +112,10 @@ public final class DatabaseManager
         for(Table table : tables) {
             table.onUpgrade(database, oldVersion, newVersion);
         }
+    }
+
+    public SQLiteDatabase getDatabase() {
+        return this.database;
     }
 
     public interface Transaction {
