@@ -4,15 +4,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplefragments.R;
+
+import java.util.List;
 
 /**
  * Created by Zhuinden on 2017.02.01..
@@ -90,46 +92,40 @@ public class DemoActivity
             return;
         }
 
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().disallowAddToBackStack();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack();
         if(stateChange.getDirection() == StateChange.FORWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left);
         } else if(stateChange.getDirection() == StateChange.BACKWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        for(Key oldKey : stateChange.<Key>getPreviousState()) {
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag(oldKey.getFragmentTag());
+        List<Key> previousState = stateChange.getPreviousState();
+        List<Key> newState = stateChange.getNewState();
+        for(Key oldKey : previousState) {
+            Fragment fragment = fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
-                if(!stateChange.getNewState().contains(oldKey)) {
-                    Log.i(TAG, "Old key is NOT in new state: removing [" + oldKey + "]");
+                if(!newState.contains(oldKey)) {
                     fragmentTransaction.remove(fragment);
                 } else if(!fragment.isDetached()) {
-                    Log.i(TAG, "Old key is in new state, but not showing: detaching [" + oldKey + "]");
                     fragmentTransaction.detach(fragment);
                 }
             }
         }
-        for(Key newKey : stateChange.<Key>getNewState()) {
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag(newKey.getFragmentTag());
+        for(Key newKey : newState) {
+            Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {
                     if(fragment.isDetached()) {
-                        Log.i(TAG, "New key is top state but detached: reattaching [" + newKey + "]");
                         fragmentTransaction.attach(fragment);
-                    } else {
-                        Log.i(TAG, "New key is top state but already attached: probably config change for [" + newKey + "]");
                     }
                 } else {
-                    Log.i(TAG, "New fragment does not exist yet, adding [" + newKey + "]");
                     fragment = newKey.createFragment();
                     fragmentTransaction.add(R.id.root, fragment, newKey.getFragmentTag());
                 }
             } else {
                 if(fragment != null && !fragment.isDetached()) {
-                    Log.i(TAG, "New fragment is not active fragment. It should be detached: [" + newKey + "]");
                     fragmentTransaction.detach(fragment);
-                } else {
-                    Log.i(TAG, "New fragment is already detached or doesn't exist, as expected: [" + newKey + "]");
                 }
             }
         }

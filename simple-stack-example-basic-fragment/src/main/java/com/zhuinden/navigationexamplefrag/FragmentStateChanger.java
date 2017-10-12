@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentTransaction;
 
 import com.zhuinden.simplestack.StateChange;
 
+import java.util.List;
+
 /**
  * Created by Owner on 2017. 06. 29..
  */
@@ -27,17 +29,19 @@ public class FragmentStateChanger {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        for(BaseKey oldKey : stateChange.<BaseKey>getPreviousState()) {
+        List<BaseKey> previousState = stateChange.getPreviousState();
+        List<BaseKey> newState = stateChange.getNewState();
+        for(BaseKey oldKey : previousState) {
             Fragment fragment = fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
-                if(!stateChange.getNewState().contains(oldKey)) {
+                if(!newState.contains(oldKey)) {
                     fragmentTransaction.remove(fragment);
                 } else if(!fragment.isDetached()) {
                     fragmentTransaction.detach(fragment);
                 }
             }
         }
-        for(BaseKey newKey : stateChange.<BaseKey>getNewState()) {
+        for(BaseKey newKey : newState) {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {

@@ -8,6 +8,8 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemoexamplefragments.R;
 import com.zhuinden.simplestackdemoexamplefragments.application.Key;
 
+import java.util.List;
+
 /**
  * Created by Owner on 2017. 02. 03..
  */
@@ -29,17 +31,19 @@ public class FragmentStateChanger {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        for(Key oldKey : stateChange.<Key>getPreviousState()) {
+        List<Key> previousState = stateChange.getPreviousState();
+        List<Key> newState = stateChange.getNewState();
+        for(Key oldKey : previousState) {
             Fragment fragment = fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
-                if(!stateChange.getNewState().contains(oldKey)) {
+                if(!newState.contains(oldKey)) {
                     fragmentTransaction.remove(fragment);
                 } else if(!fragment.isDetached()) {
                     fragmentTransaction.detach(fragment);
                 }
             }
         }
-        for(Key newKey : stateChange.<Key>getNewState()) {
+        for(Key newKey : newState) {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {

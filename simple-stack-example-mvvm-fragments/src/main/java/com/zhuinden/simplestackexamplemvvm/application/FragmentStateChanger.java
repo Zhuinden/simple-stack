@@ -8,6 +8,8 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.core.viewmodels.ViewModelLifecycleHelper;
 
+import java.util.List;
+
 /**
  * Created by Owner on 2017. 06. 29..
  */
@@ -37,17 +39,19 @@ public class FragmentStateChanger {
                     R.anim.slide_out_to_right);
         }
 
-        for(BaseKey oldKey : stateChange.<BaseKey>getPreviousState()) {
+        List<BaseKey<?>> previousState = stateChange.getPreviousState();
+        List<BaseKey<?>> newState = stateChange.getNewState();
+        for(BaseKey oldKey : previousState) {
             BaseFragment fragment = (BaseFragment) fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
-                if(!stateChange.getNewState().contains(oldKey)) {
+                if(!newState.contains(oldKey)) {
                     fragmentTransaction.remove(fragment);
                 } else if(!fragment.isDetached()) {
                     fragmentTransaction.detach(fragment);
                 }
             }
         }
-        for(BaseKey newKey : stateChange.<BaseKey>getNewState()) {
+        for(BaseKey newKey : newState) {
             BaseFragment fragment = (BaseFragment) fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {

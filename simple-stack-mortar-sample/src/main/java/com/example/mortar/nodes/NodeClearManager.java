@@ -7,6 +7,8 @@ import com.zhuinden.servicetree.ServiceTree;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.StateChange;
 
+import java.util.List;
+
 /**
  * Created by Zhuinden on 2017.05.14..
  */
@@ -25,8 +27,10 @@ public class NodeClearManager
 
     @Override
     public void stateChangeCompleted(@NonNull StateChange stateChange) {
-        for(Object previousKey : stateChange.getPreviousState()) {
-            if(!stateChange.getNewState().contains(previousKey) && serviceTree.hasNodeWithKey(previousKey)) {
+        List<Object> previousState = stateChange.getPreviousState();
+        List<Object> newState = stateChange.getNewState();
+        for(Object previousKey : previousState) {
+            if(!newState.contains(previousKey) && serviceTree.hasNodeWithKey(previousKey)) {
                 Log.i(TAG, "Destroying [" + previousKey + " ]");
                 nodeStateManager.clearStatesForKey(previousKey);
                 serviceTree.removeNodeAndChildren(serviceTree.getNode(previousKey));

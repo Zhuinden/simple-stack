@@ -9,6 +9,8 @@ import com.example.stackmasterdetailfrag.application.Path;
 import com.example.stackmasterdetailfrag.paths.NoDetailsPath;
 import com.zhuinden.simplestack.StateChange;
 
+import java.util.List;
+
 /**
  * Created by Zhuinden on 2017.02.12..
  */
@@ -31,10 +33,12 @@ public class SinglePaneFragmentStateChanger {
             fragmentTransaction.remove(noDetailsFragment);
         }
 
-        for(Path oldPath : stateChange.<Path>getPreviousState()) {
+        List<Path> previousState = stateChange.getPreviousState();
+        List<Path> newState = stateChange.getNewState();
+        for(Path oldPath : previousState) {
             Fragment fragment = fragmentManager.findFragmentByTag(oldPath.getFragmentTag());
             if(fragment != null) {
-                if(!stateChange.getNewState().contains(oldPath)) {
+                if(!newState.contains(oldPath)) {
                     fragmentTransaction.remove(fragment);
                 } else if(!oldPath.equals(stateChange.topNewState())) {
                     fragmentTransaction.detach(fragment);
@@ -42,7 +46,7 @@ public class SinglePaneFragmentStateChanger {
             }
         }
 
-        for(Path newPath : stateChange.<Path>getNewState()) {
+        for(Path newPath : newState) {
             Fragment fragment = fragmentManager.findFragmentByTag(newPath.getFragmentTag());
             if(!newPath.equals(stateChange.topNewState())) {
                 if(fragment != null && !fragment.isDetached()) {

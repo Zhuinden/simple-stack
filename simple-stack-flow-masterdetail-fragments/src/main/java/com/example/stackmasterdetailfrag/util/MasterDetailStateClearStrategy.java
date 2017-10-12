@@ -8,6 +8,7 @@ import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.StateChange;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +24,8 @@ public class MasterDetailStateClearStrategy
         while(keyIterator.hasNext()) {
             Object key = keyIterator.next();
             boolean isMasterOf = false;
-            for(Object newKey : stateChange.getNewState()) {
+            List<Object> newState = stateChange.getNewState();
+            for(Object newKey : newState) {
                 if(newKey instanceof MasterDetailPath) {
                     if(key.equals(((MasterDetailPath) newKey).getMaster())) {
                         isMasterOf = true;
@@ -31,7 +33,7 @@ public class MasterDetailStateClearStrategy
                     }
                 }
             }
-            if(!stateChange.getNewState().contains(key) && !isMasterOf) {
+            if(!newState.contains(key) && !isMasterOf) {
                 keyIterator.remove();
             }
         }
