@@ -226,7 +226,7 @@ public class BackstackManager
         if(view != null) {
             Object key = KeyContextWrapper.getKey(view.getContext());
             if(key == null) {
-                throw new IllegalArgumentException("The view [" + view + "] contained no key!");
+                throw new IllegalArgumentException("The view [" + view + "] contained no key in its context hierarchy. The view or its parent hierarchy should be inflated by a layout inflater from `stateChange.createContext(baseContext, key)`, or a KeyContextWrapper.");
             }
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             view.saveHierarchyState(viewHierarchyState);

@@ -426,7 +426,7 @@ public class Backstack {
     private void assertNoStateChange() {
         if(isStateChangePending()) {
             throw new IllegalStateException(
-                    "The backstack cannot be cleared while there are enqueued state changes.");
+                    "This operation is not allowed while there are enqueued state changes.");
         }
     }
 }
