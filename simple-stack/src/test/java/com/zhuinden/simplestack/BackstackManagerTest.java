@@ -43,11 +43,37 @@ public class BackstackManagerTest {
         backstackManager.setStateChanger(stateChanger);
 
         Backstack backstack = backstackManager.getBackstack();
-        backstack.goBack();
+        if(!backstack.goBack()) {
+            backstack.reset();
+        }
         assertThat(backstack.getHistory()).isEmpty();
         backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
         assertThat(backstack.getHistory()).doesNotContain(restored);
         assertThat(backstack.getHistory()).containsExactly(initial);
+    }
+
+    @Test
+    public void onGoBackKeysShouldNotBeClearedAndShouldRestoreRestoredKey() {
+        TestKey initial = new TestKey("initial");
+        TestKey restored = new TestKey("restored");
+
+        ArrayList<Parcelable> history = new ArrayList<>();
+        history.add(restored);
+        StateBundle stateBundle = new StateBundle();
+        stateBundle.putParcelableArrayList(BackstackManager.getHistoryTag(),
+                history);
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.fromBundle(stateBundle);
+        backstackManager.setStateChanger(stateChanger);
+
+        Backstack backstack = backstackManager.getBackstack();
+        backstack.goBack();
+        assertThat(backstack.getHistory()).isNotEmpty();
+        assertThat(backstack.getHistory()).containsExactly(restored);
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        assertThat(backstack.getHistory()).containsExactly(restored);
     }
 
     @Test

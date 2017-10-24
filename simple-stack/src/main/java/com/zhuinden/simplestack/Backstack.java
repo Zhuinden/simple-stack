@@ -176,7 +176,6 @@ public class Backstack {
             return true;
         }
         if(stack.size() <= 1) {
-            resetBackstack();
             return false;
         }
         ArrayList<Object> newHistory = new ArrayList<>();
@@ -192,6 +191,18 @@ public class Backstack {
     private void resetBackstack() {
         stack.clear();
         initialParameters = new ArrayList<>(initialKeys);
+    }
+
+    /**
+     * Immediately clears the backstack, it is NOT enqueued as a state change.
+     *
+     * If there are pending state changes, then it throws an exception.
+     *
+     * You generally don't need to use this method.
+     */
+    public void reset() {
+        assertNoStateChange();
+        resetBackstack();
     }
 
     /**
@@ -224,9 +235,12 @@ public class Backstack {
      *
      * @return the unmodifiable copy of history.
      */
-    public List<Object> getHistory() {
-        List<Object> copy = new ArrayList<>();
-        copy.addAll(stack);
+    public <T> List<T> getHistory() {
+        List<T> copy = new ArrayList<>(stack.size());
+        for(Object key : stack) {
+            // noinspection unchecked
+            copy.add((T) key);
+        }
         return Collections.unmodifiableList(copy);
     }
 
@@ -235,8 +249,13 @@ public class Backstack {
      *
      * @return the list of keys used at first initialization
      */
-    public List<Object> getInitialParameters() {
-        return initialParameters;
+    public <T> List<T> getInitialParameters() {
+        List<T> copy = new ArrayList<>(stack.size());
+        for(Object key : initialParameters) {
+            // noinspection unchecked
+            copy.add((T) key);
+        }
+        return Collections.unmodifiableList(copy);
     }
 
     /**
@@ -288,7 +307,8 @@ public class Backstack {
             previousState = new ArrayList<>();
             previousState.addAll(stack);
         }
-        final StateChange stateChange = new StateChange(this, Collections.unmodifiableList(previousState),
+        final StateChange stateChange = new StateChange(this,
+                Collections.unmodifiableList(previousState),
                 Collections.unmodifiableList(newHistory),
                 direction);
         StateChanger.Callback completionCallback = new StateChanger.Callback() {
@@ -400,6 +420,13 @@ public class Backstack {
     private void checkNewKey(Object newKey) {
         if(newKey == null) {
             throw new IllegalArgumentException("Key cannot be null");
+        }
+    }
+
+    private void assertNoStateChange() {
+        if(isStateChangePending()) {
+            throw new IllegalStateException(
+                    "The backstack cannot be cleared while there are enqueued state changes.");
         }
     }
 }

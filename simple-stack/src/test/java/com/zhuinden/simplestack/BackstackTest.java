@@ -283,4 +283,48 @@ public class BackstackTest {
         assertThat(backstack.isStateChangePending()).isFalse();
         Mockito.verify(completionListener, Mockito.never()).stateChangeCompleted(stateChange);
     }
+
+    @Test
+    public void resetShouldThrowIfStateChangeIsEnqueued() {
+        TestKey initial = new TestKey("hello");
+        Backstack backstack = new Backstack(initial);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger,
+                Backstack.INITIALIZE); // initialize state change
+        try {
+            backstack.reset();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void resetShouldClearStackIfStateChangeIsComplete() {
+        TestKey initial = new TestKey("hello");
+        TestKey other = new TestKey("other");
+        Backstack backstack = new Backstack(initial);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        callback.stateChangeComplete();
+        backstack.goTo(other);
+        callback.stateChangeComplete();
+        backstack.reset();
+        assertThat(backstack.getHistory()).isEmpty();
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial);
+    }
 }

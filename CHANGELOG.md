@@ -1,5 +1,26 @@
 # Change log
 
+-Simple Stack 1.8.0 (2017-10-24) 
+--------------------------------
+
+- BREAKING(?) CHANGE: when `goBack()` returns false, then the backstack is not cleared automatically. Added `reset()` to allow imitating the previous behavior. 
+
+Previous behavior would now be the same as:
+
+    if(!backstack.goBack()) {
+        backstack.reset();
+    }
+    
+Honestly, this might have been unexpected, as `goBack()` returning `false` had the side-effect of clearing the stack, and next state change using the initial key.
+
+The test that checks for this has been changed to use the above construct.
+
+Also, to eliminate the possibility of `reset()` misuse, it is only allowed when there are no pending state changes.
+
+- ENHANCEMENT: `getHistory()` and `getInitialParameters()`  also returns a `List<T>` in which each element is cast to `T`. 
+
+- FIX: `getInitialParameters()` returned the actual list instead of an unmodifiable copy.
+
 -Simple Stack 1.7.2 (2017-07-24)
 --------------------------------
 - MINOR CHANGE + ENHANCEMENT: `StateChange.getNewState()` and `StateChange.getPreviousState()` return a copy of the list (it was already a copy, don't worry), where each item is casted to `<T>` specified as generic parameter.
