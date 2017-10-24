@@ -327,4 +327,69 @@ public class BackstackTest {
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
+
+    @Test
+    public void replaceTopShouldThrowIfNullIsGiven() {
+        TestKey initial = new TestKey("hello");
+        Backstack backstack = new Backstack(initial);
+        try {
+            backstack.replaceTop(null, StateChange.REPLACE);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void replaceTopShouldWorkAsIntended() {
+        TestKey initial = new TestKey("hello");
+        TestKey other = new TestKey("other");
+        TestKey another = new TestKey("another");
+        Backstack backstack = new Backstack(initial);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        callback.stateChangeComplete();
+        backstack.goTo(other);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other);
+        backstack.replaceTop(another, StateChange.FORWARD);
+        assertThat(stateChange.getDirection()).isEqualTo(StateChange.FORWARD);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, another);
+    }
+
+    @Test
+    public void replaceTopReentrantShouldWorkAsIntended() {
+        TestKey initial = new TestKey("hello");
+        TestKey other = new TestKey("other");
+        TestKey another = new TestKey("another");
+        TestKey yetAnother = new TestKey("yetAnother");
+        Backstack backstack = new Backstack(initial);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        callback.stateChangeComplete();
+        backstack.goTo(other);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other);
+
+        backstack.replaceTop(another, StateChange.BACKWARD);
+        backstack.replaceTop(yetAnother, StateChange.REPLACE);
+        assertThat(stateChange.getDirection()).isEqualTo(StateChange.BACKWARD);
+        callback.stateChangeComplete();
+        assertThat(stateChange.getDirection()).isEqualTo(StateChange.REPLACE);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, yetAnother);
+    }
 }

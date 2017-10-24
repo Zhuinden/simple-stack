@@ -145,7 +145,7 @@ public class Backstack {
     public void goTo(@NonNull Object newKey) {
         checkNewKey(newKey);
 
-        ArrayList<Object> newHistory = new ArrayList<>();
+        List<Object> newHistory = new ArrayList<>();
         boolean isNewKey = true;
         for(Object key : selectActiveHistory()) {
             newHistory.add(key);
@@ -165,6 +165,23 @@ public class Backstack {
     }
 
     /**
+     * Replaces the current top with the provided key.
+     * This means removing the current last element, and then adding the new element.
+     *
+     * @param newTop the new top key
+     * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     */
+    public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
+        checkNewKey(newTop);
+
+        List<Object> newHistory = HistoryBuilder.from(selectActiveHistory()) //
+                .removeLast() //
+                .add(newTop) //
+                .build();
+        enqueueStateChange(newHistory, direction, false);
+    }
+
+    /**
      * Goes back in the history.
      * If the key is found, then it goes backward to the existing key.
      * If the key is not found, then it goes forward to the newly added key.
@@ -178,7 +195,7 @@ public class Backstack {
         if(stack.size() <= 1) {
             return false;
         }
-        ArrayList<Object> newHistory = new ArrayList<>();
+        List<Object> newHistory = new ArrayList<>();
 
         List<Object> activeHistory = selectActiveHistory();
         for(int i = 0; i < activeHistory.size() - 1; i++) {
@@ -209,7 +226,7 @@ public class Backstack {
      * Sets the provided state list as the new active history.
      *
      * @param newHistory the new active history.
-     * @param direction  The direction of the state change: BACKWARD, FORWARD or REPLACE.
+     * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
     public void setHistory(@NonNull List<Object> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);

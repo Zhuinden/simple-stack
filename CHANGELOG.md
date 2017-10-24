@@ -3,6 +3,8 @@
 -Simple Stack 1.8.0 (2017-10-24) 
 --------------------------------
 
+- ADDED: `replaceTop()` backstack operator.
+
 - BREAKING(?) CHANGE: when `goBack()` returns false, then the backstack is not cleared automatically. Added `reset()` to allow imitating the previous behavior. 
 
 Previous behavior would now be the same as:
@@ -20,6 +22,8 @@ Also, to eliminate the possibility of `reset()` misuse, it is only allowed when 
 - ENHANCEMENT: `getHistory()` and `getInitialParameters()`  also returns a `List<T>` in which each element is cast to `T`. 
 
 - FIX: `getInitialParameters()` returned the actual list instead of an unmodifiable copy.
+
+- ENHANCEMENT: Some improvement to `persistViewToState()` exception message if the view has no key (so that it references `KeyContextWrapper`).
 
 -Simple Stack 1.7.2 (2017-07-24)
 --------------------------------
