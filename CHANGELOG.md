@@ -1,29 +1,45 @@
 # Change log
 
--Simple Stack 1.8.0 (2017-10-24) 
+-Simple Stack 1.8.0 (2017-10-25) 
 --------------------------------
 
-- ADDED: `replaceTop()` backstack operator.
-
-- BREAKING(?) CHANGE: when `goBack()` returns false, then the backstack is not cleared automatically. Added `reset()` to allow imitating the previous behavior. 
+- BREAKING(?) CHANGE / FIX: when `goBack()` returns false, then the backstack is not cleared automatically. Added `reset()` to allow imitating the previous behavior. 
 
 Previous behavior would now be the same as:
 
-    if(!backstack.goBack()) {
+    if(!backstack.goBack() && !backstack.isStateChangePending()) {
         backstack.reset();
     }
     
-Honestly, this might have been unexpected, as `goBack()` returning `false` had the side-effect of clearing the stack, and next state change using the initial key.
+Honestly, this might have been unexpected, as `goBack()` returning `false` had the side-effect of clearing the stack, and next state change using the initial key!
 
-The test that checks for this has been changed to use the above construct.
+The test that checks for this has been changed to use the above construct. Another test of course has been added to validate new behavior.
 
 Also, to eliminate the possibility of `reset()` misuse, it is only allowed when there are no pending state changes.
 
+- BREAKING CHANGE: `getInitialParameters()` is renamed to `getInitialKeys()`. 
+
+- FIX: `getInitialParameters()` returned the actual list instead of an unmodifiable copy, it returns the keys provided at initialization.
+
+- ADDED: `replaceTop()` backstack operator, which replaces current top with the provided key.
+
+- ADDED: `goUp()` backstack operator, which will go back to the provided key if exists, replace top with new key otherwise.
+
+- ADDED: `goUpChain()` backstack operator, which will:
+
+  - If the chain of parents is found as previous elements, then it works as back navigation to that chain.
+  - If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
+  - If none of the chain is found, the current top is removed, and the provided parent chain is added.
+  
+  I added a bunch of tests for this, hopefully I didn't forget anything!
+
+- ENHANCEMENT/FIX: `HistoryBuilder.get()` is now `@NonNull`, because `HistoryBuilder.from(List<?>)` throws if List contains `null`.
+
 - ENHANCEMENT: `getHistory()` and `getInitialParameters()`  also returns a `List<T>` in which each element is cast to `T`. 
 
-- FIX: `getInitialParameters()` returned the actual list instead of an unmodifiable copy.
+- FIX: `BackstackDelegate.setStateChanger()` should have been allowed even without calling `backstackDelegate.onCreate()` first. All the samples use `new BackstackDelegate(null)` so it never came up.
 
-- ENHANCEMENT: Some improvement to `persistViewToState()` exception message if the view has no key (so that it references `KeyContextWrapper`).
+- ENHANCEMENT: Some improvement to `persistViewToState()` exception message if the view has no key (so that it references `KeyContextWrapper` and `stateChange.createContext()`).
 
 -Simple Stack 1.7.2 (2017-07-24)
 --------------------------------

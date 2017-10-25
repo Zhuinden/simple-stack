@@ -174,11 +174,105 @@ public class Backstack {
     public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
         checkNewKey(newTop);
 
-        List<Object> newHistory = HistoryBuilder.from(selectActiveHistory()) //
-                .removeLast() //
-                .add(newTop) //
+        HistoryBuilder historyBuilder = HistoryBuilder.from(selectActiveHistory());
+        if(!historyBuilder.isEmpty()) {
+            historyBuilder.removeLast();
+        }
+        List<Object> newHistory = historyBuilder.add(newTop) //
                 .build();
-        enqueueStateChange(newHistory, direction, false);
+        setHistory(newHistory, direction);
+    }
+
+    /**
+     * Goes "up" to the provided element.
+     * This means that if the provided element is found anywhere in the history, then the history goes to it.
+     * If not found, then the current top is replaced with the provided element.
+     *
+     * Going up occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param newKey the new key to go up to
+     */
+    public void goUp(@NonNull Object newKey) {
+        checkNewKey(newKey);
+
+        List<Object> currentHistory = selectActiveHistory();
+        int size = currentHistory.size();
+
+        if(size <= 1) { // single-element history cannot contain the previous element. Short circuit to replaceTop.
+            replaceTop(newKey, StateChange.BACKWARD);
+            return;
+        }
+        if(currentHistory.contains(newKey)) {
+            goTo(newKey);
+        } else {
+            replaceTop(newKey, StateChange.BACKWARD);
+        }
+    }
+
+    /**
+     * Goes "up" once to the provided chain of parents.
+     * If the chain of parents is found as previous elements, then it works as back navigation to that chain.
+     * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
+     * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
+     *
+     * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param parentChain the chain of parents, from oldest to newest.
+     */
+    public void goUpChain(@NonNull List<Object> parentChain) {
+        checkNewHistory(parentChain);
+
+        int parentChainSize = parentChain.size();
+        if(parentChainSize == 1) {
+            goUp(parentChain.get(0));
+            return;
+        }
+
+        HistoryBuilder historyBuilder = HistoryBuilder.from(selectActiveHistory());
+        historyBuilder.removeLast(); // we will never keep the current key on "up" navigation.
+
+        int indexOfSubList = Collections.indexOfSubList(historyBuilder.build(), parentChain);
+
+        if(indexOfSubList != -1) {
+            // if the parent chain is found as is,
+            // we clear all on top of it and go back to the chain
+            goTo(parentChain.get(parentChainSize-1));
+            //noinspection UnnecessaryReturnStatement
+            return;
+        } else {
+            // now we must check if any element is found in the new history.
+            // if it exists, we go to that, and add the remaining chain to it.
+            for(int i = 0; i < parentChainSize; i++) {
+                Object key = parentChain.get(i);
+                if(historyBuilder.contains(key)) {
+                    // if the key is found, we'll keep all keys up to it.
+                    // the remaining chain will be appended.
+                    // if any elements in the chain are duplicates,
+                    // they are ordered according to the provided chain.
+                    int indexOfKey = historyBuilder.indexOf(key);
+                    HistoryBuilder newHistory = HistoryBuilder.newBuilder();
+                    for(int j = 0; j < indexOfKey; j++) {
+                        newHistory.add(historyBuilder.get(j)); // preserve equivalent prefix
+                    }
+                    for(int j = 0; j < parentChainSize; j++) {
+                        Object nextKey = parentChain.get(j);
+                        if(newHistory.contains(nextKey)) {
+                            // if the new chain reorders previous elements,
+                            // then those are reordered according to the parent chain.
+                            newHistory.remove(nextKey);
+                        }
+                        newHistory.add(nextKey);
+                    }
+                    setHistory(newHistory.build(), StateChange.BACKWARD);
+                    return;
+                }
+            }
+
+            // no elements in the current history were found in the parent chain
+            // default behavior is to add the newly received list in place of the original key
+            HistoryBuilder newHistory = historyBuilder.addAll(parentChain);
+            setHistory(newHistory.build(), StateChange.BACKWARD);
+        }
     }
 
     /**
@@ -266,9 +360,9 @@ public class Backstack {
      *
      * @return the list of keys used at first initialization
      */
-    public <T> List<T> getInitialParameters() {
-        List<T> copy = new ArrayList<>(stack.size());
-        for(Object key : initialParameters) {
+    public <T> List<T> getInitialKeys() {
+        List<T> copy = new ArrayList<>(initialKeys.size());
+        for(Object key : initialKeys) {
             // noinspection unchecked
             copy.add((T) key);
         }

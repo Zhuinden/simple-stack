@@ -15,6 +15,8 @@
  */
 package com.zhuinden.simplestack;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -332,6 +334,154 @@ public class BackstackDelegateTest {
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK
+        }
+    }
+
+    @Test
+    public void setKeyFilterWithNullShouldThrow() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.setKeyFilter(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void setKeyFilterMustBeCalledBeforeOnCreate() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        Object key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        try {
+            backstackDelegate.setKeyFilter(new KeyFilter() {
+                @NonNull
+                @Override
+                public List<Object> filterHistory(@NonNull List<Object> restoredKeys) {
+                    return restoredKeys;
+                }
+            });
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void setKeyParcelerWithNullShouldThrow() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.setKeyParceler(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void setKeyParcelerMustBeCalledBeforeOnCreate() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        Object key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        try {
+            backstackDelegate.setKeyParceler(new KeyParceler() {
+                @Override
+                public Parcelable toParcelable(Object object) {
+                    return (Parcelable)object;
+                }
+
+                @Override
+                public Object fromParcelable(Parcelable parcelable) {
+                    return parcelable;
+                }
+            });
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void setStateClearStrategyWithNullShouldThrow() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.setStateClearStrategy(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void setStateClearStrategyMustBeCalledBeforeOnCreate() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        Object key = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        try {
+            backstackDelegate.setStateClearStrategy(new DefaultStateClearStrategy());
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void registerLifecycleCallbacksShouldThrowForNull() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.registerForLifecycleCallbacks(null);
+            Assert.fail();
+        } catch(NullPointerException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void registerLifecycleCallbacksShouldThrowIfNotCalledCreate() {
+        Activity activity = Mockito.mock(Activity.class);
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.registerForLifecycleCallbacks(activity);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void registerLifecycleCallbacksShouldBeCalledForActivity() {
+        Activity activity = Mockito.mock(Activity.class);
+        Application application = Mockito.mock(Application.class);
+        Mockito.when(activity.getApplication()).thenReturn(application);
+        Object key = new TestKey("hello");
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
+        // THEN
+        backstackDelegate.registerForLifecycleCallbacks(activity);
+        Mockito.verify(activity, Mockito.times(1)).getApplication();
+    }
+
+    @Test
+    public void callingOnPostResumeBeforeOnCreateShouldThrow() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate.setStateChanger(stateChanger);
+        try {
+            backstackDelegate.onPostResume();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            assertThat(e.getMessage()).contains("This method can only be called after calling `onCreate()`");
+            // OK!
+        }
+    }
+
+    @Test
+    public void callingOnPauseBeforeOnCreateShouldThrow() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        try {
+            backstackDelegate.onPause();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
         }
     }
 }

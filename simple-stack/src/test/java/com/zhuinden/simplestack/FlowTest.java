@@ -320,7 +320,7 @@ public class FlowTest {
         assertThat(lastDirection).isEqualTo(StateChange.REPLACE);
     }
 
-    @SuppressWarnings({"deprecation", "CheckResult"})
+    @SuppressWarnings({"CheckResult"})
     @Test
     public void setHistoryKeepsOriginals() {
         TestKey able = new TestKey("Able");

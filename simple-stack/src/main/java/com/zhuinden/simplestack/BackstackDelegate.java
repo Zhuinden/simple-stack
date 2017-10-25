@@ -178,9 +178,7 @@ public class BackstackDelegate {
         if(activity == null) {
             throw new NullPointerException("Activity is null");
         }
-        if(backstackManager == null) {
-            throw new IllegalStateException("You can register for lifecycle callbacks only after calling `onCreate()`.");
-        }
+        @SuppressWarnings("unused") BackstackManager backstackManager = getManager();
         final Application application = activity.getApplication();
         application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
@@ -276,7 +274,9 @@ public class BackstackDelegate {
      */
     public void setStateChanger(@Nullable StateChanger stateChanger) {
         this.stateChanger = stateChanger;
-        backstackManager.setStateChanger(stateChanger);
+        if(backstackManager != null) { // allowed before `onCreate()`
+            backstackManager.setStateChanger(stateChanger);
+        }
     }
 
     /**
@@ -307,9 +307,7 @@ public class BackstackDelegate {
      * @param outState the Bundle into which the backstack history and view states are saved.
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        if(backstackManager == null) {
-            throw new IllegalStateException("You can call this method only after `onCreate()`");
-        }
+        BackstackManager backstackManager = getManager(); // assertion!
         outState.putParcelable(getHistoryTag(), backstackManager.toBundle());
     }
 
@@ -321,10 +319,7 @@ public class BackstackDelegate {
         if(stateChanger == null) {
             throw new IllegalStateException("State changer is still not set in `onPostResume`!");
         }
-        if(backstackManager == null) {
-            throw new IllegalStateException("You can call this method only after `onCreate()`");
-        }
-        backstackManager.reattachStateChanger();
+        getManager().reattachStateChanger();
     }
 
     /**
@@ -332,10 +327,7 @@ public class BackstackDelegate {
      * It removes the {@link StateChanger} if it is set.
      */
     public void onPause() {
-        if(backstackManager == null) {
-            throw new IllegalStateException("You can call this method only after `onCreate()`");
-        }
-        backstackManager.detachStateChanger();
+        getManager().detachStateChanger();
     }
 
     /**
@@ -356,10 +348,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public Backstack getBackstack() {
-        if(backstackManager == null) {
-            throw new IllegalStateException("The backstack within the delegate must be initialized by `onCreate()`");
-        }
-        return backstackManager.getBackstack();
+        return getManager().getBackstack();
     }
 
     // ----- viewstate persistence
@@ -370,10 +359,7 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void persistViewToState(@Nullable View view) {
-        if(backstackManager == null) {
-            throw new IllegalStateException("You can call this method only after `onCreate()`");
-        }
-        backstackManager.persistViewToState(view);
+        getManager().persistViewToState(view);
     }
 
     /**
@@ -382,10 +368,7 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void restoreViewFromState(@NonNull View view) {
-        if(backstackManager == null) {
-            throw new IllegalStateException("You can call this method only after `onCreate()`");
-        }
-        backstackManager.restoreViewFromState(view);
+        getManager().restoreViewFromState(view);
     }
 
     /**
@@ -397,10 +380,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public SavedState getSavedState(@NonNull Object key) {
-        if(backstackManager == null) {
-            throw new IllegalStateException("You can call this method only after `onCreate()`");
-        }
-        return backstackManager.getSavedState(key);
+        return getManager().getSavedState(key);
     }
 
     /**
@@ -411,7 +391,7 @@ public class BackstackDelegate {
     @NonNull
     public BackstackManager getManager() {
         if(backstackManager == null) {
-            throw new IllegalStateException("The backstack manager within the delegate must be initialized by `onCreate()`");
+            throw new IllegalStateException("This method can only be called after calling `onCreate()`");
         }
         return backstackManager;
     }

@@ -30,6 +30,49 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HistoryBuilderTest {
     @Test
+    public void historyBuilderThrowsForListThatContainsNull() {
+        List<Object> nullList = new ArrayList<>();
+        nullList.add(null);
+        try {
+            HistoryBuilder.from(nullList);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void historyBuilderThrowsForNullBackstack() {
+        try {
+            HistoryBuilder historyBuilder = HistoryBuilder.from((Backstack)null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void historyBuilderThrowsForAddingNull() {
+        HistoryBuilder historyBuilder = HistoryBuilder.newBuilder();
+        try {
+            historyBuilder.add(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void historyBuilderThrowsFromNull() {
+        try {
+            HistoryBuilder.from((Object)null).build();
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
     public void removeUntilThrowsIfKeyNotFound() {
         try {
             HistoryBuilder builder = HistoryBuilder.newBuilder().add(new TestKey("hello"));

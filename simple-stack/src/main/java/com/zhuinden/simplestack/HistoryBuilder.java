@@ -81,6 +81,11 @@ public class HistoryBuilder
      */
     @NonNull
     public static HistoryBuilder from(@NonNull List<?> keys) {
+        for(Object key : keys) {
+            if(key == null) {
+                throw new IllegalArgumentException("Cannot provide `null` as a key!");
+            }
+        }
         return newBuilder().addAll(keys);
     }
 
@@ -280,7 +285,7 @@ public class HistoryBuilder
      * @param index
      * @return the key at the given index
      */
-    @Nullable
+    @NonNull
     public <T> T get(int index) {
         // noinspection unchecked
         return (T) list.get(index);
