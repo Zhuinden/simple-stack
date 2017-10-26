@@ -1,5 +1,14 @@
 # Change log
 
+-Simple Stack _._._ (__-__-__)
+--------------------------------
+
+- Updated to use implementation/api and AS 3.0's tooling.
+
+- Updated implementation lib versions in samples and tests.
+
+- Updated State-Bundle to 1.2.0.
+
 -Simple Stack 1.8.0 (2017-10-25) 
 --------------------------------
 

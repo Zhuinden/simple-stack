@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.zhuinden.simplestackexamplekotlin"
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -30,21 +30,21 @@ kapt {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':simple-stack')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':simple-stack')
 
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:26.+'
+    testImplementation 'junit:junit:4.12'
 
-    compile 'com.jakewharton:butterknife:8.5.1'
-    kapt 'com.jakewharton:butterknife-compiler:8.5.1'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
 
-    compile 'nz.bradcampbell:paperparcel:2.0.1'
-    compile 'nz.bradcampbell:paperparcel-kotlin:2.0.1'
-    kapt 'nz.bradcampbell:paperparcel-compiler:2.0.1'
+    implementation 'nz.bradcampbell:paperparcel:2.0.4'
+    implementation 'nz.bradcampbell:paperparcel-kotlin:2.0.4'
+    kapt 'nz.bradcampbell:paperparcel-compiler:2.0.4'
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-3"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.51"
 }
