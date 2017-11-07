@@ -24,10 +24,8 @@ public class MainScopeListener
 
     public MainScopeListener() {
         setRetainInstance(true);
-        looperScheduler = Injector.get()
-                .looperScheduler();
-        databaseManager = Injector.get()
-                .databaseManager();
+        looperScheduler = Injector.get().looperScheduler();
+        databaseManager = Injector.get().databaseManager();
     }
 
     @Override

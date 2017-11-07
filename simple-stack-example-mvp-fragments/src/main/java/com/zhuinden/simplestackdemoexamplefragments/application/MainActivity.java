@@ -50,10 +50,8 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         CustomApplication.get(this).initialize();
-        DatabaseManager databaseManager = Injector.get()
-                .databaseManager();
-        BackstackHolder backstackHolder = Injector.get()
-                .backstackHolder();
+        DatabaseManager databaseManager = Injector.get().databaseManager();
+        BackstackHolder backstackHolder = Injector.get().backstackHolder();
 
         databaseManager.init(this);
 

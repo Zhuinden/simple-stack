@@ -55,8 +55,7 @@ public class TaskDetailFragment
 
     @Override
     protected void injectSelf() {
-        taskDetailPresenter = Injector.get()
-                .taskDetailPresenter();
+        taskDetailPresenter = Injector.get().taskDetailPresenter();
     }
 
     public void editTask() {

@@ -55,8 +55,7 @@ public class AddOrEditTaskFragment
 
     @Override
     protected void injectSelf() {
-        addOrEditTaskPresenter = Injector.get()
-                .addOrEditTaskPresenter();
+        addOrEditTaskPresenter = Injector.get().addOrEditTaskPresenter();
     }
 
     public void saveTask() {

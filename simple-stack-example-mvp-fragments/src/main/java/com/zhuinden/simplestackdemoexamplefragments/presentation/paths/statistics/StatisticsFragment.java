@@ -44,10 +44,8 @@ public class StatisticsFragment
 
     @Override
     protected void injectSelf() {
-        resources = Injector.get()
-                .resources();
-        statisticsPresenter = Injector.get()
-                .statisticsPresenter();
+        resources = Injector.get().resources();
+        statisticsPresenter = Injector.get().statisticsPresenter();
     }
 
 

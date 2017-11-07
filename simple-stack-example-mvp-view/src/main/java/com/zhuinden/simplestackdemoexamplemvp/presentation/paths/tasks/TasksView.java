@@ -59,10 +59,8 @@ public class TasksView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            this.tasksPresenter = Injector.get()
-                    .tasksPresenter();
-            this.resources = Injector.get()
-                    .resources();
+            this.tasksPresenter = Injector.get().tasksPresenter();
+            this.resources = Injector.get().resources();
         }
     }
 
@@ -165,8 +163,8 @@ public class TasksView
         listView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         setColorSchemeColors(ContextCompat.getColor(this.getContext(), R.color.colorPrimary),
-                ContextCompat.getColor(this.getContext(), R.color.colorAccent),
-                ContextCompat.getColor(this.getContext(), R.color.colorPrimaryDark));
+                             ContextCompat.getColor(this.getContext(), R.color.colorAccent),
+                             ContextCompat.getColor(this.getContext(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
         setScrollUpChild(listView);
     }

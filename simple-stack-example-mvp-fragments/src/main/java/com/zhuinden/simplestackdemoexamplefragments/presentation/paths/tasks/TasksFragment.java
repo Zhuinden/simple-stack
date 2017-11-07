@@ -120,12 +120,9 @@ public class TasksFragment
 
     @Override
     protected void injectSelf() {
-        tasksPresenter = Injector.get()
-                .tasksPresenter();
-        resources = Injector.get()
-                .resources();
-        messageQueue = Injector.get()
-                .messageQueue();
+        tasksPresenter = Injector.get().tasksPresenter();
+        resources = Injector.get().resources();
+        messageQueue = Injector.get().messageQueue();
     }
 
     @Nullable
@@ -142,8 +139,8 @@ public class TasksFragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.colorPrimary),
-                ContextCompat.getColor(getContext(), R.color.colorAccent),
-                ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                                                ContextCompat.getColor(getContext(), R.color.colorAccent),
+                                                ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(listView);
         swipeRefreshLayout.setOnRefreshListener(this::refresh);
@@ -223,10 +220,10 @@ public class TasksFragment
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(ignored -> {
-            if(swipeRefreshLayout != null) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+                    if(swipeRefreshLayout != null) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
     }
 
     public void showNoActiveTasks() {

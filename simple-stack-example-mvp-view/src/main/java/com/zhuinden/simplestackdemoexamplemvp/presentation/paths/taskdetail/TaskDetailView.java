@@ -49,8 +49,7 @@ public class TaskDetailView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            taskDetailPresenter = Injector.get()
-                    .taskDetailPresenter();
+            taskDetailPresenter = Injector.get().taskDetailPresenter();
         }
     }
 

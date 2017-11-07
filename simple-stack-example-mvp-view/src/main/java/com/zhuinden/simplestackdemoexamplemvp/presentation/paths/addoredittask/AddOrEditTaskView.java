@@ -47,8 +47,7 @@ public class AddOrEditTaskView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            addOrEditTaskPresenter = Injector.get()
-                    .addOrEditTaskPresenter();
+            addOrEditTaskPresenter = Injector.get().addOrEditTaskPresenter();
         }
     }
 

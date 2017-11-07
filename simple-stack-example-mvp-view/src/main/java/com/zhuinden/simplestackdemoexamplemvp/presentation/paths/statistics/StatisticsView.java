@@ -42,10 +42,8 @@ public class StatisticsView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            resources = Injector.get()
-                    .resources();
-            statisticsPresenter = Injector.get()
-                    .statisticsPresenter();
+            resources = Injector.get().resources();
+            statisticsPresenter = Injector.get().statisticsPresenter();
         }
     }
 

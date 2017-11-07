@@ -114,8 +114,7 @@ public class MainView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            backstack = Injector.get()
-                    .backstack();
+            backstack = Injector.get().backstack();
         }
     }
 
