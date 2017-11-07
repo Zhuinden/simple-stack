@@ -8,8 +8,6 @@ import com.zhuinden.simplestackdemoexamplefragments.R;
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector;
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -23,11 +21,8 @@ public class StatisticsFragment
     public StatisticsFragment() {
     }
 
-    @Inject
-    Resources resources;
-
-    @Inject
-    StatisticsPresenter statisticsPresenter;
+    private Resources resources;
+    private StatisticsPresenter statisticsPresenter;
 
     @BindView(R.id.statistics)
     TextView mStatisticsTV;
@@ -49,7 +44,10 @@ public class StatisticsFragment
 
     @Override
     protected void injectSelf() {
-        Injector.get().inject(this);
+        resources = Injector.get()
+                .resources();
+        statisticsPresenter = Injector.get()
+                .statisticsPresenter();
     }
 
 

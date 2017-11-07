@@ -26,7 +26,7 @@ public class CustomApplication extends Application {
         return (CustomApplication)context.getApplicationContext();
     }
 
-    public SingletonComponent getComponent() {
+    SingletonComponent getComponent() {
         return singletonComponent;
     }
 

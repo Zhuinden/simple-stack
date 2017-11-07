@@ -29,17 +29,15 @@ public class AddOrEditTaskPresenter
     String title;
     String description;
 
-    @Inject
-    TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
+    private final MessageQueue messageQueue;
+    private final Backstack backstack;
 
     @Inject
-    MessageQueue messageQueue;
-
-    @Inject
-    Backstack backstack;
-
-    @Inject
-    public AddOrEditTaskPresenter() {
+    public AddOrEditTaskPresenter(TaskRepository taskRepository, MessageQueue messageQueue, Backstack backstack) {
+        this.taskRepository = taskRepository;
+        this.messageQueue = messageQueue;
+        this.backstack = backstack;
     }
 
     public void updateTitle(String title) {

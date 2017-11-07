@@ -13,8 +13,6 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment;
 import com.zhuinden.simplestackdemoexamplefragments.util.Strings;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -38,8 +36,7 @@ public class TaskDetailFragment
     public TaskDetailFragment() {
     }
 
-    @Inject
-    TaskDetailPresenter taskDetailPresenter;
+    private TaskDetailPresenter taskDetailPresenter;
 
     @Override
     public TaskDetailPresenter getPresenter() {
@@ -58,7 +55,8 @@ public class TaskDetailFragment
 
     @Override
     protected void injectSelf() {
-        Injector.get().inject(this);
+        taskDetailPresenter = Injector.get()
+                .taskDetailPresenter();
     }
 
     public void editTask() {

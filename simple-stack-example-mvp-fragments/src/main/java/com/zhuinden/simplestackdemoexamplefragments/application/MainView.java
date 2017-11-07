@@ -21,8 +21,6 @@ import com.zhuinden.simplestackdemoexamplefragments.R;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics.StatisticsKey;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -46,7 +44,6 @@ public class MainView
     @BindView(R.id.fab_add_task)
     FloatingActionButton fabAddTask;
 
-    @Inject
     Backstack backstack;
 
     private void setCheckedItem(int navigationItemId) {
@@ -117,7 +114,8 @@ public class MainView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            CustomApplication.get(context).getComponent().inject(this);
+            backstack = Injector.get()
+                    .backstack();
         }
     }
 

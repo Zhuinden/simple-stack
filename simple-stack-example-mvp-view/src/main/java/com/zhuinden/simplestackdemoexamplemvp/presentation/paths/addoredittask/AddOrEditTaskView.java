@@ -8,12 +8,10 @@ import android.util.AttributeSet;
 import android.widget.EditText;
 import android.widget.ScrollView;
 
+import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector;
-import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.statebundle.StateBundle;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,12 +47,11 @@ public class AddOrEditTaskView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            Injector.get().inject(this);
+            addOrEditTaskPresenter = Injector.get()
+                    .addOrEditTaskPresenter();
         }
     }
 
-
-    @Inject
     AddOrEditTaskPresenter addOrEditTaskPresenter;
 
     @OnTextChanged(R.id.add_task_title)

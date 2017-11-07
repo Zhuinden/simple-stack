@@ -8,8 +8,6 @@ import com.zhuinden.simplestackdemoexamplefragments.R;
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector;
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
@@ -22,8 +20,7 @@ import butterknife.Unbinder;
 // UNSCOPED!
 public class AddOrEditTaskFragment
         extends BaseFragment<AddOrEditTaskFragment, AddOrEditTaskPresenter> {
-    @Inject
-    AddOrEditTaskPresenter addOrEditTaskPresenter;
+    private AddOrEditTaskPresenter addOrEditTaskPresenter;
 
     @OnTextChanged(R.id.add_task_title)
     public void titleChanged(Editable editable) {
@@ -58,7 +55,8 @@ public class AddOrEditTaskFragment
 
     @Override
     protected void injectSelf() {
-        Injector.get().inject(this);
+        addOrEditTaskPresenter = Injector.get()
+                .addOrEditTaskPresenter();
     }
 
     public void saveTask() {

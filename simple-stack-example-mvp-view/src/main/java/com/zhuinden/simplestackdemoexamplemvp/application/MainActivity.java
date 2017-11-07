@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplemvp.application;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -23,8 +24,6 @@ import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -43,6 +42,7 @@ public class MainActivity
 
     public static final String TAG = "MainActivity";
 
+    @SuppressLint("WrongConstant")
     public static MainActivity get(Context context) {
         // noinspection ResourceType
         return (MainActivity) context.getSystemService(TAG);
@@ -58,16 +58,14 @@ public class MainActivity
         return mainView.onCreateOptionsMenu(menu);
     }
 
-    @Inject
-    DatabaseManager databaseManager;
-
-    @Inject
-    BackstackHolder backstackHolder;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         CustomApplication.get(this).initialize();
-        CustomApplication.get(this).getComponent().inject(this);
+        DatabaseManager databaseManager = Injector.get()
+                .databaseManager();
+        BackstackHolder backstackHolder = Injector.get()
+                .backstackHolder();
+
         databaseManager.init(this);
 
         super.onCreate(savedInstanceState);

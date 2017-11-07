@@ -21,7 +21,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class StatisticsPresenter
-        extends BasePresenter<StatisticsView, StatisticsPresenter> {
+        extends BasePresenter<StatisticsView> {
     @Inject
     public StatisticsPresenter() {
     }

@@ -34,8 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -61,9 +59,15 @@ public class TasksView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            Injector.get().inject(this);
+            this.tasksPresenter = Injector.get()
+                    .tasksPresenter();
+            this.resources = Injector.get()
+                    .resources();
         }
     }
+
+    private TasksPresenter tasksPresenter;
+    private Resources resources;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -103,12 +107,6 @@ public class TasksView
             tasksPresenter.fromBundle(bundle);
         }
     }
-
-    @Inject
-    TasksPresenter tasksPresenter;
-
-    @Inject
-    Resources resources;
 
     @OnClick(R.id.noTasksAdd)
     void openAddNewTask() {

@@ -16,8 +16,6 @@ import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity;
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task;
 import com.zhuinden.simplestackdemoexamplemvp.util.Strings;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -51,7 +49,8 @@ public class TaskDetailView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            Injector.get().inject(this);
+            taskDetailPresenter = Injector.get()
+                    .taskDetailPresenter();
         }
     }
 
@@ -74,8 +73,6 @@ public class TaskDetailView
         return false;
     }
 
-
-    @Inject
     TaskDetailPresenter taskDetailPresenter;
 
     public void editTask() {

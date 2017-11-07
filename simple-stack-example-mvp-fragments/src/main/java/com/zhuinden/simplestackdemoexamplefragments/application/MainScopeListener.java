@@ -9,9 +9,6 @@ import android.support.v4.app.Fragment;
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplefragments.util.SchedulerHolder;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
@@ -22,16 +19,15 @@ public class MainScopeListener
         extends Fragment {
     HandlerThread handlerThread;
 
-    @Inject
-    @Named("LOOPER_SCHEDULER")
     SchedulerHolder looperScheduler;
-
-    @Inject
     DatabaseManager databaseManager;
 
     public MainScopeListener() {
         setRetainInstance(true);
-        CustomApplication.get().getComponent().inject(this);
+        looperScheduler = Injector.get()
+                .looperScheduler();
+        databaseManager = Injector.get()
+                .databaseManager();
     }
 
     @Override

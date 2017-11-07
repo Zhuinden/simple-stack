@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -53,14 +51,9 @@ public class TasksFragment
     public TasksFragment() {
     }
 
-    @Inject
-    TasksPresenter tasksPresenter;
-
-    @Inject
-    Resources resources;
-
-    @Inject
-    MessageQueue messageQueue;
+    private TasksPresenter tasksPresenter;
+    private Resources resources;
+    private MessageQueue messageQueue;
 
     @OnClick(R.id.noTasksAdd)
     void openAddNewTask() {
@@ -127,7 +120,12 @@ public class TasksFragment
 
     @Override
     protected void injectSelf() {
-        Injector.get().inject(this);
+        tasksPresenter = Injector.get()
+                .tasksPresenter();
+        resources = Injector.get()
+                .resources();
+        messageQueue = Injector.get()
+                .messageQueue();
     }
 
     @Nullable

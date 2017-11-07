@@ -16,16 +16,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  */
 
 public class TaskDetailPresenter
-        extends BasePresenter<TaskDetailView, TaskDetailPresenter> {
+        extends BasePresenter<TaskDetailView> {
+    private final TaskRepository taskRepository;
+    private final Backstack backstack;
+
     @Inject
-    public TaskDetailPresenter() {
+    public TaskDetailPresenter(TaskRepository taskRepository, Backstack backstack) {
+        this.taskRepository = taskRepository;
+        this.backstack = backstack;
     }
-
-    @Inject
-    TaskRepository taskRepository;
-
-    @Inject
-    Backstack backstack;
 
     TaskDetailKey taskDetailKey;
 

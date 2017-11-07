@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
@@ -24,20 +25,20 @@ import io.reactivex.schedulers.Schedulers;
 
 public class StatisticsPresenter
         extends BasePresenter<StatisticsFragment, StatisticsPresenter> {
-    @Inject
-    public StatisticsPresenter() {
-    }
+    private final TaskRepository taskRepository;
 
     @Inject
-    TaskRepository tasksRepository;
+    public StatisticsPresenter(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     Disposable disposable;
 
     @Override
     protected void onAttach(StatisticsFragment coordinator) {
-        disposable = Observable.combineLatest(tasksRepository.getActiveTasks(), //
-                tasksRepository.getCompletedTasks(), //
-                (activeTasks, completedTasks) -> Pair.with(activeTasks, completedTasks)) //
+        disposable = Observable.combineLatest(taskRepository.getActiveTasks(), //
+                                              taskRepository.getCompletedTasks(), //
+                                              (activeTasks, completedTasks) -> Pair.with(activeTasks, completedTasks)) //
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(pairOfActiveAndCompletedTasks -> {
@@ -55,6 +56,7 @@ public class StatisticsPresenter
     }
 
     @Override
+    @NonNull
     public StateBundle toBundle() {
         return new StateBundle();
     }

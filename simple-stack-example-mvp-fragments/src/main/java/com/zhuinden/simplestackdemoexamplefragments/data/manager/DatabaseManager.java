@@ -22,13 +22,12 @@ import io.realm.RealmConfiguration;
  */
 @Singleton
 public class DatabaseManager {
-    @Inject
-    public DatabaseManager() {
-    }
+    private final SchedulerHolder looperScheduler;
 
     @Inject
-    @Named("LOOPER_SCHEDULER")
-    SchedulerHolder looperScheduler;
+    public DatabaseManager(@Named("LOOPER_SCHEDULER") SchedulerHolder looperScheduler) {
+        this.looperScheduler = looperScheduler;
+    }
 
     private static final String TAG = "DatabaseManager";
 

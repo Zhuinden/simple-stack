@@ -25,23 +25,20 @@ import io.reactivex.schedulers.Schedulers;
  */
 // UNSCOPED!
 public class TasksPresenter
-        extends BasePresenter<TasksView, TasksPresenter>
+        extends BasePresenter<TasksView>
         implements Bundleable {
+    private final Backstack backstack;
+    private final TaskRepository taskRepository;
+    private final MessageQueue messageQueue;
+    private final Resources resources;
+
     @Inject
-    public TasksPresenter() {
+    public TasksPresenter(Backstack backstack, TaskRepository taskRepository, MessageQueue messageQueue, Resources resources) {
+        this.backstack = backstack;
+        this.taskRepository = taskRepository;
+        this.messageQueue = messageQueue;
+        this.resources = resources;
     }
-
-    @Inject
-    Backstack backstack;
-
-    @Inject
-    TaskRepository taskRepository;
-
-    @Inject
-    MessageQueue messageQueue;
-
-    @Inject
-    Resources resources;
 
     BehaviorRelay<TasksFilterType> filterType = BehaviorRelay.createDefault(TasksFilterType.ALL_TASKS);
 

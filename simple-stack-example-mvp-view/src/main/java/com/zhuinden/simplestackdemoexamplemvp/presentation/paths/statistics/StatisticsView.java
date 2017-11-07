@@ -10,8 +10,6 @@ import android.widget.TextView;
 import com.zhuinden.simplestackdemoexamplemvp.R;
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -44,15 +42,15 @@ public class StatisticsView
 
     private void init(Context context) {
         if(!isInEditMode()) {
-            Injector.get().inject(this);
+            resources = Injector.get()
+                    .resources();
+            statisticsPresenter = Injector.get()
+                    .statisticsPresenter();
         }
     }
 
-    @Inject
-    Resources resources;
-
-    @Inject
-    StatisticsPresenter statisticsPresenter;
+    private Resources resources;
+    private StatisticsPresenter statisticsPresenter;
 
     @BindView(R.id.statistics)
     TextView statisticsText;

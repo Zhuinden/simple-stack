@@ -6,7 +6,7 @@ import android.view.View;
  * Created by Owner on 2017. 01. 27..
  */
 
-public abstract class BasePresenter<V extends View, P extends BasePresenter<V, P>> {
+public abstract class BasePresenter<V extends View> {
     V view;
 
     public V getView() {

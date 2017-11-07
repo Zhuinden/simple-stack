@@ -31,19 +31,15 @@ import io.realm.Sort;
  */
 @Singleton
 public class TaskRepository {
-    @Inject
-    TaskMapper taskMapper;
+    private final TaskMapper taskMapper;
+    private final SchedulerHolder looperScheduler;
+    private final SchedulerHolder writeScheduler;
 
     @Inject
-    @Named("LOOPER_SCHEDULER")
-    SchedulerHolder looperScheduler;
-
-    @Inject
-    @Named("WRITE_SCHEDULER")
-    SchedulerHolder writeScheduler;
-
-    @Inject
-    public TaskRepository() {
+    public TaskRepository(TaskMapper taskMapper, @Named("LOOPER_SCHEDULER") SchedulerHolder looperScheduler, @Named("WRITE_SCHEDULER") SchedulerHolder writeScheduler) {
+        this.taskMapper = taskMapper;
+        this.looperScheduler = looperScheduler;
+        this.writeScheduler = writeScheduler;
     }
 
     private List<Task> mapFrom(RealmResults<DbTask> dbTasks) {

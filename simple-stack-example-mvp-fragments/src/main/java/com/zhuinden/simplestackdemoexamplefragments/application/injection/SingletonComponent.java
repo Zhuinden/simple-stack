@@ -4,17 +4,15 @@ import android.content.Context;
 import android.content.res.Resources;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity;
-import com.zhuinden.simplestackdemoexamplefragments.application.MainScopeListener;
-import com.zhuinden.simplestackdemoexamplefragments.application.MainView;
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager;
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.mapper.TaskMapper;
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskFragment;
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics.StatisticsFragment;
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail.TaskDetailFragment;
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksFragment;
+import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskPresenter;
+import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics.StatisticsPresenter;
+import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail.TaskDetailPresenter;
+import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksPresenter;
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder;
+import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue;
 import com.zhuinden.simplestackdemoexamplefragments.util.SchedulerHolder;
 
 import javax.inject.Named;
@@ -45,22 +43,18 @@ public interface SingletonComponent {
 
     Backstack backstack();
 
+    MessageQueue messageQueue();
+
     @Named("applicationContext")
     Context applicationContext();
 
     Resources resources();
 
-    void inject(MainActivity mainActivity);
+    AddOrEditTaskPresenter addOrEditTaskPresenter();
 
-    void inject(MainScopeListener mainScopeListener);
+    TasksPresenter tasksPresenter();
 
-    void inject(MainView mainView);
+    TaskDetailPresenter taskDetailPresenter();
 
-    void inject(AddOrEditTaskFragment addOrEditTaskFragment);
-
-    void inject(StatisticsFragment statisticsFragment);
-
-    void inject(TaskDetailFragment taskDetailFragment);
-
-    void inject(TasksFragment tasksFragment);
+    StatisticsPresenter statisticsPresenter();
 }

@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.application;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -19,8 +20,6 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.Tas
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder;
 import com.zhuinden.simplestackdemoexamplefragments.util.FragmentStateChanger;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -39,6 +38,7 @@ public class MainActivity
 
     public static final String TAG = "MainActivity";
 
+    @SuppressLint("WrongConstant")
     public static MainActivity get(Context context) {
         // noinspection ResourceType
         return (MainActivity) context.getSystemService(TAG);
@@ -47,16 +47,14 @@ public class MainActivity
     BackstackDelegate backstackDelegate;
     FragmentStateChanger fragmentStateChanger;
 
-    @Inject
-    DatabaseManager databaseManager;
-
-    @Inject
-    BackstackHolder backstackHolder;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         CustomApplication.get(this).initialize();
-        CustomApplication.get(this).getComponent().inject(this);
+        DatabaseManager databaseManager = Injector.get()
+                .databaseManager();
+        BackstackHolder backstackHolder = Injector.get()
+                .backstackHolder();
+
         databaseManager.init(this);
 
         backstackDelegate = new BackstackDelegate(null /* delayed init */);
