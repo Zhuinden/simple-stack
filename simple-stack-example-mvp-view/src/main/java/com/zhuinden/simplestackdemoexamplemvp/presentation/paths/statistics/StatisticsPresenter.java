@@ -22,12 +22,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public class StatisticsPresenter
         extends BasePresenter<StatisticsView> {
+    private final TaskRepository tasksRepository;
+        
     @Inject
-    public StatisticsPresenter() {
+    public StatisticsPresenter(TaskRepository taskRepository) {
+        this.tasksRepository = taskRepository;
     }
-
-    @Inject
-    TaskRepository tasksRepository;
 
     Disposable disposable;
 
