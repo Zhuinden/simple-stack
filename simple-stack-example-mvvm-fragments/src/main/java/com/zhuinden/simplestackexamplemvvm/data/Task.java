@@ -61,9 +61,7 @@ public abstract class Task {
         return new AutoValue_Task.Builder();
     }
 
-    public Builder toBuilder() {
-        return new AutoValue_Task.Builder(this);
-    }
+    public abstract Builder toBuilder();
 
     @Nullable
     public String getTitleForList() {
