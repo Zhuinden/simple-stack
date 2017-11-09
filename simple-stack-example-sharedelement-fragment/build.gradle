@@ -33,8 +33,8 @@ dependencies {
     implementation 'com.android.support:support-vector-drawable:26.+'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    compileOnly "com.google.auto.value:auto-value:1.2"
-    annotationProcessor "com.google.auto.value:auto-value:1.2"
+    compileOnly "com.google.auto.value:auto-value:1.4.1"
+    annotationProcessor "com.google.auto.value:auto-value:1.4.1"
     implementation 'nz.bradcampbell:paperparcel:2.0.1'
     annotationProcessor 'nz.bradcampbell:paperparcel-compiler:2.0.1'
     annotationProcessor 'com.github.reggar:auto-value-ignore-hash-equals:1.1.4'
