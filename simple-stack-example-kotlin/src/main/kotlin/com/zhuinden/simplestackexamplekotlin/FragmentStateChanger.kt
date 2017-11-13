@@ -13,9 +13,8 @@ class FragmentStateChanger(private val fragmentManager: FragmentManager, private
 
     @SuppressLint("CommitTransaction") // lint does not detect it in the apply block.
     fun handleStateChange(stateChange: StateChange) {
-        val fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack()
-        fragmentTransaction.apply {
-            when(stateChange.direction) {
+        fragmentManager.beginTransaction().apply {
+            when (stateChange.direction) {
                 StateChange.FORWARD -> {
                     setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_right, R.anim.slide_out_to_left)
                 }
