@@ -9,6 +9,8 @@
 
 - Updated State-Bundle to 1.2.0.
 
+- Updated Kotlin example to use Fragment-based usage.
+
 -Simple Stack 1.8.0 (2017-10-25) 
 --------------------------------
 
