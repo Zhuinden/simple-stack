@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager
 import com.zhuinden.simplestack.StateChange
 
 /**
- * Created by Owner on 2017. 06. 29..
+ * Created by Owner on 2017.11.13.
  */
 
 class FragmentStateChanger(private val fragmentManager: FragmentManager, private val containerId: Int) {

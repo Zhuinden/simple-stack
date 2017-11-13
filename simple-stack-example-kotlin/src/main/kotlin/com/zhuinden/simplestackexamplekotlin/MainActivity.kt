@@ -15,8 +15,10 @@ import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import java.util.*
 
+/**
+ * Created by Owner on 2017.11.13.
+ */
 class MainActivity : AppCompatActivity(), StateChanger {
-
     @BindView(R.id.navigation)
     lateinit internal var navigation: BottomNavigationView
 

@@ -9,7 +9,7 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 
 /**
- * Created by Owner on 2017. 06. 29..
+ * Created by Owner on 2017.11.13.
  */
 
 class HomeFragment : BaseFragment() {
@@ -18,7 +18,7 @@ class HomeFragment : BaseFragment() {
         MainActivity.get(view.context).navigateTo(OtherKey)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         inflater.inflate(R.layout.home_view, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

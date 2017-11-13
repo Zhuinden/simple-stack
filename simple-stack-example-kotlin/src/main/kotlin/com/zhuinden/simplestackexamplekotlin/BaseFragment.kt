@@ -3,7 +3,7 @@ package com.zhuinden.simplestackexamplekotlin
 import android.support.v4.app.Fragment
 
 /**
- * Created by Owner on 2017. 06. 29..
+ * Created by Owner on 2017.11.13.
  */
 
 open class BaseFragment : Fragment() {

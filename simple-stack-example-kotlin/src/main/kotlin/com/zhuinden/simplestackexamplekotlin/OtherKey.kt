@@ -4,7 +4,7 @@ import android.os.Parcelable
 import paperparcel.PaperParcel
 
 /**
- * Created by Owner on 2017. 06. 29..
+ * Created by Owner on 2017.11.13.
  */
 @PaperParcel
 object OtherKey : BaseKey() {

@@ -4,7 +4,7 @@ import android.os.Bundle
 import paperparcel.PaperParcelable
 
 /**
- * Created by Owner on 2017. 06. 29..
+ * Created by Owner on 2017.11.13.
  */
 abstract class BaseKey : PaperParcelable {
     val fragmentTag: String

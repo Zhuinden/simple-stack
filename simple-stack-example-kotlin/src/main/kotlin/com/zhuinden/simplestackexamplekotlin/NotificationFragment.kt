@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import butterknife.ButterKnife
 
 /**
- * Created by Owner on 2017. 06. 29..
+ * Created by Owner on 2017.11.13.
  */
 
 class NotificationFragment : BaseFragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater.inflate(R.layout.notification_view, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
