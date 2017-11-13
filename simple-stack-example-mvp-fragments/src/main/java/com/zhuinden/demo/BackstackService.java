@@ -1,5 +1,6 @@
 package com.zhuinden.demo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.zhuinden.simplestack.Backstack;
@@ -14,6 +15,7 @@ public class BackstackService {
     private BackstackService() {
     }
 
+    @SuppressLint("WrongConstant")
     public static Backstack getBackstack(Context context) {
         //noinspection ResourceType
         return (Backstack)context.getSystemService(TAG);

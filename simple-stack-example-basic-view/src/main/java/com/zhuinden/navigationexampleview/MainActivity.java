@@ -1,14 +1,12 @@
 package com.zhuinden.navigationexampleview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
@@ -66,6 +64,7 @@ public class MainActivity
         Navigator.getBackstack(this).goTo(key);
     }
 
+    @SuppressLint("WrongConstant")
     public static MainActivity get(Context context) {
         // noinspection ResourceType
         return (MainActivity)context.getSystemService(TAG);

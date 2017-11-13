@@ -1,11 +1,11 @@
 package com.zhuinden.navigationexamplecond;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Conductor;
@@ -14,8 +14,6 @@ import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
-
-import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,6 +85,7 @@ public class MainActivity
         backstackDelegate.getBackstack().goTo(key);
     }
 
+    @SuppressLint("WrongConstant")
     public static MainActivity get(Context context) {
         // noinspection ResourceType
         return (MainActivity)context.getSystemService(TAG);

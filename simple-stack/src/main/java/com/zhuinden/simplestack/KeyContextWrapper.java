@@ -15,6 +15,7 @@
  */
 package com.zhuinden.simplestack;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.support.annotation.NonNull;
@@ -61,6 +62,7 @@ public class KeyContextWrapper
      * @return the key.
      */
     @Nullable
+    @SuppressLint("WrongConstant")
     public static <T> T getKey(Context context) {
         // noinspection ResourceType
         Object key = context.getSystemService(TAG);

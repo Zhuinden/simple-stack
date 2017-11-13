@@ -1,5 +1,6 @@
 package com.example.fragmenttransitions;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -59,6 +60,7 @@ public class MainActivity
         return backstackDelegate.getBackstack();
     }
 
+    @SuppressLint("WrongConstant")
     public static MainActivity get(Context context) {
         // noinspection ResourceType
         return (MainActivity) context.getSystemService(TAG);

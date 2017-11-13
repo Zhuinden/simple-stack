@@ -1,5 +1,6 @@
 package com.zhuinden.navigationexamplefrag;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -85,6 +86,7 @@ public class MainActivity
         backstackDelegate.getBackstack().goTo(key);
     }
 
+    @SuppressLint("WrongConstant")
     public static MainActivity get(Context context) {
         // noinspection ResourceType
         return (MainActivity)context.getSystemService(TAG);
