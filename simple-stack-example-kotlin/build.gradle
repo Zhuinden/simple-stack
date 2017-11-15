@@ -47,5 +47,5 @@ dependencies {
     implementation 'nz.bradcampbell:paperparcel-kotlin:2.0.4'
     kapt 'nz.bradcampbell:paperparcel-compiler:2.0.4'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.51"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.60"
 }
