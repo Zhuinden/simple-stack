@@ -8,7 +8,7 @@ import paperparcel.PaperParcel
  */
 
 @PaperParcel
-data class DashboardKey(val tag: String = DashboardKey::javaClass.name) : BaseKey() {
+data class DashboardKey(val tag: String = DashboardKey::class.java.name) : BaseKey() {
     // using data class makes you not need to implement hashCode/equals/toString
     // the other option is using `object` where you MUST override `toString`
     override fun createFragment(): BaseFragment = DashboardFragment()
