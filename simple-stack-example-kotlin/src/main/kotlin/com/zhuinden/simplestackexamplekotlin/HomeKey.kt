@@ -12,5 +12,5 @@ object HomeKey : BaseKey() {
 
     @JvmField val CREATOR: Parcelable.Creator<HomeKey> = PaperParcelHomeKey.CREATOR
 
-    override fun toString(): String = javaClass.name // you NEED to implement this in an `object` because of Kotlin!
+    override fun toString(): String = this::class.java.name // you NEED to implement this in an `object` because of Kotlin!
 }
