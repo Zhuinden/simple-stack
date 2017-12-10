@@ -36,8 +36,8 @@ public class StatisticsPresenter
 
     @Override
     protected void onAttach(StatisticsFragment coordinator) {
-        disposable = Observable.combineLatest(taskRepository.getActiveTasks(), //
-                                              taskRepository.getCompletedTasks(), //
+        disposable = Observable.combineLatest(taskRepository.getActiveTasksWithChanges(),//
+                                              taskRepository.getCompletedTasksWithChanges(),//
                                               (activeTasks, completedTasks) -> Pair.with(activeTasks, completedTasks)) //
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())

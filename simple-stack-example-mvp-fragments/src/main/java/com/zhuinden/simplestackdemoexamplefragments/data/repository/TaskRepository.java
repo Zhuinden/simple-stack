@@ -54,6 +54,14 @@ public class TaskRepository {
         RealmResults<E> createQuery(Realm realm);
     }
 
+    private void doWrite(Realm.Transaction transaction) {
+        Single.create((SingleOnSubscribe<Void>) singleSubscriber -> {
+            try(Realm r = Realm.getDefaultInstance()) {
+                r.executeTransaction(transaction);
+            }
+        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+    }
+
     private Observable<List<Task>> createResults(QuerySelector<DbTask> querySelector) {
         return Observable.create((ObservableOnSubscribe<List<Task>>) emitter -> {
             Realm realm = Realm.getDefaultInstance();
@@ -76,67 +84,54 @@ public class TaskRepository {
         }).subscribeOn(looperScheduler.getScheduler()).unsubscribeOn(looperScheduler.getScheduler());
     }
 
-    public Observable<List<Task>> getTasks() {
-        return createResults((realm) -> realm.where(DbTask.class).findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
+    public Observable<List<Task>> getTasksWithChanges() {
+        return createResults((realm) -> realm.where(DbTask.class)
+                .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
     }
 
-    public Observable<List<Task>> getCompletedTasks() {
-        return createResults((realm) -> realm
-                .where(DbTask.class)
+    public Observable<List<Task>> getCompletedTasksWithChanges() {
+        return createResults((realm) -> realm.where(DbTask.class)
                 .equalTo(DbTaskFields.COMPLETED, true)
                 .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
     }
 
-    public Observable<List<Task>> getActiveTasks() {
-        return createResults((realm) -> realm
-                .where(DbTask.class)
+    public Observable<List<Task>> getActiveTasksWithChanges() {
+        return createResults((realm) -> realm.where(DbTask.class)
                 .equalTo(DbTaskFields.COMPLETED, false)
                 .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
     }
 
     @SuppressWarnings("NewApi")
     public void insertTask(Task task) {
-        Single.create((SingleOnSubscribe<Void>) singleSubscriber -> {
-            try(Realm r = Realm.getDefaultInstance()) {
-                r.executeTransaction(realm -> {
-                    realm.insertOrUpdate(taskMapper.toRealm(task));
-                });
-            }
-        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+        doWrite(realm -> realm.insertOrUpdate(taskMapper.toRealm(task)));
     }
 
     @SuppressWarnings("NewApi")
     public void insertTasks(List<Task> tasks) {
-        Single.create((SingleOnSubscribe<Void>) singleSubscriber -> {
-            try(Realm r = Realm.getDefaultInstance()) {
-                List<DbTask> dbTasks = new ArrayList<>(tasks.size());
-                for(Task task : tasks) {
-                    dbTasks.add(taskMapper.toRealm(task));
-                }
-                r.executeTransaction(realm -> {
-                    realm.insertOrUpdate(dbTasks);
-                });
+        doWrite(realm -> {
+            List<DbTask> dbTasks = new ArrayList<>(tasks.size());
+            for(Task task : tasks) {
+                dbTasks.add(taskMapper.toRealm(task));
             }
-        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+            realm.insertOrUpdate(dbTasks);
+        });
     }
 
     @SuppressWarnings("NewApi")
     public void deleteCompletedTasks() {
-        Single.create((SingleOnSubscribe<Void>) singleSubscriber -> {
-            try(Realm r = Realm.getDefaultInstance()) {
-                r.executeTransaction(realm -> realm.where(DbTask.class)
-                        .equalTo(DbTaskFields.COMPLETED, true)
-                        .findAll()
-                        .deleteAllFromRealm());
-            }
-        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+        doWrite(realm -> realm.where(DbTask.class)
+                .equalTo(DbTaskFields.COMPLETED, true)
+                .findAll()
+                .deleteAllFromRealm());
     }
 
     @SuppressWarnings("NewApi")
     public Single<Optional<Task>> findTask(String taskId) {
         return Single.fromCallable((Callable<Optional<Task>>) () -> {
             try(Realm realm = Realm.getDefaultInstance()) {
-                RealmResults<DbTask> tasks = realm.where(DbTask.class).equalTo(DbTaskFields.ID, taskId).findAll();
+                RealmResults<DbTask> tasks = realm.where(DbTask.class)
+                        .equalTo(DbTaskFields.ID, taskId)
+                        .findAll();
                 if(tasks.size() > 0) {
                     return Optional.of(taskMapper.fromRealm(tasks.get(0)));
                 } else {
@@ -156,10 +151,9 @@ public class TaskRepository {
 
     @SuppressWarnings("NewApi")
     public void deleteTask(Task task) {
-        Single.create((SingleOnSubscribe<Void>) singleSubscriber -> {
-            try(Realm r = Realm.getDefaultInstance()) {
-                r.executeTransaction(realm -> realm.where(DbTask.class).equalTo(DbTaskFields.ID, task.id()).findAll().deleteAllFromRealm());
-            }
-        }).subscribeOn(writeScheduler.getScheduler()).subscribe();
+        doWrite(realm -> realm.where(DbTask.class)
+                .equalTo(DbTaskFields.ID, task.id())
+                .findAll()
+                .deleteAllFromRealm());
     }
 }

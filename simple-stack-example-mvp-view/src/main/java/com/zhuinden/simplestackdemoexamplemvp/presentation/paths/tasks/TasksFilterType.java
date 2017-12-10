@@ -35,7 +35,7 @@ public enum TasksFilterType {
     ALL_TASKS {
         @Override
         public Observable<List<Task>> filterTask(TaskRepository taskRepository) {
-            return taskRepository.getTasks();
+            return taskRepository.getTasksWithChanges();
         }
 
         @Override
@@ -55,7 +55,7 @@ public enum TasksFilterType {
     ACTIVE_TASKS {
         @Override
         public Observable<List<Task>> filterTask(TaskRepository taskRepository) {
-            return taskRepository.getActiveTasks();
+            return taskRepository.getActiveTasksWithChanges();
         }
 
         @Override
@@ -75,7 +75,7 @@ public enum TasksFilterType {
     COMPLETED_TASKS {
         @Override
         public Observable<List<Task>> filterTask(TaskRepository taskRepository) {
-            return taskRepository.getCompletedTasks();
+            return taskRepository.getCompletedTasksWithChanges();
         }
 
         @Override

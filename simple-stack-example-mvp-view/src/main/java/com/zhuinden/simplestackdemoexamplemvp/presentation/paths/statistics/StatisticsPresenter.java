@@ -33,9 +33,9 @@ public class StatisticsPresenter
 
     @Override
     protected void onAttach(StatisticsView view) {
-        disposable = Observable.combineLatest(tasksRepository.getActiveTasks(), //
-                tasksRepository.getCompletedTasks(), //
-                (activeTasks, completedTasks) -> Pair.with(activeTasks, completedTasks)) //
+        disposable = Observable.combineLatest(tasksRepository.getActiveTasksWithChanges(),//
+                                              tasksRepository.getCompletedTasksWithChanges(),//
+                                              (activeTasks, completedTasks) -> Pair.with(activeTasks, completedTasks)) //
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(pairOfActiveAndCompletedTasks -> {
