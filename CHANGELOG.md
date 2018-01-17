@@ -1,7 +1,9 @@
 # Change log
 
--Simple Stack _._._ (__-__-__)
+-Simple Stack 1.8.1 (....-..-..)
 --------------------------------
+
+- ADDED / CHANGE: `Navigator.findActivity(Context)` is now public. It also casts the returned Activity to whatever subclass type is expected.
 
 - Updated to use implementation/api and AS 3.0's tooling.
 

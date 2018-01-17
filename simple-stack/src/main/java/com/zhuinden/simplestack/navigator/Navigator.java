@@ -327,9 +327,24 @@ public class Navigator {
         return (BackstackHost) activity.getFragmentManager().findFragmentByTag("NAVIGATOR_BACKSTACK_HOST");
     }
 
-    private static Activity findActivity(Context context) {
+    /**
+     * Attempt to find the Activity in the Context through the chain of its base contexts.
+     *
+     * @throws IllegalArgumentException if context is null
+     * @throws IllegalStateException if the context's base context hierarchy doesn't contain an Activity
+     *
+     * @param context the context
+     * @param <T> the type of the Activity
+     * @return the Activity
+     */
+    @NonNull
+    public static <T extends Activity> T findActivity(@NonNull Context context) {
+        if(context == null) {
+            throw new IllegalArgumentException("Context cannot be null!");
+        }
         if(context instanceof Activity) {
-            return (Activity) context;
+            // noinspection unchecked
+            return (T) context;
         } else {
             ContextWrapper contextWrapper = (ContextWrapper) context;
             Context baseContext = contextWrapper.getBaseContext();
