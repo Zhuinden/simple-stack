@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.content.Context;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -333,6 +334,7 @@ public class Backstack {
      * @param <T> the type of the key
      * @return the top key
      */
+    @Nullable
     public <T> T top() {
         if(stack.isEmpty()) {
             return null;
@@ -342,10 +344,44 @@ public class Backstack {
     }
 
     /**
+     * Returns the element indexed from the top.
+     *
+     * Offset value `0` behaves the same as {@link Backstack#top()}, while `1` returns the one before it.
+     * Negative indices are wrapped around, for example `-1` is the first element of the stack, `-2` the second, and so on.
+     *
+     * Accepted values are in range of [-size, size).
+     *
+     * @throws IllegalStateException if the backstack history doesn't contain any elements yet.
+     * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
+     *
+     * @param offset the offset from the top
+     * @param <T> the type of the key
+     * @return the key from the top with offset
+     */
+    @NonNull
+    public <T> T fromTop(int offset) {
+        int size = stack.size();
+        if(size <= 0) {
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
+        }
+        if(offset < -size || offset >= size) {
+            throw new IllegalArgumentException("The provided offset value [" + offset + "] was out of range: [" + -size + "; " + size + ")");
+        }
+        while(offset < 0) {
+            offset += size;
+        }
+        offset %= size;
+        int target = (size - 1 - offset) % size;
+        // noinspection unchecked
+        return (T) stack.get(target);
+    }
+
+    /**
      * Returns an unmodifiable copy of the current history.
      *
      * @return the unmodifiable copy of history.
      */
+    @NonNull
     public <T> List<T> getHistory() {
         List<T> copy = new ArrayList<>(stack.size());
         for(Object key : stack) {
@@ -360,6 +396,7 @@ public class Backstack {
      *
      * @return the list of keys used at first initialization
      */
+    @NonNull
     public <T> List<T> getInitialKeys() {
         List<T> copy = new ArrayList<>(initialKeys.size());
         for(Object key : initialKeys) {

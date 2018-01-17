@@ -1,15 +1,17 @@
 # Change log
 
--Simple Stack 1.8.1 (....-..-..)
+-Simple Stack 1.8.1 (2018-01-17)
 --------------------------------
 
 - ADDED / CHANGE: `Navigator.findActivity(Context)` is now public. It also casts the returned Activity to whatever subclass type is expected.
 
+- ADDED: `Backstack.fromTop(int offset)` method, which provides the element in the backstack from the top with a given offset. 
+
+- Updated State-Bundle to 1.2.0.
+
 - Updated to use implementation/api and AS 3.0's tooling.
 
 - Updated implementation lib versions in samples and tests.
-
-- Updated State-Bundle to 1.2.0.
 
 - Updated Kotlin example to use Fragment-based usage.
 

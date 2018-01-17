@@ -811,4 +811,71 @@ public class BackstackTest {
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
     }
+
+    @Test
+    public void fromTopOnEmptyArrayThrows() {
+        TestKey initial1 = new TestKey("hello1");
+        Backstack backstack = new Backstack(initial1);
+        try {
+            backstack.fromTop(0);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void fromTopWorksAsExpected() {
+        TestKey initial1 = new TestKey("hello1");
+        TestKey initial2 = new TestKey("hello2");
+        TestKey initial3 = new TestKey("hello3");
+        TestKey initial4 = new TestKey("hello4");
+        Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        callback.stateChangeComplete();
+
+        assertThat(backstack.fromTop(0)).isSameAs(backstack.top());
+        assertThat(backstack.fromTop(0)).isSameAs(initial4);
+        assertThat(backstack.fromTop(1)).isSameAs(initial3);
+        assertThat(backstack.fromTop(2)).isSameAs(initial2);
+        assertThat(backstack.fromTop(3)).isSameAs(initial1);
+        assertThat(backstack.fromTop(-1)).isSameAs(backstack.fromTop(backstack.getHistory().size()-1));
+        assertThat(backstack.fromTop(-1)).isSameAs(backstack.fromTop(3));
+        assertThat(backstack.fromTop(-1)).isSameAs(initial1);
+        assertThat(backstack.fromTop(-2)).isSameAs(initial2);
+        assertThat(backstack.fromTop(-3)).isSameAs(initial3);
+        assertThat(backstack.fromTop(-4)).isSameAs(initial4);
+        try {
+            backstack.fromTop(-5);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+        try {
+            backstack.fromTop(-6);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+        try {
+            backstack.fromTop(4);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+
+        try {
+            backstack.fromTop(5);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
 }
