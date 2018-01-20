@@ -1,7 +1,9 @@
 # Change log
 
--Simple Stack 1.8.1 (2018-01-17)
+-Simple Stack 1.8.2 (2018-01-20)
 --------------------------------
+
+- CRITICAL FIX: `1.8.1 (2018-01-17)` didn't retrieve `state-bundle 1.2.0` as transitive dependency because of `com.github.dcendents:android-maven-gradle-plugin:1.5`. It is updated to `2.0` to fix publishing to Jitpack.
 
 - ADDED / CHANGE: `Navigator.findActivity(Context)` is now public. It also casts the returned Activity to whatever subclass type is expected.
 
