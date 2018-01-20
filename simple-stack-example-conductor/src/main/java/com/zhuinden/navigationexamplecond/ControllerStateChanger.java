@@ -6,7 +6,6 @@ import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
 import com.zhuinden.simplestack.StateChange;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,19 +30,19 @@ public class ControllerStateChanger {
 
         List<RouterTransaction> routerTransactions = new LinkedList<>();
         Iterator<RouterTransaction> currentTransactions = router.getBackstack().iterator();
-        Iterator<Object> _newKeys = stateChange.getNewState().iterator();
-        while(currentTransactions.hasNext() && _newKeys.hasNext()) {
+        Iterator<BaseKey> newKeys = stateChange.<BaseKey>getNewState().iterator();
+        while(currentTransactions.hasNext() && newKeys.hasNext()) {
             RouterTransaction currentTransaction = currentTransactions.next();
             BaseKey previousKey = ((BaseController) currentTransaction.controller()).getKey();
-            BaseKey newKey = (BaseKey) _newKeys.next();
+            BaseKey newKey = newKeys.next();
             if(!newKey.equals(previousKey)) {
                 routerTransactions.add(RouterTransaction.with(newKey.newController()));
                 break;
             }
             routerTransactions.add(currentTransaction);
         }
-        while(_newKeys.hasNext()) {
-            BaseKey newKey = (BaseKey) _newKeys.next();
+        while(newKeys.hasNext()) {
+            BaseKey newKey = newKeys.next();
             routerTransactions.add(RouterTransaction.with(newKey.newController()));
         }
         router.setBackstack(routerTransactions,
