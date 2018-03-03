@@ -2,6 +2,7 @@ package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,7 +14,7 @@ import java.util.ListIterator;
 /**
  * An immutable wrapper over backstack history with some additional helper methods.
  */
-public class History<T> extends ArrayList<T> implements List<T> { // TODO: replace with AbstractList in 2.0
+public class History<T> extends AbstractList<T> implements List<T> {
     private final List<T> elements;
     
     History() {
