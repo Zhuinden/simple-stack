@@ -34,7 +34,7 @@ public class HistoryBuilder
         implements Iterable<Object> {
     private ArrayList<Object> list = new ArrayList<>();
 
-    HistoryBuilder() { // use newBuilder()
+    HistoryBuilder() { // use History.newBuilder()
     }
 
     /**
