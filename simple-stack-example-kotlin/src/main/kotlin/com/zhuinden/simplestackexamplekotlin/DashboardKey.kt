@@ -1,19 +1,16 @@
 package com.zhuinden.simplestackexamplekotlin
 
-import android.os.Parcelable
-import paperparcel.PaperParcel
+import android.annotation.SuppressLint
+import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Owner on 2017.11.13.
  */
 
-@PaperParcel
-data class DashboardKey(val tag: String = DashboardKey::class.java.name) : BaseKey() {
-    // using data class makes you not need to implement hashCode/equals/toString
-    // the other option is using `object` where you MUST override `toString`
-    override fun createFragment(): BaseFragment = DashboardFragment()
+@SuppressLint("ParcelCreator")
+@Parcelize
+data class DashboardKey(val tag: String) : BaseKey() {
+    constructor() : this("DashboardKey")
 
-    companion object {
-        @JvmField val CREATOR: Parcelable.Creator<DashboardKey> = PaperParcelDashboardKey.CREATOR
-    }
+    override fun createFragment(): BaseFragment = DashboardFragment()
 }

@@ -3,60 +3,42 @@ package com.zhuinden.simplestackexamplekotlin
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import android.view.ViewGroup
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.zhuinden.simplestack.BackstackDelegate
 import com.zhuinden.simplestack.HistoryBuilder
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
-import java.util.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 /**
  * Created by Owner on 2017.11.13.
  */
 class MainActivity : AppCompatActivity(), StateChanger {
-    @BindView(R.id.navigation)
-    lateinit internal var navigation: BottomNavigationView
-
-    @BindView(R.id.root)
-    lateinit internal var root: ViewGroup
-
-    lateinit internal var backstackDelegate: BackstackDelegate
-    lateinit internal var fragmentStateChanger: FragmentStateChanger
+    private lateinit var backstackDelegate: BackstackDelegate
+    private lateinit var fragmentStateChanger: FragmentStateChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         backstackDelegate = BackstackDelegate(null)
         backstackDelegate.onCreate(savedInstanceState,
                 lastCustomNonConfigurationInstance,
-                HistoryBuilder.single(HomeKey))
+                HistoryBuilder.single(HomeKey()))
         backstackDelegate.registerForLifecycleCallbacks(this)
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
-        ButterKnife.bind(this)
 
-        navigation.setOnNavigationItemSelectedListener({ item ->
-            when (item.getItemId()) {
-                R.id.navigation_home -> {
-                    replaceHistory(HomeKey)
-                    return@setOnNavigationItemSelectedListener true
-                }
-                R.id.navigation_dashboard -> {
-                    replaceHistory(DashboardKey())
-                    return@setOnNavigationItemSelectedListener true
-                }
-                R.id.navigation_notifications -> {
-                    replaceHistory(NotificationKey)
-                    return@setOnNavigationItemSelectedListener true
-                }
+        navigation.setOnNavigationItemSelectedListener { item ->
+            val destination = when(item.itemId) {
+                R.id.navigation_home -> HomeKey()
+                R.id.navigation_dashboard -> DashboardKey()
+                R.id.navigation_notifications -> NotificationKey()
+                else -> null
             }
-            false
-        })
-        Log.i(TAG, "History [" + Arrays.toString(backstackDelegate.backstack.getHistory<Any>().toTypedArray()) + "]") // from conversion
+            destination?.let { key ->
+                replaceHistory(key)
+                true
+            } ?: false
+        }
         fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
         backstackDelegate.setStateChanger(this)
     }
@@ -70,19 +52,12 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
     }
 
-    private fun replaceHistory(rootKey: Any) {
+    private fun replaceHistory(rootKey: BaseKey) {
         backstackDelegate.backstack.setHistory(HistoryBuilder.single(rootKey), StateChange.REPLACE)
     }
 
-    fun navigateTo(key: Any) {
+    fun navigateTo(key: BaseKey) {
         backstackDelegate.backstack.goTo(key)
-    }
-
-    override fun getSystemService(name: String): Any? {
-        return when {
-            name == TAG -> this
-            else -> super.getSystemService(name)
-        }
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
@@ -92,6 +67,12 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
         fragmentStateChanger.handleStateChange(stateChange)
         completionCallback.stateChangeComplete()
+    }
+
+    // share activity through context
+    override fun getSystemService(name: String): Any? = when {
+        name == TAG -> this
+        else -> super.getSystemService(name)
     }
 
     companion object {

@@ -1,24 +1,19 @@
 package com.zhuinden.simplestackexamplekotlin
 
 import android.os.Bundle
-import paperparcel.PaperParcelable
+import android.os.Parcelable
 
 /**
  * Created by Owner on 2017.11.13.
  */
-abstract class BaseKey : PaperParcelable {
+abstract class BaseKey : Parcelable {
     val fragmentTag: String
         get() = toString()
 
-    fun newFragment(): BaseFragment {
-        val fragment = createFragment()
-        var bundle: Bundle? = fragment.arguments
-        if (bundle == null) {
-            bundle = Bundle()
+    fun newFragment(): BaseFragment = createFragment().apply {
+        arguments = (arguments ?: Bundle()).also { bundle ->
+            bundle.putParcelable("KEY", this@BaseKey)
         }
-        bundle.putParcelable("KEY", this)
-        fragment.arguments = bundle
-        return fragment
     }
 
     protected abstract fun createFragment(): BaseFragment

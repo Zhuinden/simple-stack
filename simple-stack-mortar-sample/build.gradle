@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
+
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.2'
 
     defaultConfig {
         applicationId 'com.example.mortar'
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionName '1.0'
     }
 
@@ -55,19 +55,19 @@ dependencies {
 
     annotationProcessor 'frankiesardo:auto-parcel:1.0.3'
 
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
-    implementation 'com.google.dagger:dagger:2.11'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
+    implementation 'com.google.dagger:dagger:2.14.1'
     compileOnly 'org.glassfish:javax.annotation:10.0-b28'
-    implementation 'com.android.support:appcompat-v7:26.+'
-    implementation "com.android.support:recyclerview-v7:26.+"
-    implementation "com.android.support:design:26.+"
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation "com.android.support:recyclerview-v7:27.1.0"
+    implementation "com.android.support:design:27.1.0"
 
 
-    implementation 'com.squareup.retrofit2:retrofit:2.2.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.github.Zhuinden:service-tree:1.6.1'
 
-    implementation "io.reactivex.rxjava2:rxjava:2.1.0"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    implementation 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
+    implementation "io.reactivex.rxjava2:rxjava:2.1.10"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 }

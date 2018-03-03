@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
+
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.2'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId "com.zhuinden.simplestackexamplemvvm"
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
@@ -52,32 +52,32 @@ dependencies {
     implementation project(':simple-stack')
 
     // App's dependencies, including test
-    implementation "com.android.support:appcompat-v7:26.1.0"
-    implementation "com.android.support:cardview-v7:26.1.0"
-    implementation "com.android.support:design:26.1.0"
-    implementation "com.android.support:recyclerview-v7:26.1.0"
-    implementation "com.android.support:support-v4:26.1.0"
+    implementation "com.android.support:appcompat-v7:27.1.0"
+    implementation "com.android.support:cardview-v7:27.1.0"
+    implementation "com.android.support:design:27.1.0"
+    implementation "com.android.support:recyclerview-v7:27.1.0"
+    implementation "com.android.support:support-v4:27.1.0"
 
     // live data
-    implementation "android.arch.lifecycle:runtime:1.0.3"
-    implementation "android.arch.lifecycle:extensions:1.0.0-rc1"
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-rc1"
+    implementation "android.arch.lifecycle:runtime:1.1.0"
+    implementation "android.arch.lifecycle:extensions:1.1.0"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.0"
 
     // useful stuff
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    compileOnly "com.google.auto.value:auto-value:1.4.1"
-    annotationProcessor "com.google.auto.value:auto-value:1.4.1"
+    compileOnly "com.google.auto.value:auto-value:1.5.2"
+    annotationProcessor "com.google.auto.value:auto-value:1.5.2"
     implementation 'nz.bradcampbell:paperparcel:2.0.4'
     annotationProcessor 'nz.bradcampbell:paperparcel-compiler:2.0.4'
     annotationProcessor 'com.github.reggar:auto-value-ignore-hash-equals:1.1.4'
-    implementation 'com.google.dagger:dagger:2.11'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
+    implementation 'com.google.dagger:dagger:2.14.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
 
     // Dependencies for local unit tests
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.assertj:assertj-core:3.8.0'
-    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'org.assertj:assertj-core:3.9.1'
+    testImplementation 'org.mockito:mockito-core:2.15.0'
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-all:1.10.19"
@@ -90,21 +90,21 @@ dependencies {
     // Espresso UI Testing
     // Unit Tests
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.assertj:assertj-core:3.8.0'
+    testImplementation 'org.assertj:assertj-core:3.9.1'
     testImplementation "org.mockito:mockito-all:1.10.19"
     testImplementation "org.hamcrest:hamcrest-all:1.3"
-    testImplementation "org.powermock:powermock-module-junit4:1.6.4"
-    testImplementation "org.powermock:powermock-api-mockito:1.6.4"
+    testImplementation "org.powermock:powermock-module-junit4:1.6.5"
+    testImplementation "org.powermock:powermock-api-mockito:1.6.5"
     // Espresso Idling Resource
 
     // Dependencies for Android unit tests
     androidTestImplementation "junit:junit:4.12"
-    androidTestImplementation "org.mockito:mockito-core:1.10.19"
+    androidTestImplementation "org.mockito:mockito-core:2.15.0"
     androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
     androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
 
     // Android Testing Support Library's runner and rules
-    androidTestImplementation 'org.assertj:assertj-core:3.8.0'
+    androidTestImplementation 'org.assertj:assertj-core:3.9.1'
 
     androidTestImplementation("com.android.support.test:runner:1.0.1") {
         exclude group: 'com.android.support', module: 'support-annotations'

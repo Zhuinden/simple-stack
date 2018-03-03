@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
+
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.2'
 
     defaultConfig {
         applicationId 'com.example.stackmasterdetailfrag'
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionName '1.0'
     }
 
@@ -55,10 +55,10 @@ dependencies {
 
     annotationProcessor 'frankiesardo:auto-parcel:1.0.3'
 
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
-    implementation 'com.google.dagger:dagger:2.11'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
+    implementation 'com.google.dagger:dagger:2.14.1'
     compileOnly 'org.glassfish:javax.annotation:10.0-b28'
-    implementation 'com.android.support:appcompat-v7:26.+'
-    implementation "com.android.support:recyclerview-v7:26.+"
-    implementation "com.android.support:design:26.+"
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation "com.android.support:recyclerview-v7:27.1.0"
+    implementation "com.android.support:design:27.1.0"
 }

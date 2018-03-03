@@ -1,16 +1,15 @@
 package com.zhuinden.simplestackexamplekotlin
 
-import android.os.Parcelable
-import paperparcel.PaperParcel
+import android.annotation.SuppressLint
+import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Owner on 2017.11.13.
  */
-@PaperParcel
-object NotificationKey : BaseKey() {
+@SuppressLint("ParcelCreator")
+@Parcelize
+data class NotificationKey(val tag: String) : BaseKey() {
+    constructor() : this("NotificationKey")
+
     override fun createFragment(): BaseFragment = NotificationFragment()
-
-    @JvmField val CREATOR: Parcelable.Creator<NotificationKey> = PaperParcelNotificationKey.CREATOR
-
-    override fun toString(): String = this::class.java.name // you NEED to implement this in an `object` because of Kotlin!
 }

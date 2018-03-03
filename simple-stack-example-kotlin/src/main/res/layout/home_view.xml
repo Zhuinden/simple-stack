@@ -27,7 +27,7 @@
             android:hint="Type some text here" />
 
         <Button
-            android:id="@+id/home_button"
+            android:id="@+id/homeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="32dp"

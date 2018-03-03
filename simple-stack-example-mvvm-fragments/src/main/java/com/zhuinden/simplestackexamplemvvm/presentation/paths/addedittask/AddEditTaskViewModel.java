@@ -34,6 +34,7 @@ import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksViewModel;
+import com.zhuinden.simplestackexamplemvvm.util.Strings;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.List;
@@ -89,8 +90,12 @@ public class AddEditTaskViewModel
     }
 
     public void onTaskLoaded(Task task) {
-        title.set(task.title());
-        description.set(task.description());
+        if(Strings.isNullOrEmpty(title.get())) {
+            title.set(task.title());
+        }
+        if(Strings.isNullOrEmpty(description.get())) {
+            description.set(task.description());
+        }
         taskObservable.set(task);
         dataLoading.set(false);
         isDataLoaded = true;

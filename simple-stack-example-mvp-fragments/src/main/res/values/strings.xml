@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Simple Stack Fragments</string>
+    <string name="app_name">Nav MVP-Frag</string>
     <string name="add_task">New TO-DO</string>
     <string name="edit_task">Edit TO-DO</string>
     <string name="task_marked_complete">Task marked complete</string>
