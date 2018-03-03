@@ -171,7 +171,7 @@ public class FlowTest {
 
     @Test
     public void historyChangesAfterListenerCall() {
-        final List<Object> firstHistory = HistoryBuilder.single(new Uno());
+        final List<Object> firstHistory = History.single(new Uno());
 
         class Ourrobouros
                 implements StateChanger {
@@ -404,7 +404,7 @@ public class FlowTest {
 
     @Test
     public void setCallsEquals() {
-        List<Object> history = HistoryBuilder.newBuilder()
+        List<Object> history = History.newBuilder()
                 .addAll(Arrays.<Parcelable>asList(new Picky("Able"), new Picky("Baker"), new Picky("Charlie"), new Picky("Delta")))
                 .build();
         Backstack flow = new Backstack(history);

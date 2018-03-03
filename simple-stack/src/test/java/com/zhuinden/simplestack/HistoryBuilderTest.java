@@ -44,7 +44,7 @@ public class HistoryBuilderTest {
     @Test
     public void historyBuilderThrowsForNullBackstack() {
         try {
-            HistoryBuilder historyBuilder = HistoryBuilder.from((Backstack)null);
+            HistoryBuilder historyBuilder = History.builderFrom((Backstack)null);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK!
@@ -53,7 +53,7 @@ public class HistoryBuilderTest {
 
     @Test
     public void historyBuilderThrowsForAddingNull() {
-        HistoryBuilder historyBuilder = HistoryBuilder.newBuilder();
+        HistoryBuilder historyBuilder = History.newBuilder();
         try {
             historyBuilder.add(null);
             Assert.fail();
@@ -75,7 +75,7 @@ public class HistoryBuilderTest {
     @Test
     public void removeUntilThrowsIfKeyNotFound() {
         try {
-            HistoryBuilder builder = HistoryBuilder.newBuilder().add(new TestKey("hello"));
+            HistoryBuilder builder = History.newBuilder().add(new TestKey("hello"));
             builder.removeUntil(new TestKey("bye"));
             Assert.fail();
         } catch(IllegalArgumentException e) {
@@ -86,7 +86,7 @@ public class HistoryBuilderTest {
     @Test
     public void removeUntilShouldThrowIfKeyIsNull() {
         try {
-            HistoryBuilder.newBuilder().removeUntil(null);
+            History.newBuilder().removeUntil(null);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // Good!
@@ -98,19 +98,19 @@ public class HistoryBuilderTest {
         TestKey hi = new TestKey("hi");
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
-        ArrayList<Object> history = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye).removeUntil(hi).build();
+        List<Object> history = History.newBuilder().add(hi).add(hello).add(bye).removeUntil(hi).build();
         assertThat(history).containsExactly(hi);
     }
 
     @Test
     public void getLastReturnsNullIfEmpty() {
-        assertThat(HistoryBuilder.newBuilder().getLast()).isNull();
+        assertThat(History.newBuilder().getLast()).isNull();
     }
 
     @Test
     public void removeLastThrowsIfBuilderIsEmpty() {
         try {
-            HistoryBuilder.newBuilder().removeLast();
+            History.newBuilder().removeLast();
         } catch(IllegalStateException e) {
             // Good!
         }
@@ -121,7 +121,7 @@ public class HistoryBuilderTest {
         TestKey hi = new TestKey("hi");
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
-        HistoryBuilder builder = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye);
+        HistoryBuilder builder = History.newBuilder().add(hi).add(hello).add(bye);
         List<Object> history = builder.removeLast().build();
         assertThat(history).containsExactly(hi, hello);
     }
@@ -131,7 +131,7 @@ public class HistoryBuilderTest {
         TestKey hi = new TestKey("hi");
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
-        HistoryBuilder historyBuilder = HistoryBuilder.newBuilder().add(hi).add(hello).add(bye);
+        HistoryBuilder historyBuilder = History.newBuilder().add(hi).add(hello).add(bye);
         assertThat(historyBuilder.getLast()).isEqualTo(bye);
         assertThat(historyBuilder.build().get(historyBuilder.build().size()-1)).isEqualTo(bye);
     }
@@ -148,7 +148,7 @@ public class HistoryBuilderTest {
 
     @Test
     public void historyBuilderWorksAsIterable() {
-        HistoryBuilder historyBuilder = HistoryBuilder.newBuilder().add(new TestKey("hello")).add(new TestKey("bye"));
+        HistoryBuilder historyBuilder = History.newBuilder().add(new TestKey("hello")).add(new TestKey("bye"));
         int i = 0;
         for(Object _key : historyBuilder) {
             TestKey key = (TestKey) _key;

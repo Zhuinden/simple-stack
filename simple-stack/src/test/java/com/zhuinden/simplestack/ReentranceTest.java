@@ -106,7 +106,7 @@ public class ReentranceTest {
                 lastStack = traversal.getNewState();
                 Object next = traversal.topNewState();
                 if(next instanceof Detail) {
-                    ReentranceTest.this.flow.setHistory(HistoryBuilder.newBuilder() //
+                    ReentranceTest.this.flow.setHistory(History.newBuilder() //
                                     .add(new Detail()) //
                                     .add(new Loading())  //
                                     .build(), //

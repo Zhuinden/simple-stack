@@ -21,8 +21,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,13 +62,13 @@ public class StateChange {
     }
 
     // create a copy list where each item is casted to <T>
-    private <T> List<T> createParametricCopyList(List<Object> list) {
+    private <T> History<T> createParametricCopyList(List<Object> list) {
         List<T> copyList = new LinkedList<>();
         for(Object key : list) {
             // noinspection unchecked
             copyList.add((T)key);
         }
-        return Collections.unmodifiableList(new ArrayList<T>(copyList));
+        return History.from(copyList);
     }
 
     /**
@@ -82,7 +80,7 @@ public class StateChange {
      * @return the previous state.
      */
     @NonNull
-    public <T> List<T> getPreviousState() {
+    public <T> History<T> getPreviousState() {
         return createParametricCopyList(previousState);
     }
 
@@ -94,7 +92,7 @@ public class StateChange {
      * @return the new state.
      */
     @NonNull
-    public <T> List<T> getNewState() {
+    public <T> History<T> getNewState() {
         return createParametricCopyList(newState);
     }
 

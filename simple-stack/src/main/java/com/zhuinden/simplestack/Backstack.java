@@ -251,7 +251,7 @@ public class Backstack {
                     // if any elements in the chain are duplicates,
                     // they are ordered according to the provided chain.
                     int indexOfKey = historyBuilder.indexOf(key);
-                    HistoryBuilder newHistory = HistoryBuilder.newBuilder();
+                    HistoryBuilder newHistory = History.newBuilder();
                     for(int j = 0; j < indexOfKey; j++) {
                         newHistory.add(historyBuilder.get(j)); // preserve equivalent prefix
                     }
@@ -382,13 +382,13 @@ public class Backstack {
      * @return the unmodifiable copy of history.
      */
     @NonNull
-    public <T> List<T> getHistory() {
+    public <T> History<T> getHistory() {
         List<T> copy = new ArrayList<>(stack.size());
         for(Object key : stack) {
             // noinspection unchecked
             copy.add((T) key);
         }
-        return Collections.unmodifiableList(copy);
+        return History.from(copy);
     }
 
     /**
@@ -397,13 +397,13 @@ public class Backstack {
      * @return the list of keys used at first initialization
      */
     @NonNull
-    public <T> List<T> getInitialKeys() {
+    public <T> History<T> getInitialKeys() {
         List<T> copy = new ArrayList<>(initialKeys.size());
         for(Object key : initialKeys) {
             // noinspection unchecked
             copy.add((T) key);
         }
-        return Collections.unmodifiableList(copy);
+        return History.from(copy);
     }
 
     /**

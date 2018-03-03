@@ -22,25 +22,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Convenience class for creating ArrayList of Objects, for backstack history.
+ * Builder for {@link History}.
+ *
+ * Will be moved to {@link History} as `History.Builder` in 2.0.
  */
 public class HistoryBuilder
         implements Iterable<Object> {
     private ArrayList<Object> list = new ArrayList<>();
 
-    private HistoryBuilder() { // use newBuilder()
+    HistoryBuilder() { // use newBuilder()
     }
 
     /**
      * Creates a new history builder based on the {@link Backstack}'s history.
      *
+     * Deprecated in 1.9, in favor of {@link History#builderFrom(Backstack)}.
+     *
      * @param backstack the {@link Backstack}.
      * @return the newly created {@link HistoryBuilder}.
      */
     @NonNull
+    @Deprecated
     public static HistoryBuilder from(@NonNull Backstack backstack) {
         if(backstack == null) {
             throw new IllegalArgumentException("Backstack cannot be null!");
@@ -51,10 +57,13 @@ public class HistoryBuilder
     /**
      * Creates a new history builder based on the {@link BackstackDelegate}'s managed backstack history.
      *
+     * Deprecated in 1.9, in favor of {@link History#builderFrom(BackstackDelegate)}.
+     *
      * @param backstackDelegate the {@link BackstackDelegate}.
      * @return the newly created {@link HistoryBuilder}.
      */
     @NonNull
+    @Deprecated
     public static HistoryBuilder from(@NonNull BackstackDelegate backstackDelegate) {
         if(backstackDelegate == null) {
             throw new IllegalArgumentException("BackstackDelegate cannot be null!");
@@ -65,10 +74,13 @@ public class HistoryBuilder
     /**
      * Creates a new history builder from the provided ordered elements.
      *
+     * Deprecated in 1.9, in favor of {@link History#builderFrom(Object...)}.
+     *
      * @param keys
      * @return the newly created {@link HistoryBuilder}.
      */
     @NonNull
+    @Deprecated
     public static HistoryBuilder from(Object... keys) {
         return from(Arrays.asList(keys));
     }
@@ -76,25 +88,31 @@ public class HistoryBuilder
     /**
      * Creates a new history builder from the provided ordered collection.
      *
+     * Deprecated in 1.9, in favor of {@link History#builderFrom(List)}.
+     *
      * @param keys
      * @return the newly created {@link HistoryBuilder}.
      */
     @NonNull
+    @Deprecated
     public static HistoryBuilder from(@NonNull List<?> keys) {
         for(Object key : keys) {
             if(key == null) {
                 throw new IllegalArgumentException("Cannot provide `null` as a key!");
             }
         }
-        return newBuilder().addAll(keys);
+        return History.newBuilder().addAll(keys);
     }
 
     /**
      * Creates a new empty history builder.
      *
+     * Deprecated in 1.9, in favor of {@link History#newBuilder()}.
+     *
      * @return the newly created {@link HistoryBuilder}.
      */
     @NonNull
+    @Deprecated
     public static HistoryBuilder newBuilder() {
         return new HistoryBuilder();
     }
@@ -102,12 +120,15 @@ public class HistoryBuilder
     /**
      * Creates a new array list of object that contains only the provided key.
      *
+     * Deprecated in 1.9, in favor of {@link History#single(Object)}.
+     *
      * @param key
      * @return an array list of object that contains the key.
      */
     @NonNull
-    public static ArrayList<Object> single(@NonNull Object key) {
-        return newBuilder()
+    @Deprecated
+    public static History<Object> single(@NonNull Object key) {
+        return History.newBuilder()
                 .add(key)
                 .build();
     }
@@ -347,8 +368,13 @@ public class HistoryBuilder
      * @return the built history.
      */
     @NonNull
-    public ArrayList<Object> build() {
-        return new ArrayList<>(this.list);
+    public <T> History<T> build() {
+        List<T> list = new LinkedList<>();
+        for(Object obj: this.list) {
+            // noinspection unchecked
+            list.add((T)obj);
+        }
+        return new History<>(list);
     }
 
     // validations

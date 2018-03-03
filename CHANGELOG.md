@@ -1,5 +1,18 @@
 # Change log
 
+-Simple Stack 1.9.0 (2018-03-XX)
+--------------------------------
+
+- DEPRECATED: HistoryBuilder's factory methods are moved from HistoryBuilder to the newly added History.
+
+`HistoryBuilder.from()` -> `History.builderFrom()`
+
+`HistoryBuilder.single()` -> `History.single()`
+
+`HistoryBuilder.newBuilder()` -> `History.newBuilder()`
+
+- ADDED: `History` class, an immutable list with additional operations over `List<T>`.
+
 -Simple Stack 1.8.2 (2018-01-20)
 --------------------------------
 
