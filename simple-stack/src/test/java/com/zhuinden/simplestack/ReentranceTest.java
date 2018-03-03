@@ -80,11 +80,11 @@ public class ReentranceTest {
                         flow.goTo(new Error());
                     } else if(next instanceof Error) {
                         loading = false;
-                        flow.setHistory(HistoryBuilder.from(flow).removeLast().build(), StateChange.BACKWARD);
+                        flow.setHistory(History.builderFrom(flow).removeLast().build(), StateChange.BACKWARD);
                     }
                 } else {
                     if(next instanceof Loading) {
-                        flow.setHistory(HistoryBuilder.from(flow).removeLast().build(), StateChange.BACKWARD);
+                        flow.setHistory(History.builderFrom(flow).removeLast().build(), StateChange.BACKWARD);
                     }
                 }
                 onComplete.stateChangeComplete();

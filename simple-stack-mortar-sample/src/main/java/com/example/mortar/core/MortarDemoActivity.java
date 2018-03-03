@@ -38,7 +38,7 @@ import com.example.mortar.util.BaseKey;
 import com.example.mortar.util.DaggerService;
 import com.example.mortar.util.NodePrinter;
 import com.zhuinden.servicetree.ServiceTree;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
@@ -139,7 +139,7 @@ public class MortarDemoActivity
                         .setContextCreationStrategy(new NodeCreationManager(serviceTree,
                                 activityScope,
                                 nodeStateManager)).create(this, container))
-                .install(this, container, HistoryBuilder.single(ChatListScreen.create()));
+                .install(this, container, History.single(ChatListScreen.create()));
     }
 
     @Override

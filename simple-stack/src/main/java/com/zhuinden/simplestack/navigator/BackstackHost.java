@@ -51,7 +51,7 @@ public final class BackstackHost
 
     BackstackManager backstackManager;
 
-    List<Object> initialKeys = Collections.emptyList(); // should not stay empty list
+    List<?> initialKeys = Collections.emptyList(); // should not stay empty list
     ViewGroup container;
 
     Bundle savedInstanceState;

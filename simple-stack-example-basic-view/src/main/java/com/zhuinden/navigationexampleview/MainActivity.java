@@ -8,7 +8,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.navigator.Navigator;
 
@@ -44,7 +44,7 @@ public class MainActivity
             }
             return false;
         });
-        Navigator.install(this, root, HistoryBuilder.single(HomeKey.create()));
+        Navigator.install(this, root, History.single(HomeKey.create()));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class MainActivity
 
     private void replaceHistory(Object rootKey) {
         Navigator.getBackstack(this)
-                .setHistory(HistoryBuilder.single(rootKey),
+                .setHistory(History.single(rootKey),
                         StateChange.REPLACE);
     }
 

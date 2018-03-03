@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemoexamplefragments.R;
@@ -58,7 +58,7 @@ public class MainActivity
         backstackDelegate = new BackstackDelegate(null /* delayed init */);
         backstackDelegate.onCreate(savedInstanceState, //
                 getLastCustomNonConfigurationInstance(), //
-                HistoryBuilder.single(TasksKey.create()));
+                History.single(TasksKey.create()));
 
         backstackDelegate.registerForLifecycleCallbacks(this);
 

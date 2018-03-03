@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
@@ -139,7 +139,7 @@ public class AddEditTaskViewModel
     }
 
     private void navigateOnTaskSaved() {
-        backstack.setHistory(HistoryBuilder.single(TasksKey.create()), StateChange.BACKWARD);
+        backstack.setHistory(History.single(TasksKey.create()), StateChange.BACKWARD);
     }
 
     @NonNull

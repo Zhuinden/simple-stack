@@ -139,7 +139,7 @@ public class HistoryBuilderTest {
     @Test
     public void keyCannotBeNull() {
         try {
-            HistoryBuilder.single(null);
+            History.of(null);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // Good!

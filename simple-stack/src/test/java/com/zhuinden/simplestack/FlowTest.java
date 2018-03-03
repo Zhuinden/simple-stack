@@ -146,7 +146,7 @@ public class FlowTest {
 
     @Test
     public void oneTwoThree() {
-        List<Object> history = HistoryBuilder.single(new Uno());
+        List<?> history = History.single(new Uno());
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());
 
@@ -297,7 +297,7 @@ public class FlowTest {
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
 
-        flow.setHistory(HistoryBuilder.single(delta), StateChange.REPLACE);
+        flow.setHistory(History.single(delta), StateChange.REPLACE);
         assertThat(lastStack.get(lastStack.size() - 1)).isEqualTo(new TestKey("Delta"));
         assertThat(lastStack.get(lastStack.size() - 1) == delta).isTrue();
         assertThat(lastStack.get(lastStack.size() - 1)).isSameAs(delta);
@@ -312,7 +312,7 @@ public class FlowTest {
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
 
-        flow.setHistory(HistoryBuilder.from(flow).removeLast().add(delta).build(), StateChange.REPLACE);
+        flow.setHistory(History.builderFrom(flow).removeLast().add(delta).build(), StateChange.REPLACE);
         assertThat(lastStack.get(lastStack.size() - 1)).isEqualTo(new TestKey("Delta"));
         assertThat(lastStack.get(lastStack.size() - 1) == delta).isTrue();
         assertThat(lastStack.get(lastStack.size() - 1)).isSameAs(delta);

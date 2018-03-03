@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.Bundleable;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository;
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task;
@@ -107,7 +107,7 @@ public class AddOrEditTaskPresenter
             messageQueue.pushMessageTo(addOrEditTaskKey.parent(), new TasksFragment.SavedSuccessfullyMessage());
             backstack.goBack();
         } else {
-            backstack.setHistory(HistoryBuilder.from(backstack).removeUntil(TasksKey.create()).build(), StateChange.BACKWARD);
+            backstack.setHistory(History.builderFrom(backstack).removeUntil(TasksKey.create()).build(), StateChange.BACKWARD);
         }
     }
 }

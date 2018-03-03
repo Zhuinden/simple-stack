@@ -121,6 +121,14 @@ public class History<T> extends AbstractList<T> implements List<T> {
     @SuppressWarnings("unchecked") // @SafeVarargs is API 19+
     @NonNull
     public static <T> History<T> of(T... keys) {
+        if(keys == null) {
+            throw new IllegalArgumentException("Cannot provide `null` as a key!");
+        }
+        for(Object key : keys) {
+            if(key == null) {
+                throw new IllegalArgumentException("Cannot provide `null` as a key!");
+            }
+        }
         return builderFrom(Arrays.asList(keys)).build();
     }
 

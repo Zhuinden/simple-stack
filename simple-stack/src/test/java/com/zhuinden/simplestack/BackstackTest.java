@@ -528,7 +528,7 @@ public class BackstackTest {
         backstack.goTo(other);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.single(initial));
+        backstack.goUpChain(History.single(initial));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
@@ -573,7 +573,7 @@ public class BackstackTest {
         backstack.goTo(other);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.single(another));
+        backstack.goUpChain(History.single(another));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, another);
     }

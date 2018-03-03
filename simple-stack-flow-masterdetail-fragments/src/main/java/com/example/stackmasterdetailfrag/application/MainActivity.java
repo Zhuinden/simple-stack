@@ -33,7 +33,6 @@ import com.example.stackmasterdetailfrag.util.pathview.HandlesBack;
 import com.example.stackmasterdetailfrag.util.pathview.TabletMasterDetailRoot;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.HistoryBuilder;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
@@ -74,7 +73,7 @@ public class MainActivity
         backstackDelegate = new BackstackDelegate();
         backstackDelegate.setStateClearStrategy(new MasterDetailStateClearStrategy());
         backstackDelegate.onCreate(savedInstanceState,
-                getLastCustomNonConfigurationInstance(), HistoryBuilder.single(ConversationListPath.create()));
+                getLastCustomNonConfigurationInstance(), History.single(ConversationListPath.create()));
         backstackDelegate.registerForLifecycleCallbacks(this);
         setContentView(R.layout.root_layout);
         container = (StateChanger) findViewById(R.id.container);

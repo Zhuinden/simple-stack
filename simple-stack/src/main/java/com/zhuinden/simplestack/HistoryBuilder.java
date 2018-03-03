@@ -51,7 +51,7 @@ public class HistoryBuilder
         if(backstack == null) {
             throw new IllegalArgumentException("Backstack cannot be null!");
         }
-        return from(backstack.getHistory());
+        return History.builderFrom(backstack.getHistory());
     }
 
     /**
@@ -68,7 +68,7 @@ public class HistoryBuilder
         if(backstackDelegate == null) {
             throw new IllegalArgumentException("BackstackDelegate cannot be null!");
         }
-        return from(backstackDelegate.getBackstack());
+        return History.builderFrom(backstackDelegate.getBackstack());
     }
 
     /**
@@ -82,7 +82,7 @@ public class HistoryBuilder
     @NonNull
     @Deprecated
     public static HistoryBuilder from(Object... keys) {
-        return from(Arrays.asList(keys));
+        return History.builderFrom(Arrays.asList(keys));
     }
 
     /**
