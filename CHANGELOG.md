@@ -3,15 +3,19 @@
 -Simple Stack 1.9.0 (2018-03-XX)
 --------------------------------
 
-- DEPRECATED: HistoryBuilder's factory methods are moved from HistoryBuilder to the newly added History.
+- DEPRECATED: HistoryBuilder's factory methods are moved from HistoryBuilder to the newly added `History` class.
 
-`HistoryBuilder.from()` -> `History.builderFrom()`
+`HistoryBuilder.from(T... objects)` -> `History.builderOf(T... objects)`
+
+`HistoryBuilder.from(...)` -> `History.builderFrom(...)`
 
 `HistoryBuilder.single()` -> `History.single()`
 
 `HistoryBuilder.newBuilder()` -> `History.newBuilder()`
 
 - ADDED: `History` class, an immutable list with additional operations over `List<T>`.
+
+- ADDED: Long-overdue empty constructor for `BackstackDelegate` and `backstack.setStateChanger(StateChanger)`.
 
 -Simple Stack 1.8.2 (2018-01-20)
 --------------------------------
