@@ -75,7 +75,7 @@ public class MainActivity
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), HistoryBuilder.single(TasksKey.create()));
         backstackDelegate.registerForLifecycleCallbacks(this);
         BackstackHolder backstackHolder = Injection.get().backstackHolder();

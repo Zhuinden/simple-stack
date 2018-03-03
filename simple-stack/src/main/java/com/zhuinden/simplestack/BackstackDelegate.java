@@ -150,6 +150,15 @@ public class BackstackDelegate {
 
     /**
      * Creates the {@link BackstackDelegate}.
+     *
+     * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
+     */
+    public BackstackDelegate() {
+        this(null);
+    }
+
+    /**
+     * Creates the {@link BackstackDelegate}.
      * If {@link StateChanger} is null, then the initialize {@link StateChange} is postponed until it is explicitly set.
      * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
      *
@@ -240,7 +249,7 @@ public class BackstackDelegate {
      * @param nonConfigurationInstance The {@link NonConfigurationInstance} that is typically obtained with getLastCustomNonConfigurationInstance().
      * @param initialKeys              A list of the keys that are used to set as initial history of the backstack.
      */
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull List<Object> initialKeys) {
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull List<?> initialKeys) {
         if(nonConfigurationInstance != null && !(nonConfigurationInstance instanceof NonConfigurationInstance)) {
             throw new IllegalArgumentException(
                     "The provided non configuration instance must be of type BackstackDelegate.NonConfigurationInstance!");

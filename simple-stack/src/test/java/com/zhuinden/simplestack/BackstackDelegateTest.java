@@ -72,7 +72,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setNullPersistenceTagShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.setPersistenceTag(null);
             fail();
@@ -83,7 +83,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setSamePersistenceTagTwiceShouldBeOk() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.setPersistenceTag(new String("hello"));
         backstackDelegate.setPersistenceTag(new String("hello"));
         // no exceptions thrown
@@ -91,7 +91,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setTwoDifferentPersistenceTagsShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.setPersistenceTag(new String("hello"));
         try {
             backstackDelegate.setPersistenceTag(new String("world"));
@@ -103,7 +103,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setPersistenceTagAfterOnCreateShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, new ArrayList<Object>() {{
             add(new TestKey("hello"));
         }});
@@ -118,7 +118,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void onCreateRestoresBackstackKeys() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey testKey = new TestKey("hello");
         final TestKey restoredKey = new TestKey("world");
         ArrayList<Parcelable> restoredKeys = new ArrayList<Parcelable>() {{
@@ -135,7 +135,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void onCreateChoosesInitialKeysIfRestoredHistoryIsEmpty() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey testKey = new TestKey("hello");
         ArrayList<Parcelable> restoredKeys = new ArrayList<>();
         Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getHistoryTag())).thenReturn(restoredKeys);
@@ -147,7 +147,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void getSavedStateThrowsBeforeOnCreate() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.getSavedState(null);
             Assert.fail();
@@ -158,7 +158,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void getSavedStateForNullThrowsException() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey testKey = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
         try {
@@ -171,7 +171,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void onCreateInvalidNonConfigurationThrowsException() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.onCreate(null, new TestKey("crashpls"), HistoryBuilder.single(new TestKey("hello")));
             Assert.fail();
@@ -185,7 +185,7 @@ public class BackstackDelegateTest {
         Mockito.when(backstackManager.getBackstack()).thenReturn(backstack);
         BackstackDelegate.NonConfigurationInstance nonConfigurationInstance = new BackstackDelegate.NonConfigurationInstance(
                 backstackManager);
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey testKey = new TestKey("hello");
         backstackDelegate.onCreate(null, nonConfigurationInstance, HistoryBuilder.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isSameAs(backstack);
@@ -194,7 +194,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void testRestoreViewFromState() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         backstackDelegate.setStateChanger(stateChanger);
@@ -212,7 +212,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void onBackPressedGoesBack() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey a = new TestKey("hello");
         TestKey b = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.from(a, b).build());
@@ -224,7 +224,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void onPostResumeThrowsExceptionIfStateChangerNotSet() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         // no state changer set
@@ -238,7 +238,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void onPauseRemovesStateChanger() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         backstackDelegate.setStateChanger(stateChanger);
@@ -248,7 +248,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void onPostResumeReattachesStateChanger() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         backstackDelegate.setStateChanger(stateChanger);
@@ -260,7 +260,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void getBackstackShouldThrowIfOnCreateNotCalled() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.getBackstack();
             Assert.fail();
@@ -279,7 +279,7 @@ public class BackstackDelegateTest {
                 called.add(stateChange);
             }
         };
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.addStateChangeCompletionListener(completionListener);
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
         backstackDelegate.setStateChanger(stateChanger);
@@ -296,7 +296,7 @@ public class BackstackDelegateTest {
                 // do nothing
             }
         };
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
         try {
             backstackDelegate.addStateChangeCompletionListener(completionListener);
@@ -309,7 +309,7 @@ public class BackstackDelegateTest {
     @Test
     public void addNullStateChangeListenerThrows() {
         TestKey testKey = new TestKey("hello");
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.addStateChangeCompletionListener(null);
             Assert.fail();
@@ -321,14 +321,14 @@ public class BackstackDelegateTest {
     @Test
     public void getManagerReturnsBackstackManager() {
         TestKey testKey = new TestKey("Hello");
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(testKey));
         assertThat(backstackDelegate.getManager()).isNotNull();
     }
 
     @Test
     public void getManagerBeforeOnCreateThrows() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.getManager();
             Assert.fail();
@@ -339,7 +339,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setKeyFilterWithNullShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.setKeyFilter(null);
             Assert.fail();
@@ -350,7 +350,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setKeyFilterMustBeCalledBeforeOnCreate() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         Object key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         try {
@@ -369,7 +369,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setKeyParcelerWithNullShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.setKeyParceler(null);
             Assert.fail();
@@ -380,7 +380,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setKeyParcelerMustBeCalledBeforeOnCreate() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         Object key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         try {
@@ -403,7 +403,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setStateClearStrategyWithNullShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.setStateClearStrategy(null);
             Assert.fail();
@@ -414,7 +414,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void setStateClearStrategyMustBeCalledBeforeOnCreate() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         Object key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         try {
@@ -427,7 +427,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void registerLifecycleCallbacksShouldThrowForNull() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.registerForLifecycleCallbacks(null);
             Assert.fail();
@@ -439,7 +439,7 @@ public class BackstackDelegateTest {
     @Test
     public void registerLifecycleCallbacksShouldThrowIfNotCalledCreate() {
         Activity activity = Mockito.mock(Activity.class);
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.registerForLifecycleCallbacks(activity);
             Assert.fail();
@@ -454,7 +454,7 @@ public class BackstackDelegateTest {
         Application application = Mockito.mock(Application.class);
         Mockito.when(activity.getApplication()).thenReturn(application);
         Object key = new TestKey("hello");
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, HistoryBuilder.single(key));
         // THEN
         backstackDelegate.registerForLifecycleCallbacks(activity);
@@ -463,7 +463,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void callingOnPostResumeBeforeOnCreateShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.setStateChanger(stateChanger);
         try {
             backstackDelegate.onPostResume();
@@ -476,7 +476,7 @@ public class BackstackDelegateTest {
 
     @Test
     public void callingOnPauseBeforeOnCreateShouldThrow() {
-        BackstackDelegate backstackDelegate = new BackstackDelegate(null);
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
             backstackDelegate.onPause();
             Assert.fail();

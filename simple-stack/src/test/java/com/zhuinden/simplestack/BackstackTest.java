@@ -70,7 +70,7 @@ public class BackstackTest {
     public void stateChangerShouldNotBeNull() {
         try {
             Backstack backstack = new Backstack(new TestKey("Hi"));
-            backstack.setStateChanger(null, Backstack.INITIALIZE);
+            backstack.setStateChanger(null);
             Assert.fail();
         } catch(NullPointerException e) {
             // good!
@@ -109,7 +109,7 @@ public class BackstackTest {
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
 
@@ -128,7 +128,7 @@ public class BackstackTest {
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
         assertThat(backstack.goBack()).isFalse();
@@ -146,7 +146,7 @@ public class BackstackTest {
                 assertThat(stateChange.topPreviousState()).isNull();
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
     }
@@ -165,12 +165,31 @@ public class BackstackTest {
                 }
                 callback = completionCallback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         callback.stateChangeComplete();
 
         backstack.goBack();
         callback.stateChangeComplete();
+    }
+
+    @Test
+    public void uninitializedBackstackReturnsEmptyListAsHistory() {
+        final TestKey hi = new TestKey("hi");
+        final TestKey bye = new TestKey("bye");
+
+        Backstack backstack = new Backstack(hi, bye);
+
+        assertThat(backstack.getHistory()).isEmpty();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.getHistory()).containsExactly(hi, bye);
     }
 
     @Test
@@ -207,7 +226,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         backstack.executePendingStateChange();
 
         assertThat(backstack.isStateChangePending()).isFalse();
@@ -253,7 +272,7 @@ public class BackstackTest {
             }
         };
         backstack.addCompletionListener(completionListener);
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
 
         callback.stateChangeComplete();
 
@@ -276,7 +295,7 @@ public class BackstackTest {
         };
         backstack.addCompletionListener(completionListener);
         backstack.removeCompletionListener(completionListener);
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
 
         callback.stateChangeComplete();
 
@@ -295,8 +314,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger,
-                Backstack.INITIALIZE); // initialize state change
+        backstack.setStateChanger(stateChanger); // initialize state change
         try {
             backstack.reset();
             Assert.fail();
@@ -317,13 +335,13 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goTo(other);
         callback.stateChangeComplete();
         backstack.reset();
         assertThat(backstack.getHistory()).isEmpty();
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
@@ -353,7 +371,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goTo(other);
         callback.stateChangeComplete();
@@ -378,7 +396,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goTo(other);
         callback.stateChangeComplete();
@@ -417,7 +435,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goUp(other);
         callback.stateChangeComplete();
@@ -438,7 +456,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goTo(other);
         callback.stateChangeComplete();
@@ -460,7 +478,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goTo(other);
         callback.stateChangeComplete();
@@ -505,7 +523,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goTo(other);
         callback.stateChangeComplete();
@@ -528,7 +546,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
 
@@ -550,7 +568,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
         backstack.goTo(other);
         callback.stateChangeComplete();
@@ -573,7 +591,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial1, initial2).build());
@@ -595,7 +613,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial1, initial2).build());
@@ -617,7 +635,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial4).build());
@@ -640,7 +658,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial2, initial3).build());
@@ -662,7 +680,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial1, initial2).build());
@@ -684,7 +702,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial2, initial3).build());
@@ -706,7 +724,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial2, initial1).build());
@@ -729,7 +747,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial3, initial2, initial1).build());
@@ -755,7 +773,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(other1, other2).build());
@@ -782,7 +800,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(other3, initial2, initial4, other1, other2).build());
@@ -804,7 +822,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         backstack.goUpChain(HistoryBuilder.from(initial2, initial3).build());
@@ -838,7 +856,7 @@ public class BackstackTest {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
         assertThat(backstack.fromTop(0)).isSameAs(backstack.top());

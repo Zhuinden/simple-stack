@@ -47,7 +47,7 @@ public class BackstackManagerTest {
             backstack.reset();
         }
         assertThat(backstack.getHistory()).isEmpty();
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         assertThat(backstack.getHistory()).doesNotContain(restored);
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
@@ -72,7 +72,7 @@ public class BackstackManagerTest {
         backstack.goBack();
         assertThat(backstack.getHistory()).isNotEmpty();
         assertThat(backstack.getHistory()).containsExactly(restored);
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         assertThat(backstack.getHistory()).containsExactly(restored);
     }
 
@@ -229,7 +229,7 @@ public class BackstackManagerTest {
 
         Backstack backstack = backstackManager.getBackstack();
         backstack.goBack();
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
 
         assertThat(backstack.getInitialKeys()).containsExactly(initial);
     }

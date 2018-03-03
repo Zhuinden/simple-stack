@@ -1,15 +1,23 @@
 package com.zhuinden.simplestack;
 
+import android.annotation.TargetApi;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 /**
  * An immutable wrapper over backstack history with some additional helper methods.
@@ -25,6 +33,75 @@ public class History<T> extends AbstractList<T> implements List<T> {
         this.elements = Collections.unmodifiableList(new ArrayList<>(elements));
     }
 
+    // operations
+
+    /**
+     * Returns the last element in the list, or null if the history is empty.
+     *
+     * @param <K> the type of the key
+     * @return the top key
+     */
+    @Nullable
+    public <K> K top() {
+        if(this.isEmpty()) {
+            return null;
+        }
+        // noinspection unchecked
+        return (K) this.get(this.size() - 1);
+    }
+
+    /**
+     * Returns the element indexed from the top.
+     *
+     * Offset value `0` behaves the same as {@link History#top()}, while `1` returns the one before it.
+     * Negative indices are wrapped around, for example `-1` is the first element of the stack, `-2` the second, and so on.
+     *
+     * Accepted values are in range of [-size, size).
+     *
+     * @throws IllegalStateException if the history doesn't contain any elements yet.
+     * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
+     *
+     * @param offset the offset from the top
+     * @param <K> the type of the key
+     * @return the key from the top with offset
+     */
+    @NonNull
+    public <K> K fromTop(int offset) {
+        int size = this.size();
+        if(size <= 0) {
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized history.");
+        }
+        if(offset < -size || offset >= size) {
+            throw new IllegalArgumentException("The provided offset value [" + offset + "] was out of range: [" + -size + "; " + size + ")");
+        }
+        while(offset < 0) {
+            offset += size;
+        }
+        offset %= size;
+        int target = (size - 1 - offset) % size;
+        // noinspection unchecked
+        return (K) this.get(target);
+    }
+
+    /**
+     * Returns the root (bottom / first) element of this history, if exists.
+     *
+     * @throws IllegalStateException if the history is empty
+     *
+     * @param <K> the type of the key
+     * @return the root (bottom) key
+     */
+    @NonNull
+    public <K> K root() {
+        if(isEmpty()) {
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized history.");
+        }
+        // noinspection unchecked
+        return (K) get(0);
+    }
+
+    // factories
+
     /**
      * Creates a {@link HistoryBuilder} from this {@link History} to create a modified version of it.
      *
@@ -33,7 +110,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
     public HistoryBuilder buildUpon() {
         return History.builderFrom(this);
     }
-
+    
     /**
      * Creates a new history from the provided keys.
      *
@@ -43,7 +120,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      */
     @SuppressWarnings("unchecked") // @SafeVarargs is API 19+
     @NonNull
-    public static <T> History<T> from(T... keys) {
+    public static <T> History<T> of(T... keys) {
         return builderFrom(Arrays.asList(keys)).build();
     }
 
@@ -88,19 +165,19 @@ public class History<T> extends AbstractList<T> implements List<T> {
     }
 
     /**
-     * Creates a new history builder builderFrom the provided ordered elements.
+     * Creates a new history builder from the provided ordered elements.
      *
      * @param keys
      * @return the newly created {@link HistoryBuilder}.
      */
     @SuppressWarnings("unchecked") // @SafeVarargs is API 19+
     @NonNull
-    public static HistoryBuilder builderFrom(Object... keys) {
+    public static HistoryBuilder builderOf(Object... keys) {
         return builderFrom(Arrays.asList(keys));
     }
 
     /**
-     * Creates a new history builder builderFrom the provided ordered collection.
+     * Creates a new history builder from the provided ordered collection.
      *
      * @param keys
      * @return the newly created {@link HistoryBuilder}.
@@ -138,6 +215,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
                 .build();
     }
 
+    // delegations
     @Override
     public boolean add(T t) {
         return elements.add(t);
@@ -282,5 +360,45 @@ public class History<T> extends AbstractList<T> implements List<T> {
         return elements.size();
     }
 
-    // arraylist specific things
+    @Override
+    @TargetApi(24)
+    public boolean removeIf(Predicate<? super T> filter) {
+        return elements.removeIf(filter);
+    }
+
+    @Override
+    @TargetApi(24)
+    public void replaceAll(UnaryOperator<T> operator) {
+        elements.replaceAll(operator);
+    }
+
+    @Override
+    @TargetApi(24)
+    public void sort(Comparator<? super T> c) {
+        elements.sort(c);
+    }
+
+    @Override
+    @TargetApi(24)
+    public Spliterator<T> spliterator() {
+        return elements.spliterator();
+    }
+
+    @Override
+    @TargetApi(24)
+    public Stream<T> stream() {
+        return elements.stream();
+    }
+
+    @Override
+    @TargetApi(24)
+    public Stream<T> parallelStream() {
+        return elements.parallelStream();
+    }
+
+    @Override
+    @TargetApi(24)
+    public void forEach(Consumer<? super T> action) {
+        elements.forEach(action);
+    }
 }

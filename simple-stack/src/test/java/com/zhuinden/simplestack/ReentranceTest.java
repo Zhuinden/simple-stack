@@ -59,7 +59,7 @@ public class ReentranceTest {
             }
         };
         flow = new Backstack(HistoryBuilder.single(new Catalog()));
-        flow.setStateChanger(dispatcher, Backstack.INITIALIZE);
+        flow.setStateChanger(dispatcher);
         flow.goTo(new Detail());
         verifyHistory(lastStack, new Error(), new Loading(), new Detail(), new Catalog());
     }
@@ -91,7 +91,7 @@ public class ReentranceTest {
             }
         };
         flow = new Backstack(HistoryBuilder.single(new Catalog()));
-        flow.setStateChanger(dispatcher, Backstack.INITIALIZE);
+        flow.setStateChanger(dispatcher);
         verifyHistory(lastStack, new Catalog());
         flow.goTo(new Detail());
         verifyHistory(lastStack, new Detail(), new Catalog());
@@ -116,7 +116,7 @@ public class ReentranceTest {
                 }
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
         this.flow = flow;
         flow.goTo(new Detail());
         verifyHistory(lastStack, new Error(), new Loading(), new Detail());
@@ -138,7 +138,7 @@ public class ReentranceTest {
             }
         };
         flow = new Backstack(HistoryBuilder.single(new Catalog()));
-        flow.setStateChanger(dispatcher, Backstack.INITIALIZE);
+        flow.setStateChanger(dispatcher);
         lastCallback.stateChangeComplete();
 
         flow.goTo(new Detail());
@@ -160,7 +160,7 @@ public class ReentranceTest {
                 lastStack = traversal.getNewState();
                 lastCallback = callback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         lastCallback.stateChangeComplete();
         try {
@@ -181,7 +181,7 @@ public class ReentranceTest {
                 lastStack = traversal.getNewState();
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
 
         verifyHistory(lastStack, new Catalog());
     }
@@ -199,7 +199,7 @@ public class ReentranceTest {
                 lastStack = traversal.getNewState();
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
 
         verifyHistory(lastStack, new Detail(), new Catalog());
         assertThat(dispatchCount.intValue()).isEqualTo(1);
@@ -217,7 +217,7 @@ public class ReentranceTest {
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
                 lastCallback = callback;
             }
-        }, Backstack.INITIALIZE);
+        });
 
         lastCallback.stateChangeComplete();
         verifyHistory(flow.getHistory(), new Loading(), new Catalog());
@@ -237,7 +237,7 @@ public class ReentranceTest {
                 flow.removeStateChanger();
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
 
         verifyHistory(flow.getHistory(), new Catalog());
 
@@ -246,7 +246,7 @@ public class ReentranceTest {
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
 
         verifyHistory(flow.getHistory(), new Loading(), new Catalog());
     }
@@ -259,14 +259,14 @@ public class ReentranceTest {
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
                 lastCallback = callback;
             }
-        }, Backstack.INITIALIZE);
+        });
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
                 lastStack = traversal.getNewState();
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
 
         assertThat(lastStack).isNull();
         lastCallback.stateChangeComplete();
@@ -283,7 +283,7 @@ public class ReentranceTest {
                 flow.goTo(new Detail());
                 lastCallback = callback;
             }
-        }, Backstack.INITIALIZE);
+        });
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
@@ -291,7 +291,7 @@ public class ReentranceTest {
                 lastStack = traversal.getNewState();
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
 
         assertThat(lastStack).isNull();
         lastCallback.stateChangeComplete();
@@ -311,7 +311,7 @@ public class ReentranceTest {
                 flow.removeStateChanger();
                 flow.goTo(new Loading());
             }
-        }, Backstack.INITIALIZE);
+        });
 
         verifyHistory(flow.getHistory(), new Catalog());
 
@@ -321,7 +321,7 @@ public class ReentranceTest {
                 secondDispatcherCount.incrementAndGet();
                 callback.stateChangeComplete();
             }
-        }, Backstack.INITIALIZE);
+        });
 
         assertThat(secondDispatcherCount.get()).isZero();
         lastCallback.stateChangeComplete();

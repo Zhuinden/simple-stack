@@ -74,7 +74,7 @@ public class HistoryBuilder
     /**
      * Creates a new history builder from the provided ordered elements.
      *
-     * Deprecated in 1.9, in favor of {@link History#builderFrom(Object...)}.
+     * Deprecated in 1.9, in favor of {@link History#builderOf(Object...)}.
      *
      * @param keys
      * @return the newly created {@link HistoryBuilder}.

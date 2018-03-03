@@ -27,7 +27,7 @@ public class MainActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), HistoryBuilder.single(GridKey.create()));
         backstackDelegate.registerForLifecycleCallbacks(this);
         super.onCreate(savedInstanceState);

@@ -71,7 +71,7 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = new BackstackDelegate();
         backstackDelegate.setStateClearStrategy(new MasterDetailStateClearStrategy());
         backstackDelegate.onCreate(savedInstanceState,
                 getLastCustomNonConfigurationInstance(), HistoryBuilder.single(ConversationListPath.create()));
