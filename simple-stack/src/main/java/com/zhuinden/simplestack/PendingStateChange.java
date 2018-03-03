@@ -27,7 +27,7 @@ class PendingStateChange {
         COMPLETED
     }
 
-    final List<Object> newHistory;
+    final List<?> newHistory;
     final int direction;
     final boolean initialization;
 
@@ -36,7 +36,7 @@ class PendingStateChange {
     StateChanger.Callback completionCallback;
     boolean didForceExecute = false;
 
-    PendingStateChange(List<Object> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
+    PendingStateChange(List<?> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
         this.newHistory = newHistory;
         this.direction = direction;
         this.initialization = initialization;

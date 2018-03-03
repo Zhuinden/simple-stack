@@ -363,7 +363,7 @@ public class HistoryBuilder
     }
 
     /**
-     * Creates a copied version of the builder as an ArrayList.
+     * Creates the history, which is immutable.
      *
      * @return the built history.
      */

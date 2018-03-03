@@ -616,7 +616,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial1, initial2).build());
+        backstack.goUpChain(History.of(initial1, initial2));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
     }

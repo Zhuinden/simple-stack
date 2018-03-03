@@ -205,7 +205,7 @@ public class Backstack {
     public void goUp(@NonNull Object newKey) {
         checkNewKey(newKey);
 
-        List<Object> currentHistory = selectActiveHistory();
+        List<?> currentHistory = selectActiveHistory();
         int size = currentHistory.size();
 
         if(size <= 1) { // single-element history cannot contain the previous element. Short circuit to replaceTop.
@@ -229,7 +229,7 @@ public class Backstack {
      *
      * @param parentChain the chain of parents, from oldest to newest.
      */
-    public void goUpChain(@NonNull List<Object> parentChain) {
+    public void goUpChain(@NonNull List<?> parentChain) {
         checkNewHistory(parentChain);
 
         int parentChainSize = parentChain.size();
@@ -301,7 +301,7 @@ public class Backstack {
         }
         List<Object> newHistory = new ArrayList<>();
 
-        List<Object> activeHistory = selectActiveHistory();
+        List<?> activeHistory = selectActiveHistory();
         for(int i = 0; i < activeHistory.size() - 1; i++) {
             newHistory.add(activeHistory.get(i));
         }
@@ -332,7 +332,7 @@ public class Backstack {
      * @param newHistory the new active history.
      * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    public void setHistory(@NonNull List<Object> newHistory, @StateChange.StateChangeDirection int direction) {
+    public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
         enqueueStateChange(newHistory, direction, false);
     }
@@ -424,13 +424,13 @@ public class Backstack {
         return !queuedStateChanges.isEmpty();
     }
 
-    private void enqueueStateChange(List<Object> newHistory, int direction, boolean initialization) {
+    private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization) {
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
     }
 
-    private List<Object> selectActiveHistory() {
+    private List<?> selectActiveHistory() {
         if(stack.isEmpty() && queuedStateChanges.size() <= 0) {
             return initialParameters;
         } else if(queuedStateChanges.size() <= 0) {
@@ -454,7 +454,7 @@ public class Backstack {
 
     private void changeState(final PendingStateChange pendingStateChange) {
         boolean initialization = pendingStateChange.initialization;
-        List<Object> newHistory = pendingStateChange.newHistory;
+        List<?> newHistory = pendingStateChange.newHistory;
         @StateChange.StateChangeDirection int direction = pendingStateChange.direction;
 
         List<Object> previousState;
@@ -568,7 +568,7 @@ public class Backstack {
     }
 
     // argument checks
-    private void checkNewHistory(List<Object> newHistory) {
+    private void checkNewHistory(List<?> newHistory) {
         if(newHistory == null || newHistory.isEmpty()) {
             throw new IllegalArgumentException("New history cannot be null or empty");
         }

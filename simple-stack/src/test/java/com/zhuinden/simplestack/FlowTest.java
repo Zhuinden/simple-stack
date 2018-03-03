@@ -171,7 +171,7 @@ public class FlowTest {
 
     @Test
     public void historyChangesAfterListenerCall() {
-        final List<Object> firstHistory = History.single(new Uno());
+        final List<?> firstHistory = History.single(new Uno());
 
         class Ourrobouros
                 implements StateChanger {
@@ -184,7 +184,7 @@ public class FlowTest {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback onComplete) {
                 assertThat(firstHistory).hasSameSizeAs(flow.getHistory());
-                Iterator<Object> original = firstHistory.iterator();
+                Iterator<?> original = firstHistory.iterator();
                 for(Object o : flow.getHistory()) {
                     assertThat(o).isEqualTo(original.next());
                 }

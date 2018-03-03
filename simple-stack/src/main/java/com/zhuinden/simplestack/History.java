@@ -209,7 +209,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @return an array list of object that contains the key.
      */
     @NonNull
-    public static List<Object> single(@NonNull Object key) {
+    public static <T> List<T> single(@NonNull T key) {
         return History.newBuilder()
                 .add(key)
                 .build();
