@@ -112,7 +112,7 @@ public class StateChange {
      * @return the last element in previous state, or null if empty.
      */
     @Nullable
-    public <T extends Object> T topPreviousState() {
+    public <T> T topPreviousState() {
         if(previousState.size() > 0) {
             // noinspection unchecked
             return (T) previousState.get(previousState.size() - 1);
@@ -127,7 +127,7 @@ public class StateChange {
      * @return the last element in new state.
      */
     @NonNull
-    public <T extends Object> T topNewState() {
+    public <T> T topNewState() {
         // noinspection unchecked
         return (T) newState.get(newState.size() - 1);
     }

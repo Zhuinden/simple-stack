@@ -13,9 +13,11 @@
 
 `HistoryBuilder.newBuilder()` -> `History.newBuilder()`
 
-- ADDED: `History` class, an immutable list with additional operations over `List<T>`.
+- ADDED: `History` class, an immutable list with additional operations over `List<T>` - as some methods' return type.
 
 - ADDED: Long-overdue empty constructor for `BackstackDelegate` and `backstack.setStateChanger(StateChanger)`.
+
+- UPDATE: Kotlin sample replaces `PaperParcel` with `@Parcelize`.
 
 -Simple Stack 1.8.2 (2018-01-20)
 --------------------------------
