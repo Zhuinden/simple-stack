@@ -20,6 +20,8 @@ Also adds `History.of(T... objects)` instead of `HistoryBuilder.of(...).build()`
 I also changed some return types (in history building) from `List<Object>` to `<T> List<T>`,
 this resulted in having to change some `List<Object>`s to `List<?>` on the receiving side if used in assignment.
 
+So if you run into that, just change `List<Object>` to `List<?>` and it should work.
+
 - ADDED: Long-overdue empty constructor for `BackstackDelegate` and `backstack.setStateChanger(StateChanger)`.
 
 - UPDATE: Kotlin sample replaces `PaperParcel` with `@Parcelize`.
