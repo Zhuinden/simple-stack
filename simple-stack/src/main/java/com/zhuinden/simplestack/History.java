@@ -84,17 +84,15 @@ public class History<T> extends AbstractList<T> implements List<T> {
     }
 
     /**
-     * Returns the root (bottom / first) element of this history, if exists.
-     *
-     * @throws IllegalStateException if the history is empty
+     * Returns the root (bottom / first) element of this history, or null if it's empty.
      *
      * @param <K> the type of the key
      * @return the root (bottom) key
      */
-    @NonNull
+    @Nullable
     public <K> K root() {
         if(isEmpty()) {
-            throw new IllegalStateException("Cannot obtain elements from an uninitialized history.");
+            return null;
         }
         // noinspection unchecked
         return (K) get(0);
@@ -107,6 +105,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      *
      * @return the history builder
      */
+    @NonNull
     public HistoryBuilder buildUpon() {
         return History.builderFrom(this);
     }

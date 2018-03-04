@@ -37,7 +37,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * {@link Backstack#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link Backstack#REATTACH} does not.
  */
 public class Backstack {
-    public static <T> T getKey(@NonNull Context context) {
+    public static <K> K getKey(@NonNull Context context) {
         return KeyContextWrapper.getKey(context);
     }
 
@@ -338,18 +338,33 @@ public class Backstack {
     }
 
     /**
-     * Returns the last element in the list, or null if the history is empty.
+     * Returns the root (first) element of this history, or null if the history is empty.
      *
-     * @param <T> the type of the key
-     * @return the top key
+     * @param <K> the type of the key
+     * @return the root (first) key
      */
     @Nullable
-    public <T> T top() {
+    public <K> K root() {
         if(stack.isEmpty()) {
             return null;
         }
         // noinspection unchecked
-        return (T) stack.get(stack.size() - 1);
+        return (K) stack.get(0);
+    }
+
+    /**
+     * Returns the last element in the list, or null if the history is empty.
+     *
+     * @param <K> the type of the key
+     * @return the top key
+     */
+    @Nullable
+    public <K> K top() {
+        if(stack.isEmpty()) {
+            return null;
+        }
+        // noinspection unchecked
+        return (K) stack.get(stack.size() - 1);
     }
 
     /**
@@ -364,11 +379,11 @@ public class Backstack {
      * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
      *
      * @param offset the offset from the top
-     * @param <T> the type of the key
+     * @param <K> the type of the key
      * @return the key from the top with offset
      */
     @NonNull
-    public <T> T fromTop(int offset) {
+    public <K> K fromTop(int offset) {
         int size = stack.size();
         if(size <= 0) {
             throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
@@ -382,7 +397,7 @@ public class Backstack {
         offset %= size;
         int target = (size - 1 - offset) % size;
         // noinspection unchecked
-        return (T) stack.get(target);
+        return (K) stack.get(target);
     }
 
     /**
@@ -391,11 +406,11 @@ public class Backstack {
      * @return the unmodifiable copy of history.
      */
     @NonNull
-    public <T> History<T> getHistory() {
-        List<T> copy = new ArrayList<>(stack.size());
+    public <K> History<K> getHistory() {
+        List<K> copy = new ArrayList<>(stack.size());
         for(Object key : stack) {
             // noinspection unchecked
-            copy.add((T) key);
+            copy.add((K) key);
         }
         return History.from(copy);
     }
@@ -406,11 +421,11 @@ public class Backstack {
      * @return the list of keys used at first initialization
      */
     @NonNull
-    public <T> History<T> getInitialKeys() {
-        List<T> copy = new ArrayList<>(initialKeys.size());
+    public <K> History<K> getInitialKeys() {
+        List<K> copy = new ArrayList<>(initialKeys.size());
         for(Object key : initialKeys) {
             // noinspection unchecked
-            copy.add((T) key);
+            copy.add((K) key);
         }
         return History.from(copy);
     }

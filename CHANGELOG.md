@@ -13,7 +13,12 @@
 
 `HistoryBuilder.newBuilder()` -> `History.newBuilder()`
 
+Also adds `History.of(T... objects)` instead of `HistoryBuilder.of(...).build()`.
+
 - ADDED: `History` class, an immutable list with additional operations over `List<T>` - as some methods' return type.
+
+I also changed some return types (in history building) from `List<Object>` to `<T> List<T>`,
+this resulted in having to change some `List<Object>`s to `List<?>` on the receiving side if used in assignment.
 
 - ADDED: Long-overdue empty constructor for `BackstackDelegate` and `backstack.setStateChanger(StateChanger)`.
 

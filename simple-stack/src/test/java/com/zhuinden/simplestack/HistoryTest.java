@@ -77,6 +77,9 @@ public class HistoryTest {
         History history = History.of(testKey1, testKey2, testKey3);
 
         assertThat(history.root()).isSameAs(testKey1);
+
+        History emptyHistory = History.of();
+        assertThat(emptyHistory.root()).isNull();
     }
 
     @Test

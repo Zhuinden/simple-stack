@@ -896,4 +896,27 @@ public class BackstackTest {
             // OK!
         }
     }
+
+    @Test
+    public void rootWorks() {
+        TestKey initial1 = new TestKey("hello1");
+        TestKey initial2 = new TestKey("hello2");
+        TestKey initial3 = new TestKey("hello3");
+        Backstack backstack = new Backstack(initial1);
+
+        assertThat(backstack.root()).isNull();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.root()).isSameAs(initial1);
+
+        backstack.setHistory(History.of(initial2, initial3), StateChange.REPLACE);
+
+        assertThat(backstack.root()).isSameAs(initial2);
+    }
 }
