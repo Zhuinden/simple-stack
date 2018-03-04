@@ -210,13 +210,13 @@ public class History<T> extends AbstractList<T> implements List<T> {
     }
 
     /**
-     * Creates a new array list of object that contains only the provided key.
+     * Creates a new history that contains only the provided key.
      *
      * @param key
-     * @return an array list of object that contains the key.
+     * @return a history that contains the key.
      */
     @NonNull
-    public static <T> List<T> single(@NonNull T key) {
+    public static <T> History<T> single(@NonNull T key) {
         return History.newBuilder()
                 .add(key)
                 .build();

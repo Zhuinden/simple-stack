@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.9.1 (2018-XX-XX)
+--------------------------------
+- Fix: `History.single()` should return `History<T>`, not `List<T>`.
+
 -Simple Stack 1.9.0 (2018-03-04)
 --------------------------------
 
