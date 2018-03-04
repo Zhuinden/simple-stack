@@ -31,7 +31,7 @@ import com.example.stackmasterdetail.util.BackstackService;
 import com.example.stackmasterdetail.util.MasterDetailStateClearStrategy;
 import com.example.stackmasterdetail.util.pathview.HandlesBack;
 import com.example.stackmasterdetail.util.pathview.TabletMasterDetailRoot;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
@@ -71,14 +71,14 @@ public class MainActivity
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
         setContentView(R.layout.root_layout);
-        container = (ViewGroup) findViewById(R.id.container);
+        container = findViewById(R.id.container);
         containerAsStateChanger = (StateChanger) container;
         containerAsBackTarget = (HandlesBack) containerAsStateChanger;
         Navigator.configure()
                 .setStateChanger(this)
                 .setStateClearStrategy(new MasterDetailStateClearStrategy())
                 .setShouldPersistContainerChild(false)
-                .install(this, container, HistoryBuilder.single(ConversationListPath.create()));
+                .install(this, container, History.single(ConversationListPath.create()));
     }
 
     @Override
@@ -97,7 +97,7 @@ public class MainActivity
         menu.add("Friends").setShowAsActionFlags(SHOW_AS_ACTION_ALWAYS).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                BackstackService.get(MainActivity.this).setHistory(HistoryBuilder.newBuilder() //
+                BackstackService.get(MainActivity.this).setHistory(History.newBuilder() //
                         .add(ConversationListPath.create()) //
                         .add(FriendListPath.create()) //
                         .build(), StateChange.FORWARD);

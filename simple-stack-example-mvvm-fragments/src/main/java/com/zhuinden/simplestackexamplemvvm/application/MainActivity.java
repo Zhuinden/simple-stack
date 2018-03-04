@@ -17,7 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackexamplemvvm.R;
@@ -75,8 +75,8 @@ public class MainActivity
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate(null);
-        backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), HistoryBuilder.single(TasksKey.create()));
+        backstackDelegate = new BackstackDelegate();
+        backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), History.single(TasksKey.create()));
         backstackDelegate.registerForLifecycleCallbacks(this);
         BackstackHolder backstackHolder = Injection.get().backstackHolder();
         backstackHolder.setBackstack(backstackDelegate.getBackstack()); // <-- make Backstack globally available through Dagger

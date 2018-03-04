@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
@@ -27,8 +27,8 @@ public class MainActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate(null);
-        backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), HistoryBuilder.single(GridKey.create()));
+        backstackDelegate = new BackstackDelegate();
+        backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), History.single(GridKey.create()));
         backstackDelegate.registerForLifecycleCallbacks(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

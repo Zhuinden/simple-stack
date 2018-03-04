@@ -37,7 +37,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * {@link Backstack#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link Backstack#REATTACH} does not.
  */
 public class Backstack {
-    public static <T> T getKey(@NonNull Context context) {
+    public static <K> K getKey(@NonNull Context context) {
         return KeyContextWrapper.getKey(context);
     }
 
@@ -104,6 +104,15 @@ public class Backstack {
      */
     public boolean hasStateChanger() {
         return stateChanger != null;
+    }
+
+    /**
+     * Sets a {@link StateChanger} with {@link Backstack#INITIALIZE} register mode.
+     *
+     * @param stateChanger the new {@link StateChanger}, which cannot be null.
+     */
+    public void setStateChanger(@NonNull StateChanger stateChanger) {
+        setStateChanger(stateChanger, INITIALIZE);
     }
 
     /**
@@ -175,7 +184,7 @@ public class Backstack {
     public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
         checkNewKey(newTop);
 
-        HistoryBuilder historyBuilder = HistoryBuilder.from(selectActiveHistory());
+        HistoryBuilder historyBuilder = History.builderFrom(selectActiveHistory());
         if(!historyBuilder.isEmpty()) {
             historyBuilder.removeLast();
         }
@@ -196,7 +205,7 @@ public class Backstack {
     public void goUp(@NonNull Object newKey) {
         checkNewKey(newKey);
 
-        List<Object> currentHistory = selectActiveHistory();
+        List<?> currentHistory = selectActiveHistory();
         int size = currentHistory.size();
 
         if(size <= 1) { // single-element history cannot contain the previous element. Short circuit to replaceTop.
@@ -220,7 +229,7 @@ public class Backstack {
      *
      * @param parentChain the chain of parents, from oldest to newest.
      */
-    public void goUpChain(@NonNull List<Object> parentChain) {
+    public void goUpChain(@NonNull List<?> parentChain) {
         checkNewHistory(parentChain);
 
         int parentChainSize = parentChain.size();
@@ -229,7 +238,7 @@ public class Backstack {
             return;
         }
 
-        HistoryBuilder historyBuilder = HistoryBuilder.from(selectActiveHistory());
+        HistoryBuilder historyBuilder = History.builderFrom(selectActiveHistory());
         historyBuilder.removeLast(); // we will never keep the current key on "up" navigation.
 
         int indexOfSubList = Collections.indexOfSubList(historyBuilder.build(), parentChain);
@@ -251,7 +260,7 @@ public class Backstack {
                     // if any elements in the chain are duplicates,
                     // they are ordered according to the provided chain.
                     int indexOfKey = historyBuilder.indexOf(key);
-                    HistoryBuilder newHistory = HistoryBuilder.newBuilder();
+                    HistoryBuilder newHistory = History.newBuilder();
                     for(int j = 0; j < indexOfKey; j++) {
                         newHistory.add(historyBuilder.get(j)); // preserve equivalent prefix
                     }
@@ -292,7 +301,7 @@ public class Backstack {
         }
         List<Object> newHistory = new ArrayList<>();
 
-        List<Object> activeHistory = selectActiveHistory();
+        List<?> activeHistory = selectActiveHistory();
         for(int i = 0; i < activeHistory.size() - 1; i++) {
             newHistory.add(activeHistory.get(i));
         }
@@ -323,24 +332,39 @@ public class Backstack {
      * @param newHistory the new active history.
      * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    public void setHistory(@NonNull List<Object> newHistory, @StateChange.StateChangeDirection int direction) {
+    public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
         enqueueStateChange(newHistory, direction, false);
     }
 
     /**
-     * Returns the last element in the list, or null if the history is empty.
+     * Returns the root (first) element of this history, or null if the history is empty.
      *
-     * @param <T> the type of the key
-     * @return the top key
+     * @param <K> the type of the key
+     * @return the root (first) key
      */
     @Nullable
-    public <T> T top() {
+    public <K> K root() {
         if(stack.isEmpty()) {
             return null;
         }
         // noinspection unchecked
-        return (T) stack.get(stack.size() - 1);
+        return (K) stack.get(0);
+    }
+
+    /**
+     * Returns the last element in the list, or null if the history is empty.
+     *
+     * @param <K> the type of the key
+     * @return the top key
+     */
+    @Nullable
+    public <K> K top() {
+        if(stack.isEmpty()) {
+            return null;
+        }
+        // noinspection unchecked
+        return (K) stack.get(stack.size() - 1);
     }
 
     /**
@@ -355,11 +379,11 @@ public class Backstack {
      * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
      *
      * @param offset the offset from the top
-     * @param <T> the type of the key
+     * @param <K> the type of the key
      * @return the key from the top with offset
      */
     @NonNull
-    public <T> T fromTop(int offset) {
+    public <K> K fromTop(int offset) {
         int size = stack.size();
         if(size <= 0) {
             throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
@@ -373,7 +397,7 @@ public class Backstack {
         offset %= size;
         int target = (size - 1 - offset) % size;
         // noinspection unchecked
-        return (T) stack.get(target);
+        return (K) stack.get(target);
     }
 
     /**
@@ -382,13 +406,13 @@ public class Backstack {
      * @return the unmodifiable copy of history.
      */
     @NonNull
-    public <T> List<T> getHistory() {
-        List<T> copy = new ArrayList<>(stack.size());
+    public <K> History<K> getHistory() {
+        List<K> copy = new ArrayList<>(stack.size());
         for(Object key : stack) {
             // noinspection unchecked
-            copy.add((T) key);
+            copy.add((K) key);
         }
-        return Collections.unmodifiableList(copy);
+        return History.from(copy);
     }
 
     /**
@@ -397,13 +421,13 @@ public class Backstack {
      * @return the list of keys used at first initialization
      */
     @NonNull
-    public <T> List<T> getInitialKeys() {
-        List<T> copy = new ArrayList<>(initialKeys.size());
+    public <K> History<K> getInitialKeys() {
+        List<K> copy = new ArrayList<>(initialKeys.size());
         for(Object key : initialKeys) {
             // noinspection unchecked
-            copy.add((T) key);
+            copy.add((K) key);
         }
-        return Collections.unmodifiableList(copy);
+        return History.from(copy);
     }
 
     /**
@@ -415,13 +439,13 @@ public class Backstack {
         return !queuedStateChanges.isEmpty();
     }
 
-    private void enqueueStateChange(List<Object> newHistory, int direction, boolean initialization) {
+    private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization) {
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
     }
 
-    private List<Object> selectActiveHistory() {
+    private List<?> selectActiveHistory() {
         if(stack.isEmpty() && queuedStateChanges.size() <= 0) {
             return initialParameters;
         } else if(queuedStateChanges.size() <= 0) {
@@ -445,7 +469,7 @@ public class Backstack {
 
     private void changeState(final PendingStateChange pendingStateChange) {
         boolean initialization = pendingStateChange.initialization;
-        List<Object> newHistory = pendingStateChange.newHistory;
+        List<?> newHistory = pendingStateChange.newHistory;
         @StateChange.StateChangeDirection int direction = pendingStateChange.direction;
 
         List<Object> previousState;
@@ -559,7 +583,7 @@ public class Backstack {
     }
 
     // argument checks
-    private void checkNewHistory(List<Object> newHistory) {
+    private void checkNewHistory(List<?> newHistory) {
         if(newHistory == null || newHistory.isEmpty()) {
             throw new IllegalArgumentException("New history cannot be null or empty");
         }

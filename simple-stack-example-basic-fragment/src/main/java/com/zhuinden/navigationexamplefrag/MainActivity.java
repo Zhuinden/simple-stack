@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 
@@ -35,10 +35,10 @@ public class MainActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate(null);
+        backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(savedInstanceState,
                 getLastCustomNonConfigurationInstance(),
-                HistoryBuilder.single(HomeKey.create()));
+                History.single(HomeKey.create()));
         backstackDelegate.registerForLifecycleCallbacks(this);
         super.onCreate(savedInstanceState);
 
@@ -77,9 +77,7 @@ public class MainActivity
     }
 
     private void replaceHistory(Object rootKey) {
-        backstackDelegate.getBackstack()
-                .setHistory(HistoryBuilder.single(rootKey),
-                        StateChange.REPLACE);
+        backstackDelegate.getBackstack().setHistory(History.single(rootKey), StateChange.REPLACE);
     }
 
     public void navigateTo(Object key) {

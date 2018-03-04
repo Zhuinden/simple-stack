@@ -1,5 +1,31 @@
 # Change log
 
+-Simple Stack 1.9.0 (2018-03-XX)
+--------------------------------
+
+- DEPRECATED: HistoryBuilder's factory methods are moved from HistoryBuilder to the newly added `History` class.
+
+`HistoryBuilder.from(T... objects)` -> `History.builderOf(T... objects)`
+
+`HistoryBuilder.from(...)` -> `History.builderFrom(...)`
+
+`HistoryBuilder.single()` -> `History.single()`
+
+`HistoryBuilder.newBuilder()` -> `History.newBuilder()`
+
+Also adds `History.of(T... objects)` instead of `HistoryBuilder.of(...).build()`.
+
+- ADDED: `History` class, an immutable list with additional operations over `List<T>` - as some methods' return type.
+
+I also changed some return types (in history building) from `List<Object>` to `<T> List<T>`,
+this resulted in having to change some `List<Object>`s to `List<?>` on the receiving side if used in assignment.
+
+So if you run into that, just change `List<Object>` to `List<?>` and it should work.
+
+- ADDED: Long-overdue empty constructor for `BackstackDelegate` and `backstack.setStateChanger(StateChanger)`.
+
+- UPDATE: Kotlin sample replaces `PaperParcel` with `@Parcelize`.
+
 -Simple Stack 1.8.2 (2018-01-20)
 --------------------------------
 

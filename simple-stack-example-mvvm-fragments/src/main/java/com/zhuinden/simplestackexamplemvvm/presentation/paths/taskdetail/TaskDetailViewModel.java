@@ -19,7 +19,7 @@ package com.zhuinden.simplestackexamplemvvm.presentation.paths.taskdetail;
 import android.content.Context;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
@@ -55,7 +55,7 @@ public class TaskDetailViewModel
     public void deleteTask() {
         super.deleteTask();
         messageQueue.pushMessageTo(TasksKey.create(), new TasksViewModel.DeletedTaskMessage());
-        backstack.setHistory(HistoryBuilder.single(TasksKey.create()), StateChange.BACKWARD);
+        backstack.setHistory(History.single(TasksKey.create()), StateChange.BACKWARD);
     }
 
     public void startEditTask() {

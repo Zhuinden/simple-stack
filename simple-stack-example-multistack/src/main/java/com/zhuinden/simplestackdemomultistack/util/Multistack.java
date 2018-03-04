@@ -6,7 +6,7 @@ import android.view.View;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemomultistack.application.Key;
 
@@ -47,7 +47,7 @@ public class Multistack {
     public void onCreate(String identifier, Bundle savedInstanceState, NonConfigurationInstance nonConfigurationInstance, Parcelable key) {
         get(identifier).onCreate(savedInstanceState,
                 nonConfigurationInstance == null ? null : nonConfigurationInstance.getNonConfigInstance(identifier),
-                HistoryBuilder.single(key));
+                History.single(key));
     }
 
     public void onSaveInstanceState(Bundle outState) {

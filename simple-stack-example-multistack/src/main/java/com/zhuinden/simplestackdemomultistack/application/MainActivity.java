@@ -64,10 +64,10 @@ public class MainActivity
     protected void onCreate(Bundle savedInstanceState) {
         this.multistack = new Multistack();
 
-        multistack.add(CLOUDSYNC.name(), new BackstackDelegate(null));
-        multistack.add(CHROMECAST.name(), new BackstackDelegate(null));
-        multistack.add(MAIL.name(), new BackstackDelegate(null));
-        multistack.add(LIST.name(), new BackstackDelegate(null));
+        multistack.add(CLOUDSYNC.name(), new BackstackDelegate());
+        multistack.add(CHROMECAST.name(), new BackstackDelegate());
+        multistack.add(MAIL.name(), new BackstackDelegate());
+        multistack.add(LIST.name(), new BackstackDelegate());
 
         Multistack.NonConfigurationInstance nonConfigurationInstance = (Multistack.NonConfigurationInstance) getLastCustomNonConfigurationInstance();
 

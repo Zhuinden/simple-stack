@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.HistoryBuilder;
+import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.DefaultStateChanger;
@@ -76,7 +76,7 @@ public class MainActivity
                         .setExternalStateChanger(this)
                         .setViewChangeCompletionListener(this)
                         .create(this, root))
-                .install(this, root, HistoryBuilder.single(TasksKey.create()));
+                .install(this, root, History.single(TasksKey.create()));
         backstackHolder.setBackstack(backstack);
 
         MainScopeListener mainScopeListener = (MainScopeListener) getSupportFragmentManager().findFragmentByTag(

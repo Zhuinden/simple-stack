@@ -25,7 +25,6 @@ import android.view.View;
 
 import com.zhuinden.statebundle.StateBundle;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class BackstackDelegate {
     /**
      * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
      *
-     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
      * @param keyFilter The custom {@link KeyFilter}.
      */
@@ -61,7 +60,7 @@ public class BackstackDelegate {
     /**
      * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
      *
-     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
      * @param keyParceler The custom {@link KeyParceler}.
      */
@@ -79,7 +78,7 @@ public class BackstackDelegate {
      * Specifies a custom {@link BackstackManager.StateClearStrategy}, allowing a custom way of retaining saved state.
      * The {@link DefaultStateClearStrategy} clears saved state for keys not found in the new state.
      *
-     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
      * @param stateClearStrategy The custom {@link BackstackManager.StateClearStrategy}.
      */
@@ -99,7 +98,7 @@ public class BackstackDelegate {
      *
      * Please note that this should not be an anonymous inner class, because this is kept across configuration changes.
      *
-     * This can only be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * This can only be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
      * @param stateChangeCompletionListener the state change completion listener
      */
@@ -125,7 +124,7 @@ public class BackstackDelegate {
     /**
      * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
      * This is required to make sure that the {@link Backstack} states do not overwrite each other in the saved instance state bundle.
-     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      * A persistence tag can only be set once on a given BackstackDelegate instance.
      *
      * @param persistenceTag a non-null persistence tag that uniquely identifies this {@link BackstackDelegate} inside the Activity.
@@ -151,6 +150,15 @@ public class BackstackDelegate {
 
     /**
      * Creates the {@link BackstackDelegate}.
+     *
+     * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
+     */
+    public BackstackDelegate() {
+        this(null);
+    }
+
+    /**
+     * Creates the {@link BackstackDelegate}.
      * If {@link StateChanger} is null, then the initialize {@link StateChange} is postponed until it is explicitly set.
      * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
      *
@@ -167,7 +175,7 @@ public class BackstackDelegate {
      * - {@link BackstackDelegate#onSaveInstanceState(Bundle)}
      * - {@link BackstackDelegate#onDestroy()}.
      *
-     * This method can only be called after {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}.
+     * This method can only be called after {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
      * Note: This method cannot handle {@link BackstackDelegate#onRetainCustomNonConfigurationInstance()}, so that must still be called manually.
      *
@@ -241,7 +249,7 @@ public class BackstackDelegate {
      * @param nonConfigurationInstance The {@link NonConfigurationInstance} that is typically obtained with getLastCustomNonConfigurationInstance().
      * @param initialKeys              A list of the keys that are used to set as initial history of the backstack.
      */
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull ArrayList<Object> initialKeys) {
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull List<?> initialKeys) {
         if(nonConfigurationInstance != null && !(nonConfigurationInstance instanceof NonConfigurationInstance)) {
             throw new IllegalArgumentException(
                     "The provided non configuration instance must be of type BackstackDelegate.NonConfigurationInstance!");
@@ -342,7 +350,7 @@ public class BackstackDelegate {
 
     /**
      * Returns the {@link Backstack} that belongs to this delegate.
-     * This method can only be invoked after {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)} has been called.
+     * This method can only be invoked after {@link BackstackDelegate#onCreate(Bundle, Object, List)} has been called.
      *
      * @return the {@link Backstack} managed by this delegate.
      */
@@ -384,7 +392,7 @@ public class BackstackDelegate {
     }
 
     /**
-     * Returns the {@link BackstackManager}. If called before {@link BackstackDelegate#onCreate(Bundle, Object, ArrayList)}, it throws an exception.
+     * Returns the {@link BackstackManager}. If called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}, it throws an exception.
      *
      * @return the backstack manager
      */

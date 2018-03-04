@@ -174,7 +174,7 @@ public class Navigator {
          * @return
          */
         @NonNull
-        public Backstack install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<Object> initialKeys) {
+        public Backstack install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
             if(stateChanger == null) {
                 stateChanger = DefaultStateChanger.create(activity, container);
             }
@@ -202,11 +202,11 @@ public class Navigator {
      * @param initialKeys the keys used to initialize the backstack
      */
     @NonNull
-    public static void install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<Object> initialKeys) {
+    public static void install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
         configure().install(activity, container, initialKeys);
     }
 
-    private static Backstack install(Installer installer, @NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<Object> initialKeys) {
+    private static Backstack install(Installer installer, @NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
         if(activity == null) {
             throw new IllegalArgumentException("Activity cannot be null!");
         }

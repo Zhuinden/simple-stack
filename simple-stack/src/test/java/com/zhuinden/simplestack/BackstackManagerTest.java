@@ -38,7 +38,7 @@ public class BackstackManagerTest {
         stateBundle.putParcelableArrayList(BackstackManager.getHistoryTag(), history);
 
         BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
         backstackManager.setStateChanger(stateChanger);
 
@@ -47,7 +47,7 @@ public class BackstackManagerTest {
             backstack.reset();
         }
         assertThat(backstack.getHistory()).isEmpty();
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         assertThat(backstack.getHistory()).doesNotContain(restored);
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
@@ -64,7 +64,7 @@ public class BackstackManagerTest {
                 history);
 
         BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
         backstackManager.setStateChanger(stateChanger);
 
@@ -72,7 +72,7 @@ public class BackstackManagerTest {
         backstack.goBack();
         assertThat(backstack.getHistory()).isNotEmpty();
         assertThat(backstack.getHistory()).containsExactly(restored);
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
         assertThat(backstack.getHistory()).containsExactly(restored);
     }
 
@@ -97,7 +97,7 @@ public class BackstackManagerTest {
                 return restoredKeys;
             }
         });
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
         backstackManager.setStateChanger(stateChanger);
 
@@ -107,7 +107,7 @@ public class BackstackManagerTest {
 
         //// would restore properly
         backstackManager = new BackstackManager();
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
         backstackManager.setStateChanger(stateChanger);
 
@@ -126,7 +126,7 @@ public class BackstackManagerTest {
             }
         });
 
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
         backstackManager.setStateChanger(stateChanger);
 
@@ -139,7 +139,7 @@ public class BackstackManagerTest {
     public void keyFilterSetAfterSetupShouldThrow() {
         final TestKey initial = new TestKey("initial");
         BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         try {
             backstackManager.setKeyFilter(new KeyFilter() {
                 @NonNull
@@ -162,7 +162,7 @@ public class BackstackManagerTest {
         final AtomicInteger atomicInteger = new AtomicInteger(0);
         final List<Integer> integers = new ArrayList<>();
         BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         Backstack.CompletionListener stateChangeCompletionListener = new Backstack.CompletionListener() {
             @Override
             public void stateChangeCompleted(@NonNull StateChange stateChange) {
@@ -175,10 +175,10 @@ public class BackstackManagerTest {
         backstackManager.getBackstack().goBack();
         assertThat(integers).containsExactly(0, 1, 2);
         backstackManager.removeStateChangeCompletionListener(stateChangeCompletionListener);
-        backstackManager.getBackstack().setHistory(HistoryBuilder.single(other), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.single(other), StateChange.REPLACE);
         assertThat(integers).containsExactly(0, 1, 2);
         backstackManager.addStateChangeCompletionListener(stateChangeCompletionListener);
-        backstackManager.getBackstack().setHistory(HistoryBuilder.single(initial), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.single(initial), StateChange.REPLACE);
         assertThat(integers).containsExactly(0, 1, 2, 3);
         backstackManager.removeAllStateChangeCompletionListeners();
         backstackManager.getBackstack().goTo(other);
@@ -191,7 +191,7 @@ public class BackstackManagerTest {
         final TestKey other = new TestKey("other");
         final List<TestKey> integers = new ArrayList<>();
         BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         Backstack backstack = backstackManager.getBackstack();
         Backstack.CompletionListener stateChangeCompletionListener = new Backstack.CompletionListener() {
             @Override
@@ -203,10 +203,10 @@ public class BackstackManagerTest {
         backstackManager.setStateChanger(stateChanger);
         backstackManager.detachStateChanger();
         backstack.goTo(other);
-        backstack.setHistory(HistoryBuilder.single(initial), StateChange.REPLACE);
-        backstack.setHistory(HistoryBuilder.single(other), StateChange.REPLACE);
-        backstack.setHistory(HistoryBuilder.single(initial), StateChange.REPLACE);
-        backstack.setHistory(HistoryBuilder.single(initial), StateChange.REPLACE);
+        backstack.setHistory(History.single(initial), StateChange.REPLACE);
+        backstack.setHistory(History.single(other), StateChange.REPLACE);
+        backstack.setHistory(History.single(initial), StateChange.REPLACE);
+        backstack.setHistory(History.single(initial), StateChange.REPLACE);
         backstack.goTo(other);
         backstackManager.reattachStateChanger();
         assertThat(integers).containsExactly(initial, other, initial, other, initial, initial, other);
@@ -223,13 +223,13 @@ public class BackstackManagerTest {
         stateBundle.putParcelableArrayList(BackstackManager.getHistoryTag(), history);
 
         BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(HistoryBuilder.single(initial));
+        backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
         backstackManager.setStateChanger(stateChanger);
 
         Backstack backstack = backstackManager.getBackstack();
         backstack.goBack();
-        backstack.setStateChanger(stateChanger, Backstack.INITIALIZE);
+        backstack.setStateChanger(stateChanger);
 
         assertThat(backstack.getInitialKeys()).containsExactly(initial);
     }

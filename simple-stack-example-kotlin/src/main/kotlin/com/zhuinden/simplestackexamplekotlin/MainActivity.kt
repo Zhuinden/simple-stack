@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.zhuinden.simplestack.BackstackDelegate
-import com.zhuinden.simplestack.HistoryBuilder
+import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import kotlinx.android.synthetic.main.activity_main.*
@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         backstackDelegate = BackstackDelegate(null)
         backstackDelegate.onCreate(savedInstanceState,
                 lastCustomNonConfigurationInstance,
-                HistoryBuilder.single(HomeKey()))
+                History.single(HomeKey()))
         backstackDelegate.registerForLifecycleCallbacks(this)
         super.onCreate(savedInstanceState)
 
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     private fun replaceHistory(rootKey: BaseKey) {
-        backstackDelegate.backstack.setHistory(HistoryBuilder.single(rootKey), StateChange.REPLACE)
+        backstackDelegate.backstack.setHistory(History.single(rootKey), StateChange.REPLACE)
     }
 
     fun navigateTo(key: BaseKey) {
