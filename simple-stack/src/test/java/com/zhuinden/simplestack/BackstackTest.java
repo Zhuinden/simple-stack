@@ -550,7 +550,7 @@ public class BackstackTest {
         callback.stateChangeComplete();
 
 
-        backstack.goUpChain(HistoryBuilder.from(initial1).build());
+        backstack.goUpChain(History.of(initial1));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
     }
@@ -594,7 +594,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial1, initial2).build());
+        backstack.goUpChain(History.of(initial1, initial2));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
     }
@@ -638,7 +638,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial4).build());
+        backstack.goUpChain(History.of(initial4));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial4);
     }
@@ -661,7 +661,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial2, initial3).build());
+        backstack.goUpChain(History.of(initial2, initial3));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
     }
@@ -683,7 +683,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial1, initial2).build());
+        backstack.goUpChain(History.of(initial1, initial2));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
     }
@@ -705,7 +705,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial2, initial3).build());
+        backstack.goUpChain(History.of(initial2, initial3));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
     }
@@ -727,7 +727,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial2, initial1).build());
+        backstack.goUpChain(History.of(initial2, initial1));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial2, initial1); //initial1 reordered to end
     }
@@ -750,7 +750,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial3, initial2, initial1).build());
+        backstack.goUpChain(History.of(initial3, initial2, initial1));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial3, initial2, initial1); //initial1 reordered to end
     }
@@ -776,7 +776,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(other1, other2).build());
+        backstack.goUpChain(History.of(other1, other2));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3, other1, other2);
     }
@@ -803,7 +803,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(other3, initial2, initial4, other1, other2).build());
+        backstack.goUpChain(History.of(other3, initial2, initial4, other1, other2));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, other3, initial2, initial4, other1, other2);
     }
@@ -825,7 +825,7 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
         callback.stateChangeComplete();
 
-        backstack.goUpChain(HistoryBuilder.from(initial2, initial3).build());
+        backstack.goUpChain(History.of(initial2, initial3));
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
     }

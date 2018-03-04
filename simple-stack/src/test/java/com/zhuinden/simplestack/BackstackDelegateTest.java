@@ -215,7 +215,7 @@ public class BackstackDelegateTest {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey a = new TestKey("hello");
         TestKey b = new TestKey("hello");
-        backstackDelegate.onCreate(null, null, HistoryBuilder.from(a, b).build());
+        backstackDelegate.onCreate(null, null, History.of(a, b));
         backstackDelegate.setStateChanger(stateChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a, b);
         backstackDelegate.onBackPressed();

@@ -184,7 +184,7 @@ public class Backstack {
     public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
         checkNewKey(newTop);
 
-        HistoryBuilder historyBuilder = HistoryBuilder.from(selectActiveHistory());
+        HistoryBuilder historyBuilder = History.builderFrom(selectActiveHistory());
         if(!historyBuilder.isEmpty()) {
             historyBuilder.removeLast();
         }
@@ -238,7 +238,7 @@ public class Backstack {
             return;
         }
 
-        HistoryBuilder historyBuilder = HistoryBuilder.from(selectActiveHistory());
+        HistoryBuilder historyBuilder = History.builderFrom(selectActiveHistory());
         historyBuilder.removeLast(); // we will never keep the current key on "up" navigation.
 
         int indexOfSubList = Collections.indexOfSubList(historyBuilder.build(), parentChain);

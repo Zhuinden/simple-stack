@@ -126,7 +126,7 @@ public class FlowTest {
     final TestKey charlie = new TestKey("Charlie");
     final TestKey delta = new TestKey("Delta");
 
-    List<Object> lastStack;
+    List<?> lastStack;
     int lastDirection;
 
     class FlowDispatcher
@@ -198,7 +198,7 @@ public class FlowTest {
 
     @Test
     public void historyPushAllIsPushy() {
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker, charlie)).build();
+        List<?> history = History.from(Arrays.asList(able, baker, charlie));
         assertThat(history.size()).isEqualTo(3);
 
         Backstack flow = new Backstack(history);
@@ -215,12 +215,12 @@ public class FlowTest {
 
     @Test
     public void setHistoryWorks() {
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker)).build();
+        List<?> history = History.from(Arrays.asList(able, baker));
         Backstack flow = new Backstack(history);
         FlowDispatcher handleStateChangeer = new FlowDispatcher();
         flow.setStateChanger(handleStateChangeer);
 
-        List<Object> newHistory = HistoryBuilder.from(Arrays.<Parcelable>asList(charlie, delta)).build();
+        List<?> newHistory = History.from(Arrays.asList(charlie, delta));
         flow.setHistory(newHistory, StateChange.FORWARD);
         assertThat(lastDirection).isSameAs(StateChange.FORWARD);
         assertThat(lastStack.get(lastStack.size() - 1)).isSameAs(delta);
@@ -231,7 +231,7 @@ public class FlowTest {
 
     @Test
     public void setObjectGoesBack() {
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker, charlie, delta)).build();
+        List<?> history = History.from(Arrays.asList(able, baker, charlie, delta));
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());
 
@@ -255,7 +255,7 @@ public class FlowTest {
 
     @Test
     public void setObjectToMissingObjectPushes() {
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker)).build();
+        List<?> history = History.from(Arrays.asList(able, baker));
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(2);
@@ -277,7 +277,7 @@ public class FlowTest {
 
     @Test
     public void setObjectKeepsOriginal() {
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker)).build();
+        List<?> history = History.from(Arrays.asList(able, baker));
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(2);
@@ -292,7 +292,7 @@ public class FlowTest {
 
     @Test
     public void replaceHistoryResultsInLengthOneHistory() {
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker, charlie)).build();
+        List<?> history = History.from(Arrays.asList(able, baker, charlie));
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
@@ -307,7 +307,7 @@ public class FlowTest {
 
     @Test
     public void replaceTopDoesNotAlterHistoryLength() {
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker, charlie)).build();
+        List<?> history = History.from(Arrays.asList(able, baker, charlie));
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
@@ -327,14 +327,14 @@ public class FlowTest {
         TestKey baker = new TestKey("Baker");
         TestKey charlie = new TestKey("Charlie");
         TestKey delta = new TestKey("Delta");
-        List<Object> history = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker, charlie, delta)).build();
+        List<?> history = History.from(Arrays.asList(able, baker, charlie, delta));
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(4);
 
         TestKey echo = new TestKey("Echo");
         TestKey foxtrot = new TestKey("Foxtrot");
-        List<Object> newHistory = HistoryBuilder.from(Arrays.<Parcelable>asList(able, baker, echo, foxtrot)).build();
+        List<?> newHistory = History.from(Arrays.asList(able, baker, echo, foxtrot));
         flow.setHistory(newHistory, StateChange.REPLACE);
         assertThat(lastStack.size()).isEqualTo(4);
         assertThat(lastStack.get(lastStack.size() - 1)).isEqualTo(foxtrot);
@@ -404,8 +404,8 @@ public class FlowTest {
 
     @Test
     public void setCallsEquals() {
-        List<Object> history = History.newBuilder()
-                .addAll(Arrays.<Parcelable>asList(new Picky("Able"), new Picky("Baker"), new Picky("Charlie"), new Picky("Delta")))
+        List<?> history = History.newBuilder()
+                .addAll(Arrays.asList(new Picky("Able"), new Picky("Baker"), new Picky("Charlie"), new Picky("Delta")))
                 .build();
         Backstack flow = new Backstack(history);
         flow.setStateChanger(new FlowDispatcher());

@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,7 +66,7 @@ public class HistoryBuilderTest {
     @Test
     public void historyBuilderThrowsFromNull() {
         try {
-            HistoryBuilder.from((Object)null).build();
+            History.builderFrom(Arrays.asList(null, null));
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK!
