@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 1.9.0 (2018-03-XX)
+-Simple Stack 1.9.0 (2018-03-04)
 --------------------------------
 
 - DEPRECATED: HistoryBuilder's factory methods are moved from HistoryBuilder to the newly added `History` class.
