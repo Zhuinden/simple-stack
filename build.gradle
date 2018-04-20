@@ -7,9 +7,10 @@ buildscript {
         maven { url "https://clojars.org/repo/" }
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.google.com' }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.0'
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath "io.realm:realm-gradle-plugin:4.3.3"
