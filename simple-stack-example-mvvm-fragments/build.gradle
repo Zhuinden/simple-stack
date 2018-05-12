@@ -52,11 +52,11 @@ dependencies {
     implementation project(':simple-stack')
 
     // App's dependencies, including test
-    implementation "com.android.support:appcompat-v7:27.1.0"
-    implementation "com.android.support:cardview-v7:27.1.0"
-    implementation "com.android.support:design:27.1.0"
-    implementation "com.android.support:recyclerview-v7:27.1.0"
-    implementation "com.android.support:support-v4:27.1.0"
+    implementation "com.android.support:appcompat-v7:27.1.1"
+    implementation "com.android.support:cardview-v7:27.1.1"
+    implementation "com.android.support:design:27.1.1"
+    implementation "com.android.support:recyclerview-v7:27.1.1"
+    implementation "com.android.support:support-v4:27.1.1"
 
     // live data
     implementation "android.arch.lifecycle:runtime:1.1.0"
