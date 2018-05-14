@@ -155,23 +155,18 @@ public class Backstack {
     public void goTo(@NonNull Object newKey) {
         checkNewKey(newKey);
 
-        List<Object> newHistory = new ArrayList<>();
-        boolean isNewKey = true;
-        for(Object key : selectActiveHistory()) {
-            newHistory.add(key);
-            if(key.equals(newKey)) {
-                isNewKey = false;
-                break;
-            }
-        }
+        List<?> activeHistory = selectActiveHistory();
+        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
+
         int direction;
-        if(isNewKey) {
-            newHistory.add(newKey);
-            direction = StateChange.FORWARD;
-        } else {
+        if(historyBuilder.contains(newKey)) {
+            historyBuilder.removeUntil(newKey);
             direction = StateChange.BACKWARD;
+        } else {
+            historyBuilder.add(newKey);
+            direction = StateChange.FORWARD;
         }
-        enqueueStateChange(newHistory, direction, false);
+        setHistory(historyBuilder.build(), direction);
     }
 
     /**
@@ -188,9 +183,8 @@ public class Backstack {
         if(!historyBuilder.isEmpty()) {
             historyBuilder.removeLast();
         }
-        List<Object> newHistory = historyBuilder.add(newTop) //
-                .build();
-        setHistory(newHistory, direction);
+        historyBuilder.add(newTop);
+        setHistory(historyBuilder.build(), direction);
     }
 
     /**
@@ -205,18 +199,76 @@ public class Backstack {
     public void goUp(@NonNull Object newKey) {
         checkNewKey(newKey);
 
-        List<?> currentHistory = selectActiveHistory();
-        int size = currentHistory.size();
+        List<?> activeHistory = selectActiveHistory();
+        int size = activeHistory.size();
 
         if(size <= 1) { // single-element history cannot contain the previous element. Short circuit to replaceTop.
             replaceTop(newKey, StateChange.BACKWARD);
             return;
         }
-        if(currentHistory.contains(newKey)) {
+        if(activeHistory.contains(newKey)) {
             goTo(newKey);
         } else {
             replaceTop(newKey, StateChange.BACKWARD);
         }
+    }
+
+    /**
+     * Moves the provided new key to the top of the backstack.
+     * If the key already exists, then it is first removed, and added as the last element.
+     * If it doesn't exist, then it is just added as the last element.
+     *
+     * @param newKey the new key
+     * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
+     */
+    public void moveToTop(@NonNull Object newKey, boolean asReplace) {
+        checkNewKey(newKey);
+
+        List<?> activeHistory = selectActiveHistory();
+        int direction = asReplace ? StateChange.REPLACE : StateChange.FORWARD;
+
+        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
+        if(historyBuilder.contains(newKey)) {
+            historyBuilder.remove(newKey);
+        }
+        historyBuilder.add(newKey);
+        setHistory(historyBuilder.build(), direction);
+    }
+
+    /**
+     * Moves the provided new key to the top of the backstack.
+     * If the key already exists, then it is first removed, and added as the last element.
+     * If it doesn't exist, then it is just added as the last element.
+     *
+     * The used direction is {@link StateChange#FORWARD}.
+     *
+     * @param newKey the new key
+     */
+    public void moveToTop(@NonNull Object newKey) {
+        moveToTop(newKey, false);
+    }
+
+    /**
+     * Jumps to the root of the backstack.
+     *
+     * This operation counts as a {@link StateChange#BACKWARD} navigation.
+     *
+     * @return if an operation was enqueued for jumping to root. False if already at the root.
+     */
+    public boolean jumpToRoot() {
+        List<?> activeHistory = selectActiveHistory();
+
+        if(activeHistory.size() <= 1) {
+            return false; // nothing to do
+        }
+
+        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
+        while(historyBuilder.size() > 1) {
+            historyBuilder.removeLast();
+        }
+
+        setHistory(historyBuilder.build(), StateChange.BACKWARD);
+        return true;
     }
 
     /**
@@ -299,13 +351,11 @@ public class Backstack {
         if(stack.size() <= 1) {
             return false;
         }
-        List<Object> newHistory = new ArrayList<>();
 
         List<?> activeHistory = selectActiveHistory();
-        for(int i = 0; i < activeHistory.size() - 1; i++) {
-            newHistory.add(activeHistory.get(i));
-        }
-        enqueueStateChange(newHistory, StateChange.BACKWARD, false);
+        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
+        historyBuilder.removeLast();
+        setHistory(historyBuilder.build(), StateChange.BACKWARD);
         return true;
     }
 
@@ -334,7 +384,7 @@ public class Backstack {
      */
     public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
-        enqueueStateChange(newHistory, direction, false);
+        enqueueStateChange(newHistory, direction, false); // must use enqueue!
     }
 
     /**

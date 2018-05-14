@@ -919,4 +919,70 @@ public class BackstackTest {
 
         assertThat(backstack.root()).isSameAs(initial2);
     }
+
+    @Test
+    public void moveToTopWorks() {
+        TestKey initial1 = new TestKey("hello1");
+        TestKey initial2 = new TestKey("hello2");
+        TestKey initial3 = new TestKey("hello3");
+        Backstack backstack = new Backstack(initial1);
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger);
+        callback.stateChangeComplete(); // initial state change
+
+        backstack.moveToTop(initial2);
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
+
+        backstack.moveToTop(initial3);
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
+
+        backstack.moveToTop(initial2, true);
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.REPLACE);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial1, initial3, initial2);
+
+        backstack.moveToTop(initial1, true);
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.REPLACE);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial3, initial2, initial1);
+    }
+
+    @Test
+    public void jumpToRootWorks() {
+        TestKey initial1 = new TestKey("hello1");
+        TestKey initial2 = new TestKey("hello2");
+        TestKey initial3 = new TestKey("hello3");
+        Backstack backstack = new Backstack(initial1);
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setHistory(History.of(initial1, initial2, initial3), StateChange.REPLACE);
+        backstack.setStateChanger(stateChanger);
+        callback.stateChangeComplete(); // initial state change
+        assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
+
+        boolean jumped = backstack.jumpToRoot();
+        assertThat(jumped).isTrue();
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.BACKWARD);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial1);
+
+        assertThat(backstack.jumpToRoot()).isFalse();
+    }
 }

@@ -271,7 +271,7 @@ public class HistoryBuilder
     }
 
     /**
-     * Removes all keys until the provided key is found.
+     * Removes all keys until the provided key is found (exclusive).
      * If the key is not found, an exception is thrown.
      *
      * @param key

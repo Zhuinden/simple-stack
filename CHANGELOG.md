@@ -4,6 +4,8 @@
 --------------------------------
 - Fix: `History.single()` should return `History<T>`, not `List<T>`.
 
+- ADDED: `jumpToRoot()` and `moveToTop()` convenience operators to `Backstack`.
+
 -Simple Stack 1.9.0 (2018-03-04)
 --------------------------------
 
