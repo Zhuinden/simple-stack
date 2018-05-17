@@ -86,19 +86,22 @@ public class TaskRepository {
 
     public Observable<List<Task>> getTasksWithChanges() {
         return createResults((realm) -> realm.where(DbTask.class)
-                .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
+                .sort(DbTaskFields.ID, Sort.ASCENDING)
+                .findAllAsync());
     }
 
     public Observable<List<Task>> getCompletedTasksWithChanges() {
         return createResults((realm) -> realm.where(DbTask.class)
                 .equalTo(DbTaskFields.COMPLETED, true)
-                .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
+                .sort(DbTaskFields.ID, Sort.ASCENDING)
+                .findAllAsync());
     }
 
     public Observable<List<Task>> getActiveTasksWithChanges() {
         return createResults((realm) -> realm.where(DbTask.class)
                 .equalTo(DbTaskFields.COMPLETED, false)
-                .findAllSortedAsync(DbTaskFields.ID, Sort.ASCENDING));
+                .sort(DbTaskFields.ID, Sort.ASCENDING)
+                .findAllAsync());
     }
 
     @SuppressWarnings("NewApi")
