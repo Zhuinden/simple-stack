@@ -1,10 +1,12 @@
 # Change log
 
--Simple Stack 1.9.1 (2018-XX-XX)
+-Simple Stack 1.9.1 (2018-05-20)
 --------------------------------
 - Fix: `History.single()` should return `History<T>`, not `List<T>`.
 
 - ADDED: `jumpToRoot()` and `moveToTop()` convenience operators to `Backstack`.
+
+- ADDED: `goUp(Object, boolean fallbackToBack)` and `goUpChain(List<?>, boolean fallbackToBack)` to allow opt-in for the newly provided navigation principle: "Up and Back are equivalent within your app's task"
 
 -Simple Stack 1.9.0 (2018-03-04)
 --------------------------------

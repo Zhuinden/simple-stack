@@ -197,6 +197,20 @@ public class Backstack {
      * @param newKey the new key to go up to
      */
     public void goUp(@NonNull Object newKey) {
+        goUp(newKey, false);
+    }
+
+    /**
+     * Goes "up" to the provided element.
+     * This means that if the provided element is found anywhere in the history, then the history goes to it (unless specified otherwise).
+     * If not found, then the current top is replaced with the provided element.
+     *
+     * Going up occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param newKey the new key to go up to
+     * @param fallbackToBack specifies that if the key is found in the backstack, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
+     */
+    public void goUp(@NonNull Object newKey, boolean fallbackToBack) {
         checkNewKey(newKey);
 
         List<?> activeHistory = selectActiveHistory();
@@ -207,7 +221,11 @@ public class Backstack {
             return;
         }
         if(activeHistory.contains(newKey)) {
-            goTo(newKey);
+            if(fallbackToBack) {
+                setHistory(History.builderFrom(activeHistory).removeLast().build(), StateChange.BACKWARD);
+            } else {
+                goTo(newKey);
+            }
         } else {
             replaceTop(newKey, StateChange.BACKWARD);
         }
@@ -252,28 +270,16 @@ public class Backstack {
      * Jumps to the root of the backstack.
      *
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
-     *
-     * @return if an operation was enqueued for jumping to root. False if already at the root.
      */
-    public boolean jumpToRoot() {
+    public void jumpToRoot() {
         List<?> activeHistory = selectActiveHistory();
-
-        if(activeHistory.size() <= 1) {
-            return false; // nothing to do
-        }
-
-        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
-        while(historyBuilder.size() > 1) {
-            historyBuilder.removeLast();
-        }
-
-        setHistory(historyBuilder.build(), StateChange.BACKWARD);
-        return true;
+        History<?> currentHistory = History.from(activeHistory);
+        setHistory(History.of(currentHistory.root()), StateChange.BACKWARD);
     }
 
     /**
      * Goes "up" once to the provided chain of parents.
-     * If the chain of parents is found as previous elements, then it works as back navigation to that chain.
+     * If the chain of parents is found as previous elements, then it works as back navigation to that chain,, removing all other elements on top of it.
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
      * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
      *
@@ -282,11 +288,26 @@ public class Backstack {
      * @param parentChain the chain of parents, from oldest to newest.
      */
     public void goUpChain(@NonNull List<?> parentChain) {
+        goUpChain(parentChain, false);
+    }
+
+    /**
+     * Goes "up" once to the provided chain of parents.
+     * If the chain of parents is found as previous elements, then it works as back navigation to that chain, removing all other elements on top of it (unless specified otherwise).
+     * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
+     * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
+     *
+     * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param parentChain the chain of parents, from oldest to newest.
+     * @param fallbackToBack determines that if the chain is fully found in the backstack, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
+     */
+    public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
         checkNewHistory(parentChain);
 
         int parentChainSize = parentChain.size();
         if(parentChainSize == 1) {
-            goUp(parentChain.get(0));
+            goUp(parentChain.get(0), fallbackToBack);
             return;
         }
 
@@ -296,9 +317,14 @@ public class Backstack {
         int indexOfSubList = Collections.indexOfSubList(historyBuilder.build(), parentChain);
 
         if(indexOfSubList != -1) {
-            // if the parent chain is found as is,
-            // we clear all on top of it and go back to the chain
-            goTo(parentChain.get(parentChainSize-1));
+            // if the parent chain is found as is, then decide based on fallback what should happen
+            if(fallbackToBack) {
+                // last item is already removed, and we're defaulting to back.
+                setHistory(historyBuilder.build(), StateChange.BACKWARD);
+            } else {
+                // we clear all on top of it and go back to the chain
+                goTo(parentChain.get(parentChainSize-1));
+            }
             //noinspection UnnecessaryReturnStatement
             return;
         } else {

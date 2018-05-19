@@ -952,8 +952,8 @@ public class BackstackTest {
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial3, initial2);
 
-        backstack.moveToTop(initial1, true);
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.REPLACE);
+        backstack.moveToTop(initial1, false);
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial3, initial2, initial1);
     }
@@ -977,12 +977,101 @@ public class BackstackTest {
         callback.stateChangeComplete(); // initial state change
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
 
-        boolean jumped = backstack.jumpToRoot();
-        assertThat(jumped).isTrue();
+        backstack.jumpToRoot();
         assertThat(stateChange.getDirection()).isSameAs(StateChange.BACKWARD);
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
 
-        assertThat(backstack.jumpToRoot()).isFalse();
+        backstack.jumpToRoot();
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial1);
+    }
+
+    @Test
+    public void goUpWithMoreElementsFoundParentNoFallbackRemovesTopKeys() {
+        TestKey initial = new TestKey("hello");
+        TestKey other = new TestKey("other");
+        TestKey another = new TestKey("another");
+        TestKey boop = new TestKey("boop");
+
+        Backstack backstack = new Backstack(initial, other, another, boop);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger);
+        callback.stateChangeComplete();
+        backstack.goUp(initial, false);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial);
+    }
+
+    @Test
+    public void goUpWithMoreElementsFoundParentWithFallbackRemovesLast() {
+        TestKey initial = new TestKey("hello");
+        TestKey other = new TestKey("other");
+        TestKey another = new TestKey("another");
+        TestKey boop = new TestKey("boop");
+
+        Backstack backstack = new Backstack(initial, other, another, boop);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other, another, boop);
+
+        backstack.goUp(initial, true);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other, another);
+
+        backstack.goUp(initial, true);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other);
+
+        backstack.goUp(initial, true);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial);
+
+        backstack.goUp(initial, true);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial);
+    }
+
+    @Test
+    public void goUpChainWithFallbackOnExactMatchWorksAsDefaultBack() {
+        TestKey initial = new TestKey("hello");
+        TestKey other = new TestKey("other");
+        TestKey another = new TestKey("another");
+        TestKey boop = new TestKey("boop");
+
+        Backstack backstack = new Backstack(initial, other, another, boop);
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.setStateChanger(stateChanger);
+        callback.stateChangeComplete();
+        backstack.goUpChain(History.of(initial, other), true);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other, another);
+
+        backstack.goUpChain(History.of(initial, other), true);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other);
+
+        backstack.goUpChain(History.of(initial, other), true);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial, other);
     }
 }
