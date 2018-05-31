@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.9.2 (2018-06-01)
+--------------------------------
+- MINOR CHANGE: `DefaultStateChanger` uses `FadeViewChanger` for `StateChange.REPLACE` by default, instead of `NoOpViewChangeHandler`.
+
 -Simple Stack 1.9.1 (2018-05-20)
 --------------------------------
 - Fix: `History.single()` should return `History<T>`, not `List<T>`.

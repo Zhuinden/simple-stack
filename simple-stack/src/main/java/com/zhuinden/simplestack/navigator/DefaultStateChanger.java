@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
-import com.zhuinden.simplestack.navigator.changehandlers.NoOpViewChangeHandler;
+import com.zhuinden.simplestack.navigator.changehandlers.FadeViewChangeHandler;
 
 /**
  * A default state changer that handles view changes, and allows an optional external state changer (which is executed before the view change).
@@ -107,10 +107,10 @@ public final class DefaultStateChanger
             ViewChangeHandler viewChangeHandler;
             if(direction == StateChange.FORWARD) {
                 viewChangeHandler = ((StateKey) newKey).viewChangeHandler();
-            } else if(previousKey != null && direction == StateChange.BACKWARD) {
+            } else if(direction == StateChange.BACKWARD) {
                 viewChangeHandler = ((StateKey) previousKey).viewChangeHandler();
             } else {
-                viewChangeHandler = NO_OP_VIEW_CHANGE_HANDLER;
+                viewChangeHandler = FADE_VIEW_CHANGE_HANDLER;
             }
             return viewChangeHandler;
         }
@@ -258,7 +258,7 @@ public final class DefaultStateChanger
         void restoreViewFromState(@NonNull Object newKey, @NonNull View newView);
     }
 
-    private static final NoOpViewChangeHandler NO_OP_VIEW_CHANGE_HANDLER = new NoOpViewChangeHandler();
+    private static final FadeViewChangeHandler FADE_VIEW_CHANGE_HANDLER = new FadeViewChangeHandler();
 
     private Context baseContext;
     private ViewGroup container;
