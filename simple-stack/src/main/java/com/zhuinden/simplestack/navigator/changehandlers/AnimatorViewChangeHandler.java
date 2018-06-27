@@ -19,8 +19,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
 
 import com.zhuinden.simplestack.navigator.ViewChangeHandler;
 
@@ -51,8 +53,58 @@ public abstract class AnimatorViewChangeHandler
     private void runAnimation(final View previousView, final View newView, int direction, AnimatorListenerAdapter animatorListenerAdapter) {
         Animator animator = createAnimator(previousView, newView, direction);
         animator.addListener(animatorListenerAdapter);
+
+        if (duration != null) {
+            animator.setDuration(duration);
+        }
+        if (interpolator != null) {
+            animator.setInterpolator(interpolator);
+        }
+        if (startDelay != null) {
+            animator.setStartDelay(startDelay);
+        }
+
         animator.start();
     }
 
     protected abstract Animator createAnimator(@NonNull View previousView, @NonNull View newView, int direction);
+
+    // stuff
+    private Long startDelay = null;
+
+    private Interpolator interpolator = null;
+
+    private Long duration = null;
+
+    // fluff
+
+    @Nullable
+    public Long getStartDelay() {
+        return startDelay;
+    }
+
+    public AnimatorViewChangeHandler setStartDelay(@Nullable Long startDelay) {
+        this.startDelay = startDelay;
+        return this;
+    }
+
+    @Nullable
+    public Interpolator getInterpolator() {
+        return interpolator;
+    }
+
+    public AnimatorViewChangeHandler setInterpolator(@Nullable Interpolator interpolator) {
+        this.interpolator = interpolator;
+        return this;
+    }
+
+    @Nullable
+    public Long getDuration() {
+        return duration;
+    }
+
+    public AnimatorViewChangeHandler setDuration(@Nullable Long duration) {
+        this.duration = duration;
+        return this;
+    }
 }

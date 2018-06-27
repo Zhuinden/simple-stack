@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.9.3 (2018-06-28)
+--------------------------------
+- ADDED: Ability to change duration, interpolation and start delay of `AnimatorViewChangeHandler`.
+
 -Simple Stack 1.9.2 (2018-06-01)
 --------------------------------
 - MINOR CHANGE: `DefaultStateChanger` uses `FadeViewChanger` for `StateChange.REPLACE` by default, instead of `NoOpViewChangeHandler`.
