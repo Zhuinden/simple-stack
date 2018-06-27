@@ -272,9 +272,18 @@ public class Backstack {
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
     public void jumpToRoot() {
+        jumpToRoot(StateChange.BACKWARD);
+    }
+
+    /**
+     * Jumps to the root of the backstack.
+     *
+     * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     */
+    public void jumpToRoot(@StateChange.StateChangeDirection int direction) {
         List<?> activeHistory = selectActiveHistory();
         History<?> currentHistory = History.from(activeHistory);
-        setHistory(History.of(currentHistory.root()), StateChange.BACKWARD);
+        setHistory(History.of(currentHistory.root()), direction);
     }
 
     /**

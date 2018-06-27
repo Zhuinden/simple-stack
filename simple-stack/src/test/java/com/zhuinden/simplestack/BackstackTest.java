@@ -982,7 +982,13 @@ public class BackstackTest {
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
 
-        backstack.jumpToRoot();
+        backstack.jumpToRoot(StateChange.REPLACE);
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.REPLACE);
+        callback.stateChangeComplete();
+        assertThat(backstack.getHistory()).containsExactly(initial1);
+
+        backstack.jumpToRoot(StateChange.FORWARD);
+        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
     }
