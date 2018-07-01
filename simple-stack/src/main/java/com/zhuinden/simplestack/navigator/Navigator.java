@@ -33,6 +33,8 @@ import com.zhuinden.simplestack.DefaultStateClearStrategy;
 import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.SavedState;
+import com.zhuinden.simplestack.ScopeKey;
+import com.zhuinden.simplestack.ScopedServices;
 import com.zhuinden.simplestack.StateChanger;
 
 import java.util.LinkedList;
@@ -58,6 +60,7 @@ public class Navigator {
         KeyFilter keyFilter = new DefaultKeyFilter();
         KeyParceler keyParceler = new DefaultKeyParceler();
         BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
+        ScopedServices scopedServices = null;
         boolean isInitializeDeferred = false;
         boolean shouldPersistContainerChild = true;
         List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
@@ -121,6 +124,18 @@ public class Navigator {
                 throw new IllegalArgumentException("If set, StateClearStrategy cannot be null!");
             }
             this.stateClearStrategy = stateClearStrategy;
+            return this;
+        }
+
+        /**
+         *
+         */
+        @NonNull
+        public Installer setScopedServices(@NonNull ScopedServices scopedServices) {
+            if(scopedServices == null) {
+                throw new IllegalArgumentException("If set, scoped services cannot be null!");
+            }
+            this.scopedServices = scopedServices;
             return this;
         }
 
@@ -226,6 +241,7 @@ public class Navigator {
         backstackHost.keyFilter = installer.keyFilter;
         backstackHost.keyParceler = installer.keyParceler;
         backstackHost.stateClearStrategy = installer.stateClearStrategy;
+        backstackHost.scopedServices = installer.scopedServices;
         backstackHost.stateChangeCompletionListeners = installer.stateChangeCompletionListeners;
         backstackHost.shouldPersistContainerChild = installer.shouldPersistContainerChild;
         backstackHost.container = container;
@@ -263,6 +279,30 @@ public class Navigator {
      */
     public static boolean onBackPressed(Context context) {
         return getBackstack(context).goBack();
+    }
+
+    /**
+     * Returns if a service is bound to the scope of the {@link ScopeKey} by the provided tag.
+     *
+     * @param scopeKey   the scope key
+     * @param serviceTag the service tag
+     * @return whether the service is bound in the given scope
+     */
+    public static boolean hasService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+        return getManager(context).hasService(scopeKey, serviceTag);
+    }
+
+    /**
+     * Returns the service bound to the scope of the {@link ScopeKey} by the provided tag.
+     *
+     * @param scopeKey   the scope key
+     * @param serviceTag the service tag
+     * @param <T>        the type of the service
+     * @return the service
+     */
+    @NonNull
+    public static <T> T getService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+        return getManager(context).getService(scopeKey, serviceTag);
     }
 
     /**

@@ -138,6 +138,21 @@ public class BackstackManager
         this.stateClearStrategy = stateClearStrategy;
     }
 
+    /**
+     * Specifies a {@link ScopedServices} to allow handling the creation of scoped services.
+     *
+     * @param scopedServices the {@link ScopedServices}.
+     */
+    public void setScopedServices(@NonNull ScopedServices scopedServices) {
+        if(backstack != null) {
+            throw new IllegalStateException("Scope provider should be set before calling `setup()`");
+        }
+        if(scopedServices == null) {
+            throw new IllegalArgumentException("The scope provider cannot be null!");
+        }
+        this.scopeManager.setScopedServices(scopedServices);
+    }
+
     Backstack backstack;
 
     Map<Object, SavedState> keyStateMap = new HashMap<>();
@@ -212,7 +227,7 @@ public class BackstackManager
      *
      * @return whether the service is bound in the given scope
      */
-    public boolean hasService(ScopeKey scopeKey, String serviceTag) {
+    public boolean hasService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
         return hasService(scopeKey.getScopeTag(), serviceTag);
     }
 
@@ -224,7 +239,8 @@ public class BackstackManager
      * @param <T>        the type of the service
      * @return the service
      */
-    public <T> T getService(ScopeKey scopeKey, String serviceTag) {
+    @NonNull
+    public <T> T getService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
         return getService(scopeKey.getScopeTag(), serviceTag);
     }
 
@@ -236,7 +252,7 @@ public class BackstackManager
      *
      * @return whether the service is bound in the given scope
      */
-    public boolean hasService(String scopeTag, String serviceTag) {
+    public boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
         return scopeManager.hasService(scopeTag, serviceTag);
     }
 
@@ -248,7 +264,8 @@ public class BackstackManager
      * @param <T>        the type of the service
      * @return the service
      */
-    public <T> T getService(String scopeTag, String serviceTag) {
+    @NonNull
+    public <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
         return scopeManager.getService(scopeTag, serviceTag);
     }
 

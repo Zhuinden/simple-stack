@@ -24,7 +24,8 @@ public class ScopingTest {
         services.put(SERVICE_TAG, new Service());
     }
 
-    private static class Service implements Bundleable, ScopeKey.Scoped {
+    private static class Service
+            implements Bundleable, ScopedServices.Scoped {
         int blah = 2;
 
         boolean didEnterScope = false;
@@ -46,12 +47,12 @@ public class ScopingTest {
         }
 
         @Override
-        public void onEnterScope(String scope) {
+        public void onEnterScope(@NonNull String scope) {
             didEnterScope = true;
         }
 
         @Override
-        public void onExitScope(String scope) {
+        public void onExitScope(@NonNull String scope) {
             didExitScope = true;
         }
     }
@@ -63,9 +64,24 @@ public class ScopingTest {
         }
     };
 
+    public interface HasServices {
+        void bindServices(ScopedServices.ServiceBinder serviceBinder);
+    }
+
+    private static class ServiceProvider
+            implements ScopedServices {
+        @Override
+        public void bindServices(ServiceBinder serviceBinder) {
+            Object key = serviceBinder.getKey();
+            if(key instanceof HasServices) {
+                ((HasServices) key).bindServices(serviceBinder);
+            }
+        }
+    }
+
     private static class TestKeyWithScope
             extends TestKey
-            implements ScopeKey {
+            implements ScopeKey, HasServices {
         TestKeyWithScope(String name) {
             super(name);
         }
@@ -74,13 +90,14 @@ public class ScopingTest {
             super(in);
         }
 
+        @NonNull
         @Override
         public String getScopeTag() {
             return "boop";
         }
 
         @Override
-        public void bindServices(ServiceBinder serviceBinder) {
+        public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
             serviceBinder.add(SERVICE_TAG, services.get(SERVICE_TAG));
         }
 
@@ -102,8 +119,45 @@ public class ScopingTest {
     private TestKey testKey3 = new TestKey("!");
 
     @Test
+    public void scopedServicesShouldNotBeNull() {
+        BackstackManager backstackManager = new BackstackManager();
+        try {
+            backstackManager.setScopedServices(null);
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void scopedServicesShouldBeSetBeforeSetup() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setup(History.of(testKey1));
+        try {
+            backstackManager.setScopedServices(new ServiceProvider());
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void scopedServicesThrowIfNoScopedServicesAreDefinedAndServicesAreToBeBound() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setup(History.of(testKey2));
+
+        try {
+            backstackManager.setStateChanger(stateChanger);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            assertThat(e.getMessage()).contains("scoped services");
+        }
+    }
+
+    @Test
     public void scopeIsCreatedForScopeKeys() {
         BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.single(testKey2));
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
         backstackManager.setStateChanger(stateChanger);
@@ -114,8 +168,26 @@ public class ScopingTest {
     }
 
     @Test
+    public void gettingNonExistentServiceThrows() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+        backstackManager.setup(History.single(testKey2));
+        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
+        backstackManager.setStateChanger(stateChanger);
+        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
+
+        try {
+            backstackManager.getService(testKey2, "d'oh");
+            Assert.fail();
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
     public void scopeIsDestroyedForClearedScopeKeys() {
         BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.single(testKey2));
 
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
@@ -130,6 +202,7 @@ public class ScopingTest {
     @Test
     public void scopeServicesArePersistedToStateBundle() {
         final ScopeManager scopeManager = new ScopeManager();
+        scopeManager.setScopedServices(new ServiceProvider());
         
         StateChanger stateChanger = new StateChanger() {
             @Override
@@ -146,12 +219,14 @@ public class ScopingTest {
 
         StateBundle stateBundle = scopeManager.saveStates();
 
+        //noinspection ConstantConditions
         assertThat(stateBundle.getBundle(testKey2.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah")).isEqualTo(5);
     }
 
     @Test
     public void persistedStateOfScopedServicesIsRestored() {
         final ScopeManager scopeManager = new ScopeManager();
+        scopeManager.setScopedServices(new ServiceProvider());
 
         StateChanger stateChanger = new StateChanger() {
             @Override
@@ -169,6 +244,8 @@ public class ScopingTest {
         StateBundle stateBundle = scopeManager.saveStates();
 
         final ScopeManager scopeManager2 = new ScopeManager();
+        scopeManager2.setScopedServices(new ServiceProvider());
+
         StateChanger stateChanger2 = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
@@ -188,7 +265,7 @@ public class ScopingTest {
     @Test
     public void nonExistentServiceShouldReturnFalseAndThrow() {
         BackstackManager backstackManager = new BackstackManager();
-
+        backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.of(testKey2));
 
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
@@ -203,12 +280,19 @@ public class ScopingTest {
     @Test
     public void scopedServiceCallbackIsCalledCorrectly() {
         BackstackManager backstackManager = new BackstackManager();
-
+        backstackManager.setScopedServices(new ServiceProvider());
         final Service service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ServiceBinder serviceBinder) {
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
             }
         };
 

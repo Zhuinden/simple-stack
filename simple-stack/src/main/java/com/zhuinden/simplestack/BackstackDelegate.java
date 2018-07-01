@@ -93,6 +93,23 @@ public class BackstackDelegate {
     }
 
     /**
+     * Specifies {@link ScopedServices}, allowing the configuration and creation of scoped services.
+     *
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
+     *
+     * @param scopedServices The {@link ScopedServices}.
+     */
+    public void setScopedServices(@NonNull ScopedServices scopedServices) {
+        if(backstackManager != null && backstackManager.getBackstack() != null) {
+            throw new IllegalStateException("If set, scoped services must set before calling `onCreate()`");
+        }
+        if(scopedServices == null) {
+            throw new IllegalArgumentException("Specified scoped services should not be null!");
+        }
+        this.scopedServices = scopedServices;
+    }
+
+    /**
      * Adds a {@link Backstack.CompletionListener}, which will be added to the {@link Backstack} when it is initialized.
      * As it is added only on initialization, these are added to the Backstack only once.
      *
@@ -118,6 +135,7 @@ public class BackstackDelegate {
 
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
+    private ScopedServices scopedServices = null;
     private BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
     private List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
@@ -263,6 +281,9 @@ public class BackstackDelegate {
             backstackManager.setKeyFilter(keyFilter);
             backstackManager.setKeyParceler(keyParceler);
             backstackManager.setStateClearStrategy(stateClearStrategy);
+            if(scopedServices != null) {
+                backstackManager.setScopedServices(scopedServices);
+            }
             backstackManager.setup(initialKeys);
             for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
                 backstackManager.addStateChangeCompletionListener(completionListener);
@@ -389,6 +410,30 @@ public class BackstackDelegate {
     @NonNull
     public SavedState getSavedState(@NonNull Object key) {
         return getManager().getSavedState(key);
+    }
+
+    /**
+     * Returns if a service is bound to the scope of the {@link ScopeKey} by the provided tag.
+     *
+     * @param scopeKey   the scope key
+     * @param serviceTag the service tag
+     * @return whether the service is bound in the given scope
+     */
+    public boolean hasService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+        return getManager().hasService(scopeKey, serviceTag);
+    }
+
+    /**
+     * Returns the service bound to the scope of the {@link ScopeKey} by the provided tag.
+     *
+     * @param scopeKey   the scope key
+     * @param serviceTag the service tag
+     * @param <T>        the type of the service
+     * @return the service
+     */
+    @NonNull
+    public <T> T getService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+        return getManager().getService(scopeKey, serviceTag);
     }
 
     /**

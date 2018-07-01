@@ -11,6 +11,17 @@ import java.util.Map;
 import java.util.Set;
 
 class ScopeManager {
+    static class AssertingScopedServices
+            implements ScopedServices {
+        @Override
+        public void bindServices(ServiceBinder serviceBinder) {
+            throw new IllegalStateException(
+                    "No scoped services are defined. To create scoped services, an instance of ScopedServices must be provided to configure the services that are available in a given scope.");
+        }
+    }
+
+    private ScopedServices scopedServices = new AssertingScopedServices();
+
     ScopeManager() {
     }
 
@@ -18,27 +29,38 @@ class ScopeManager {
 
     private final StateBundle rootBundle = new StateBundle();
 
+    void setScopedServices(ScopedServices scopedServices) {
+        this.scopedServices = scopedServices;
+    }
+
     void buildScopes(StateChange stateChange) {
         for(Object key : stateChange.getNewState()) {
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 String scopeTag = scopeKey.getScopeTag();
+                //noinspection ConstantConditions
+                if(scopeKey == null) {
+                    throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
+                }
                 if(!scopes.containsKey(scopeTag)) {
                     Map<String, Object> scope = new LinkedHashMap<>();
                     scopes.put(scopeTag, scope);
-                    scopeKey.bindServices(new ScopeKey.ServiceBinder(scopeTag, scope));
 
-                    // restore states
-                    if(rootBundle.containsKey(scopeTag)) {
-                        for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
-                            String serviceTag = serviceEntry.getKey();
-                            Object service = serviceEntry.getValue();
+                    scopedServices.bindServices(new ScopedServices.ServiceBinder(key, scopeTag, scope));
+
+                    for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
+                        String serviceTag = serviceEntry.getKey();
+                        Object service = serviceEntry.getValue();
+                        if(rootBundle.containsKey(scopeTag)) {
                             if(service instanceof Bundleable) {
                                 StateBundle scopeBundle = rootBundle.getBundle(scopeTag);
                                 if(scopeBundle != null && scopeBundle.containsKey(serviceTag)) {
                                     ((Bundleable) service).fromBundle(scopeBundle.getBundle(serviceTag));
                                 }
                             }
+                        }
+                        if(service instanceof ScopedServices.Scoped) {
+                            ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
                         }
                     }
                 }
@@ -61,8 +83,8 @@ class ScopeManager {
             Map<String, Object> services = entry.getValue();
             if(!currentScopes.contains(scope)) {
                 for(Object service : services.values()) {
-                    if(service instanceof ScopeKey.Scoped) {
-                        ((ScopeKey.Scoped) service).onExitScope(scope);
+                    if(service instanceof ScopedServices.Scoped) {
+                        ((ScopedServices.Scoped) service).onExitScope(scope);
                     }
                 }
                 scopeSet.remove();
@@ -96,7 +118,13 @@ class ScopeManager {
         }
     }
 
-    boolean hasService(String scopeTag, String serviceTag) {
+    boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
+        if(scopeTag == null) {
+            throw new IllegalArgumentException("Scope tag cannot be null!");
+        }
+        if(serviceTag == null) {
+            throw new IllegalArgumentException("Service tag cannot be null!");
+        }
         if(!scopes.containsKey(scopeTag)) {
             return false;
         }
@@ -106,12 +134,18 @@ class ScopeManager {
     }
 
     @NonNull
-    <T> T getService(String scopeTag, String serviceTag) {
+    <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
+        if(scopeTag == null) {
+            throw new IllegalArgumentException("Scope tag cannot be null!");
+        }
+        if(serviceTag == null) {
+            throw new IllegalArgumentException("Service tag cannot be null!");
+        }
         checkScopeExists(scopeTag);
 
         Map<String, Object> services = scopes.get(scopeTag);
         if(!services.containsKey(serviceTag)) {
-            throw new IllegalArgumentException("The specified service with tag [" + serviceTag + "] does not exist!");
+            throw new IllegalArgumentException("The specified service with tag [" + serviceTag + "] does not exist in scope [" + scopeTag + "]!");
         }
         //noinspection unchecked
         return (T) services.get(serviceTag);
