@@ -1,5 +1,21 @@
 # Change log
 
+-Simple Stack 1.11.0 (2018-07-01)
+--------------------------------
+- ADDED: Ability to share data across screens via scoped services.
+
+To use, the key must implement `ScopeKey` and define its scope's tag. If `ScopeKey` is used, then a `ScopedServices` must be provided.
+
+Currently, a scope can be shared across keys, but there is no scope inheritance, and there is no way to have multiple scopes for a given key.
+
+To use, one must set an implementation of `ScopedServices` on either `BackstackDelegate`, `Navigator.Installer`, or `BackstackManager`.
+
+Services that are `Bundleable` and registered in a given scope receive callbacks to `toBundle()` and `fromBundle()` to persist/restore their state.
+
+Services registered in a given scope receive `onEnterScope()` and `onExitScope()` callbacks if they implement `ScopedServices.Scoped`.
+
+Tip: A possible way to simplify the usage of `service tags` is to define an inline reified extension function for `ServiceBinder` to default to using `T::class.java.name`.
+
 -Simple Stack 1.9.3 (2018-06-28)
 --------------------------------
 - ADDED: Ability to change duration, interpolation and start delay of `AnimatorViewChangeHandler`.

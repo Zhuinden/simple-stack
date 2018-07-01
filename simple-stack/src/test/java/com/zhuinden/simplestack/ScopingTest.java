@@ -202,25 +202,39 @@ public class ScopingTest {
     @Test
     public void scopeServicesArePersistedToStateBundle() {
         final ScopeManager scopeManager = new ScopeManager();
+
         scopeManager.setScopedServices(new ServiceProvider());
-        
-        StateChanger stateChanger = new StateChanger() {
+        final Service service = new Service();
+        TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(SERVICE_TAG, service);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        Backstack backstack = new Backstack(History.of(testKeyWithScope));
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 scopeManager.buildScopes(stateChange);
                 completionCallback.stateChangeComplete();
             }
-        };
-        
-        Backstack backstack = new Backstack(History.of(testKey2));
-        backstack.setStateChanger(stateChanger);
-        
-        assertThat(scopeManager.hasService(testKey2.getScopeTag(), SERVICE_TAG));
+        });
+
+        assertThat(scopeManager.hasService(testKeyWithScope.getScopeTag(), SERVICE_TAG)).isTrue();
 
         StateBundle stateBundle = scopeManager.saveStates();
 
         //noinspection ConstantConditions
-        assertThat(stateBundle.getBundle(testKey2.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah")).isEqualTo(5);
+        assertThat(stateBundle.getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah")).isEqualTo(
+                5);
     }
 
     @Test
