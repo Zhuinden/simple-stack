@@ -24,6 +24,7 @@ import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
+import com.zhuinden.simplestack.ScopedServices;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.statebundle.StateBundle;
 
@@ -45,6 +46,7 @@ public final class BackstackHost
     KeyFilter keyFilter;
     KeyParceler keyParceler;
     BackstackManager.StateClearStrategy stateClearStrategy;
+    ScopedServices scopedServices;
     List<Backstack.CompletionListener> stateChangeCompletionListeners;
 
     boolean shouldPersistContainerChild;
@@ -68,6 +70,9 @@ public final class BackstackHost
             backstackManager.setKeyFilter(keyFilter);
             backstackManager.setKeyParceler(keyParceler);
             backstackManager.setStateClearStrategy(stateClearStrategy);
+            if(scopedServices != null) {
+                backstackManager.setScopedServices(scopedServices);
+            }
             backstackManager.setup(initialKeys);
             for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
                 backstackManager.addStateChangeCompletionListener(completionListener);

@@ -23,6 +23,8 @@ The secondary operators are:
 - `replaceTop()`: removes the current top element, and replaces it with the newly provided one.
 - `goUp()`: navigates back to the element if exists, replaces current top with it if does not.
 - `goUpChain()`: goes up to the parent chain if exists completely, replaces current with the chain if partially exists (while re-ordering existing duplicates to match the provided chain), and replaces current with chain if doesn't exist.
+- `jumpToRoot()`: goes to the root of the stack with the given direction (by default, backwards).
+- `moveToTop()`: moves to provided key to the top if exists, otherwise adds it to top. 
 
 ## What does it do?
 
@@ -66,7 +68,7 @@ In order to use Simple Stack, you need to add jitpack to your project root gradl
 
 and add the compile dependency to your module level gradle.
 
-    compile 'com.github.Zhuinden:simple-stack:1.9.3'
+    compile 'com.github.Zhuinden:simple-stack:1.11.0'
 
 ## How does it work?
 
