@@ -138,7 +138,6 @@ public class BackstackDelegateTest {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey testKey = new TestKey("hello");
         ArrayList<Parcelable> restoredKeys = new ArrayList<>();
-        Mockito.when(savedInstanceState.getParcelableArrayList(backstackDelegate.getHistoryTag())).thenReturn(restoredKeys);
         backstackDelegate.onCreate(savedInstanceState, null, History.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isNotNull();
         backstackDelegate.setStateChanger(stateChanger);

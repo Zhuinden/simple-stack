@@ -51,6 +51,7 @@ public class BackstackManager
 
     private static final String HISTORY_TAG = "HISTORY";
     private static final String STATES_TAG = "STATES";
+    private static final String SCOPES_TAG = "SCOPES";
 
     static String getHistoryTag() {
         return HISTORY_TAG;
@@ -60,15 +61,21 @@ public class BackstackManager
         return STATES_TAG;
     }
 
+    static String getScopesTag() {
+        return SCOPES_TAG;
+    }
+
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
+            scopeManager.buildScopes(stateChange);
             stateChanger.handleStateChange(stateChange, new Callback() {
                 @Override
                 public void stateChangeComplete() {
                     completionCallback.stateChangeComplete();
                     if(!backstack.isStateChangePending()) {
                         stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
+                        scopeManager.clearScopesNotIn(stateChange);
                     }
                 }
             });
@@ -134,6 +141,7 @@ public class BackstackManager
     Backstack backstack;
 
     Map<Object, SavedState> keyStateMap = new HashMap<>();
+    ScopeManager scopeManager = new ScopeManager();
 
     StateChanger stateChanger;
 
@@ -194,6 +202,54 @@ public class BackstackManager
         if(!backstack.hasStateChanger()) {
             backstack.setStateChanger(managedStateChanger, Backstack.REATTACH);
         }
+    }
+
+    /**
+     * Returns if a service is bound to the scope of the {@link ScopeKey} by the provided tag.
+     *
+     * @param scopeKey   the scope key
+     * @param serviceTag the service tag
+     *
+     * @return whether the service is bound in the given scope
+     */
+    public boolean hasService(ScopeKey scopeKey, String serviceTag) {
+        return hasService(scopeKey.getScopeTag(), serviceTag);
+    }
+
+    /**
+     * Returns the service bound to the scope of the {@link ScopeKey} by the provided tag.
+     *
+     * @param scopeKey   the scope key
+     * @param serviceTag the service tag
+     * @param <T>        the type of the service
+     * @return the service
+     */
+    public <T> T getService(ScopeKey scopeKey, String serviceTag) {
+        return getService(scopeKey.getScopeTag(), serviceTag);
+    }
+
+    /**
+     * Returns if a service is bound to the scope specified by the provided tag for the provided service tag.
+     *
+     * @param scopeTag   the scope tag
+     * @param serviceTag the service tag
+     *
+     * @return whether the service is bound in the given scope
+     */
+    public boolean hasService(String scopeTag, String serviceTag) {
+        return scopeManager.hasService(scopeTag, serviceTag);
+    }
+
+    /**
+     * Returns the service bound to the scope specified by the provided tag for the provided service tag.
+     *
+     * @param scopeTag the scope tag
+     * @param serviceTag the service tag
+     * @param <T>        the type of the service
+     * @return the service
+     */
+    public <T> T getService(String scopeTag, String serviceTag) {
+        return scopeManager.getService(scopeTag, serviceTag);
     }
 
     /**
@@ -338,6 +394,8 @@ public class BackstackManager
                     keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
+
+            scopeManager.setRestoredStates(stateBundle.getBundle(SCOPES_TAG));
         }
     }
 
@@ -371,6 +429,8 @@ public class BackstackManager
             states.add(parcelledState);
         }
         stateBundle.putParcelableArrayList(getStatesTag(), states);
+
+        stateBundle.putParcelable(getScopesTag(), scopeManager.saveStates());
         return stateBundle;
     }
 }
