@@ -99,7 +99,12 @@ public class BackstackDelegate {
      *
      * @param scopedServices The {@link ScopedServices}.
      */
-    public void setScopedServices(@NonNull ScopedServices scopedServices) {
+    public void setScopedServices(@NonNull Activity activity, @NonNull ScopedServices scopedServices) {
+        if(activity == null) {
+            throw new IllegalArgumentException("Activity cannot be null!");
+        }
+        this.activity = activity;
+
         if(backstackManager != null && backstackManager.getBackstack() != null) {
             throw new IllegalStateException("If set, scoped services must set before calling `onCreate()`");
         }
@@ -130,6 +135,8 @@ public class BackstackDelegate {
     }
 
     private static final String HISTORY = "simplestack.HISTORY";
+
+    private Activity activity;
 
     private StateChanger stateChanger;
 
@@ -361,10 +368,17 @@ public class BackstackDelegate {
 
     /**
      * The onDestroy() delegate for the Activity.
+     *
      * Forces any pending state change to execute with {@link Backstack#executePendingStateChange()}.
+     *
+     * Also, if {@link ScopedServices} are used, this is what destroys the remaining scopes if the Activity is finishing.
      */
     public void onDestroy() {
         getBackstack().executePendingStateChange();
+
+        if(activity != null && activity.isFinishing()) {
+            getManager().finalizeScopes();
+        }
     }
 
     // ----- get backstack

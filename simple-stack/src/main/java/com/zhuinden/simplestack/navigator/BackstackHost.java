@@ -111,9 +111,16 @@ public final class BackstackHost
     @Override
     public void onDestroyView() {
         backstackManager.getBackstack().executePendingStateChange();
+
         stateChanger = null;
         container = null;
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        backstackManager.finalizeScopes();
     }
 
     public Backstack getBackstack() {

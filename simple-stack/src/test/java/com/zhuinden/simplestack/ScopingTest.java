@@ -1,5 +1,6 @@
 package com.zhuinden.simplestack;
 
+import android.app.Activity;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import com.zhuinden.statebundle.StateBundle;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -71,7 +73,7 @@ public class ScopingTest {
     private static class ServiceProvider
             implements ScopedServices {
         @Override
-        public void bindServices(ServiceBinder serviceBinder) {
+        public void bindServices(@NonNull ServiceBinder serviceBinder) {
             Object key = serviceBinder.getKey();
             if(key instanceof HasServices) {
                 ((HasServices) key).bindServices(serviceBinder);
@@ -198,7 +200,7 @@ public class ScopingTest {
 
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
     }
-    
+
     @Test
     public void scopeServicesArePersistedToStateBundle() {
         final ScopeManager scopeManager = new ScopeManager();
@@ -223,7 +225,7 @@ public class ScopingTest {
         backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange);
+                scopeManager.buildScopes(stateChange.getNewState());
                 completionCallback.stateChangeComplete();
             }
         });
@@ -245,7 +247,7 @@ public class ScopingTest {
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange);
+                scopeManager.buildScopes(stateChange.getNewState());
                 completionCallback.stateChangeComplete();
             }
         };
@@ -263,7 +265,7 @@ public class ScopingTest {
         StateChanger stateChanger2 = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager2.buildScopes(stateChange);
+                scopeManager2.buildScopes(stateChange.getNewState());
                 completionCallback.stateChangeComplete();
             }
         };
@@ -322,6 +324,49 @@ public class ScopingTest {
 
         backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
 
+        assertThat(service.didEnterScope).isTrue();
+        assertThat(service.didExitScope).isTrue();
+    }
+
+    @Test
+    public void scopesAreFinalizedWhenActivityIsFinishing() {
+        Activity activity = Mockito.mock(Activity.class);
+        Mockito.when(activity.isFinishing()).thenReturn(true);
+
+        final Service service = new Service();
+        TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(SERVICE_TAG, service);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
+        backstackDelegate.setScopedServices(activity, new ServiceProvider());
+        backstackDelegate.onCreate(null, null, History.of(testKeyWithScope));
+        backstackDelegate.setStateChanger(stateChanger);
+
+        backstackDelegate.onPostResume();
+        backstackDelegate.onPause();
+
+        assertThat(backstackDelegate.hasService(testKeyWithScope, SERVICE_TAG)).isTrue();
+        assertThat(service.didEnterScope).isTrue();
+        assertThat(service.didExitScope).isFalse();
+        backstackDelegate.onDestroy();
+        assertThat(backstackDelegate.hasService(testKeyWithScope, SERVICE_TAG)).isFalse();
         assertThat(service.didEnterScope).isTrue();
         assertThat(service.didExitScope).isTrue();
     }

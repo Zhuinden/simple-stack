@@ -26,8 +26,10 @@ import com.zhuinden.statebundle.StateBundle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The backstack manager manages a {@link Backstack} internally, and wraps it with the ability of persisting view state and the backstack history itself.
@@ -68,14 +70,14 @@ public class BackstackManager
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
-            scopeManager.buildScopes(stateChange);
+            scopeManager.buildScopes(stateChange.getNewState());
             stateChanger.handleStateChange(stateChange, new Callback() {
                 @Override
                 public void stateChangeComplete() {
                     completionCallback.stateChangeComplete();
                     if(!backstack.isStateChangePending()) {
                         stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
-                        scopeManager.clearScopesNotIn(stateChange);
+                        scopeManager.clearScopesNotIn(stateChange.getNewState());
                     }
                 }
             });
@@ -216,6 +218,24 @@ public class BackstackManager
         checkBackstack("You must call `setup()` before calling `reattachStateChanger().`");
         if(!backstack.hasStateChanger()) {
             backstack.setStateChanger(managedStateChanger, Backstack.REATTACH);
+        }
+    }
+
+    /**
+     * Typically called when Activity is finishing, and the remaining scopes should be destroyed for proper clean-up.
+     *
+     * Note that if you use {@link BackstackDelegate} or {@link com.zhuinden.simplestack.navigator.Navigator}, then there is no need to call this method manually.
+     */
+    public void finalizeScopes() {
+        List<Object> history = backstack.getHistory();
+        Set<String> scopeSet = new LinkedHashSet<>();
+        for(Object key : history) {
+            if(key instanceof ScopeKey) {
+                scopeSet.add(((ScopeKey) key).getScopeTag());
+            }
+        }
+        for(String scope : scopeSet) {
+            scopeManager.destroyScope(scope);
         }
     }
 

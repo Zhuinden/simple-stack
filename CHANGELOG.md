@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 1.11.1 (2018-07-14)
+--------------------------------
+- API CHANGE: `backstackDelegate.setScopedServices(ScopedServices)` is now `backstackDelegate.setScopedServices(Activity, ScopedServices)`.
+
+- FIX: If enclosing Activity is destroyed (`onDestroy`) *and* `Activity.isFinishing()`, then the existing scopes are destroyed along with it so that `Scoped.onExitScope()` is called properly, and resources are cleaned up as expected across closing the app and restarting it quickly.
+
+- MINOR FIX: Added `ScopedServices` javadoc and missing`@NonNull` on ServiceBinder.
+
+- DEPRECATED: `reset()` method. Renamed to `forceClear()`. You probably don't need it, but that wasn't clear enough.
+
 -Simple Stack 1.11.0 (2018-07-01)
 --------------------------------
 - ADDED: Ability to share data across screens via scoped services.

@@ -7,6 +7,7 @@ import com.zhuinden.statebundle.StateBundle;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ class ScopeManager {
     static class AssertingScopedServices
             implements ScopedServices {
         @Override
-        public void bindServices(ServiceBinder serviceBinder) {
+        public void bindServices(@NonNull ServiceBinder serviceBinder) {
             throw new IllegalStateException(
                     "No scoped services are defined. To create scoped services, an instance of ScopedServices must be provided to configure the services that are available in a given scope.");
         }
@@ -33,8 +34,8 @@ class ScopeManager {
         this.scopedServices = scopedServices;
     }
 
-    void buildScopes(StateChange stateChange) {
-        for(Object key : stateChange.getNewState()) {
+    void buildScopes(List<Object> newState) {
+        for(Object key : newState) {
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 String scopeTag = scopeKey.getScopeTag();
@@ -68,9 +69,9 @@ class ScopeManager {
         }
     }
 
-    void clearScopesNotIn(StateChange stateChange) {
+    void clearScopesNotIn(List<Object> newState) {
         Set<String> currentScopes = new LinkedHashSet<>();
-        for(Object key : stateChange.getNewState()) {
+        for(Object key : newState) {
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 currentScopes.add(scopeKey.getScopeTag());
@@ -90,6 +91,18 @@ class ScopeManager {
                 scopeSet.remove();
                 rootBundle.remove(scope);
             }
+        }
+    }
+
+    void destroyScope(String scopeTag) {
+        if(scopes.containsKey(scopeTag)) {
+            Map<String, Object> services = scopes.remove(scopeTag);
+            for(Object service : services.values()) {
+                if(service instanceof ScopedServices.Scoped) {
+                    ((ScopedServices.Scoped) service).onExitScope(scopeTag);
+                }
+            }
+            rootBundle.remove(scopeTag);
         }
     }
 

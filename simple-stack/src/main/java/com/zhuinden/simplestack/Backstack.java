@@ -406,9 +406,21 @@ public class Backstack {
      *
      * You generally don't need to use this method.
      */
-    public void reset() {
+    public void forceClear() {
         assertNoStateChange();
         resetBackstack();
+    }
+
+    /**
+     * Same as {@link Backstack#forceClear()}.
+     *
+     * You generally don't need to use this method.
+     *
+     * @deprecated The name `reset()` doesn't signal enough that it should not be used. If you need it, use {@link Backstack#forceClear()} instead, but you probably don't need it.
+     */
+    @Deprecated
+    public void reset() {
+        forceClear();
     }
 
     /**

@@ -4,6 +4,19 @@ import android.support.annotation.NonNull;
 
 import java.util.Map;
 
+/**
+ * Scoped Services allow binding services to a given scope. Scopes are identified by a "scope tag" defined by a {@link ScopeKey}.
+ *
+ * For each scope, the services are bound to that scope only when that scope is first created. Otherwise, they survive configuration change, and are shared between keys that belong to the same scope.
+ *
+ * This allows the creation of services that can contain observable data (think BehaviorRelay), which can be shared between multiple views/fragments.
+ *
+ * Additionally, services that implement {@link Bundleable} have their state persisted/restored across process death automatically.
+ *
+ * Services that implement {@link Scoped} will receive callbacks for when their scope is created, and their scope is destroyed.
+ *
+ * NOTE: Think of it as configuration: it is kept across configuration change, so it should not reference the Activity directly.
+ */
 public interface ScopedServices {
     /**
      * When a service implements Scoped, then it will receive a callback when the service is registered/unregistered from the scope.
@@ -114,5 +127,5 @@ public interface ScopedServices {
         }
     }
 
-    void bindServices(ServiceBinder serviceBinder);
+    void bindServices(@NonNull ServiceBinder serviceBinder);
 }
