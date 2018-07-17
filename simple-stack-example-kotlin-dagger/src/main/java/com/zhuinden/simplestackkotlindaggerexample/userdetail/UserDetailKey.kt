@@ -12,5 +12,5 @@ data class UserDetailKey(
 
     constructor(userRO: UserRO) : this("UserDetailKey", userRO)
 
-    override fun createFragment() = UserDetailFragment.newInstance(userRO)
+    override fun createFragment() = UserDetailFragment()
 }
