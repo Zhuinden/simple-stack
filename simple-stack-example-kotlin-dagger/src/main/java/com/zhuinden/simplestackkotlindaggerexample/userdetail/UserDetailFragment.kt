@@ -46,7 +46,7 @@ class UserDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         val userRO = userRO
         userName.text = userRO.userName
-        userPhoneNumber.text = userRO.userPhoneNumber + " (" + userRO.userPhoneNumberType + ")"
+        userPhoneNumber.text = "${userRO.userPhoneNumber} (${userRO.userPhoneNumberType})"
         userEmail.text = userRO.userEmail
     }
 

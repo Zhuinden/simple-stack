@@ -50,8 +50,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
     implementation 'com.google.dagger:dagger:2.14.1'
     implementation 'com.android.support:support-v4:27.1.1'
-    kapt 'com.google.dagger:dagger-compiler:2.13'
-    implementation 'com.github.Zhuinden:simple-stack:1.11.0'
+    kapt 'com.google.dagger:dagger-compiler:2.14.1'
+    implementation project(path: ':simple-stack')
 
     implementation('com.squareup.retrofit2:retrofit:2.4.0') {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import
@@ -66,5 +66,5 @@ dependencies {
     implementation 'org.jetbrains.anko:anko-sdk15-listeners:0.10.5'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
-    implementation 'io.realm:android-adapters:2.1.1'
+    implementation 'io.realm:android-adapters:3.0.0'
 }

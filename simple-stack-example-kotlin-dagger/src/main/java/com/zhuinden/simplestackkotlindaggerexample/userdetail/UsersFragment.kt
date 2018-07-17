@@ -43,7 +43,6 @@ class UsersFragment : BaseFragment() {
     private lateinit var usersAdapter: UsersAdapter
     private var indexOfContentView: Int = 0
     private var indexOfLoadingView: Int = 0
-    private lateinit var items: RealmResults<UserRO>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -56,8 +55,7 @@ class UsersFragment : BaseFragment() {
         indexOfContentView = viewAnimator.indexOfChild(contentView)
         indexOfLoadingView = viewAnimator.indexOfChild(loadingView)
         realm = Realm.getDefaultInstance()
-        items = realm.where<UserRO>().sort("userName", Sort.ASCENDING).findAll()
-        usersAdapter = UsersAdapter(items)
+        usersAdapter = UsersAdapter(realm.where<UserRO>().findAllAsync())
         usersSearchView.textChangedListener {
             afterTextChanged {
                 usersAdapter.updateData(
@@ -77,13 +75,9 @@ class UsersFragment : BaseFragment() {
             .getAllUsers()
             .retry()
             .subscribeOn(schedulerProvider.io())
-            .doOnNext {
+            .doOnNext { users ->
+                val userROs = users.result.map { user -> UserRO.createFromUser(user) }
                 println("Thread doOnNext: %s" + Thread.currentThread().name)
-                val userROs: MutableList<UserRO> = ArrayList()
-                for (user in it.result) {
-                    val userRO: UserRO = UserRO.createFromUser(user)
-                    userROs.add(userRO)
-                }
                 Realm.getDefaultInstance().use { realmInstance ->
                     realmInstance.executeTransaction {
                         realmInstance.insertOrUpdate(userROs)
@@ -105,8 +99,12 @@ class UsersFragment : BaseFragment() {
             )
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
+        super.onDestroyView()
         realm.close()
+    }
+
+    override fun onDestroy() {
         compositeDisposable.clearIfNotDisposed()
         super.onDestroy()
     }
