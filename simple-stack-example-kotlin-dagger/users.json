@@ -1,0 +1,33 @@
+{
+    "success": true,
+    "result":[
+        {
+            "id": 1,
+            "name": "test 1",
+            "email": "test1@example.com",
+            "phoneNumber": {
+                "number": "111111",
+                "type": "landline"
+            }
+        },
+        {
+            "id": 2,
+            "name": "estt 2",
+            "email": "test2@example.com",
+            "phoneNumber": {
+                "number": "0222222222",
+                "type": "mobile"
+            }
+        },
+        {
+            "id": 3,
+            "name": "sett 3",
+            "email": "test3@example.com",
+            "phoneNumber": {
+                "number": "00000",
+                "type": "government"
+            }
+        }
+    ] 
+    
+}
