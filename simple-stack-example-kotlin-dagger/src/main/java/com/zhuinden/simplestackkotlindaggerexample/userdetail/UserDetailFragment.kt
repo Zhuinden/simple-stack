@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.zhuinden.simplestackkotlindaggerexample.BaseFragment
 import com.zhuinden.simplestackkotlindaggerexample.R
 import com.zhuinden.simplestackkotlindaggerexample.realmobjects.UserRO
-import com.zhuinden.simplestackkotlindaggerexample.requireArguments
 import kotlinx.android.synthetic.main.fragment_user_detail.userEmail
 import kotlinx.android.synthetic.main.fragment_user_detail.userName
 import kotlinx.android.synthetic.main.fragment_user_detail.userPhoneNumber
@@ -17,22 +16,9 @@ class UserDetailFragment : BaseFragment() {
 
     private lateinit var userRO: UserRO
 
-    companion object {
-        private const val ARG_USER_RO = "userRO"
-        @JvmStatic
-        fun newInstance(userRO: UserRO) =
-            UserDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(ARG_USER_RO, userRO)
-                }
-            }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireArguments.let {
-            userRO = it.getParcelable(ARG_USER_RO)
-        }
+        userRO = getKey<UserDetailKey>().userRO
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
