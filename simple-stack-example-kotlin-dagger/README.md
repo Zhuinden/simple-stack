@@ -1,4 +1,4 @@
-# Simple example of master detail using fragments with simple-stack
+# Simple example of using fragments with simple-stack
 
 ## Run local host backend to server sample `users.json`
 
@@ -8,3 +8,4 @@
 
 * Simple realm implementation.
 * Simple dagger implementation.
+* Using Kotlin-
