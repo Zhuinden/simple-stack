@@ -6,25 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout.VERTICAL
-import com.zhuinden.simplestackkotlindaggerexample.AndroidApp
-import com.zhuinden.simplestackkotlindaggerexample.ApiService
-import com.zhuinden.simplestackkotlindaggerexample.BaseFragment
-import com.zhuinden.simplestackkotlindaggerexample.R
-import com.zhuinden.simplestackkotlindaggerexample.clearIfNotDisposed
+import com.zhuinden.simplestackkotlindaggerexample.*
 import com.zhuinden.simplestackkotlindaggerexample.realmobjects.UserRO
 import com.zhuinden.simplestackkotlindaggerexample.schedulers.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
-import io.realm.RealmResults
-import io.realm.Sort
 import io.realm.kotlin.where
-import kotlinx.android.synthetic.main.fragment_users.contactsView
-import kotlinx.android.synthetic.main.fragment_users.contentView
-import kotlinx.android.synthetic.main.fragment_users.usersSearchView
-import kotlinx.android.synthetic.main.fragment_users.viewAnimator
-import kotlinx.android.synthetic.main.view_loading.loadingView
+import kotlinx.android.synthetic.main.fragment_users.*
+import kotlinx.android.synthetic.main.view_loading.*
 import org.jetbrains.anko.sdk15.listeners.textChangedListener
 import javax.inject.Inject
 
@@ -100,13 +91,8 @@ class UsersFragment : BaseFragment() {
     }
 
     override fun onDestroyView() {
+        compositeDisposable.clearIfNotDisposed()
         super.onDestroyView()
         realm.close()
     }
-
-    override fun onDestroy() {
-        compositeDisposable.clearIfNotDisposed()
-        super.onDestroy()
-    }
-
 }
