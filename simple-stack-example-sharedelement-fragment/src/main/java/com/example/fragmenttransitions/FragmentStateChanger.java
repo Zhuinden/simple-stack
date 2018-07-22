@@ -53,6 +53,9 @@ public class FragmentStateChanger {
         }
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack();
+
+        fragmentTransaction.setReorderingAllowed(true); // WITHOUT THIS LINE, SHARED ELEMENT TRANSITIONS WON'T WORK.
+
         if(topNewKey instanceof HasSharedElement) {
             HasSharedElement elementKey = (HasSharedElement) topNewKey;
             if(elementKey.sharedElement() != null) {
@@ -71,8 +74,8 @@ public class FragmentStateChanger {
             if(fragment != null) {
                 if(!newState.contains(oldKey)) {
                     fragmentTransaction.remove(fragment);
-                } else if(!fragment.isDetached()) {
-                    fragmentTransaction.detach(fragment);
+                } else if(!fragment.isHidden()) {
+                    fragmentTransaction.hide(fragment);
                 }
             }
         }
@@ -80,15 +83,15 @@ public class FragmentStateChanger {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {
-                    if(fragment.isDetached()) {
-                        fragmentTransaction.attach(fragment);
+                    if(fragment.isHidden()) {
+                        fragmentTransaction.show(fragment);
                     }
                 } else {
                     fragmentTransaction.add(containerId, topNewFragment, newKey.getFragmentTag());
                 }
             } else {
-                if(fragment != null && !fragment.isDetached()) {
-                    fragmentTransaction.detach(fragment);
+                if(fragment != null && !fragment.isHidden()) {
+                    fragmentTransaction.hide(fragment);
                 }
             }
         }
