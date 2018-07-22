@@ -1,11 +1,7 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
-
 apply plugin: 'realm-android'
 
 android {
@@ -48,9 +44,9 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
-    implementation 'com.google.dagger:dagger:2.14.1'
+    implementation 'com.google.dagger:dagger:2.16'
     implementation 'com.android.support:support-v4:27.1.1'
-    kapt 'com.google.dagger:dagger-compiler:2.14.1'
+    kapt 'com.google.dagger:dagger-compiler:2.16'
     implementation project(path: ':simple-stack')
 
     implementation('com.squareup.retrofit2:retrofit:2.4.0') {
@@ -60,7 +56,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
-    implementation 'com.github.Zhuinden:simple-stack:1.11.0'
     implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
     implementation 'org.jetbrains.anko:anko-commons:0.10.5'
     implementation 'org.jetbrains.anko:anko-sdk15-listeners:0.10.5'
