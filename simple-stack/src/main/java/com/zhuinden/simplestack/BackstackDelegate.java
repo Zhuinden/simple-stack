@@ -40,6 +40,8 @@ public class BackstackDelegate {
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
 
+    private boolean activityWasDestroyed = false;
+
     /**
      * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
      *
@@ -97,20 +99,19 @@ public class BackstackDelegate {
      *
      * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
+     * @param activity the Activity to track whether it is finalized. If null, {@link BackstackDelegate#onDestroy()} will finalize scopes. Otherwise, only if the Activity is finishing.
      * @param scopedServices The {@link ScopedServices}.
      */
-    public void setScopedServices(@NonNull Activity activity, @NonNull ScopedServices scopedServices) {
-        if(activity == null) {
-            throw new IllegalArgumentException("Activity cannot be null!");
-        }
+    public void setScopedServices(@Nullable Activity activity, @NonNull ScopedServices scopedServices) {
         this.activity = activity;
 
-        if(backstackManager != null && backstackManager.getBackstack() != null) {
-            throw new IllegalStateException("If set, scoped services must set before calling `onCreate()`");
-        }
         if(scopedServices == null) {
             throw new IllegalArgumentException("Specified scoped services should not be null!");
         }
+        if(!activityWasDestroyed && (backstackManager != null && backstackManager.getBackstack() != null)) {
+            throw new IllegalStateException("If set, scoped services must set before calling `onCreate()`");
+        }
+        activityWasDestroyed = false;
         this.scopedServices = scopedServices;
     }
 
@@ -372,13 +373,18 @@ public class BackstackDelegate {
      * Forces any pending state change to execute with {@link Backstack#executePendingStateChange()}.
      *
      * Also, if {@link ScopedServices} are used, this is what destroys the remaining scopes if the Activity is finishing.
+     *
+     * NOTE: if the Activity is not set, then the scopes are finalized.
      */
     public void onDestroy() {
+        activityWasDestroyed = true;
         getBackstack().executePendingStateChange();
 
-        if(activity != null && activity.isFinishing()) {
+        //noinspection ConstantConditions
+        if(activity == null || (activity != null && activity.isFinishing())) {
             getManager().finalizeScopes();
         }
+        activity = null;
     }
 
     // ----- get backstack

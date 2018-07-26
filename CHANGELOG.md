@@ -1,5 +1,13 @@
 # Change log
 
+-Simple Stack 1.11.2 (2018-07-26)
+--------------------------------
+- UPDATE: `state-bundle` is updated to 1.2.1.
+
+- CHANGE: Allow calling `BackstackDelegate.setScopedServices(activity, scopedServices)` once after an `onDestroy()` callback (to allow setting back the Activity).
+
+- CHANGE: Allow calling `BackstackDelegate.setScopedServices(null, scopedServices)`. In this case, `onDestroy()` will finalize scopes - normally it only does that if Activity is finalizing.
+
 -Simple Stack 1.11.1 (2018-07-14)
 --------------------------------
 - API CHANGE: `backstackDelegate.setScopedServices(ScopedServices)` is now `backstackDelegate.setScopedServices(Activity, ScopedServices)`.
