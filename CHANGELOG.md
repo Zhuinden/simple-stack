@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 1.11.3 (2018-08-10)
+-Simple Stack 1.11.4 (2018-08-10)
 --------------------------------
 - ADDED: `Navigator.isNavigatorAvailable(Activity)` to ensure the ability to check if the `BackstackHost` is added to the Activity.
 

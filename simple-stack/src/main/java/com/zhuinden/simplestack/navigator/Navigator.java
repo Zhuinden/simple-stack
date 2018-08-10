@@ -315,7 +315,7 @@ public class Navigator {
      * @throws IllegalStateException if the service doesn't exist in any scope
      */
     @NonNull
-    public <T> T lookupService(@NonNull Context context, @NonNull String serviceTag) {
+    public static <T> T lookupService(@NonNull Context context, @NonNull String serviceTag) {
         return getManager(context).lookupService(serviceTag);
     }
 
