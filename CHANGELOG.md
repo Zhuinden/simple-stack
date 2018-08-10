@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 1.11.3 (2018-08-10)
+--------------------------------
+- ADDED: `Navigator.isNavigatorAvailable(Activity)` to ensure the ability to check if the `BackstackHost` is added to the Activity.
+
+- ADDED: `BackstackManager.lookupService(serviceTag)`, `BackstackDelegate.lookupService(serviceTag), and `Navigator.lookupService(Context, serviceTag)`, which attempts to look up the service in all currently existing scopes (starting from the newest added scope).
+
 -Simple Stack 1.11.2 (2018-07-26)
 --------------------------------
 - UPDATE: `state-bundle` is updated to 1.2.1.

@@ -290,6 +290,20 @@ public class BackstackManager
     }
 
     /**
+     * Attempts to look-up the service in all currently existing scopes, starting from the last added scope.
+     * If the service is not found, an exception is thrown.
+     *
+     * @param serviceTag the tag of the service
+     * @param <T>        the type of the service
+     * @return the service
+     * @throws IllegalStateException if the service doesn't exist in any scope
+     */
+    @NonNull
+    public <T> T lookupService(@NonNull String serviceTag) {
+        return scopeManager.lookupService(serviceTag);
+    }
+
+    /**
      * Returns a {@link SavedState} instance for the given key.
      * If the state does not exist, then a new associated state is created.
      *

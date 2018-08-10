@@ -306,6 +306,20 @@ public class Navigator {
     }
 
     /**
+     * Attempts to look-up the service in all currently existing scopes, starting from the last added scope.
+     * If the service is not found, an exception is thrown.
+     *
+     * @param serviceTag the tag of the service
+     * @param <T>        the type of the service
+     * @return the service
+     * @throws IllegalStateException if the service doesn't exist in any scope
+     */
+    @NonNull
+    public <T> T lookupService(@NonNull Context context, @NonNull String serviceTag) {
+        return getManager(context).lookupService(serviceTag);
+    }
+
+    /**
      * A method to return the backstack manager, managed by the {@link BackstackHost}.
      * Typically not needed.
      *
@@ -361,6 +375,16 @@ public class Navigator {
         }
         BackstackHost backstackHost = getBackstackHost(context);
         return backstackHost.getBackstackManager().getSavedState(key);
+    }
+
+    /**
+     * Returns if the BackstackHost is properly added to the Activity.
+     *
+     * @param activity  the activity
+     * @return whether navigator is available
+     */
+    public static boolean isNavigatorAvailable(@NonNull Activity activity) {
+        return findBackstackHost(activity) != null;
     }
 
     private static BackstackHost findBackstackHost(Activity activity) {

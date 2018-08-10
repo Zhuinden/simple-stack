@@ -370,4 +370,114 @@ public class ScopingTest {
         assertThat(service.didEnterScope).isTrue();
         assertThat(service.didExitScope).isTrue();
     }
+
+    @Test
+    public void lookupServiceNoOverlapsWorks() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+        final Service service = new Service();
+        TestKeyWithScope beep = new TestKeyWithScope("beep") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(SERVICE_TAG, service);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        TestKeyWithScope boop = new TestKeyWithScope("boop") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "boop";
+            }
+        };
+
+        backstackManager.setup(History.of(beep, boop));
+
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
+        backstackManager.setStateChanger(stateChanger);
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
+        backstackManager.getBackstack().goBack();
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
+        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
+        try {
+            backstackManager.lookupService(SERVICE_TAG);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            assertThat(e.getMessage()).contains("does not exist in any scope");
+            // OK!
+        }
+    }
+
+    @Test
+    public void lookupServiceWithOverlapsWorks() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+        final Service service1 = new Service();
+        final Service service2 = new Service();
+        TestKeyWithScope beep = new TestKeyWithScope("beep") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(SERVICE_TAG, service1);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        TestKeyWithScope boop = new TestKeyWithScope("boop") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(SERVICE_TAG, service2);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "boop";
+            }
+        };
+
+        backstackManager.setup(History.of(beep, boop));
+
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
+        backstackManager.setStateChanger(stateChanger);
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isTrue();
+        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service2);
+        backstackManager.getBackstack().goBack();
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service1);
+        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
+        try {
+            backstackManager.lookupService(SERVICE_TAG);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            assertThat(e.getMessage()).contains("does not exist in any scope");
+            // OK!
+        }
+    }
 }

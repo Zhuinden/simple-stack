@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.zhuinden.statebundle.StateBundle;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -158,10 +160,22 @@ class ScopeManager {
 
         Map<String, Object> services = scopes.get(scopeTag);
         if(!services.containsKey(serviceTag)) {
-            throw new IllegalArgumentException("The specified service with tag [" + serviceTag + "] does not exist in scope [" + scopeTag + "]!");
+            throw new IllegalArgumentException("The specified service with tag [" + serviceTag + "] does not exist in scope [" + scopeTag + "]! Did you accidentally try to use the same scope tag with different services?");
         }
         //noinspection unchecked
         return (T) services.get(serviceTag);
+    }
+
+    @NonNull
+    <T> T lookupService(String serviceTag) {
+        List<String> activeScopes = new ArrayList<>(scopes.keySet());
+        Collections.reverse(activeScopes);
+        for(String scopeTag : activeScopes) {
+            if(hasService(scopeTag, serviceTag)) {
+                return getService(scopeTag, serviceTag);
+            }
+        }
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes!");
     }
 
     private void checkScopeExists(String scopeTag) {
