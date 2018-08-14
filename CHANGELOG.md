@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 1.11.5 (2018-08-14)
+-Simple Stack 1.11.6 (2018-08-14)
 --------------------------------
 - ADDED: `Navigator.hasScope(scopeTag)`, `BackstackDelegate.hasScope(scopeTag)`, `BackstackManager.hasScope(scopeTag)`.
 
@@ -8,7 +8,7 @@
 
 - ADDED: `ServiceBinder.lookup()` and `ServiceBinder.canFind()` to inherit from currently existing scopes while creating service binding.
 
-- CHANGE: `onExitScope(scopeTag)` is now ensured to happen in reverse order compared to `onEnterScope(scopeTag)`.
+- CHANGE: `onExitScope(scopeTag)` is now ensured to happen in reverse order compared to `onEnterScope(scopeTag)` (both in terms of scope creation order and service binding order).
 
 -Simple Stack 1.11.4 (2018-08-10)
 --------------------------------

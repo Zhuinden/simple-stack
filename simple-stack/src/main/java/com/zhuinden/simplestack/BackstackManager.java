@@ -234,7 +234,9 @@ public class BackstackManager
                 scopeSet.add(((ScopeKey) key).getScopeTag());
             }
         }
-        for(String scope : scopeSet) {
+        List<String> scopes = new ArrayList<>(scopeSet);
+        Collections.reverse(scopes);
+        for(String scope : scopes) {
             scopeManager.destroyScope(scope);
         }
     }

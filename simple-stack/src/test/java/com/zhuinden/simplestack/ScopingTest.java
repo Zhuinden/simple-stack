@@ -716,7 +716,62 @@ public class ScopingTest {
 
         assertThat(enteredScope).containsExactly(service1, service2);
         assertThat(exitedScope).containsExactly(service2, service1);
+    }
+
+    @Test
+    public void serviceCreationAndDestructionHappensInForwardAndReverseOrder() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final List<Object> enteredScope = new ArrayList<>();
+        final List<Object> exitedScope = new ArrayList<>();
+
+        class MyService implements ScopedServices.Scoped {
+            @Override
+            public void onEnterScope(@NonNull String scope) {
+                enteredScope.add(this);
+            }
+
+            @Override
+            public void onExitScope(@NonNull String scope) {
+                exitedScope.add(this);
+            }
+        }
+
+        final MyService service1 = new MyService();
+        final MyService service2 = new MyService();
 
 
+        TestKeyWithScope beep = new TestKeyWithScope("beep") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+
+                serviceBinder.add("SERVICE1", service1);
+                serviceBinder.add("SERVICE2", service2);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        TestKey bye = new TestKey("bye");
+
+        backstackManager.setup(History.of(beep));
+
+        assertThat(enteredScope).isEmpty();
+        assertThat(exitedScope).isEmpty();
+        backstackManager.setStateChanger(stateChanger);
+
+        assertThat(enteredScope).containsExactly(service1, service2);
+        assertThat(exitedScope).isEmpty();
+
+        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+
+        assertThat(enteredScope).containsExactly(service1, service2);
+        assertThat(exitedScope).containsExactly(service2, service1);
     }
 }

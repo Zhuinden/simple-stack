@@ -89,7 +89,9 @@ class ScopeManager {
         for(String activeScope: scopeSet) {
             if(!currentScopes.contains(activeScope)) {
                 Map<String, Object> scope = scopes.get(activeScope);
-                for(Object service : scope.values()) {
+                List<Object> services = new ArrayList<>(scope.values());
+                Collections.reverse(services);
+                for(Object service : services) {
                     if(service instanceof ScopedServices.Scoped) {
                         ((ScopedServices.Scoped) service).onExitScope(activeScope);
                     }
@@ -102,8 +104,10 @@ class ScopeManager {
 
     void destroyScope(String scopeTag) {
         if(scopes.containsKey(scopeTag)) {
-            Map<String, Object> services = scopes.remove(scopeTag);
-            for(Object service : services.values()) {
+            Map<String, Object> serviceMap = scopes.remove(scopeTag);
+            List<Object> services = new ArrayList<>(serviceMap.values());
+            Collections.reverse(services);
+            for(Object service : services) {
                 if(service instanceof ScopedServices.Scoped) {
                     ((ScopedServices.Scoped) service).onExitScope(scopeTag);
                 }
