@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 1.11.5 (2018-08-14)
+--------------------------------
+- ADDED: `Navigator.hasScope(scopeTag)`, `BackstackDelegate.hasScope(scopeTag)`, `BackstackManager.hasScope(scopeTag)`.
+
+- ADDED: `Navigator.canFindService(Context, serviceTag)`, `BackstackDelegate.canFindService(serviceTag)`, `BackstackManager.canFindService(serviceTag)` to check if `lookup` can find the service.
+
+- ADDED: `ServiceBinder.lookup()` and `ServiceBinder.canFind()` to inherit from currently existing scopes while creating service binding.
+
+- CHANGE: `onExitScope(scopeTag)` is now ensured to happen in reverse order compared to `onEnterScope(scopeTag)`.
+
 -Simple Stack 1.11.4 (2018-08-10)
 --------------------------------
 - ADDED: `Navigator.isNavigatorAvailable(Activity)` to ensure the ability to check if the `BackstackHost` is added to the Activity.

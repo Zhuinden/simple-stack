@@ -290,6 +290,29 @@ public class BackstackManager
     }
 
     /**
+     * Returns if a given scope exists.
+     *
+     * @param scopeTag   the scope tag
+     *
+     * @return whether the scope exists
+     */
+    public boolean hasScope(@NonNull String scopeTag) {
+        return scopeManager.hasScope(scopeTag);
+    }
+
+    /**
+     * Attempts to look-up the service in all currently existing scopes, starting from the last added scope.
+     * Returns whether the service exists in any scopes.
+     *
+     * @param serviceTag the tag of the service
+     * @return whether the service exists in any active scopes
+     * @throws IllegalStateException if the service doesn't exist in any scope
+     */
+    public boolean canFindService(@NonNull String serviceTag) {
+        return scopeManager.canFindService(serviceTag);
+    }
+
+    /**
      * Attempts to look-up the service in all currently existing scopes, starting from the last added scope.
      * If the service is not found, an exception is thrown.
      *

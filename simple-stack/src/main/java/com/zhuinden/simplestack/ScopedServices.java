@@ -43,11 +43,15 @@ public interface ScopedServices {
      * Please note that the service binder is only called when the scope is created, but not called if the scope already exists.
      */
     public static class ServiceBinder {
+        private final ScopeManager scopeManager;
+
         private final Object key;
         private final String scopeTag;
         private final Map<String, Object> scope;
 
-        ServiceBinder(Object key, String scopeTag, Map<String, Object> scope) {
+        ServiceBinder(ScopeManager scopeManager, Object key, String scopeTag, Map<String, Object> scope) {
+            this.scopeManager = scopeManager;
+
             this.key = key;
             this.scopeTag = scopeTag;
             this.scope = scope;
@@ -94,7 +98,7 @@ public interface ScopedServices {
         }
 
         /**
-         * Returns whether the service with given service tag is in the scope.
+         * Returns whether the service with given service tag is in the local scope.
          *
          * @param serviceTag the service tag
          * @return if the service is in the scope
@@ -107,7 +111,7 @@ public interface ScopedServices {
         }
 
         /**
-         * Retrieves the service from the scope if it exists.
+         * Retrieves the service from the local scope if it exists.
          *
          * @param serviceTag the service tag
          * @param <T>        the type of the service
@@ -124,6 +128,29 @@ public interface ScopedServices {
             }
             //noinspection unchecked
             return (T) scope.get(serviceTag);
+        }
+
+        /**
+         * Returns whether the service can be found within the currently existing active scopes.
+         *
+         * @param serviceTag the service tag
+         * @return if the service exists in active scopes
+         */
+        public boolean canFind(@NonNull String serviceTag) {
+            return scopeManager.canFindService(serviceTag);
+        }
+
+        /**
+         * Retrieves the service from the active scopes if it exists.
+         *
+         * @param serviceTag the service tag
+         * @param <T>        the type of the service
+         * @return the service
+         * @throws IllegalArgumentException if the service is not in the scope
+         */
+        @NonNull
+        public <T> T lookup(@NonNull String serviceTag) {
+            return scopeManager.lookupService(serviceTag);
         }
     }
 

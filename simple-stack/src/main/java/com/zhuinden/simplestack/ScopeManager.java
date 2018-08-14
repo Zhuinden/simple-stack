@@ -6,7 +6,6 @@ import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,6 +31,12 @@ class ScopeManager {
 
     private final StateBundle rootBundle = new StateBundle();
 
+    private List<String> getActiveScopesReverse() {
+        List<String> activeScopes = new ArrayList<>(scopes.keySet());
+        Collections.reverse(activeScopes);
+        return activeScopes;
+    }
+
     void setScopedServices(ScopedServices scopedServices) {
         this.scopedServices = scopedServices;
     }
@@ -49,7 +54,7 @@ class ScopeManager {
                     Map<String, Object> scope = new LinkedHashMap<>();
                     scopes.put(scopeTag, scope);
 
-                    scopedServices.bindServices(new ScopedServices.ServiceBinder(key, scopeTag, scope));
+                    scopedServices.bindServices(new ScopedServices.ServiceBinder(this, key, scopeTag, scope));
 
                     for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
                         String serviceTag = serviceEntry.getKey();
@@ -79,19 +84,18 @@ class ScopeManager {
                 currentScopes.add(scopeKey.getScopeTag());
             }
         }
-        Iterator<Map.Entry<String, Map<String, Object>>> scopeSet = scopes.entrySet().iterator();
-        while(scopeSet.hasNext()) {
-            Map.Entry<String, Map<String, Object>> entry = scopeSet.next();
-            String scope = entry.getKey();
-            Map<String, Object> services = entry.getValue();
-            if(!currentScopes.contains(scope)) {
-                for(Object service : services.values()) {
+
+        List<String> scopeSet = getActiveScopesReverse();
+        for(String activeScope: scopeSet) {
+            if(!currentScopes.contains(activeScope)) {
+                Map<String, Object> scope = scopes.get(activeScope);
+                for(Object service : scope.values()) {
                     if(service instanceof ScopedServices.Scoped) {
-                        ((ScopedServices.Scoped) service).onExitScope(scope);
+                        ((ScopedServices.Scoped) service).onExitScope(activeScope);
                     }
                 }
-                scopeSet.remove();
-                rootBundle.remove(scope);
+                scopes.remove(activeScope);
+                rootBundle.remove(activeScope);
             }
         }
     }
@@ -156,7 +160,10 @@ class ScopeManager {
         if(serviceTag == null) {
             throw new IllegalArgumentException("Service tag cannot be null!");
         }
-        checkScopeExists(scopeTag);
+
+        if(!scopes.containsKey(scopeTag)) {
+            throw new IllegalArgumentException("The specified scope with tag [" + scopeTag + "] does not exist!");
+        }
 
         Map<String, Object> services = scopes.get(scopeTag);
         if(!services.containsKey(serviceTag)) {
@@ -166,21 +173,37 @@ class ScopeManager {
         return (T) services.get(serviceTag);
     }
 
+    boolean hasScope(@NonNull String scopeTag) {
+        if(scopeTag == null) {
+            throw new IllegalArgumentException("Scope tag cannot be null!");
+        }
+        return scopes.containsKey(scopeTag);
+    }
+
+    boolean canFindService(@NonNull String serviceTag) {
+        if(serviceTag == null) {
+            throw new IllegalArgumentException("Service tag cannot be null!");
+        }
+        List<String> activeScopes = getActiveScopesReverse();
+        for(String scopeTag : activeScopes) {
+            if(hasService(scopeTag, serviceTag)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @NonNull
-    <T> T lookupService(String serviceTag) {
-        List<String> activeScopes = new ArrayList<>(scopes.keySet());
-        Collections.reverse(activeScopes);
+    <T> T lookupService(@NonNull String serviceTag) {
+        if(serviceTag == null) {
+            throw new IllegalArgumentException("Service tag cannot be null!");
+        }
+        List<String> activeScopes = getActiveScopesReverse();
         for(String scopeTag : activeScopes) {
             if(hasService(scopeTag, serviceTag)) {
                 return getService(scopeTag, serviceTag);
             }
         }
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes!");
-    }
-
-    private void checkScopeExists(String scopeTag) {
-        if(!scopes.containsKey(scopeTag)) {
-            throw new IllegalArgumentException("The specified scope with tag [" + scopeTag + "] does not exist!");
-        }
     }
 }

@@ -281,6 +281,18 @@ public class Navigator {
         return getBackstack(context).goBack();
     }
 
+
+    /**
+     * Returns if a given scope exists.
+     *
+     * @param scopeTag   the scope tag
+     *
+     * @return whether the scope exists
+     */
+    public static boolean hasScope(@NonNull Context context, @NonNull String scopeTag) {
+        return getManager(context).hasScope(scopeTag);
+    }
+
     /**
      * Returns if a service is bound to the scope of the {@link ScopeKey} by the provided tag.
      *
@@ -303,6 +315,18 @@ public class Navigator {
     @NonNull
     public static <T> T getService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
         return getManager(context).getService(scopeKey, serviceTag);
+    }
+
+    /**
+     * Attempts to look-up the service in all currently existing scopes, starting from the last added scope.
+     * Returns whether the service exists in any scopes.
+     *
+     * @param serviceTag the tag of the service
+     * @return whether the service exists in any active scopes
+     * @throws IllegalStateException if the service doesn't exist in any scope
+     */
+    public static boolean canFindService(@NonNull Context context, @NonNull String serviceTag) {
+        return getManager(context).canFindService(serviceTag);
     }
 
     /**
