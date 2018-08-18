@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -773,5 +774,45 @@ public class ScopingTest {
 
         assertThat(enteredScope).containsExactly(service1, service2);
         assertThat(exitedScope).containsExactly(service2, service1);
+    }
+
+    @Test
+    public void scopedServicesCanRetrieveBackstackFromServiceBinder() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final AtomicReference<Backstack> backstack = new AtomicReference<>();
+
+        class MyService implements ScopedServices.Scoped {
+            @Override
+            public void onEnterScope(@NonNull String scope) {
+            }
+
+            @Override
+            public void onExitScope(@NonNull String scope) {
+            }
+        }
+
+        final MyService service1 = new MyService();
+
+        TestKeyWithScope beep = new TestKeyWithScope("beep") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+
+                serviceBinder.add("SERVICE1", service1);
+                backstack.set(serviceBinder.getBackstack());
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        backstackManager.setup(History.of(beep));
+        backstackManager.setStateChanger(stateChanger);
+        assertThat(backstackManager.getBackstack()).isSameAs(backstack.get());
     }
 }

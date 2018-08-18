@@ -1,5 +1,9 @@
 # Change log
 
+-Simple Stack 1.11.7 (2018-08-18)
+--------------------------------
+- ADDED: `ServiceBinder.getBackstack()` method. This allows scoped services to be given the backstack as constructor argument.
+
 -Simple Stack 1.11.6 (2018-08-14)
 --------------------------------
 - ADDED: `Navigator.hasScope(scopeTag)`, `BackstackDelegate.hasScope(scopeTag)`, `BackstackManager.hasScope(scopeTag)`.

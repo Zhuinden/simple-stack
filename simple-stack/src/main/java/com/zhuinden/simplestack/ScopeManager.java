@@ -27,6 +27,16 @@ class ScopeManager {
     ScopeManager() {
     }
 
+    private BackstackManager backstackManager;
+
+    void setBackstackManager(BackstackManager backstackManager) {
+        this.backstackManager = backstackManager;
+    }
+
+    public Backstack getBackstack() {
+        return backstackManager.getBackstack();
+    }
+
     private final Map<String, Map<String, Object>> scopes = new LinkedHashMap<>();
 
     private final StateBundle rootBundle = new StateBundle();

@@ -68,7 +68,7 @@ In order to use Simple Stack, you need to add jitpack to your project root gradl
 
 and add the compile dependency to your module level gradle.
 
-    compile 'com.github.Zhuinden:simple-stack:1.11.6'
+    compile 'com.github.Zhuinden:simple-stack:1.11.7'
 
 ## How does it work?
 

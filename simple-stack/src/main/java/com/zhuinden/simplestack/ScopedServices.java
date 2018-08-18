@@ -146,11 +146,21 @@ public interface ScopedServices {
          * @param serviceTag the service tag
          * @param <T>        the type of the service
          * @return the service
-         * @throws IllegalArgumentException if the service is not in the scope
+         * @throws IllegalArgumentException if the service is not found in any active scopes
          */
         @NonNull
         public <T> T lookup(@NonNull String serviceTag) {
             return scopeManager.lookupService(serviceTag);
+        }
+
+        /**
+         * Returns the {@link Backstack} that belongs to the {@link BackstackManager} that manages the scopes.
+         *
+         * @return the backstack
+         */
+        @NonNull
+        public Backstack getBackstack() {
+            return scopeManager.getBackstack();
         }
     }
 
