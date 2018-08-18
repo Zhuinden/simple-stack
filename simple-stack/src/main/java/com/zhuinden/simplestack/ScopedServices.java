@@ -25,16 +25,14 @@ public interface ScopedServices {
         /**
          * Called when the object is added to the scope.
          *
-         * @param scope the tag of the scope
+         * @param scopeNode the scope node
          */
-        void onEnterScope(@NonNull String scope);
+        void onEnterScope(@NonNull ScopeNode scopeNode);
 
         /**
          * Called when the scope is destroyed, and therefore the object is no longer in the scope.
-         *
-         * @param scope the tag of the scope
          */
-        void onExitScope(@NonNull String scope);
+        void onExitScope();
     }
 
     /**
@@ -42,41 +40,9 @@ public interface ScopedServices {
      *
      * Please note that the service binder is only called when the scope is created, but not called if the scope already exists.
      */
-    public static class ServiceBinder {
-        private final ScopeManager scopeManager;
-
-        private final Object key;
-        private final String scopeTag;
-        private final Map<String, Object> scope;
-
+    public static class ServiceBinder extends ScopeNode {
         ServiceBinder(ScopeManager scopeManager, Object key, String scopeTag, Map<String, Object> scope) {
-            this.scopeManager = scopeManager;
-
-            this.key = key;
-            this.scopeTag = scopeTag;
-            this.scope = scope;
-        }
-
-        /**
-         * Returns the key that this service binder was created for.
-         *
-         * @param <T> the type of the key
-         * @return the key
-         */
-        @NonNull
-        public <T> T getKey() {
-            //noinspection unchecked
-            return (T) key;
-        }
-
-        /**
-         * Returns the scope tag this service binder belongs to.
-         *
-         * @return the scope tag
-         */
-        @NonNull
-        public final String getScopeTag() {
-            return scopeTag;
+            super(scopeManager, key, scopeTag, scope);
         }
 
         /**
@@ -85,7 +51,7 @@ public interface ScopedServices {
          * @param serviceTag the tag of the service
          * @param service    the service
          */
-        public void add(@NonNull String serviceTag, @NonNull Object service) {
+        public void addService(@NonNull String serviceTag, @NonNull Object service) {
             //noinspection ConstantConditions
             if(service == null) {
                 throw new IllegalArgumentException("Service tag cannot be null!");
@@ -95,62 +61,6 @@ public interface ScopedServices {
                 throw new IllegalArgumentException("The provided service should not be null!");
             }
             scope.put(serviceTag, service);
-        }
-
-        /**
-         * Returns whether the service with given service tag is in the local scope.
-         *
-         * @param serviceTag the service tag
-         * @return if the service is in the scope
-         */
-        public boolean has(@NonNull String serviceTag) {
-            if(serviceTag == null) {
-                throw new IllegalArgumentException("Service tag cannot be null!");
-            }
-            return scope.containsKey(serviceTag);
-        }
-
-        /**
-         * Retrieves the service from the local scope if it exists.
-         *
-         * @param serviceTag the service tag
-         * @param <T>        the type of the service
-         * @return the service
-         * @throws IllegalArgumentException if the service is not in the scope
-         */
-        @NonNull
-        public <T> T get(@NonNull String serviceTag) {
-            if(serviceTag == null) {
-                throw new IllegalArgumentException("Service tag cannot be null!");
-            }
-            if(!has(serviceTag)) {
-                throw new IllegalArgumentException("The service with tag [" + serviceTag + "] was not found!");
-            }
-            //noinspection unchecked
-            return (T) scope.get(serviceTag);
-        }
-
-        /**
-         * Returns whether the service can be found within the currently existing active scopes.
-         *
-         * @param serviceTag the service tag
-         * @return if the service exists in active scopes
-         */
-        public boolean canFind(@NonNull String serviceTag) {
-            return scopeManager.canFindService(serviceTag);
-        }
-
-        /**
-         * Retrieves the service from the active scopes if it exists.
-         *
-         * @param serviceTag the service tag
-         * @param <T>        the type of the service
-         * @return the service
-         * @throws IllegalArgumentException if the service is not in the scope
-         */
-        @NonNull
-        public <T> T lookup(@NonNull String serviceTag) {
-            return scopeManager.lookupService(serviceTag);
         }
     }
 

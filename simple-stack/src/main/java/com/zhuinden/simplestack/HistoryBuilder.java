@@ -101,7 +101,7 @@ public class HistoryBuilder
                 throw new IllegalArgumentException("Cannot provide `null` as a key!");
             }
         }
-        return History.newBuilder().addAll(keys);
+        return History.builderFrom(keys);
     }
 
     /**
@@ -114,7 +114,7 @@ public class HistoryBuilder
     @NonNull
     @Deprecated
     public static HistoryBuilder newBuilder() {
-        return new HistoryBuilder();
+        return History.newBuilder();
     }
 
     /**
@@ -128,9 +128,7 @@ public class HistoryBuilder
     @NonNull
     @Deprecated
     public static History<Object> single(@NonNull Object key) {
-        return History.newBuilder()
-                .add(key)
-                .build();
+        return History.single(key);
     }
 
     /**

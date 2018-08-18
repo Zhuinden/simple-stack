@@ -22,9 +22,19 @@ class ScopeManager {
         }
     }
 
+    private BackstackManager backstackManager;
+
     private ScopedServices scopedServices = new AssertingScopedServices();
 
     ScopeManager() {
+    }
+
+    void setBackstackManager(BackstackManager backstackManager) { // this is a setter instead of constructor arg to avoid changing the tests.
+        this.backstackManager = backstackManager;
+    }
+
+    public Backstack getBackstack() {
+        return backstackManager.getBackstack();
     }
 
     private final Map<String, Map<String, Object>> scopes = new LinkedHashMap<>();
@@ -56,6 +66,8 @@ class ScopeManager {
 
                     scopedServices.bindServices(new ScopedServices.ServiceBinder(this, key, scopeTag, scope));
 
+                    ScopeNode scopeNode = new ScopeNode(this, key, scopeTag, scope);
+
                     for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
                         String serviceTag = serviceEntry.getKey();
                         Object service = serviceEntry.getValue();
@@ -68,7 +80,7 @@ class ScopeManager {
                             }
                         }
                         if(service instanceof ScopedServices.Scoped) {
-                            ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
+                            ((ScopedServices.Scoped) service).onEnterScope(scopeNode);
                         }
                     }
                 }
@@ -93,7 +105,7 @@ class ScopeManager {
                 Collections.reverse(services);
                 for(Object service : services) {
                     if(service instanceof ScopedServices.Scoped) {
-                        ((ScopedServices.Scoped) service).onExitScope(activeScope);
+                        ((ScopedServices.Scoped) service).onExitScope();
                     }
                 }
                 scopes.remove(activeScope);
@@ -109,7 +121,7 @@ class ScopeManager {
             Collections.reverse(services);
             for(Object service : services) {
                 if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onExitScope(scopeTag);
+                    ((ScopedServices.Scoped) service).onExitScope();
                 }
             }
             rootBundle.remove(scopeTag);

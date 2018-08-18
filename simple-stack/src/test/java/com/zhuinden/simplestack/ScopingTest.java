@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,12 +52,12 @@ public class ScopingTest {
         }
 
         @Override
-        public void onEnterScope(@NonNull String scope) {
+        public void onEnterScope(@NonNull ScopeNode scopeNode) {
             didEnterScope = true;
         }
 
         @Override
-        public void onExitScope(@NonNull String scope) {
+        public void onExitScope() {
             didExitScope = true;
         }
     }
@@ -102,7 +103,7 @@ public class ScopingTest {
 
         @Override
         public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
-            serviceBinder.add(SERVICE_TAG, services.get(SERVICE_TAG));
+            serviceBinder.addService(SERVICE_TAG, services.get(SERVICE_TAG));
         }
 
         public static final Creator<TestKeyWithScope> CREATOR = new Creator<TestKeyWithScope>() {
@@ -213,7 +214,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -304,7 +305,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -340,7 +341,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -384,7 +385,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -437,7 +438,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service1);
+                serviceBinder.addService(SERVICE_TAG, service1);
             }
 
             @NonNull
@@ -451,7 +452,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service2);
+                serviceBinder.addService(SERVICE_TAG, service2);
             }
 
             @NonNull
@@ -502,7 +503,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -549,7 +550,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service1);
+                serviceBinder.addService(SERVICE_TAG, service1);
             }
 
             @NonNull
@@ -563,7 +564,7 @@ public class ScopingTest {
             @Override
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service2);
+                serviceBinder.addService(SERVICE_TAG, service2);
             }
 
             @NonNull
@@ -602,13 +603,20 @@ public class ScopingTest {
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                assertThat(serviceBinder.has("SERVICE1")).isFalse();
-                assertThat(serviceBinder.canFind("SERVICE1")).isFalse();
-                serviceBinder.add("SERVICE1", service1);
-                assertThat(serviceBinder.has("SERVICE1")).isTrue();
-                assertThat(serviceBinder.canFind("SERVICE1")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE1")).isFalse();
+                try {
+                    serviceBinder.getService("SERVICE1");
+                    Assert.fail();
+                } catch(IllegalArgumentException e) {
+                    // OK!
+                }
+                assertThat(serviceBinder.canFindService("SERVICE1")).isFalse();
+                serviceBinder.addService("SERVICE1", service1);
+                assertThat(serviceBinder.hasService("SERVICE1")).isTrue();
+                assertThat(serviceBinder.getService("SERVICE1")).isSameAs(service1);
+                assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
 
-                assertThat(serviceBinder.lookup("SERVICE1")).isSameAs(service1);
+                assertThat(serviceBinder.lookupService("SERVICE1")).isSameAs(service1);
             }
 
             @NonNull
@@ -623,16 +631,16 @@ public class ScopingTest {
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                assertThat(serviceBinder.has("SERVICE1")).isFalse();
-                assertThat(serviceBinder.canFind("SERVICE1")).isTrue();
-                assertThat(serviceBinder.has("SERVICE2")).isFalse();
-                serviceBinder.add("SERVICE2", service2);
-                assertThat(serviceBinder.has("SERVICE1")).isFalse();
-                assertThat(serviceBinder.canFind("SERVICE1")).isTrue();
-                assertThat(serviceBinder.has("SERVICE2")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE1")).isFalse();
+                assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE2")).isFalse();
+                serviceBinder.addService("SERVICE2", service2);
+                assertThat(serviceBinder.hasService("SERVICE1")).isFalse();
+                assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE2")).isTrue();
 
-                assertThat(serviceBinder.lookup("SERVICE1")).isSameAs(service1);
-                assertThat(serviceBinder.lookup("SERVICE2")).isSameAs(service2);
+                assertThat(serviceBinder.lookupService("SERVICE1")).isSameAs(service1);
+                assertThat(serviceBinder.lookupService("SERVICE2")).isSameAs(service2);
             }
 
             @NonNull
@@ -657,12 +665,12 @@ public class ScopingTest {
 
         class MyService implements ScopedServices.Scoped {
             @Override
-            public void onEnterScope(@NonNull String scope) {
+            public void onEnterScope(@NonNull ScopeNode scopeNode) {
                 enteredScope.add(this);
             }
 
             @Override
-            public void onExitScope(@NonNull String scope) {
+            public void onExitScope() {
                 exitedScope.add(this);
             }
         }
@@ -676,7 +684,7 @@ public class ScopingTest {
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
+                serviceBinder.addService("SERVICE1", service1);
             }
 
             @NonNull
@@ -691,7 +699,7 @@ public class ScopingTest {
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE2", service2);
+                serviceBinder.addService("SERVICE2", service2);
             }
 
             @NonNull
@@ -728,12 +736,12 @@ public class ScopingTest {
 
         class MyService implements ScopedServices.Scoped {
             @Override
-            public void onEnterScope(@NonNull String scope) {
+            public void onEnterScope(@NonNull ScopeNode scopeNode) {
                 enteredScope.add(this);
             }
 
             @Override
-            public void onExitScope(@NonNull String scope) {
+            public void onExitScope() {
                 exitedScope.add(this);
             }
         }
@@ -747,8 +755,8 @@ public class ScopingTest {
             public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                serviceBinder.add("SERVICE2", service2);
+                serviceBinder.addService("SERVICE1", service1);
+                serviceBinder.addService("SERVICE2", service2);
             }
 
             @NonNull
@@ -773,5 +781,85 @@ public class ScopingTest {
 
         assertThat(enteredScope).containsExactly(service1, service2);
         assertThat(exitedScope).containsExactly(service2, service1);
+    }
+
+    @Test
+    public void scopedServicesCanRetrieveBackstackFromScopeNode() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final AtomicReference<Backstack> backstack = new AtomicReference<>();
+
+        class MyService implements ScopedServices.Scoped {
+            @Override
+            public void onEnterScope(@NonNull ScopeNode scopeNode) {
+                backstack.set(scopeNode.getBackstack());
+            }
+
+            @Override
+            public void onExitScope() {
+            }
+        }
+
+        final MyService service1 = new MyService();
+
+        TestKeyWithScope beep = new TestKeyWithScope("beep") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+
+                serviceBinder.addService("SERVICE1", service1);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        backstackManager.setup(History.of(beep));
+        backstackManager.setStateChanger(stateChanger);
+        assertThat(backstackManager.getBackstack()).isSameAs(backstack.get());
+    }
+
+    @Test
+    public void scopedServicesCanRetrieveBackstackFromServiceBinder() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final AtomicReference<Backstack> backstack = new AtomicReference<>();
+
+        class MyService implements ScopedServices.Scoped {
+            @Override
+            public void onEnterScope(@NonNull ScopeNode scopeNode) {
+            }
+
+            @Override
+            public void onExitScope() {
+            }
+        }
+
+        final MyService service1 = new MyService();
+
+        TestKeyWithScope beep = new TestKeyWithScope("beep") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+
+                serviceBinder.addService("SERVICE1", service1);
+                backstack.set(serviceBinder.getBackstack());
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        backstackManager.setup(History.of(beep));
+        backstackManager.setStateChanger(stateChanger);
+        assertThat(backstackManager.getBackstack()).isSameAs(backstack.get());
     }
 }

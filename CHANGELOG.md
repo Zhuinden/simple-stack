@@ -1,5 +1,19 @@
 # Change log
 
+-Simple Stack 1.12.0 (2018-08-18)
+--------------------------------
+- (BREAKING) CHANGE: `ServiceBinder.has()`, `ServiceBinder.get()`, `ServiceBinder.lookup()`, `ServiceBinder.canFind()` renamed to `hasService()`, `getService()`, `lookupService()`, and `canFindService()` to match the method name in other places (and also allow for nicer Kotlin extension functions).
+
+- (BREAKING) CHANGE: `ScopedServices.Scoped`'s `onEnterScope()` now receives a `ScopeNode` instead of just the scope tag.
+
+- (BREAKING) CHANGE: `ScopedServices.Scoped`'s `onExitScope()` no longer receives parameter.
+
+- ADDED: `ScopeNode` received in `onEnterScope()` has following methods: `hasService()`, `getService()`, `canFindService()`, `lookupService()`, `getScopeTag()`, `getKey()`, and also `getBackstack()`. This allows scoped services to easily obtain the Backstack to allow navigation from scoped services.
+
+- INTERNAL CHANGE: `ScopedServices.ServiceBinder` inherits its methods from `ScopeNode`, except for `addService()`.
+
+(all of these changes were necessary to improve the API of scoped services, thanks to @nhaarman for pointing it out in an indirect way)
+
 -Simple Stack 1.11.6 (2018-08-14)
 --------------------------------
 - ADDED: `Navigator.hasScope(scopeTag)`, `BackstackDelegate.hasScope(scopeTag)`, `BackstackManager.hasScope(scopeTag)`.

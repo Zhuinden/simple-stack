@@ -158,7 +158,12 @@ public class BackstackManager
     Backstack backstack;
 
     Map<Object, SavedState> keyStateMap = new HashMap<>();
+
     ScopeManager scopeManager = new ScopeManager();
+
+    /* init */ {
+        scopeManager.setBackstackManager(this);
+    }
 
     StateChanger stateChanger;
 
