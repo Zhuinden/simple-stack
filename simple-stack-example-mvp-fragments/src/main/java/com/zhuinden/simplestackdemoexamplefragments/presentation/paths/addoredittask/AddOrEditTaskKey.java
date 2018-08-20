@@ -12,6 +12,7 @@ import com.zhuinden.simplestackdemoexamplefragments.application.Key;
  * Created by Zhuinden on 2017.01.25..
  */
 
+// TODO: use @Parcelize
 @AutoValue
 public abstract class AddOrEditTaskKey
         extends BaseKey {
@@ -56,8 +57,9 @@ public abstract class AddOrEditTaskKey
     public View.OnClickListener fabClickListener(Fragment fragment) {
         return v -> {
             AddOrEditTaskFragment addOrEditTaskFragment = (AddOrEditTaskFragment) fragment;
-            addOrEditTaskFragment.saveTask();
-            addOrEditTaskFragment.navigateBack();
+            if(addOrEditTaskFragment.saveTask()) {
+                addOrEditTaskFragment.navigateBack();
+            }
         };
     }
 

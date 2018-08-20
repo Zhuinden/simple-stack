@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -43,11 +44,12 @@ public abstract class TasksKey
         return false;
     }
 
+    @NonNull
     @Override
-    public View.OnClickListener fabClickListener(Fragment fragment) {
+    public View.OnClickListener fabClickListener(@NonNull Fragment f) {
         return v -> {
-            TasksFragment coordinator = (TasksFragment) fragment;
-            coordinator.openAddNewTask();
+            TasksFragment fragment = (TasksFragment) f;
+            fragment.openAddNewTask();
         };
     }
 

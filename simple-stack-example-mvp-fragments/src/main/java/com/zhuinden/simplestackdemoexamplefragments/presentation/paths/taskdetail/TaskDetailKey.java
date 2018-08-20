@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -46,10 +47,10 @@ public abstract class TaskDetailKey
     }
 
     @Override
-    public View.OnClickListener fabClickListener(Fragment fragment) {
+    public View.OnClickListener fabClickListener(@NonNull Fragment f) {
         return v -> {
-            TaskDetailFragment coordinator = (TaskDetailFragment) fragment;
-            coordinator.editTask();
+            TaskDetailFragment fragment = (TaskDetailFragment) f;
+            fragment.editTask();
         };
     }
 

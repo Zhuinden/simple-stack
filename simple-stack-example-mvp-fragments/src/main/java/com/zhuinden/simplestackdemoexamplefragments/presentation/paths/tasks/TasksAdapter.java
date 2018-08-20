@@ -1,6 +1,7 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,13 +102,14 @@ public class TasksAdapter
         this.tasks = checkNotNull(tasks);
     }
 
+    @NonNull
     @Override
-    public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new TaskViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false), itemListener);
     }
 
     @Override
-    public void onBindViewHolder(TaskViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         final Task task = tasks.get(position);
         holder.bind(task);
     }

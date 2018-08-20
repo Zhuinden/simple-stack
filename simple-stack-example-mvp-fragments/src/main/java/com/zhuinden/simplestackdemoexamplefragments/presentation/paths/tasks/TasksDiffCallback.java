@@ -32,7 +32,7 @@ class TasksDiffCallback
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        return newTasks.get(newItemPosition).id().equals(oldTasks.get(oldItemPosition).id());
+        return newTasks.get(newItemPosition).getId().equals(oldTasks.get(oldItemPosition).getId());
     }
 
     @Override
