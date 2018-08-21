@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.path_taskdetail.*
 class TaskDetailFragment : BaseFragment<TaskDetailPresenter.ViewContract, TaskDetailPresenter>(), TaskDetailPresenter.ViewContract {
     private val taskDetailPresenter = Injector.get().taskDetailPresenter()
 
-    override fun getPresenter(): TaskDetailPresenter = taskDetailPresenter
+    override val presenter: TaskDetailPresenter = taskDetailPresenter
 
     override fun getThis(): TaskDetailPresenter.ViewContract = this
 

@@ -17,7 +17,7 @@ import org.jetbrains.anko.sdk15.listeners.textChangedListener
 class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskPresenter.ViewContract, AddOrEditTaskPresenter>(), AddOrEditTaskPresenter.ViewContract {
     private val addOrEditTaskPresenter = Injector.get().addOrEditTaskPresenter()
 
-    override fun getPresenter(): AddOrEditTaskPresenter = addOrEditTaskPresenter
+    override val presenter: AddOrEditTaskPresenter = addOrEditTaskPresenter
 
     override fun getThis(): AddOrEditTaskFragment = this
 

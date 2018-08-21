@@ -13,7 +13,7 @@ class StatisticsFragment : BaseFragment<StatisticsPresenter.ViewContract, Statis
     private val myResources = Injector.get().resources()
     private val statisticsPresenter = Injector.get().statisticsPresenter()
 
-    override fun getPresenter(): StatisticsPresenter = statisticsPresenter
+    override val presenter: StatisticsPresenter = statisticsPresenter
     override fun getThis(): StatisticsFragment = this
 
     fun setProgressIndicator(active: Boolean) {

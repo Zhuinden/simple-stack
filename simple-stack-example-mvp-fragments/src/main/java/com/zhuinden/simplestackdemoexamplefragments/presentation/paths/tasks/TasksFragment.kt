@@ -54,11 +54,11 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
 
     class SavedSuccessfullyMessage
 
-    override fun getPresenter(): TasksPresenter = tasksPresenter
+    override val presenter: TasksPresenter = tasksPresenter
 
     override fun getThis(): TasksFragment = this
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         super.onCreateView(inflater, container, savedInstanceState).also {
             tasksAdapter = TasksAdapter(ArrayList(0), taskItemListener)
         }
