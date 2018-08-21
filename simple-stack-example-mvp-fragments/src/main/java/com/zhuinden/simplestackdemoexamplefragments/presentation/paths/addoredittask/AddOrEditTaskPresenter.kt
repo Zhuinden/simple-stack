@@ -103,11 +103,14 @@ class AddOrEditTaskPresenter @Inject constructor(
     fun navigateBack() {
         view!!.hideKeyboard()
         val addOrEditTaskKey = view!!.getKey<AddOrEditTaskKey>()
-        if (addOrEditTaskKey.parent is TasksKey) { // TODO: this should be determined based on active scope.
-            messageQueue.pushMessageTo(addOrEditTaskKey.parent, TasksFragment.SavedSuccessfullyMessage())
-            backstack.goBack()
-        } else {
-            backstack.jumpToRoot(StateChange.BACKWARD)
+        when(addOrEditTaskKey) {
+            is AddOrEditTaskKey.AddTaskKey -> {
+                messageQueue.pushMessageTo(backstack.root<TasksKey>()!!, TasksFragment.SavedSuccessfullyMessage())
+                backstack.goBack()
+            }
+            is AddOrEditTaskKey.EditTaskKey -> {
+                backstack.jumpToRoot(StateChange.BACKWARD)
+            }
         }
     }
 }

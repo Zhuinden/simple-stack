@@ -10,9 +10,14 @@ import kotlinx.android.parcel.Parcelize
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
-@Parcelize
-data class AddOrEditTaskKey(val parent: Key, val taskId: String = "") : BaseKey() {
+sealed class AddOrEditTaskKey(val parent: Key, val taskId: String = "") : BaseKey() {
     constructor(parent: Key) : this(parent, "")
+
+    @Parcelize
+    data class AddTaskKey(val parentKey: Key): AddOrEditTaskKey(parentKey)
+
+    @Parcelize
+    data class EditTaskKey(val parentKey: Key, val taskID: String): AddOrEditTaskKey(parentKey, taskID)
 
     override fun layout(): Int = R.layout.path_addoredittask
 

@@ -2,7 +2,6 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdeta
 
 import android.annotation.SuppressLint
 import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestackdemoexamplefragments.application.Key
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskKey
@@ -59,7 +58,7 @@ class TaskDetailPresenter @Inject constructor(
             view?.showMissingTask()
             return
         }
-        backstack.goTo(AddOrEditTaskKey(view!!.getKey<Key>(), taskId))
+        backstack.goTo(AddOrEditTaskKey.EditTaskKey(view!!.getKey(), taskId))
     }
 
     fun completeTask(task: Task) {
