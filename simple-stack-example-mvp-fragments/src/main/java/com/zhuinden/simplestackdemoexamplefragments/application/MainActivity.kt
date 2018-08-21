@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         backstackDelegate.setScopedServices(this, ServiceProvider())
         backstackDelegate.onCreate(savedInstanceState, //
             lastCustomNonConfigurationInstance, //
-            History.single(TasksKey.create()))
+            History.single(TasksKey()))
 
         backstackDelegate.registerForLifecycleCallbacks(this)
 

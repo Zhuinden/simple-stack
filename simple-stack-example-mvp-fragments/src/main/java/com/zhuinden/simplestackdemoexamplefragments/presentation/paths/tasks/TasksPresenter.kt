@@ -62,11 +62,11 @@ class TasksPresenter @Inject constructor(
     fun openAddNewTask() {
         val tasksFragment = view
         val parentKey = tasksFragment!!.getKey<Key>()
-        backstack.goTo(AddOrEditTaskKey.create(parentKey))
+        backstack.goTo(AddOrEditTaskKey(parentKey))
     }
 
     fun openTaskDetails(task: Task) {
-        backstack.goTo(TaskDetailKey.create(task.id))
+        backstack.goTo(TaskDetailKey(task.id))
     }
 
     fun completeTask(task: Task) {

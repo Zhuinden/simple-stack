@@ -50,10 +50,10 @@ class AddOrEditTaskPresenter @Inject constructor(
     @SuppressLint("CheckResult")
     override fun onAttach(view: ViewContract) {
         val addOrEditTaskKey: AddOrEditTaskKey = view.getKey()
-        taskId = addOrEditTaskKey.taskId()
+        taskId = addOrEditTaskKey.taskId
 
         if (!taskId.isNullOrEmpty()) {
-            taskRepository.findTask(addOrEditTaskKey.taskId())
+            taskRepository.findTask(addOrEditTaskKey.taskId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { taskOptional ->
                     val task = taskOptional.takeIf { it.isPresent }?.get() ?: return@subscribe
@@ -103,8 +103,8 @@ class AddOrEditTaskPresenter @Inject constructor(
     fun navigateBack() {
         view!!.hideKeyboard()
         val addOrEditTaskKey = view!!.getKey<AddOrEditTaskKey>()
-        if (addOrEditTaskKey.parent() is TasksKey) {
-            messageQueue.pushMessageTo(addOrEditTaskKey.parent(), TasksFragment.SavedSuccessfullyMessage())
+        if (addOrEditTaskKey.parent is TasksKey) { // TODO: this should be determined based on active scope.
+            messageQueue.pushMessageTo(addOrEditTaskKey.parent, TasksFragment.SavedSuccessfullyMessage())
             backstack.goBack()
         } else {
             backstack.jumpToRoot(StateChange.BACKWARD)

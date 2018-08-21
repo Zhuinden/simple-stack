@@ -37,8 +37,8 @@ class MainView : DrawerLayout {
 
     private val navigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.list_navigation_menu_item -> backstack.goTo(TasksKey.create())
-            R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey.create())
+            R.id.list_navigation_menu_item -> backstack.goTo(TasksKey())
+            R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey())
             else -> {
             }
         }

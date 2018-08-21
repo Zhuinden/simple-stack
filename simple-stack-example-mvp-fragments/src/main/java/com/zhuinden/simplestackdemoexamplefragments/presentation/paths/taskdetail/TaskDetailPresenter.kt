@@ -35,7 +35,7 @@ class TaskDetailPresenter @Inject constructor(
     @SuppressLint("CheckResult")
     override fun onAttach(view: ViewContract) {
         this.taskDetailKey = view.getKey()
-        this.taskId = taskDetailKey.taskId()
+        this.taskId = taskDetailKey.taskId
 
         taskRepository.findTask(taskId)
             .observeOn(AndroidSchedulers.mainThread())
@@ -59,7 +59,7 @@ class TaskDetailPresenter @Inject constructor(
             view?.showMissingTask()
             return
         }
-        backstack.goTo(AddOrEditTaskKey.createWithTaskId(view!!.getKey<Key>(), taskId))
+        backstack.goTo(AddOrEditTaskKey(view!!.getKey<Key>(), taskId))
     }
 
     fun completeTask(task: Task) {
