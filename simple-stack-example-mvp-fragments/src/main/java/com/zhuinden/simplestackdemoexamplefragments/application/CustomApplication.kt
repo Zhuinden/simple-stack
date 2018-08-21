@@ -11,18 +11,17 @@ import com.zhuinden.simplestackdemoexamplefragments.application.injection.Single
  */
 
 class CustomApplication : Application() {
+    private var component: SingletonComponent? = null
+
     companion object {
         private var INSTANCE: CustomApplication? = null
 
-        private var component: SingletonComponent? = null
+        @JvmStatic
+        fun getComponent() = get().component!!
 
         @JvmStatic
-        fun getComponent() = component!!
-
-        @JvmStatic
-        fun get(context: Context): CustomApplication {
-            return context.applicationContext as CustomApplication
-        }
+        fun get(context: Context): CustomApplication =
+            context.applicationContext as CustomApplication
 
         @JvmStatic
         fun get(): CustomApplication = INSTANCE!!

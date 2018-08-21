@@ -27,6 +27,10 @@ class TasksPresenter @Inject constructor(
     private val taskRepository: TaskRepository
 ) : BasePresenter<TasksPresenter.ViewContract>(), Bundleable {
     interface ViewContract : BaseViewContract {
+        fun showNoActiveTasks()
+        fun showNoTasks()
+        fun showNoCompletedTasks()
+
         fun setFilterLabelText(filterText: Int)
         fun calculateDiff(tasks: List<Task>): Pair<DiffUtil.DiffResult, List<Task>>
         fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, tasksFilterType: TasksFilterType)
@@ -35,12 +39,12 @@ class TasksPresenter @Inject constructor(
         fun showCompletedTasksCleared()
     }
 
-    var filterType = BehaviorRelay.createDefault(TasksFilterType.ALL_TASKS)
+    var filterType: BehaviorRelay<TasksFilterType> = BehaviorRelay.createDefault(TasksFilterType.AllTasks())
 
     lateinit var subscription: Disposable
 
     public override fun onAttach(view: TasksPresenter.ViewContract) {
-        subscription = filterType //
+        subscription = filterType
             .doOnNext { tasksFilterType -> view.setFilterLabelText(tasksFilterType.filterText) } //
             .switchMap { tasksFilterType -> tasksFilterType.filterTask(taskRepository) } //
             .observeOn(Schedulers.computation())
@@ -85,12 +89,12 @@ class TasksPresenter @Inject constructor(
     }
 
     override fun toBundle(): StateBundle = StateBundle().apply {
-        putString("FILTERING", filterType.value.name)
+        putParcelable("FILTERING", filterType.value)
     }
 
     override fun fromBundle(bundle: StateBundle?) {
         bundle?.run {
-            filterType.accept(TasksFilterType.valueOf(getString("FILTERING")!!))
+            filterType.accept(getParcelable("FILTERING"))
         }
     }
 }

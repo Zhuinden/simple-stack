@@ -16,10 +16,7 @@ import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.application.Key
 import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
-import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
-import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue
-import com.zhuinden.simplestackdemoexamplefragments.util.hide
-import com.zhuinden.simplestackdemoexamplefragments.util.show
+import com.zhuinden.simplestackdemoexamplefragments.util.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.path_tasks.*
@@ -132,11 +129,11 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
         popup.menuInflater.inflate(R.menu.filter_tasks, popup.menu)
 
         popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.active -> tasksPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS)
-                R.id.completed -> tasksPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS)
-                else -> tasksPresenter.setFiltering(TasksFilterType.ALL_TASKS)
-            }
+            tasksPresenter.setFiltering(when(item.itemId) {
+                R.id.active -> TasksFilterType.ActiveTasks()
+                R.id.completed -> TasksFilterType.CompletedTasks()
+                else -> TasksFilterType.AllTasks()
+            })
             //loadTasks(false); // reactive data source ftw
             true
         }
@@ -162,15 +159,15 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
             }
     }
 
-    fun showNoActiveTasks() {
+    override fun showNoActiveTasks() {
         showNoTasksViews(myResources.getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false)
     }
 
-    fun showNoTasks() {
+    override fun showNoTasks() {
         showNoTasksViews(myResources.getString(R.string.no_tasks_all), R.drawable.ic_assignment_turned_in_24dp, false)
     }
 
-    fun showNoCompletedTasks() {
+    override fun showNoCompletedTasks() {
         showNoTasksViews(myResources.getString(R.string.no_tasks_completed), R.drawable.ic_verified_user_24dp, false)
     }
 
@@ -195,8 +192,9 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
     }
 
     private fun showMessage(message: String) {
+        val view = view
         if (view != null) {
-            Snackbar.make(view!!, message, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
         }
     }
 
@@ -206,7 +204,7 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
 
         textNoTasks.text = mainText
         imageNoTasksIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconRes))
-        buttonNoTasksAdd.visibility = if (showAddView) View.VISIBLE else View.GONE
+        buttonNoTasksAdd.showIf { showAddView }
     }
 
     override fun setFilterLabelText(filterText: Int) {
