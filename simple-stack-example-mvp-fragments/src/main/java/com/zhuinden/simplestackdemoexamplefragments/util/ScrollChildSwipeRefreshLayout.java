@@ -17,7 +17,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.util;
 
 import android.content.Context;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.View;
@@ -45,7 +44,7 @@ public class ScrollChildSwipeRefreshLayout
     @Override
     public boolean canChildScrollUp() {
         if(mScrollUpChild != null) {
-            return ViewCompat.canScrollVertically(mScrollUpChild, -1);
+            return mScrollUpChild.canScrollVertically(-1);
         }
         return super.canChildScrollUp();
     }
