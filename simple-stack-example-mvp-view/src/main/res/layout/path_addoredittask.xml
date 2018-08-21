@@ -28,7 +28,7 @@
         android:paddingTop="@dimen/activity_vertical_margin">
 
         <EditText
-            android:id="@+id/add_task_title"
+            android:id="@+id/textAddTaskTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title_hint"
@@ -36,7 +36,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
         <EditText
-            android:id="@+id/add_task_description"
+            android:id="@+id/textAddTaskDescription"
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:gravity="top"

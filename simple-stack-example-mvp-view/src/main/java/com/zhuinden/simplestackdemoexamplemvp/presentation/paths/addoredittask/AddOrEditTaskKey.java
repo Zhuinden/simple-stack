@@ -58,9 +58,9 @@ public abstract class AddOrEditTaskKey
     @Override
     public View.OnClickListener fabClickListener(View view) {
         return v -> {
-            AddOrEditTaskView addOrEditTaskCoordinator = (AddOrEditTaskView)view;
-            addOrEditTaskCoordinator.saveTask();
-            addOrEditTaskCoordinator.navigateBack();
+            AddOrEditTaskView addOrEditTaskView = (AddOrEditTaskView)view;
+            addOrEditTaskView.saveTask();
+            addOrEditTaskView.navigateBack();
         };
     }
 
