@@ -19,80 +19,134 @@ package com.zhuinden.simplestackexamplemvvm.data.source;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
+import com.zhuinden.simplestackexamplemvvm.core.database.LiveResults;
+import com.zhuinden.simplestackexamplemvvm.core.database.QueryBuilder;
+import com.zhuinden.simplestackexamplemvvm.core.scheduler.BackgroundScheduler;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
-import com.zhuinden.simplestackexamplemvvm.data.source.local.TasksLocalDataSource;
-import com.zhuinden.simplestackexamplemvvm.data.source.remote.TasksRemoteDataService;
+import com.zhuinden.simplestackexamplemvvm.data.dao.TaskDao;
+import com.zhuinden.simplestackexamplemvvm.data.tables.TaskTable;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import static com.zhuinden.simplestackexamplemvvm.util.Preconditions.checkNotNull;
 
+
 /**
- * Experimental.
+ * Concrete implementation of a data source as a db.
  */
 @Singleton
-public class TasksRepository {
-    private final TasksDataSource tasksLocalDataSource;
-    private final TasksRemoteDataService tasksRemoteDataService;
+public class TasksRepository
+        implements TasksDataSource {
+    private final BackgroundScheduler backgroundScheduler;
+    private final TaskDao taskDao;
 
     @Inject
-    TasksRepository(@NonNull TasksRemoteDataService tasksRemoteDataService, TasksLocalDataSource tasksLocalDataSource) {
-        this.tasksLocalDataSource = checkNotNull(tasksLocalDataSource);
-        this.tasksRemoteDataService = checkNotNull(tasksRemoteDataService);
+    TasksRepository(BackgroundScheduler backgroundScheduler, TaskDao taskDao) {
+        this.backgroundScheduler = backgroundScheduler;
+        this.taskDao = taskDao;
     }
 
-    public LiveResults<Task> getTasks() {
-        return tasksLocalDataSource.getTasksWithChanges();
+    public Task getTask(String taskId) {
+        return taskDao.findOne(taskId);
     }
 
+    @Override
+    public LiveResults<Task> getTasksWithChanges() {
+        return taskDao.findAllWithChanges((database, table) -> QueryBuilder.of(table)
+                .orderBy(TaskTable.$ENTRY_ID, QueryBuilder.Sort.ASC)
+                .executeQuery(database)
+        );
+    }
+
+    @Override
+    public LiveResults<Task> getTaskWithChanges(@Nullable String taskId) {
+        return taskDao.findAllWithChanges((database, table) -> {
+            QueryBuilder queryBuilder = QueryBuilder.of(table);
+            if(taskId == null) {
+                queryBuilder.select("1 = 0"); // empty results
+            } else {
+                queryBuilder.select(TaskTable.$ENTRY_ID + " = ? ", taskId);
+            }
+            return queryBuilder.executeQuery(database);
+        });
+    }
+
+    @Override
     public void saveTask(@NonNull Task task) {
         checkNotNull(task);
-        tasksLocalDataSource.saveTask(task);
-        tasksRemoteDataService.saveTask(task);
+        backgroundScheduler.execute(() -> {
+            taskDao.insert(task);
+        });
     }
 
+    public void saveTasks(List<Task> tasks) {
+        checkNotNull(tasks);
+        backgroundScheduler.execute(() -> {
+            taskDao.insert(tasks);
+        });
+    }
+
+    @Override
     public void completeTask(@NonNull Task task) {
         checkNotNull(task);
-        tasksLocalDataSource.completeTask(task);
-        tasksRemoteDataService.completeTask(task);
+        backgroundScheduler.execute(() -> {
+            taskDao.insert(task.toBuilder().setCompleted(true).build());
+        });
     }
 
+    @Override
     public void activateTask(@NonNull Task task) {
         checkNotNull(task);
-        tasksLocalDataSource.activateTask(task);
-        tasksRemoteDataService.activateTask(task);
+        backgroundScheduler.execute(() -> {
+            taskDao.insert(task.toBuilder().setCompleted(false).build());
+        });
     }
 
+    @Override
     public void clearCompletedTasks() {
-        tasksLocalDataSource.clearCompletedTasks();
-        tasksRemoteDataService.clearCompletedTasks();
+        backgroundScheduler.execute(() -> {
+            List<Task> list = taskDao.findAll(
+                    (database, table) -> QueryBuilder.of(table).select(TaskTable.$COMPLETED + " LIKE ?",1).executeQuery(database));
+            taskDao.delete(list);
+        });
     }
 
-    public LiveResults<Task> getTask(@Nullable final String taskId) {
-        return tasksLocalDataSource.getTaskWithChanges(taskId);
-    }
-
+    @Override
     public void refreshTasks() {
-        tasksRemoteDataService.getTasks();
+        taskDao.refresh();
     }
 
+    @Override
     public void deleteAllTasks() {
-        tasksRemoteDataService.deleteAllTasks();
-        tasksLocalDataSource.deleteAllTasks();
+        backgroundScheduler.execute(() -> {
+            taskDao.deleteAll();
+        });
     }
 
+    @Override
     public void deleteTask(@NonNull String taskId) {
-        tasksRemoteDataService.deleteTask(checkNotNull(taskId));
-        tasksLocalDataSource.deleteTask(checkNotNull(taskId));
+        backgroundScheduler.execute(() -> {
+            Task task = getTask(taskId);
+            taskDao.delete(task);
+        });
     }
 
-    public LiveResults<Task> getActiveTasks() {
-        return tasksLocalDataSource.getActiveTasksWithChanges();
+    @Override
+    public LiveResults<Task> getActiveTasksWithChanges() {
+        return taskDao.findAllWithChanges((database, table) -> QueryBuilder.of(table)
+                .select(TaskTable.$COMPLETED + " = ?", 0)
+                .orderBy(TaskTable.$ENTRY_ID, QueryBuilder.Sort.ASC)
+                .executeQuery(database));
     }
 
-    public LiveResults<Task> getCompletedTasks() {
-        return tasksLocalDataSource.getCompletedTasksWithChanges();
+    @Override
+    public LiveResults<Task> getCompletedTasksWithChanges() {
+        return taskDao.findAllWithChanges((database, table) -> QueryBuilder.of(table)
+                .select(TaskTable.$COMPLETED + " = ?", 1)
+                .orderBy(TaskTable.$ENTRY_ID, QueryBuilder.Sort.ASC)
+                .executeQuery(database));
     }
 }

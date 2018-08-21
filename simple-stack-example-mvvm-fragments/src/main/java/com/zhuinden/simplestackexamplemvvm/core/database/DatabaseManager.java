@@ -21,8 +21,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.zhuinden.simplestackexamplemvvm.core.scheduler.BackgroundScheduler;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,11 +37,9 @@ import javax.inject.Singleton;
 public final class DatabaseManager
         extends SQLiteOpenHelper {
     public interface Table {
-        interface WithId<T> {
-            String getId(T t);
+        String getId(Object element);
 
-            String getIdFieldName();
-        }
+        String getIdFieldName();
 
         String getTableName();
 
@@ -154,13 +156,8 @@ public final class DatabaseManager
     public <T> List<T> findAll(Table table, Mapper<T> mapper) {
         return findAll(table,
                 mapper,
-                (database, _table) -> database.query(table.getTableName(),
-                        table.getAllQueryFields(),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null));
+                QueryBuilder.of(table).buildDefinition()
+        );
     }
 
     public <T> List<T> findAll(Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
@@ -177,6 +174,7 @@ public final class DatabaseManager
 
     public <T> void insert(Table table, Mapper<T> mapper, T element) {
         insert(table, mapper, Collections.singletonList(element));
+        // calls to other insert
     }
 
     public <T> void insert(Table table, Mapper<T> mapper, List<T> elements) {
@@ -190,13 +188,15 @@ public final class DatabaseManager
                         SQLiteDatabase.CONFLICT_REPLACE);
             }
         });
+        refresh(table);
     }
 
-    public <ID_TABLE extends Table & Table.WithId<T>, T> void delete(ID_TABLE table, T element) {
-        delete(table, Collections.singletonList(element));
+    public <T> void delete(Table table, T element) {
+        delete(table, Collections.singletonList(element));;
+        // calls to other delete
     }
 
-    public <ID_TABLE extends Table & Table.WithId<T>, T> void delete(ID_TABLE table, List<T> elements) {
+    public <T> void delete(Table table, List<T> elements) {
         executeTransaction(sqLiteDatabase -> {
             for(T t : elements) {
                 sqLiteDatabase.delete(table.getTableName(),
@@ -204,9 +204,64 @@ public final class DatabaseManager
                         new String[]{table.getId(t)});
             }
         });
+        refresh(table);
     }
 
     public void deleteAll(Table table) {
         executeTransaction(sqLiteDatabase -> sqLiteDatabase.delete(table.getTableName(), null, null));
+        refresh(table);
+    }
+
+    // Experimental. This allows for reactivity.
+    private List<WeakReference<LiveResults<?>>> liveDatas = Collections.synchronizedList(new LinkedList<>());
+
+    public <T> LiveResults<T> findAllWithChanges(BackgroundScheduler backgroundScheduler, Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
+        return new LiveResults<>(backgroundScheduler, this, table, mapper, queryDefinition);
+    }
+
+    void addLiveResults(LiveResults<?> liveResults) {
+        synchronized(this) {
+            this.liveDatas.add(new WeakReference<>(liveResults));
+        }
+    }
+
+    public void refresh() {
+        synchronized(this) {
+            Iterator<WeakReference<LiveResults<?>>> iterator = liveDatas.iterator();
+            while(iterator.hasNext()) {
+                WeakReference<LiveResults<?>> weakReference = iterator.next();
+                LiveResults<?> liveData = weakReference.get();
+                if(liveData == null) {
+                    iterator.remove();
+                } else {
+                    liveData.refresh();
+                }
+            }
+        }
+    }
+
+    public void refresh(Table... tables) {
+        synchronized(this) {
+            Iterator<WeakReference<LiveResults<?>>> iterator = liveDatas.iterator();
+            while(iterator.hasNext()) {
+                WeakReference<LiveResults<?>> weakReference = iterator.next();
+                LiveResults<?> liveData = weakReference.get();
+                if(liveData == null) {
+                    iterator.remove();
+                } else {
+                    boolean isInTables = false;
+                    Table table = liveData.table;
+                    for(Table currentTable: tables) {
+                        if(currentTable == table) {
+                            isInTables = true;
+                            break;
+                        }
+                    }
+                    if(isInTables) {
+                        liveData.refresh();
+                    }
+                }
+            }
+        }
     }
 }

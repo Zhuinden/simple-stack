@@ -25,7 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestackexamplemvvm.R;
-import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
+import com.zhuinden.simplestackexamplemvvm.core.database.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 
@@ -59,7 +59,7 @@ public abstract class SingleTaskViewModel
     public void start(String taskId) {
         if(taskId != null) {
             isDataLoading = true;
-            liveTask = tasksRepository.getTask(taskId);
+            liveTask = tasksRepository.getTaskWithChanges(taskId);
             liveTask.observeForever(this);
         }
     }

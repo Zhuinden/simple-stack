@@ -29,7 +29,7 @@ import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
-import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
+import com.zhuinden.simplestackexamplemvvm.core.database.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
@@ -81,7 +81,7 @@ public class AddEditTaskViewModel
 
     public void start(@Nullable String taskId) {
         this.taskId = taskId;
-        liveTask = tasksRepository.getTask(taskId);
+        liveTask = tasksRepository.getTaskWithChanges(taskId);
         liveTask.observeForever(this);
     }
 
