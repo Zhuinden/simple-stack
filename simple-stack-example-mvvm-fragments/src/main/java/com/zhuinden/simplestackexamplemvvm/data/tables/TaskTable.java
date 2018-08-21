@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 @Singleton
 public class TaskTable
         extends BaseTable
-        implements DatabaseManager.Mapper<Task>, DatabaseManager.Table.WithId<Task> {
+        implements DatabaseManager.Mapper<Task> {
     public static final String NAME = "task";
 
     public static final DatabaseManager.Fields ENTRY_ID = new DatabaseManager.Fields("entry_id", "text", "primary key");
@@ -47,8 +47,8 @@ public class TaskTable
     }
 
     @Override
-    public String getId(Task task) {
-        return task.id();
+    public String getId(Object element) {
+        return ((Task)element).id();
     }
 
     @Override

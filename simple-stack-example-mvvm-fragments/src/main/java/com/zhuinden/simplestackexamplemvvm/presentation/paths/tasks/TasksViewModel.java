@@ -33,7 +33,7 @@ import com.zhuinden.simplestack.Bundleable;
 import com.zhuinden.simplestackexamplemvvm.BR;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
-import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
+import com.zhuinden.simplestackexamplemvvm.core.database.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.addedittask.AddEditTaskKey;
@@ -151,11 +151,11 @@ public class TasksViewModel
     private LiveResults<Task> getFilteredResults() {
         switch(selectedFilter) {
             case ALL_TASKS:
-                return tasksRepository.getTasks();
+                return tasksRepository.getTasksWithChanges();
             case ACTIVE_TASKS:
-                return tasksRepository.getActiveTasks();
+                return tasksRepository.getActiveTasksWithChanges();
             case COMPLETED_TASKS:
-                return tasksRepository.getCompletedTasks();
+                return tasksRepository.getCompletedTasksWithChanges();
             default:
                 throw new IllegalArgumentException("Invalid filter type [" + selectedFilter + "]");
         }

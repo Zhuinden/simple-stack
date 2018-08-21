@@ -26,7 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import com.zhuinden.simplestackexamplemvvm.R;
-import com.zhuinden.simplestackexamplemvvm.core.database.liveresults.LiveResults;
+import com.zhuinden.simplestackexamplemvvm.core.database.LiveResults;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 
@@ -77,7 +77,7 @@ public class StatisticsViewModel
 
     private void loadStatistics() {
         dataLoading.set(true);
-        liveResults = tasksRepository.getTasks();
+        liveResults = tasksRepository.getTasksWithChanges();
         liveResults.observeForever(this);
     }
 
