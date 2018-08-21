@@ -1,6 +1,5 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks
 
-import android.content.res.Resources
 import android.support.v7.util.DiffUtil
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.simplestack.Backstack
@@ -11,6 +10,7 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail.TaskDetailKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter
+import com.zhuinden.simplestackdemoexamplefragments.util.BaseViewContract
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -19,37 +19,44 @@ import javax.inject.Inject
 
 
 /**
- * Created by Owner on 2017. 01. 27..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
 class TasksPresenter @Inject constructor(
-    private val backstack: Backstack, 
-    private val taskRepository: TaskRepository, 
-    private val resources: Resources
-) : BasePresenter<TasksFragment, TasksPresenter>(), Bundleable {
+    private val backstack: Backstack,
+    private val taskRepository: TaskRepository
+) : BasePresenter<TasksPresenter.ViewContract>(), Bundleable {
+    interface ViewContract : BaseViewContract {
+        fun setFilterLabelText(filterText: Int)
+        fun calculateDiff(tasks: List<Task>): Pair<DiffUtil.DiffResult, List<Task>>
+        fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, tasksFilterType: TasksFilterType)
+        fun showTaskMarkedComplete()
+        fun showTaskMarkedActive()
+        fun showCompletedTasksCleared()
+    }
 
     var filterType = BehaviorRelay.createDefault(TasksFilterType.ALL_TASKS)
 
     lateinit var subscription: Disposable
 
-    public override fun onAttach(tasksFragment: TasksFragment) {
+    public override fun onAttach(view: TasksPresenter.ViewContract) {
         subscription = filterType //
-            .doOnNext { tasksFilterType -> tasksFragment.setFilterLabelText(tasksFilterType.filterText) } //
+            .doOnNext { tasksFilterType -> view.setFilterLabelText(tasksFilterType.filterText) } //
             .switchMap { tasksFilterType -> tasksFilterType.filterTask(taskRepository) } //
             .observeOn(Schedulers.computation())
-            .map<Pair<DiffUtil.DiffResult, List<Task>>> { tasks -> tasksFragment.calculateDiff(tasks) }
+            .map<Pair<DiffUtil.DiffResult, List<Task>>> { tasks -> view.calculateDiff(tasks) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { pairOfDiffResultAndTasks ->
-                tasksFragment.showTasks(pairOfDiffResultAndTasks, filterType.value)
+                view.showTasks(pairOfDiffResultAndTasks, filterType.value)
             }
     }
 
-    public override fun onDetach(Fragment: TasksFragment) {
+    public override fun onDetach(view: TasksPresenter.ViewContract) {
         subscription.dispose()
     }
 
     fun openAddNewTask() {
-        val tasksFragment = fragment
+        val tasksFragment = view
         val parentKey = tasksFragment!!.getKey<Key>()
         backstack.goTo(AddOrEditTaskKey.create(parentKey))
     }
@@ -60,17 +67,17 @@ class TasksPresenter @Inject constructor(
 
     fun completeTask(task: Task) {
         taskRepository.setTaskCompleted(task)
-        fragment?.showTaskMarkedComplete()
+        view?.showTaskMarkedComplete()
     }
 
     fun uncompleteTask(task: Task) {
         taskRepository.setTaskActive(task)
-        fragment?.showTaskMarkedActive()
+        view?.showTaskMarkedActive()
     }
 
     fun deleteCompletedTasks() {
         taskRepository.deleteCompletedTasks()
-        fragment?.showCompletedTasksCleared()
+        view?.showCompletedTasksCleared()
     }
 
     fun setFiltering(filterType: TasksFilterType) {

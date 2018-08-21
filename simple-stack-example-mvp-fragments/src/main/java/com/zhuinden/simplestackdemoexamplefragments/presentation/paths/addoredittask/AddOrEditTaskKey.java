@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -9,7 +10,7 @@ import com.zhuinden.simplestackdemoexamplefragments.application.BaseKey;
 import com.zhuinden.simplestackdemoexamplefragments.application.Key;
 
 /**
- * Created by Zhuinden on 2017.01.25..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
 // TODO: use @Parcelize
@@ -20,6 +21,7 @@ public abstract class AddOrEditTaskKey
 
     public abstract String taskId();
 
+    @NonNull
     @Override
     public Fragment createFragment() {
         return new AddOrEditTaskFragment();
@@ -53,8 +55,9 @@ public abstract class AddOrEditTaskKey
         return true;
     }
 
+    @NonNull
     @Override
-    public View.OnClickListener fabClickListener(Fragment fragment) {
+    public View.OnClickListener fabClickListener(@NonNull Fragment fragment) {
         return v -> {
             AddOrEditTaskFragment addOrEditTaskFragment = (AddOrEditTaskFragment) fragment;
             if(addOrEditTaskFragment.saveTask()) {

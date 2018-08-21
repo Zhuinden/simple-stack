@@ -1,42 +1,40 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask
 
-import android.text.Editable
+import android.app.Activity
+import android.os.Bundle
 import android.view.View
-import butterknife.ButterKnife
-import butterknife.OnTextChanged
-import butterknife.Unbinder
-import com.zhuinden.simplestackdemoexamplefragments.R
+import android.view.inputmethod.InputMethodManager
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
 import kotlinx.android.synthetic.main.path_addoredittask.*
+import org.jetbrains.anko.sdk15.listeners.textChangedListener
 
 /**
- * Created by Owner on 2017. 01. 26..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
 // UNSCOPED!
-class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskPresenter>() {
-    private lateinit var addOrEditTaskPresenter: AddOrEditTaskPresenter
-
-    
-    @OnTextChanged(R.id.textAddTaskTitle) // TODO: use Anko's textChangedListener
-    fun titleChanged(editable: Editable) {
-        addOrEditTaskPresenter.updateTitle(editable.toString())
-    }
-
-    @OnTextChanged(R.id.textAddTaskDescription) // TODO: use Anko's textChangedListener
-    fun descriptionChanged(editable: Editable) {
-        addOrEditTaskPresenter.updateDescription(editable.toString())
-    }
+class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskPresenter.ViewContract, AddOrEditTaskPresenter>(), AddOrEditTaskPresenter.ViewContract {
+    private val addOrEditTaskPresenter = Injector.get().addOrEditTaskPresenter()
 
     override fun getPresenter(): AddOrEditTaskPresenter = addOrEditTaskPresenter
 
     override fun getThis(): AddOrEditTaskFragment = this
 
-    override fun bindViews(view: View): Unbinder = ButterKnife.bind(this, view)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun injectSelf() {
-        addOrEditTaskPresenter = Injector.get().addOrEditTaskPresenter()
+        textAddTaskTitle.textChangedListener {
+            afterTextChanged { editable ->
+                addOrEditTaskPresenter.updateTitle(editable.toString())
+            }
+        }
+
+        textAddTaskDescription.textChangedListener {
+            afterTextChanged { editable ->
+                addOrEditTaskPresenter.updateDescription(editable.toString())
+            }
+        }
     }
 
     fun saveTask() = addOrEditTaskPresenter.saveTask()
@@ -45,11 +43,20 @@ class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskP
         addOrEditTaskPresenter.navigateBack()
     }
 
-    fun setTitle(title: String) {
+    override fun setTitle(title: String) {
         textAddTaskTitle.setText(title)
     }
 
-    fun setDescription(description: String) {
+    override fun setDescription(description: String) {
         textAddTaskDescription.setText(description)
+    }
+
+    override fun hideKeyboard() {
+        (requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).also { imm ->
+            val view = view
+            if(view != null) {
+                imm.hideSoftInputFromWindow(view.windowToken, 0);
+            }
+        }
     }
 }

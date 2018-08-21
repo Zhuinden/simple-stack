@@ -1,63 +1,54 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail
 
 import android.view.MenuItem
-import android.view.View
-import butterknife.ButterKnife
-import butterknife.Unbinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
 import com.zhuinden.simplestackdemoexamplefragments.util.Strings
+import com.zhuinden.simplestackdemoexamplefragments.util.hide
+import com.zhuinden.simplestackdemoexamplefragments.util.show
 import kotlinx.android.synthetic.main.path_taskdetail.*
 
 /**
- * Created by Owner on 2017. 01. 26..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class TaskDetailFragment : BaseFragment<TaskDetailFragment, TaskDetailPresenter>() {
-    private lateinit var taskDetailPresenter: TaskDetailPresenter
+class TaskDetailFragment : BaseFragment<TaskDetailPresenter.ViewContract, TaskDetailPresenter>(), TaskDetailPresenter.ViewContract {
+    private val taskDetailPresenter = Injector.get().taskDetailPresenter()
 
     override fun getPresenter(): TaskDetailPresenter = taskDetailPresenter
 
-    override fun getThis(): TaskDetailFragment = this
-
-    override fun bindViews(view: View): Unbinder {
-        return ButterKnife.bind(this, view)
-    }
-
-    override fun injectSelf() {
-        taskDetailPresenter = Injector.get().taskDetailPresenter()
-    }
+    override fun getThis(): TaskDetailPresenter.ViewContract = this
 
     fun editTask() {
         taskDetailPresenter.editTask()
     }
 
     fun showTitle(title: String) {
-        textTaskDetailTitle.visibility = View.VISIBLE
+        textTaskDetailTitle.show()
         textTaskDetailTitle.text = title
     }
 
     fun hideTitle() {
-        textTaskDetailTitle.visibility = View.GONE
+        textTaskDetailTitle.hide()
     }
 
     fun showDescription(description: String) {
-        textTaskDetailDescription.visibility = View.VISIBLE
+        textTaskDetailDescription.show()
         textTaskDetailDescription.text = description
     }
 
     fun hideDescription() {
-        textTaskDetailDescription.visibility = View.GONE
+        textTaskDetailDescription.hide()
     }
 
-    fun showMissingTask() {
+    override fun showMissingTask() {
         textTaskDetailTitle.text = ""
         textTaskDetailDescription.text = activity!!.getString(R.string.no_data)
     }
 
-    fun showTask(task: Task) {
+    override fun showTask(task: Task) {
         val title = task.title
         val description = task.description
 

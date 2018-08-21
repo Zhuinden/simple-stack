@@ -15,7 +15,7 @@ import javax.inject.Singleton
 
 
 /**
- * Created by Owner on 2017. 01. 26..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 @Singleton
 class DatabaseManager @Inject constructor(

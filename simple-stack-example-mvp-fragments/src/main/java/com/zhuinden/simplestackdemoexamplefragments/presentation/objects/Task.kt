@@ -1,11 +1,9 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.objects
 
 /**
- * Created by Owner on 2017. 01. 25..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
-
-import com.zhuinden.simplestackdemoexamplefragments.util.Strings
 import java.util.*
 
 /**
@@ -18,10 +16,9 @@ data class Task(
     val completed: Boolean
 ) {
     val titleForList: String?
-        get() = if (!Strings.isNullOrEmpty(title)) {
-            title
-        } else {
-            description
+        get() = when {
+            !title.isNullOrEmpty() -> title
+            else -> description
         }
 
     val isCompleted: Boolean
@@ -31,7 +28,7 @@ data class Task(
         get() = !completed
 
     val isEmpty: Boolean
-        get() = Strings.isNullOrEmpty(title) && Strings.isNullOrEmpty(description)
+        get() = title.isNullOrEmpty() && description.isNullOrEmpty()
 
     companion object {
         @JvmStatic

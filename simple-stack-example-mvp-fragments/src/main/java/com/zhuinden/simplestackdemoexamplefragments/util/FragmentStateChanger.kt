@@ -7,7 +7,7 @@ import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Key
 
 /**
- * Created by Owner on 2017. 02. 03..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
 class FragmentStateChanger(

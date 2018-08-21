@@ -22,7 +22,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 /**
- * Created by Owner on 2017. 01. 26..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 @Singleton
 class TaskRepository @Inject constructor(
@@ -70,7 +70,7 @@ class TaskRepository @Inject constructor(
             val realm = Realm.getDefaultInstance()
             val dbTasks = querySelector(realm)
             val realmChangeListener = RealmChangeListener<RealmResults<DbTask>> { element ->
-                if (element.isLoaded() && !emitter.isDisposed()) {
+                if (element.isLoaded && !emitter.isDisposed) {
                     val tasks = mapFrom(element)
                     if (!emitter.isDisposed) {
                         emitter.onNext(tasks)

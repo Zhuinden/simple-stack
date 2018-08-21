@@ -1,38 +1,20 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics
 
-import android.content.res.Resources
-import android.view.View
-import butterknife.ButterKnife
-import butterknife.Unbinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
 import kotlinx.android.synthetic.main.path_statistics.*
 
 /**
- * Created by Owner on 2017. 01. 26..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class StatisticsFragment : BaseFragment<StatisticsFragment, StatisticsPresenter>() {
-    private lateinit var myResources: Resources
-    private lateinit var statisticsPresenter: StatisticsPresenter
+class StatisticsFragment : BaseFragment<StatisticsPresenter.ViewContract, StatisticsPresenter>(), StatisticsPresenter.ViewContract {
+    private val myResources = Injector.get().resources()
+    private val statisticsPresenter = Injector.get().statisticsPresenter()
 
-    override fun getPresenter(): StatisticsPresenter {
-        return statisticsPresenter
-    }
-
-    override fun getThis(): StatisticsFragment {
-        return this
-    }
-
-    override fun bindViews(view: View): Unbinder {
-        return ButterKnife.bind(this, view)
-    }
-
-    override fun injectSelf() {
-        myResources = Injector.get().resources()
-        statisticsPresenter = Injector.get().statisticsPresenter()
-    }
+    override fun getPresenter(): StatisticsPresenter = statisticsPresenter
+    override fun getThis(): StatisticsFragment = this
 
     fun setProgressIndicator(active: Boolean) {
         textStatistics.text = when {
@@ -41,7 +23,7 @@ class StatisticsFragment : BaseFragment<StatisticsFragment, StatisticsPresenter>
         }
     }
 
-    fun showStatistics(numberOfIncompleteTasks: Int, numberOfCompletedTasks: Int) {
+    override fun showStatistics(numberOfIncompleteTasks: Int, numberOfCompletedTasks: Int) {
         textStatistics.text = when {
             numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0 -> myResources.getString(R.string.statistics_no_tasks)
             else ->

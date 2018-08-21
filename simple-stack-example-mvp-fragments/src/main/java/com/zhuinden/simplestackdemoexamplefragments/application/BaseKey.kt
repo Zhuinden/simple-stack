@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
 
 /**
- * Created by Owner on 2017. 02. 03..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
 abstract class BaseKey : Key {

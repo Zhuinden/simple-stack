@@ -1,7 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -12,9 +11,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import butterknife.ButterKnife
-import butterknife.OnClick
-import butterknife.Unbinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.application.Key
@@ -22,22 +18,23 @@ import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
 import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue
+import com.zhuinden.simplestackdemoexamplefragments.util.hide
+import com.zhuinden.simplestackdemoexamplefragments.util.show
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.path_tasks.*
+import org.jetbrains.anko.sdk15.listeners.onClick
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * Created by Owner on 2017. 01. 26..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class TasksFragment : BaseFragment<TasksFragment, TasksPresenter>(), MessageQueue.Receiver {
-
-    private lateinit var tasksPresenter: TasksPresenter
-    private lateinit var myResources: Resources
-
-    private lateinit var messageQueue: MessageQueue
+class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(), MessageQueue.Receiver, TasksPresenter.ViewContract {
+    private val tasksPresenter = Injector.get().tasksPresenter()
+    private val myResources = Injector.get().resources()
+    private val messageQueue = Injector.get().messageQueue()
 
     lateinit var tasksAdapter: TasksAdapter
 
@@ -57,22 +54,9 @@ class TasksFragment : BaseFragment<TasksFragment, TasksPresenter>(), MessageQueu
 
     class SavedSuccessfullyMessage
 
-    @OnClick(R.id.buttonNoTasksAdd)
-    fun openAddNewTask() {
-        tasksPresenter.openAddNewTask()
-    }
-
     override fun getPresenter(): TasksPresenter = tasksPresenter
 
     override fun getThis(): TasksFragment = this
-
-    override fun bindViews(view: View): Unbinder = ButterKnife.bind(this, view)
-
-    override fun injectSelf() {
-        tasksPresenter = Injector.get().tasksPresenter()
-        myResources = Injector.get().resources()
-        messageQueue = Injector.get().messageQueue()
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         super.onCreateView(inflater, container, savedInstanceState).also {
@@ -91,7 +75,15 @@ class TasksFragment : BaseFragment<TasksFragment, TasksPresenter>(), MessageQueu
         swipeRefreshLayout.setScrollUpChild(recyclerTasks)
         swipeRefreshLayout.setOnRefreshListener { this.refresh() }
 
+        buttonNoTasksAdd.onClick {
+            openAddNewTask()
+        }
+
         messageQueue.requestMessages(getKey<Key>(), this)
+    }
+
+    fun openAddNewTask() {
+        tasksPresenter.openAddNewTask()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -114,16 +106,16 @@ class TasksFragment : BaseFragment<TasksFragment, TasksPresenter>(), MessageQueu
         }
     }
 
-    fun calculateDiff(tasks: List<Task>): Pair<DiffUtil.DiffResult, List<Task>> {
+    override fun calculateDiff(tasks: List<Task>): Pair<DiffUtil.DiffResult, List<Task>> {
         return Pair(DiffUtil.calculateDiff(TasksDiffCallback(tasksAdapter.data, tasks)), tasks)
     }
 
     fun hideEmptyViews() {
-        containerTasks.visibility = View.VISIBLE
-        viewNoTasks.visibility = View.GONE
+        containerTasks.show()
+        viewNoTasks.hide()
     }
 
-    fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, filterType: TasksFilterType) {
+    override fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, filterType: TasksFilterType) {
         val (diffResult, tasks) = pairOfDiffResultAndTasks
 
         tasksAdapter.data = tasks
@@ -182,15 +174,15 @@ class TasksFragment : BaseFragment<TasksFragment, TasksPresenter>(), MessageQueu
         showNoTasksViews(myResources.getString(R.string.no_tasks_completed), R.drawable.ic_verified_user_24dp, false)
     }
 
-    fun showTaskMarkedComplete() {
+    override fun showTaskMarkedComplete() {
         showMessage(myResources.getString(R.string.task_marked_complete))
     }
 
-    fun showTaskMarkedActive() {
+    override fun showTaskMarkedActive() {
         showMessage(myResources.getString(R.string.task_marked_active))
     }
 
-    fun showCompletedTasksCleared() {
+    override fun showCompletedTasksCleared() {
         showMessage(myResources.getString(R.string.completed_tasks_cleared))
     }
 
@@ -209,15 +201,15 @@ class TasksFragment : BaseFragment<TasksFragment, TasksPresenter>(), MessageQueu
     }
 
     private fun showNoTasksViews(mainText: String, iconRes: Int, showAddView: Boolean) {
-        containerTasks.visibility = View.GONE
-        viewNoTasks.visibility = View.VISIBLE
+        containerTasks.hide()
+        viewNoTasks.show()
 
         textNoTasks.text = mainText
         imageNoTasksIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconRes))
         buttonNoTasksAdd.visibility = if (showAddView) View.VISIBLE else View.GONE
     }
 
-    fun setFilterLabelText(filterText: Int) {
+    override fun setFilterLabelText(filterText: Int) {
         textFilteringLabel.setText(filterText)
     }
 

@@ -3,23 +3,23 @@ package com.zhuinden.simplestackdemoexamplefragments.util
 import com.zhuinden.simplestack.Bundleable
 
 /**
- * Created by Owner on 2017. 01. 27..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
-abstract class BasePresenter<F : BaseFragment<F, P>, P : BasePresenter<F, P>> : Bundleable {
-    var fragment: F? = null
+abstract class BasePresenter<V : BaseViewContract> : Bundleable {
+    var view: V? = null
 
-    fun attachFragment(fragment: F) {
-        this.fragment = fragment
+    fun attachFragment(fragment: V) {
+        this.view = fragment
         onAttach(fragment)
     }
 
-    fun detachFragment(fragment: F) {
+    fun detachFragment(fragment: V) {
         onDetach(fragment)
-        this.fragment = null
+        this.view = null
     }
 
-    protected abstract fun onAttach(fragment: F)
+    protected abstract fun onAttach(view: V)
 
-    protected abstract fun onDetach(fragment: F)
+    protected abstract fun onDetach(view: V)
 }

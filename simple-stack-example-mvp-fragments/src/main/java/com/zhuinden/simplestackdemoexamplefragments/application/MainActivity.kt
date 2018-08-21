@@ -14,6 +14,7 @@ import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
 import com.zhuinden.simplestackdemoexamplefragments.util.FragmentStateChanger
+import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.ServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), StateChanger {
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         databaseManager.init(this)
 
         backstackDelegate = BackstackDelegate()
+        backstackDelegate.setScopedServices(this, ServiceProvider())
         backstackDelegate.onCreate(savedInstanceState, //
             lastCustomNonConfigurationInstance, //
             History.single(TasksKey.create()))

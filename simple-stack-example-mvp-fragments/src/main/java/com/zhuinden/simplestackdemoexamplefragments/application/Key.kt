@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.View
 
 /**
- * Created by Owner on 2017. 01. 12..
+ * Created by Zhuinden on 2017. 01. 12..
  */
 
 interface Key : Parcelable {

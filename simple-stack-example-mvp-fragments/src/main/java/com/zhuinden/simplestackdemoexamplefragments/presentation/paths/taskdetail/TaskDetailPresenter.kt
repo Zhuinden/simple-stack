@@ -7,18 +7,24 @@ import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskReposito
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter
+import com.zhuinden.simplestackdemoexamplefragments.util.BaseViewContract
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 /**
- * Created by Owner on 2017. 01. 27..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
 class TaskDetailPresenter @Inject constructor(
     private val taskRepository: TaskRepository,
     private val backstack: Backstack
-) : BasePresenter<TaskDetailFragment, TaskDetailPresenter>() {
+) : BasePresenter<TaskDetailPresenter.ViewContract>() {
+    interface ViewContract: BaseViewContract {
+        fun showTask(task: Task)
+
+        fun showMissingTask()
+    }
 
     lateinit var taskDetailKey: TaskDetailKey
 
@@ -27,8 +33,8 @@ class TaskDetailPresenter @Inject constructor(
     var task: Task? = null
 
     @SuppressLint("CheckResult")
-    override fun onAttach(fragment: TaskDetailFragment) {
-        this.taskDetailKey = fragment.getKey()
+    override fun onAttach(view: ViewContract) {
+        this.taskDetailKey = view.getKey()
         this.taskId = taskDetailKey.taskId()
 
         taskRepository.findTask(taskId)
@@ -37,23 +43,23 @@ class TaskDetailPresenter @Inject constructor(
                 val task = taskOptional.takeIf { it.isPresent }?.get()
                 this.task = task
                 if(task != null) {
-                    fragment.showTask(task)
+                    view.showTask(task)
                 } else {
-                    fragment.showMissingTask()
+                    view.showMissingTask()
                 }
             }
     }
 
-    override fun onDetach(fragment: TaskDetailFragment) {
+    override fun onDetach(view: ViewContract) {
 
     }
 
     fun editTask() {
         if (task == null) {
-            fragment?.showMissingTask()
+            view?.showMissingTask()
             return
         }
-        backstack.goTo(AddOrEditTaskKey.createWithTaskId(fragment!!.getKey<Key>(), taskId))
+        backstack.goTo(AddOrEditTaskKey.createWithTaskId(view!!.getKey<Key>(), taskId))
     }
 
     fun completeTask(task: Task) {

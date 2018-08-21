@@ -9,20 +9,29 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksFragment
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter
+import com.zhuinden.simplestackdemoexamplefragments.util.BaseViewContract
 import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 /**
- * Created by Owner on 2017. 01. 27..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED
 class AddOrEditTaskPresenter @Inject constructor(
     private val taskRepository: TaskRepository,
     private val messageQueue: MessageQueue,
     private val backstack: Backstack
-) : BasePresenter<AddOrEditTaskFragment, AddOrEditTaskPresenter>(), Bundleable {
+) : BasePresenter<AddOrEditTaskPresenter.ViewContract>(), Bundleable {
+    interface ViewContract: BaseViewContract {
+        fun setTitle(title: String)
+
+        fun setDescription(description: String)
+
+        fun hideKeyboard()
+    }
+
     var title: String? = null
     var description: String? = null
 
@@ -39,9 +48,8 @@ class AddOrEditTaskPresenter @Inject constructor(
     }
 
     @SuppressLint("CheckResult")
-    override fun onAttach(fragment: AddOrEditTaskFragment) {
-        val addOrEditTaskKey = fragment.getKey<AddOrEditTaskKey>()
-
+    override fun onAttach(view: ViewContract) {
+        val addOrEditTaskKey: AddOrEditTaskKey = view.getKey()
         taskId = addOrEditTaskKey.taskId()
 
         if (!taskId.isNullOrEmpty()) {
@@ -53,14 +61,14 @@ class AddOrEditTaskPresenter @Inject constructor(
                     if (this.title == null || this.description == null) {
                         this.title = task.title
                         this.description = task.description
-                        fragment.setTitle(title!!)
-                        fragment.setDescription(description!!)
+                        view.setTitle(title!!)
+                        view.setDescription(description!!)
                     }
                 }
         }
     }
 
-    override fun onDetach(fragment: AddOrEditTaskFragment) {
+    override fun onDetach(view: ViewContract) {
     }
 
     override fun toBundle(): StateBundle = StateBundle().apply {
@@ -80,9 +88,9 @@ class AddOrEditTaskPresenter @Inject constructor(
         val title = title
         val description = description
 
-        if (!title.isNullOrEmpty() && !description.isNullOrEmpty()) {
+        if (title != null && title.isNotEmpty() && description != null && description.isNotEmpty()) {
             taskRepository.insertTask(when {
-                taskId.isNullOrEmpty() -> Task.createNewActiveTask(title!!, description!!)
+                taskId.isNullOrEmpty() -> Task.createNewActiveTask(title, description)
                 else -> {
                     task?.copy(title = title, description = description) ?: return false
                 }
@@ -93,7 +101,8 @@ class AddOrEditTaskPresenter @Inject constructor(
     }
 
     fun navigateBack() {
-        val addOrEditTaskKey = fragment!!.getKey<AddOrEditTaskKey>()
+        view!!.hideKeyboard()
+        val addOrEditTaskKey = view!!.getKey<AddOrEditTaskKey>()
         if (addOrEditTaskKey.parent() is TasksKey) {
             messageQueue.pushMessageTo(addOrEditTaskKey.parent(), TasksFragment.SavedSuccessfullyMessage())
             backstack.goBack()

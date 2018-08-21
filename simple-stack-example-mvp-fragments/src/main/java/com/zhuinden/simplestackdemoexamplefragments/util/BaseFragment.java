@@ -13,31 +13,19 @@ import android.view.ViewGroup;
 import com.zhuinden.simplestack.KeyContextWrapper;
 import com.zhuinden.simplestackdemoexamplefragments.application.Key;
 
-import butterknife.Unbinder;
-
 /**
  * Created by Zhuinden on 2017.01.26..
  */
 
-public abstract class BaseFragment<C extends BaseFragment<C, P>, P extends BasePresenter<C, P>>
+public abstract class BaseFragment<V extends BaseViewContract, P extends BasePresenter<V>>
         extends Fragment {
     public static final String KEY_TAG = "KEY";
 
     public abstract P getPresenter();
 
-    public abstract C getThis();
+    public abstract V getThis();
 
     private Key key;
-
-    private Unbinder unbinder;
-
-    protected abstract Unbinder bindViews(View view);
-
-    protected abstract void injectSelf();
-
-    public BaseFragment() {
-        injectSelf();
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,17 +40,15 @@ public abstract class BaseFragment<C extends BaseFragment<C, P>, P extends BaseP
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(savedInstanceState != null) {
             getPresenter().fromBundle(savedInstanceState.getParcelable("PRESENTER_STATE"));
         }
         key = getArguments().getParcelable(KEY_TAG);
         if(key == null) {
-            throw new IllegalStateException("The fragment was initialized without a KEY argument!");
+            throw new IllegalStateException("The view was initialized without a KEY argument!");
         }
-        View view = LayoutInflater.from(new KeyContextWrapper(inflater.getContext(), key)).inflate(key.layout(), container, false);
-        unbinder = bindViews(view);
-        return view;
+        return LayoutInflater.from(new KeyContextWrapper(inflater.getContext(), key)).inflate(key.layout(), container, false);
     }
 
     @Override
@@ -80,8 +66,6 @@ public abstract class BaseFragment<C extends BaseFragment<C, P>, P extends BaseP
     @Override
     public void onDestroyView() {
         getPresenter().detachFragment(getThis());
-        unbinder.unbind();
-        unbinder = null;
         super.onDestroyView();
     }
 

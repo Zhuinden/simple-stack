@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
@@ -8,12 +9,13 @@ import com.zhuinden.simplestackdemoexamplefragments.R;
 import com.zhuinden.simplestackdemoexamplefragments.application.BaseKey;
 
 /**
- * Created by Zhuinden on 2017.01.25..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
 @AutoValue
 public abstract class StatisticsKey
         extends BaseKey {
+    @NonNull
     @Override
     protected Fragment createFragment() {
         return new StatisticsFragment();

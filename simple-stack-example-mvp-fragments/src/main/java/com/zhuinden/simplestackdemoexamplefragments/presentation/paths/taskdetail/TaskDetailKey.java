@@ -9,7 +9,7 @@ import com.zhuinden.simplestackdemoexamplefragments.R;
 import com.zhuinden.simplestackdemoexamplefragments.application.BaseKey;
 
 /**
- * Created by Zhuinden on 2017.01.25..
+ * Created by Zhuinden on 2018. 08. 20.
  */
 
 @AutoValue
@@ -21,6 +21,7 @@ public abstract class TaskDetailKey
         return new AutoValue_TaskDetailKey(R.layout.path_taskdetail, taskId);
     }
 
+    @NonNull
     @Override
     protected Fragment createFragment() {
         return new TaskDetailFragment();
