@@ -41,10 +41,10 @@ class AddOrEditTaskPresenter @Inject constructor(
 
     override fun onAttach(view: AddOrEditTaskView) {
         val addOrEditTaskKey = Backstack.getKey<AddOrEditTaskKey>(view.context)
-        taskId = addOrEditTaskKey.taskId()
+        taskId = addOrEditTaskKey.taskId
 
         if (taskId.isNotEmpty()) {
-            taskRepository.findTask(addOrEditTaskKey.taskId())
+            taskRepository.findTask(addOrEditTaskKey.taskId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { taskOptional ->
                     val task = taskOptional.takeIf { it.isPresent }?.get() ?: return@subscribe
@@ -100,11 +100,14 @@ class AddOrEditTaskPresenter @Inject constructor(
     fun navigateBack() {
         val addOrEditTaskKey = Backstack.getKey<AddOrEditTaskKey>(view!!.context)
         view!!.hideKeyboard()
-        if (addOrEditTaskKey.parent() is TasksKey) {
-            messageQueue.pushMessageTo(backstack.root<TasksKey>()!!, TasksView.SavedSuccessfullyMessage())
-            backstack.goBack()
-        } else {
-            backstack.jumpToRoot(StateChange.BACKWARD)
+        when(addOrEditTaskKey) {
+            is AddOrEditTaskKey.AddTaskKey -> {
+                messageQueue.pushMessageTo(backstack.root<TasksKey>()!!, TasksView.SavedSuccessfullyMessage())
+                backstack.goBack()
+            }
+            is AddOrEditTaskKey.EditTaskKey -> {
+                backstack.jumpToRoot(StateChange.BACKWARD)
+            }
         }
     }
 }

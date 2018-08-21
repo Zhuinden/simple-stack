@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         val backstack = Navigator.configure()
             .setDeferredInitialization(true)
             .setStateChanger(this)
-            .install(this, root, History.single(TasksKey.create()))
+            .install(this, root, History.single(TasksKey()))
         backstackHolder.backstack = backstack
 
         val mainScopeListener: MainScopeListener? = supportFragmentManager.findFragmentByTag(

@@ -49,11 +49,11 @@ class TasksPresenter @Inject constructor(
     }
 
     fun openAddNewTask() {
-        backstack.goTo(AddOrEditTaskKey.create(Backstack.getKey<Key>(view!!.context)))
+        backstack.goTo(AddOrEditTaskKey.AddTaskKey(Backstack.getKey<Key>(view!!.context)))
     }
 
     fun openTaskDetails(task: Task) {
-        backstack.goTo(TaskDetailKey.create(task.id))
+        backstack.goTo(TaskDetailKey(task.id))
     }
 
     fun completeTask(task: Task) {

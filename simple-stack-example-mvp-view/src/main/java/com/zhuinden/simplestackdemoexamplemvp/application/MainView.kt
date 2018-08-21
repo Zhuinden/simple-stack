@@ -32,13 +32,14 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
     private lateinit var drawerLayout: DrawerLayout
 
     private val backstackHolder = Injector.get().backstackHolder()
+    private val backstack by lazy { backstackHolder.backstack }
 
     private lateinit var drawerToggle: ActionBarDrawerToggle
 
     private val navigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener { item ->
         when (item.getItemId()) {
-            R.id.list_navigation_menu_item -> backstackHolder.backstack.goTo(TasksKey.create())
-            R.id.statistics_navigation_menu_item -> backstackHolder.backstack.goTo(StatisticsKey.create())
+            R.id.list_navigation_menu_item -> backstack.goTo(TasksKey())
+            R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey())
             else -> {
             }
         }
@@ -122,7 +123,7 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
         }
         drawerLayout.setDrawerListener(drawerToggle)
 
-        drawerToggle.toolbarNavigationClickListener = OnClickListener { backstackHolder.backstack.goBack() }
+        drawerToggle.toolbarNavigationClickListener = OnClickListener { backstack.goBack() }
         actionBar.setDisplayHomeAsUpEnabled(false)
         actionBar.setHomeButtonEnabled(true)
     }
