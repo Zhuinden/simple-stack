@@ -20,10 +20,8 @@ import android.arch.lifecycle.MutableLiveData;
 import com.zhuinden.simplestackexamplemvvm.core.scheduler.Scheduler;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Experimental.
- */
 public class LiveResults<T>
         extends MutableLiveData<List<T>> {
     private final DatabaseManager databaseManager;
@@ -43,9 +41,49 @@ public class LiveResults<T>
         databaseManager.addLiveResults(this);
     }
 
+    private AtomicBoolean isInvalid = new AtomicBoolean(true); // from ComputableLiveData
+    private AtomicBoolean isComputing = new AtomicBoolean(false); // from ComputableLiveData
+
     public void refresh() {
         backgroundScheduler.execute(() -> {
-            postValue(databaseManager.findAll(table, mapper, queryDefinition));
+            // directly taken from ComputableLiveData to eliminate possible race conditions.
+            // imagine scenario that a write happens that modifies 1 item and takes 500 ms to query.
+            // another write happens 200 ms later that deletes all items. Now querying takes 20 ms.
+            // the previous write would overwrite the deletion that occurs later.
+            // using the code of ComputableLiveData, we can eliminate that scenario.
+            // the second write would cause "isInvalid" to be set,
+            // so the query will be run again on the first thread's execution until it is done.
+            // Computation will also only happen on the first initiating thread,
+            // other threads will exit immediately instead.
+            boolean didCompute;
+            do {
+                didCompute = false;
+                // compute can happen only in 1 thread but no reason to lock others.
+                if(isComputing.compareAndSet(false, true)) {
+                    // as long as it is invalid, keep computing.
+                    try {
+                        List<T> value = null;
+                        while(isInvalid.compareAndSet(true, false)) {
+                            didCompute = true;
+                            value = databaseManager.findAll(table, mapper, queryDefinition);
+                        }
+                        if(didCompute) {
+                            postValue(value);
+                        }
+                    } finally {
+                        // release compute lock
+                        isComputing.set(false);
+                    }
+                }
+                // THESE COMMENTS ARE FROM ComputableLiveData.
+                // check invalid after releasing compute lock to avoid the following scenario.
+                // - Thread A runs compute()
+                // - Thread A checks invalid, it is false
+                // - Main thread sets invalid to true
+                // - Thread B runs, fails to acquire compute lock and skips
+                // - Thread A releases compute lock
+                // We've left invalid in set state. The check below recovers.
+            } while(didCompute && isInvalid.get());
         });
     }
 
