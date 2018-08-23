@@ -1,5 +1,13 @@
 # Change log
 
+-Simple Stack 1.12.0 (2018-08-23)
+--------------------------------
+- CHANGE: `backstack.top()` and `backstack.root()` now throw exception (just like `fromTop()`) if the method is called before a StateChanger is set (and the backstack becomes initialized). This makes using `root()`/`top()` nicer in Kotlin.
+
+- FIX: During a *second* "initialize" state change (which happens when calling `setStateChanger()`), accessing the Backstack's `getHistory()`, `top()` and `root()` inside the `StateChanger` could return incorrect value.
+
+- UPDATE: MVP samples are now written in Kotlin. MVVM sample now has a better SQLite-based non-Room reactive wrapper (for people trying out SQLite without Room). Some samples were renamed.
+
 -Simple Stack 1.11.7 (2018-08-18)
 --------------------------------
 - ADDED: `ServiceBinder.getBackstack()` method. This allows scoped services to be given the backstack as constructor argument.

@@ -18,7 +18,6 @@ package com.zhuinden.simplestack;
 import android.content.Context;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -128,9 +127,10 @@ public class Backstack {
         this.stateChanger = stateChanger;
         if(registerMode == INITIALIZE && (queuedStateChanges.size() <= 1 || stack.isEmpty())) {
             if(!beginStateChangeIfPossible()) {
-                ArrayList<Object> newHistory = new ArrayList<>();
-                newHistory.addAll(selectActiveHistory());
-                stack = initialParameters;
+                ArrayList<Object> newHistory = new ArrayList<>(selectActiveHistory());
+                if(stack.isEmpty()) {
+                    stack = initialParameters;
+                }
                 enqueueStateChange(newHistory, StateChange.REPLACE, true);
             }
             return;
@@ -437,13 +437,15 @@ public class Backstack {
     /**
      * Returns the root (first) element of this history, or null if the history is empty.
      *
+     * @throws IllegalStateException if the backstack history doesn't contain any elements yet.
+     *
      * @param <K> the type of the key
      * @return the root (first) key
      */
-    @Nullable
+    @NonNull
     public <K> K root() {
         if(stack.isEmpty()) {
-            return null;
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
         }
         // noinspection unchecked
         return (K) stack.get(0);
@@ -452,13 +454,15 @@ public class Backstack {
     /**
      * Returns the last element in the list, or null if the history is empty.
      *
+     * @throws IllegalStateException if the backstack history doesn't contain any elements yet.
+     *
      * @param <K> the type of the key
      * @return the top key
      */
-    @Nullable
+    @NonNull
     public <K> K top() {
         if(stack.isEmpty()) {
-            return null;
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
         }
         // noinspection unchecked
         return (K) stack.get(stack.size() - 1);
@@ -573,8 +577,7 @@ public class Backstack {
         if(initialization) {
             previousState = Collections.emptyList();
         } else {
-            previousState = new ArrayList<>();
-            previousState.addAll(stack);
+            previousState = new ArrayList<>(stack);
         }
         final StateChange stateChange = new StateChange(this,
                 Collections.unmodifiableList(previousState),

@@ -898,26 +898,79 @@ public class BackstackTest {
     }
 
     @Test
+    public void topWorks() {
+        TestKey initial1 = new TestKey("hello1");
+        TestKey initial2 = new TestKey("hello2");
+        TestKey initial3 = new TestKey("hello3");
+        Backstack backstack = new Backstack(initial1, initial2, initial3);
+
+        try {
+            backstack.top();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                if(stateChange.getPreviousState().isEmpty()) {
+                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topNewState());
+                } else {
+                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topPreviousState());
+                }
+                completionCallback.stateChangeComplete();
+            }
+        };
+
+        backstack.setStateChanger(stateChanger);
+
+        assertThat(backstack.top()).isSameAs(initial3);
+
+        backstack.setHistory(History.of(initial1, initial2), StateChange.REPLACE);
+
+        assertThat(backstack.top()).isSameAs(initial2);
+
+        backstack.removeStateChanger();
+        backstack.setStateChanger(stateChanger);
+    }
+
+    @Test
     public void rootWorks() {
         TestKey initial1 = new TestKey("hello1");
         TestKey initial2 = new TestKey("hello2");
         TestKey initial3 = new TestKey("hello3");
         Backstack backstack = new Backstack(initial1);
 
-        assertThat(backstack.root()).isNull();
+        try {
+            backstack.root();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
 
-        backstack.setStateChanger(new StateChanger() {
+        StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                if(stateChange.getPreviousState().isEmpty()) {
+                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getNewState().get(0));
+                } else {
+                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getPreviousState().get(0));
+                }
                 completionCallback.stateChangeComplete();
             }
-        });
+        };
+
+        backstack.setStateChanger(stateChanger);
 
         assertThat(backstack.root()).isSameAs(initial1);
 
         backstack.setHistory(History.of(initial2, initial3), StateChange.REPLACE);
 
         assertThat(backstack.root()).isSameAs(initial2);
+
+        backstack.removeStateChanger();
+        backstack.setStateChanger(stateChanger);
     }
 
     @Test
@@ -1079,5 +1132,37 @@ public class BackstackTest {
         backstack.goUpChain(History.of(initial, other), true);
         callback.stateChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other);
+    }
+
+    @Test
+    public void getHistoryInsideStateChangeWorks() {
+        TestKey initial = new TestKey("initial");
+
+        TestKey other1 = new TestKey("other1");
+        TestKey other2 = new TestKey("other2");
+        Backstack backstack = new Backstack(initial);
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                List<?> history = stateChange.backstack().getHistory();
+                if(stateChange.getPreviousState().isEmpty()) {
+                    if(!history.isEmpty()) {
+                        assertThat(history).containsExactlyElementsOf(stateChange.getNewState());
+                    }
+                } else {
+                    assertThat(history).containsExactlyElementsOf(stateChange.getPreviousState());
+                }
+                completionCallback.stateChangeComplete();
+            }
+        };
+
+        backstack.setStateChanger(stateChanger);
+
+        backstack.setHistory(History.of(other1, other2), StateChange.REPLACE);
+
+        backstack.removeStateChanger();
+
+        backstack.setStateChanger(stateChanger);
     }
 }

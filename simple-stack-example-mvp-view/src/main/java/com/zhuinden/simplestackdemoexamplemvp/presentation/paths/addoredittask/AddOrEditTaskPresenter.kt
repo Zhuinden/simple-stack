@@ -102,7 +102,7 @@ class AddOrEditTaskPresenter @Inject constructor(
         view!!.hideKeyboard()
         when(addOrEditTaskKey) {
             is AddOrEditTaskKey.AddTaskKey -> {
-                messageQueue.pushMessageTo(backstack.root<TasksKey>()!!, TasksView.SavedSuccessfullyMessage())
+                messageQueue.pushMessageTo(backstack.root<TasksKey>(), TasksView.SavedSuccessfullyMessage())
                 backstack.goBack()
             }
             is AddOrEditTaskKey.EditTaskKey -> {

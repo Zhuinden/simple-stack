@@ -105,7 +105,7 @@ class AddOrEditTaskPresenter @Inject constructor(
         val addOrEditTaskKey = view!!.getKey<AddOrEditTaskKey>()
         when(addOrEditTaskKey) {
             is AddOrEditTaskKey.AddTaskKey -> {
-                messageQueue.pushMessageTo(backstack.root<TasksKey>()!!, TasksFragment.SavedSuccessfullyMessage())
+                messageQueue.pushMessageTo(backstack.root<TasksKey>(), TasksFragment.SavedSuccessfullyMessage())
                 backstack.goBack()
             }
             is AddOrEditTaskKey.EditTaskKey -> {
