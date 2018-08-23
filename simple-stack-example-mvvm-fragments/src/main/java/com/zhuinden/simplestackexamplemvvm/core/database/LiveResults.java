@@ -45,6 +45,7 @@ public class LiveResults<T>
     private AtomicBoolean isComputing = new AtomicBoolean(false); // from ComputableLiveData
 
     public void refresh() {
+        isInvalid.set(true);
         backgroundScheduler.execute(() -> {
             // directly taken from ComputableLiveData to eliminate possible race conditions.
             // imagine scenario that a write happens that modifies 1 item and takes 500 ms to query.
