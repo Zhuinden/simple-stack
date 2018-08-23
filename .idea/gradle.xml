@@ -5,16 +5,15 @@
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/simple-stack" />
-            <option value="$PROJECT_DIR$/simple-stack-example-basic-fragment" />
-            <option value="$PROJECT_DIR$/simple-stack-example-basic-view" />
+            <option value="$PROJECT_DIR$/simple-stack-example-basic-java-fragment" />
+            <option value="$PROJECT_DIR$/simple-stack-example-basic-java-view" />
+            <option value="$PROJECT_DIR$/simple-stack-example-basic-kotlin" />
             <option value="$PROJECT_DIR$/simple-stack-example-conductor" />
-            <option value="$PROJECT_DIR$/simple-stack-example-kotlin" />
-            <option value="$PROJECT_DIR$/simple-stack-example-kotlin-dagger" />
+            <option value="$PROJECT_DIR$/simple-stack-example-kotlin-community-sample" />
             <option value="$PROJECT_DIR$/simple-stack-example-multistack" />
             <option value="$PROJECT_DIR$/simple-stack-example-mvp-fragments" />
             <option value="$PROJECT_DIR$/simple-stack-example-mvp-view" />
