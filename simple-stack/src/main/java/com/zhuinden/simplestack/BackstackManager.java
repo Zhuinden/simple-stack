@@ -67,6 +67,8 @@ public class BackstackManager
         return SCOPES_TAG;
     }
 
+    private String activeScope = null;
+
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
@@ -77,7 +79,31 @@ public class BackstackManager
                     completionCallback.stateChangeComplete();
                     if(!backstack.isStateChangePending()) {
                         stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
-                        scopeManager.clearScopesNotIn(stateChange.getNewState());
+
+                        History<Object> newState = stateChange.getNewState();
+
+                        // activation/deactivation
+                        ScopeKey topScopeKey = null;
+                        for(int i = 0, size = newState.size(); i < size; i++) {
+                            Object key = newState.fromTop(i);
+                            if(key instanceof ScopeKey) {
+                                topScopeKey = (ScopeKey) key;
+                                break;
+                            }
+                        }
+                        String newScopeTag = null;
+                        if(topScopeKey != null) {
+                            newScopeTag = topScopeKey.getScopeTag();
+                        }
+                        if(activeScope == null /* no active scope */
+                                || (activeScope != null && !activeScope.equals(newScopeTag)) /* new active scope */) {
+                            String previousScopeTag = activeScope;
+                            activeScope = newScopeTag;
+                            scopeManager.dispatchActivation(previousScopeTag, newScopeTag);
+                        }
+
+                        // scope eviction + scoped
+                        scopeManager.clearScopesNotIn(newState);
                     }
                 }
             });
@@ -231,6 +257,13 @@ public class BackstackManager
      * Note that if you use {@link BackstackDelegate} or {@link com.zhuinden.simplestack.navigator.Navigator}, then there is no need to call this method manually.
      */
     public void finalizeScopes() {
+        if(activeScope != null) {
+            String previousScopeTag = activeScope;
+            activeScope = null;
+            //noinspection ConstantConditions
+            scopeManager.dispatchActivation(previousScopeTag, activeScope);
+        }
+
         List<Object> history = backstack.getHistory();
         Set<String> scopeSet = new LinkedHashSet<>();
         for(Object key : history) {

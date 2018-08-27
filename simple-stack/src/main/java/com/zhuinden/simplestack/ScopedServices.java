@@ -15,11 +15,13 @@ import java.util.Map;
  *
  * Services that implement {@link Scoped} will receive callbacks for when their scope is created, and their scope is destroyed.
  *
+ * Services that implements {@link Activated} will receive callbacks for when their scope becomes the active (top-most) scope, or become inactive.
+ *
  * NOTE: Think of it as configuration: it is kept across configuration change, so it should not reference the Activity directly.
  */
 public interface ScopedServices {
     /**
-     * When a service implements Scoped, then it will receive a callback when the service is registered/unregistered from the scope.
+     * When a service implements {@link Scoped}, then it will receive a callback when the service is registered/unregistered from the scope.
      */
     public static interface Scoped {
         /**
@@ -35,6 +37,25 @@ public interface ScopedServices {
          * @param scope the tag of the scope
          */
         void onExitScope(@NonNull String scope);
+    }
+
+    /**
+     * When a service implements {@link Activated}, then it will receive a callback when the scope the service belongs to becomes the active (top-most) scope.
+     */
+    public static interface Activated {
+        /**
+         * Called when the scope the service is bound to becomes the top-most scope.
+         *
+         * @param scope the tag of the scope
+         */
+        void onScopeActive(@NonNull String scope);
+
+        /**
+         * Called when the scope is no longer the top-most scope.
+         *
+         * @param scope the tag of the scope
+         */
+        void onScopeInactive(@NonNull String scope);
     }
 
     /**

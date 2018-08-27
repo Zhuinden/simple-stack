@@ -1,6 +1,7 @@
 package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.zhuinden.statebundle.StateBundle;
 
@@ -33,7 +34,7 @@ class ScopeManager {
         this.backstackManager = backstackManager;
     }
 
-    public Backstack getBackstack() {
+    Backstack getBackstack() {
         return backstackManager.getBackstack();
     }
 
@@ -123,6 +124,36 @@ class ScopeManager {
                 }
             }
             rootBundle.remove(scopeTag);
+        }
+    }
+
+    void dispatchActivation(@Nullable String previousScopeTag, @Nullable String newScopeTag) {
+        if(newScopeTag != null) {
+            if(!scopes.containsKey(newScopeTag)) {
+                throw new AssertionError(
+                        "The new scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
+            }
+            Map<String, Object> newServiceMap = scopes.get(newScopeTag);
+            for(Object service : newServiceMap.values()) {
+                if(service instanceof ScopedServices.Activated) {
+                    ((ScopedServices.Activated) service).onScopeActive(newScopeTag);
+                }
+            }
+        }
+
+        if(previousScopeTag != null) {
+            if(!scopes.containsKey(previousScopeTag)) {
+                throw new AssertionError(
+                        "The previous scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
+            }
+            Map<String, Object> previousServiceMap = scopes.get(previousScopeTag);
+            List<Object> previousServices = new ArrayList<>(previousServiceMap.values());
+            Collections.reverse(previousServices);
+            for(Object service : previousServices) {
+                if(service instanceof ScopedServices.Activated) {
+                    ((ScopedServices.Activated) service).onScopeInactive(previousScopeTag);
+                }
+            }
         }
     }
 
