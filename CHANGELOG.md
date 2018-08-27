@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 1.12.1 (2018-08-28)
+--------------------------------
+- ADDED: `ScopedServices.Activated`. Implementing `Activated` for a scoped service makes the service receive a callback when the scope it is bound to becomes the top-most scope, and when it stops being the top-most scope.
+
+There are strict ordering guarantees that `onEnterScope`, `onScopeActive`, `onScopeInactive`, `onExitScope` are called in *this* order.
+
+`onScopeInactive` is called in reverse order (just like `onExitScope`).
+
+When navigating from one scope to another scope, the new scope becomes active before the previous scope becomes inactive.
+
 -Simple Stack 1.12.0 (2018-08-23)
 --------------------------------
 - CHANGE: `backstack.top()` and `backstack.root()` now throw exception (just like `fromTop()`) if the method is called before a StateChanger is set (and the backstack becomes initialized). This makes using `root()`/`top()` nicer in Kotlin.
