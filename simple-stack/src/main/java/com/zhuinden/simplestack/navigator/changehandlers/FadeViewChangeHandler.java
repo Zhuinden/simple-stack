@@ -35,4 +35,9 @@ public final class FadeViewChangeHandler
         set.play(ObjectAnimator.ofFloat(newView, "alpha", 0, 1));
         return set;
     }
+
+    @Override
+    protected void resetPreviousViewValues(View previousView) {
+        previousView.setAlpha(1f);
+    }
 }

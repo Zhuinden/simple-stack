@@ -38,4 +38,9 @@ public final class SegueViewChangeHandler
         set.play(ObjectAnimator.ofFloat(to, "translationX", toTranslation, 0));
         return set;
     }
+
+    @Override
+    protected void resetPreviousViewValues(View previousView) {
+        previousView.setTranslationX(0f);
+    }
 }

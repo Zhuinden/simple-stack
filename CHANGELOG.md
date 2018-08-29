@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 1.12.2 (2018-08-29)
+--------------------------------
+- CHANGE: `AnimatorViewChangeHandler` has an overridable method called `resetPreviousViewValues()`, which receives the previous view after animation is complete.
+
+- CHANGE: `FadeViewChangeHandler` and `SegueViewChangeHandler` now reset `alpha = 1f` and `translationX = 0f` respectively, after animation is complete and the view is removed.
+
 -Simple Stack 1.12.1 (2018-08-28)
 --------------------------------
 - ADDED: `ScopedServices.Activated`. Implementing `Activated` for a scoped service makes the service receive a callback when the scope it is bound to becomes the top-most scope, and when it stops being the top-most scope.

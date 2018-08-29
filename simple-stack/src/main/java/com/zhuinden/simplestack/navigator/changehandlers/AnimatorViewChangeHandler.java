@@ -42,6 +42,7 @@ public abstract class AnimatorViewChangeHandler
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         container.removeView(previousView);
+                        resetPreviousViewValues(previousView);
                         completionCallback.onCompleted();
                     }
                 });
@@ -106,5 +107,9 @@ public abstract class AnimatorViewChangeHandler
     public AnimatorViewChangeHandler setDuration(@Nullable Long duration) {
         this.duration = duration;
         return this;
+    }
+
+    protected void resetPreviousViewValues(View previousView) {
+        // override to use specific behavior
     }
 }
