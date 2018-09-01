@@ -5,10 +5,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.RelativeLayout
+import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task
+import com.zhuinden.simplestackdemoexamplemvp.util.MvpPresenter
 import com.zhuinden.simplestackdemoexamplemvp.util.Strings
 import com.zhuinden.simplestackdemoexamplemvp.util.hide
 import com.zhuinden.simplestackdemoexamplemvp.util.show
@@ -19,7 +20,19 @@ import kotlinx.android.synthetic.main.path_taskdetail.view.*
  */
 
 class TaskDetailView : RelativeLayout, MainActivity.OptionsItemSelectedListener {
-    val taskDetailPresenter = Injector.get().taskDetailPresenter()
+    companion object {
+        const val CONTROLLER_TAG = "TaskDetailView.Presenter"
+    }
+
+    interface Presenter: MvpPresenter<TaskDetailView> {
+        fun onTaskChecked(task: Task, checked: Boolean)
+
+        fun onTaskEditButtonClicked()
+
+        fun onTaskDeleteButtonClicked()
+    }
+
+    val taskDetailPresenter by lazy { Navigator.lookupService<Presenter>(context, CONTROLLER_TAG) }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -35,10 +48,6 @@ class TaskDetailView : RelativeLayout, MainActivity.OptionsItemSelectedListener 
             }
         }
         return false
-    }
-
-    fun editTask() {
-        taskDetailPresenter.editTask()
     }
 
     fun showTitle(title: String) {
@@ -85,16 +94,16 @@ class TaskDetailView : RelativeLayout, MainActivity.OptionsItemSelectedListener 
     private fun showCompletionStatus(task: Task, completed: Boolean) {
         checkboxTaskDetailComplete.isChecked = completed
         checkboxTaskDetailComplete.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                taskDetailPresenter.completeTask(task)
-            } else {
-                taskDetailPresenter.activateTask(task)
-            }
+            taskDetailPresenter.onTaskChecked(task, isChecked)
         }
     }
 
+    fun onTaskEditButtonClicked() {
+        taskDetailPresenter.onTaskEditButtonClicked()
+    }
+
     fun deleteTask() {
-        taskDetailPresenter.deleteTask()
+        taskDetailPresenter.onTaskDeleteButtonClicked()
     }
 
     override fun onAttachedToWindow() {

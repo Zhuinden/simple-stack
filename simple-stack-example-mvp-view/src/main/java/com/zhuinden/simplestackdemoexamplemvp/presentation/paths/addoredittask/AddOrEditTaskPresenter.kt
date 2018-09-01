@@ -23,7 +23,7 @@ class AddOrEditTaskPresenter @Inject constructor(
     private val taskRepository: TaskRepository,
     private val messageQueue: MessageQueue,
     private val backstack: Backstack
-) : BasePresenter<AddOrEditTaskView>(), Bundleable {
+) : BasePresenter<AddOrEditTaskView>(), AddOrEditTaskView.Presenter, Bundleable {
     private var title: String? = null
     private var description: String? = null
 
@@ -31,50 +31,14 @@ class AddOrEditTaskPresenter @Inject constructor(
 
     private var task: Task? = null
 
-    fun updateTitle(title: String) {
+    override fun onTitleChanged(title: String) {
         this.title = title
     }
 
-    fun updateDescription(description: String) {
+    override fun onDescriptionChanged(description: String) {
         this.description = description
     }
 
-    override fun onAttach(view: AddOrEditTaskView) {
-        val addOrEditTaskKey = Backstack.getKey<AddOrEditTaskKey>(view.context)
-        taskId = addOrEditTaskKey.taskId
-
-        if (taskId.isNotEmpty()) {
-            taskRepository.findTask(addOrEditTaskKey.taskId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { taskOptional ->
-                    val task = taskOptional.takeIf { it.isPresent }?.get() ?: return@subscribe
-                    this.task = task
-
-                    if (this.title == null || this.description == null) {
-                        this.title = task.title
-                        this.description = task.description
-                        view.setTitle(title ?: "")
-                        view.setDescription(description ?: "")
-                    }
-                }
-        }
-    }
-
-    override fun onDetach(view: AddOrEditTaskView) {
-
-    }
-
-    override fun toBundle(): StateBundle = StateBundle().apply {
-        putString("title", title)
-        putString("description", description)
-    }
-
-    override fun fromBundle(bundle: StateBundle?) {
-        bundle?.run {
-            title = getString("title")
-            description = getString("description")
-        }
-    }
 
     fun saveTask(): Boolean {
         val title = title
@@ -100,7 +64,7 @@ class AddOrEditTaskPresenter @Inject constructor(
     fun navigateBack() {
         val addOrEditTaskKey = Backstack.getKey<AddOrEditTaskKey>(view!!.context)
         view!!.hideKeyboard()
-        when(addOrEditTaskKey) {
+        when (addOrEditTaskKey) {
             is AddOrEditTaskKey.AddTaskKey -> {
                 messageQueue.pushMessageTo(backstack.root<TasksKey>(), TasksView.SavedSuccessfullyMessage())
                 backstack.goBack()
@@ -108,6 +72,47 @@ class AddOrEditTaskPresenter @Inject constructor(
             is AddOrEditTaskKey.EditTaskKey -> {
                 backstack.jumpToRoot(StateChange.BACKWARD)
             }
+        }
+    }
+
+    override fun onSaveButtonClicked() {
+        saveTask()
+        navigateBack()
+    }
+
+    override fun onAttach(view: AddOrEditTaskView) {
+        val addOrEditTaskKey = Backstack.getKey<AddOrEditTaskKey>(view.context)
+        taskId = addOrEditTaskKey.taskId
+
+        if (taskId.isNotEmpty()) {
+            taskRepository.findTask(addOrEditTaskKey.taskId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { taskOptional ->
+                    val task = taskOptional.takeIf { it.isPresent }?.get() ?: return@subscribe
+                    this.task = task
+
+                    if (this.title == null || this.description == null) {
+                        this.title = task.title
+                        this.description = task.description
+                        view.setTitle(title ?: "")
+                        view.setDescription(description ?: "")
+                    }
+                }
+        }
+    }
+
+    override fun onDetach(view: AddOrEditTaskView) {
+    }
+
+    override fun toBundle(): StateBundle = StateBundle().apply {
+        putString("title", title)
+        putString("description", description)
+    }
+
+    override fun fromBundle(bundle: StateBundle?) {
+        bundle?.run {
+            title = getString("title")
+            description = getString("description")
         }
     }
 }

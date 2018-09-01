@@ -1,14 +1,23 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks
 
 import android.view.View
+import com.zhuinden.simplestack.ScopedServices
 import com.zhuinden.simplestack.navigator.ViewChangeHandler
 import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
+import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.application.Key
+import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class TasksKey(val placeholder: String) : Key {
+data class TasksKey(val placeholder: String) : Key, ServiceProvider.HasServices {
+    override fun getScopeTag(): String = "Tasks"
+
+    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+        serviceBinder.add(TasksView.CONTROLLER_TAG, Injector.get().tasksPresenter())
+    }
+
     constructor() : this("")
 
     override fun layout(): Int = R.layout.path_tasks

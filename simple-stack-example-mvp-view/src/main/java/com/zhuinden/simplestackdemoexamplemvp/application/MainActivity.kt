@@ -15,6 +15,7 @@ import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestack.navigator.changehandlers.FadeViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), StateChanger {
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         setContentView(R.layout.activity_main)
 
         val backstack = Navigator.configure()
+            .setScopedServices(ServiceProvider())
             .setDeferredInitialization(true)
             .setStateChanger(this)
             .install(this, root, History.single(TasksKey()))

@@ -16,8 +16,7 @@ import javax.inject.Inject
 class TaskDetailPresenter @Inject constructor(
     private val taskRepository: TaskRepository,
     private val backstack: Backstack
-) : BasePresenter<TaskDetailView>() {
-
+) : BasePresenter<TaskDetailView>(), TaskDetailView.Presenter {
     lateinit var taskDetailKey: TaskDetailKey
 
     var taskId: String = ""
@@ -44,7 +43,7 @@ class TaskDetailPresenter @Inject constructor(
     override fun onDetach(view: TaskDetailView) {
     }
 
-    fun editTask() {
+    override fun onTaskEditButtonClicked() {
         if (taskId.isEmpty()) {
             view!!.showMissingTask()
             return
@@ -60,7 +59,15 @@ class TaskDetailPresenter @Inject constructor(
         taskRepository.setTaskActive(task)
     }
 
-    fun deleteTask() {
+    override fun onTaskChecked(task: Task, checked: Boolean) {
+        if (checked) {
+            completeTask(task)
+        } else {
+            activateTask(task)
+        }
+    }
+
+    override fun onTaskDeleteButtonClicked() {
         if (task != null) {
             taskRepository.deleteTask(task!!)
             backstack.goBack()

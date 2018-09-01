@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
+import com.zhuinden.simplestackdemoexamplemvp.util.MvpPresenter
 import kotlinx.android.synthetic.main.path_statistics.view.*
 
 /**
@@ -14,9 +16,17 @@ import kotlinx.android.synthetic.main.path_statistics.view.*
  */
 
 class StatisticsView : LinearLayout {
+    companion object {
+        const val CONTROLLER_TAG = "StatisticsView.Presenter"
+    }
+
+    interface Presenter: MvpPresenter<StatisticsView> {
+    }
+
 
     private val myResources: Resources = Injector.get().resources()
-    private val statisticsPresenter = Injector.get().statisticsPresenter()
+
+    private val statisticsPresenter by lazy { Navigator.lookupService<Presenter>(context, CONTROLLER_TAG) }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -25,10 +35,9 @@ class StatisticsView : LinearLayout {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     fun setProgressIndicator(active: Boolean) {
-        if (active) {
-            textStatistics.text = myResources.getString(R.string.loading)
-        } else {
-            textStatistics.text = ""
+        textStatistics.text = when {
+            active -> myResources.getString(R.string.loading)
+            else -> ""
         }
     }
 

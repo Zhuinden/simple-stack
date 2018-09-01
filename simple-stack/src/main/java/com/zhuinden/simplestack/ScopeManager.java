@@ -249,6 +249,6 @@ class ScopeManager {
                 return getService(scopeTag, serviceTag);
             }
         }
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes!");
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes! Is the scope tag registered via a ScopeKey?");
     }
 }

@@ -11,45 +11,60 @@ import android.util.AttributeSet
 import android.view.MenuItem
 import butterknife.ButterKnife
 import butterknife.OnClick
-import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.*
-import com.zhuinden.statebundle.StateBundle
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.path_tasks.view.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by Owner on 2017. 01. 26..
  */
 
-class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelectedListener, StateChanger, Bundleable, MessageQueue.Receiver {
+class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelectedListener, StateChanger, MessageQueue.Receiver {
+    companion object {
+        const val CONTROLLER_TAG = "TasksView.Presenter"
+    }
+
+    interface Presenter: MvpPresenter<TasksView> {
+        fun onTaskCheckClicked(task: Task)
+
+        fun onTaskRowClicked(task: Task)
+
+        fun onNoTasksAddButtonClicked()
+
+        fun onFilterActiveSelected()
+
+        fun onFilterCompletedSelected()
+
+        fun onFilterAllSelected()
+
+        fun onClearCompletedClicked()
+
+        fun onRefreshClicked()
+    }
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-    private val tasksPresenter = Injector.get().tasksPresenter()
+    private val tasksPresenter by lazy { Navigator.lookupService<Presenter>(context, CONTROLLER_TAG) }
+
     private val myResources = Injector.get().resources()
 
     lateinit var tasksAdapter: TasksAdapter
 
     private val taskItemListener: TasksAdapter.TaskItemListener = object : TasksAdapter.TaskItemListener {
-        override fun openTask(task: Task) {
-            tasksPresenter.openTaskDetails(task)
+        override fun onTaskCheckClicked(task: Task) {
+            tasksPresenter.onTaskCheckClicked(task)
         }
 
-        override fun completeTask(task: Task) {
-            tasksPresenter.completeTask(task)
-        }
-
-        override fun uncompleteTask(task: Task) {
-            tasksPresenter.uncompleteTask(task)
+        override fun onTaskRowClicked(task: Task) {
+            tasksPresenter.onTaskRowClicked(task)
         }
     }
 
@@ -60,7 +75,7 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
                 return true
             }
             R.id.menu_clear -> {
-                clearCompletedTasks()
+                tasksPresenter.onClearCompletedClicked()
                 return true
             }
             R.id.menu_refresh -> {
@@ -80,19 +95,9 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
         completionCallback.stateChangeComplete()
     }
 
-    override fun toBundle(): StateBundle {
-        return tasksPresenter.toBundle()
-    }
-
-    override fun fromBundle(bundle: StateBundle?) {
-        if (bundle != null) {
-            tasksPresenter.fromBundle(bundle)
-        }
-    }
-
     @OnClick(R.id.buttonNoTasksAdd)
     fun openAddNewTask() {
-        tasksPresenter.openAddNewTask()
+        tasksPresenter.onNoTasksAddButtonClicked()
     }
 
     class SavedSuccessfullyMessage
@@ -155,9 +160,9 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.active -> tasksPresenter.setFiltering(TasksFilterType.ActiveTasks())
-                R.id.completed -> tasksPresenter.setFiltering(TasksFilterType.CompletedTasks())
-                else -> tasksPresenter.setFiltering(TasksFilterType.AllTasks())
+                R.id.active -> tasksPresenter.onFilterActiveSelected()
+                R.id.completed -> tasksPresenter.onFilterCompletedSelected()
+                else -> tasksPresenter.onFilterAllSelected()
             }
             //loadTasks(false); // reactive data source ftw
             true
@@ -166,18 +171,9 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
         popup.show()
     }
 
-    fun clearCompletedTasks() {
-        tasksPresenter.deleteCompletedTasks()
-    }
-
     @SuppressLint("CheckResult")
     fun refresh() {
-        isRefreshing = true
-        Single.just("")
-            .delay(2500, TimeUnit.MILLISECONDS)
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { ignored -> isRefreshing = false }
+        tasksPresenter.onRefreshClicked()
     }
 
     fun showNoActiveTasks() {

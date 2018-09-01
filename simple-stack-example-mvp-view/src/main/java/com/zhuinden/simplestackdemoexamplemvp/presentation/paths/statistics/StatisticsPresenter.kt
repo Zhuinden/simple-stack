@@ -15,8 +15,7 @@ import javax.inject.Inject
 
 class StatisticsPresenter @Inject constructor(
     private val tasksRepository: TaskRepository
-) : BasePresenter<StatisticsView>() {
-
+)  : BasePresenter<StatisticsView>(), StatisticsView.Presenter {
     lateinit var disposable: Disposable
 
     override fun onAttach(view: StatisticsView) {

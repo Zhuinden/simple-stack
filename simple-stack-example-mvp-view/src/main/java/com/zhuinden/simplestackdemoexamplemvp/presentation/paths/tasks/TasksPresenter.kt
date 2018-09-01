@@ -12,9 +12,11 @@ import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.BasePresenter
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue
 import com.zhuinden.statebundle.StateBundle
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -25,13 +27,13 @@ class TasksPresenter @Inject constructor(
     private val backstack: Backstack,
     private val taskRepository: TaskRepository,
     private val messageQueue: MessageQueue
-) : BasePresenter<TasksView>(), Bundleable {
-
+) : BasePresenter<TasksView>(), TasksView.Presenter, Bundleable {
     private val filterType: BehaviorRelay<TasksFilterType> = BehaviorRelay.createDefault(TasksFilterType.AllTasks())
 
     lateinit var disposable: Disposable
 
-    public override fun onAttach(view: TasksView) {
+    override fun onAttach(view: TasksView) {
+        super.onAttach(view)
         disposable = filterType
             .doOnNext { tasksFilterType -> view.setFilterLabelText(tasksFilterType.filterText) } //
             .switchMap { tasksFilterType -> tasksFilterType.filterTask(taskRepository) } //
@@ -44,34 +46,71 @@ class TasksPresenter @Inject constructor(
         messageQueue.requestMessages(Backstack.getKey<Key>(view.context), view)
     }
 
-    public override fun onDetach(view: TasksView) {
+    override fun onDetach(view: TasksView) {
         disposable.dispose()
     }
 
-    fun openAddNewTask() {
-        backstack.goTo(AddOrEditTaskKey.AddTaskKey(Backstack.getKey<Key>(view!!.context)))
+    override fun onTaskCheckClicked(task: Task) {
+        if (!task.isCompleted) {
+            completeTask(task)
+        } else {
+            uncompleteTask(task)
+        }
     }
 
-    fun openTaskDetails(task: Task) {
+    override fun onNoTasksAddButtonClicked() {
+        openAddNewTask()
+    }
+
+    override fun onTaskRowClicked(task: Task) {
         backstack.goTo(TaskDetailKey(task.id))
     }
 
-    fun completeTask(task: Task) {
+    override fun onFilterActiveSelected() {
+        setFiltering(TasksFilterType.ActiveTasks())
+    }
+
+    override fun onFilterCompletedSelected() {
+        setFiltering(TasksFilterType.CompletedTasks())
+    }
+
+    override fun onFilterAllSelected() {
+        setFiltering(TasksFilterType.AllTasks())
+    }
+
+    override fun onClearCompletedClicked() {
+        deleteCompletedTasks()
+    }
+
+    override fun onRefreshClicked() {
+        view?.isRefreshing = true
+        Single.just("")
+            .delay(2500, TimeUnit.MILLISECONDS)
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { ignored -> view?.isRefreshing = false }
+    }
+
+    private fun openAddNewTask() {
+        backstack.goTo(AddOrEditTaskKey.AddTaskKey(Backstack.getKey<Key>(view!!.context)))
+    }
+
+    private fun completeTask(task: Task) {
         taskRepository.setTaskCompleted(task)
         view!!.showTaskMarkedComplete()
     }
 
-    fun uncompleteTask(task: Task) {
+    private fun uncompleteTask(task: Task) {
         taskRepository.setTaskActive(task)
         view!!.showTaskMarkedActive()
     }
 
-    fun deleteCompletedTasks() {
+    private fun deleteCompletedTasks() {
         taskRepository.deleteCompletedTasks()
         view!!.showCompletedTasksCleared()
     }
 
-    fun setFiltering(filterType: TasksFilterType) {
+    private fun setFiltering(filterType: TasksFilterType) {
         this.filterType.accept(filterType)
     }
 
@@ -80,7 +119,7 @@ class TasksPresenter @Inject constructor(
     }
 
     override fun fromBundle(bundle: StateBundle?) {
-        bundle?.run{
+        bundle?.run {
             filterType.accept(getParcelable("FILTERING"))
         }
     }

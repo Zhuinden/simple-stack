@@ -1,14 +1,23 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics
 
 import android.view.View
+import com.zhuinden.simplestack.ScopedServices
 import com.zhuinden.simplestack.navigator.ViewChangeHandler
 import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
+import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.application.Key
+import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class StatisticsKey(val placeholder: String) : Key {
+data class StatisticsKey(val placeholder: String) : Key, ServiceProvider.HasServices {
+    override fun getScopeTag(): String = " Statistics"
+
+    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+        serviceBinder.add(StatisticsView.CONTROLLER_TAG, Injector.get().statisticsPresenter())
+    }
+
     constructor() : this("")
 
     override fun layout(): Int = R.layout.path_statistics
