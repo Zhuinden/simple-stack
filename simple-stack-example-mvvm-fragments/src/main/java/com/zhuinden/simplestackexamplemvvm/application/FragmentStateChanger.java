@@ -2,11 +2,9 @@ package com.zhuinden.simplestackexamplemvvm.application;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.R;
-import com.zhuinden.simplestackexamplemvvm.core.viewmodels.ViewModelLifecycleHelper;
 
 import java.util.List;
 
@@ -15,11 +13,11 @@ import java.util.List;
  */
 
 public class FragmentStateChanger {
-    private final AppCompatActivity activity;
+    private final MainActivity activity;
     private final FragmentManager fragmentManager;
     private final int containerId;
 
-    public FragmentStateChanger(AppCompatActivity activity, FragmentManager fragmentManager, int containerId) {
+    public FragmentStateChanger(MainActivity activity, FragmentManager fragmentManager, int containerId) {
         this.activity = activity;
         this.fragmentManager = fragmentManager;
         this.containerId = containerId;
@@ -69,7 +67,7 @@ public class FragmentStateChanger {
             }
             if(fragment != null) {
                 //noinspection unchecked
-                fragment.bindViewModel(ViewModelLifecycleHelper.getViewModel(activity, newKey.getViewModelTag()));
+                fragment.bindViewModel(activity.backstackDelegate.getService(newKey, newKey.getViewModelTag()));
             }
         }
         fragmentTransaction.commitNow();

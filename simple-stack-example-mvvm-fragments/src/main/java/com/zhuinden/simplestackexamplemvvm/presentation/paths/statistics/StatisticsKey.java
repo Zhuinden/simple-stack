@@ -7,8 +7,7 @@ import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.BaseFragment;
 import com.zhuinden.simplestackexamplemvvm.application.BaseKey;
-import com.zhuinden.simplestackexamplemvvm.application.injection.Injection;
-import com.zhuinden.simplestackexamplemvvm.core.viewmodels.ViewModelLifecycleHelper;
+import com.zhuinden.simplestackexamplemvvm.application.injection.Injector;
 
 /**
  * Created by Zhuinden on 2017.07.26..
@@ -47,7 +46,7 @@ public abstract class StatisticsKey
     }
 
     @Override
-    public ViewModelLifecycleHelper.ViewModelCreator<StatisticsViewModel> getViewModelCreator() {
-        return () -> Injection.get().statisticsViewModel();
+    public StatisticsViewModel newViewModel() {
+        return Injector.get().statisticsViewModel();
     }
 }

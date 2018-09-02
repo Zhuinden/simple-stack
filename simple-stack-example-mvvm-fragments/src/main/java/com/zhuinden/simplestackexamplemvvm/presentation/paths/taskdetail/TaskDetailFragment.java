@@ -112,6 +112,10 @@ public class TaskDetailFragment
     @Override
     public void bindViewModel(TaskDetailViewModel viewModel) {
         checkNotNull(viewModel);
+        if(this.viewModel == viewModel) {
+            return;
+        }
+
         this.viewModel = viewModel;
     }
 }

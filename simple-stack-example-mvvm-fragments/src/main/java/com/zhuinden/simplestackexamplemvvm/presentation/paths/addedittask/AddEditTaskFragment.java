@@ -84,6 +84,9 @@ public class AddEditTaskFragment
     @Override
     public void bindViewModel(AddEditTaskViewModel viewModel) {
         checkNotNull(viewModel);
+        if(this.viewModel == viewModel) {
+            return;
+        }
         this.viewModel = viewModel;
         snackbarCallback = new Observable.OnPropertyChangedCallback() {
             @Override

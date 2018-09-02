@@ -19,14 +19,11 @@ package com.zhuinden.simplestackexamplemvvm.presentation.paths.taskdetail;
 import android.content.Context;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestackexamplemvvm.application.injection.MessageQueue;
 import com.zhuinden.simplestackexamplemvvm.data.source.TasksRepository;
 import com.zhuinden.simplestackexamplemvvm.presentation.common.SingleTaskViewModel;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.addedittask.AddEditTaskKey;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksFragment;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksViewModel;
 
 import javax.inject.Inject;
@@ -54,8 +51,8 @@ public class TaskDetailViewModel
      */
     public void deleteTask() {
         super.deleteTask();
-        messageQueue.pushMessageTo(TasksKey.create(), new TasksViewModel.DeletedTaskMessage());
-        backstack.setHistory(History.single(TasksKey.create()), StateChange.BACKWARD);
+        messageQueue.pushMessageTo(backstack.root(), new TasksViewModel.DeletedTaskMessage());
+        backstack.jumpToRoot();
     }
 
     public void startEditTask() {

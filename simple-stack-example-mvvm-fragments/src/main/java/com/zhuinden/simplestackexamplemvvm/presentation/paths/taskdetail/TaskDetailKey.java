@@ -7,8 +7,7 @@ import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.BaseFragment;
 import com.zhuinden.simplestackexamplemvvm.application.BaseKey;
-import com.zhuinden.simplestackexamplemvvm.application.injection.Injection;
-import com.zhuinden.simplestackexamplemvvm.core.viewmodels.ViewModelLifecycleHelper;
+import com.zhuinden.simplestackexamplemvvm.application.injection.Injector;
 
 /**
  * Created by Zhuinden on 2017.07.26..
@@ -46,8 +45,8 @@ public abstract class TaskDetailKey
     }
 
     @Override
-    public ViewModelLifecycleHelper.ViewModelCreator<TaskDetailViewModel> getViewModelCreator() {
-        return () -> Injection.get().taskDetailViewModel();
+    public TaskDetailViewModel newViewModel() {
+        return Injector.get().taskDetailViewModel();
     }
 
     public static TaskDetailKey create(String taskId) {

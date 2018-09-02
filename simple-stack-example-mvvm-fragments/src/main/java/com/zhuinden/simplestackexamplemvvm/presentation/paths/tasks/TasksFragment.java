@@ -34,7 +34,7 @@ import android.widget.ListView;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.ScrollChildSwipeRefreshLayout;
 import com.zhuinden.simplestackexamplemvvm.application.BaseFragment;
-import com.zhuinden.simplestackexamplemvvm.application.injection.Injection;
+import com.zhuinden.simplestackexamplemvvm.application.injection.Injector;
 import com.zhuinden.simplestackexamplemvvm.data.Task;
 import com.zhuinden.simplestackexamplemvvm.databinding.TaskItemBinding;
 import com.zhuinden.simplestackexamplemvvm.databinding.TasksFragmentBinding;
@@ -184,6 +184,10 @@ public class TasksFragment
     @Override
     public void bindViewModel(TasksViewModel viewModel) {
         checkNotNull(viewModel);
+        if(this.tasksViewModel == viewModel) {
+            return;
+        }
+
         this.tasksViewModel = viewModel;
     }
 
@@ -229,7 +233,7 @@ public class TasksFragment
                 binding = DataBindingUtil.getBinding(view);
             }
 
-            final TaskItemViewModel taskItemViewModel = Injection.get().taskItemViewModel();
+            final TaskItemViewModel taskItemViewModel = Injector.get().taskItemViewModel();
 
             binding.setViewmodel(taskItemViewModel);
             // To save on PropertyChangedCallbacks, wire the item's snackbar text observable to the

@@ -68,6 +68,10 @@ public class StatisticsFragment
     @Override
     public void bindViewModel(StatisticsViewModel viewModel) {
         checkNotNull(viewModel);
+        if(this.statisticsViewModel == viewModel) {
+            return;
+        }
+
         this.statisticsViewModel = viewModel;
         setViewModelForView();
     }

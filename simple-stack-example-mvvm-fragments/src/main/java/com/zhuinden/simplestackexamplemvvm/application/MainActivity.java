@@ -21,12 +21,10 @@ import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackexamplemvvm.R;
-import com.zhuinden.simplestackexamplemvvm.application.injection.Injection;
-import com.zhuinden.simplestackexamplemvvm.core.viewmodels.ViewModelLifecycleHelper;
+import com.zhuinden.simplestackexamplemvvm.application.injection.Injector;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.statistics.StatisticsKey;
 import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
-
-import java.util.List;
+import com.zhuinden.simplestackexamplemvvm.util.ServiceProvider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,7 +51,7 @@ public class MainActivity
     @BindView(R.id.nav_view)
     NavigationView navigationView;
 
-    private BackstackDelegate backstackDelegate;
+    BackstackDelegate backstackDelegate;
     private FragmentStateChanger fragmentStateChanger;
     private ActionBarDrawerToggle drawerToggle;
 
@@ -76,9 +74,10 @@ public class MainActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         backstackDelegate = new BackstackDelegate();
+        backstackDelegate.setScopedServices(this, new ServiceProvider());
         backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), History.single(TasksKey.create()));
         backstackDelegate.registerForLifecycleCallbacks(this);
-        BackstackHolder backstackHolder = Injection.get().backstackHolder();
+        BackstackHolder backstackHolder = Injector.get().backstackHolder();
         backstackHolder.setBackstack(backstackDelegate.getBackstack()); // <-- make Backstack globally available through Dagger
 
         super.onCreate(savedInstanceState);
@@ -161,29 +160,12 @@ public class MainActivity
 
     @Override
     public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        bindActiveViewModels(stateChange);
         if(!stateChange.topNewState().equals(stateChange.topPreviousState())) {
             fragmentStateChanger.handleStateChange(stateChange);
             setupViewsForKey(stateChange.topNewState());
             String title = stateChange.<BaseKey>topNewState().title(getResources());
             setTitle(title == null ? getString(R.string.app_name) : title);
         }
-        destroyInactiveViewModels(stateChange);
         completionCallback.stateChangeComplete();
-    }
-
-    private void bindActiveViewModels(@NonNull StateChange stateChange) {
-        for(BaseKey<?> newKey : stateChange.<BaseKey<?>>getNewState()) {
-            ViewModelLifecycleHelper.bindViewModel(this, newKey.getViewModelCreator(), newKey.getViewModelTag());
-        }
-    }
-
-    private void destroyInactiveViewModels(StateChange stateChange) {
-        List<BaseKey<?>> newKeys = stateChange.getNewState();
-        for(BaseKey<?> previousKey : stateChange.<BaseKey<?>>getPreviousState()) {
-            if(!newKeys.contains(previousKey)) {
-                ViewModelLifecycleHelper.destroyViewModel(this, previousKey.getViewModelTag());
-            }
-        }
     }
 }
