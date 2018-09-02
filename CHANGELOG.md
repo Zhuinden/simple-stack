@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 1.12.3 (2018-09-02)
+--------------------------------
+- CHANGE: When `lookupService` cannot find the service, the exception message is improved (and tells you what *could* be wrong in your configuration).
+
+- UPDATE: `mvp-view`, `mvp-fragments` and `mvvm-fragments` samples now use `ScopedServices` (and `Bundleable`)  to retain presenters/viewmodels across config changes and have their states persisted/restored across process death.  
+
 -Simple Stack 1.12.2 (2018-08-29)
 --------------------------------
 - CHANGE: `AnimatorViewChangeHandler` has an overridable method called `resetPreviousViewValues()`, which receives the previous view after animation is complete.
