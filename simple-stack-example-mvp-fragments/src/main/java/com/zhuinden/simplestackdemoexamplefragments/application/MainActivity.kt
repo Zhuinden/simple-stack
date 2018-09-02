@@ -39,9 +39,11 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
         super.onCreate(savedInstanceState)
 
+        // this must be after `super.onCreate` otherwise multiple of them would exist after process death
         supportFragmentManager.findFragmentByTag("MAIN_SCOPE_LISTENER").also { mainScopeListener ->
             if (mainScopeListener == null) {
                 supportFragmentManager.beginTransaction().add(MainScopeListener(), "MAIN_SCOPE_LISTENER").commit()
+                supportFragmentManager.executePendingTransactions() // this guarantees that the retained fragment exists by the time the Repository needs it.
             }
         }
 
@@ -49,11 +51,27 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
         this.fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
         mainView.onCreate()
+
+        backstackDelegate.setStateChanger(this)
+        /*
+         * IMPORTANT!
+         *
+         * The order of lifecycle after process death is the following:
+         * - Activity onCreate
+         * - Activity.onStart
+         * - Fragment.onActivityCreated
+         * - Fragment.onCreateView
+         * - Fragment.onViewCreated
+         * - Activity.onPostCreate
+         *
+         * Therefore if ScopedServices is used with Fragments, the scopes must be built in onCreate,
+         * meaning the StateChanger must be set in onCreate, and onPostCreate runs too late,
+         * otherwise the scopes won't exist in onViewCreated after process death.
+         */
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        backstackDelegate.setStateChanger(this)
         mainView.onPostCreate()
     }
 
@@ -76,6 +94,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
     override fun getSystemService(name: String): Any? = when {
         TAG == name -> this
+        BACKSTACK_DELEGATE_TAG == name -> backstackDelegate
         else -> super.getSystemService(name)
     }
 
@@ -93,11 +112,16 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     companion object {
-        const val TAG = "MainActivity"
+        private const val BACKSTACK_DELEGATE_TAG = "BackstackDelegate"
 
         @SuppressLint("WrongConstant")
-        operator fun get(context: Context): MainActivity {
-            return context.getSystemService(TAG) as MainActivity
-        }
+        operator fun get(context: Context): MainActivity =
+            context.getSystemService(TAG) as MainActivity
+
+        @SuppressLint("WrongConstant")
+        fun getBackstackDelegate(context: Context): BackstackDelegate =
+            context.getSystemService(BACKSTACK_DELEGATE_TAG) as BackstackDelegate
+
+        const val TAG = "MainActivity"
     }
 }

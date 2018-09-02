@@ -34,18 +34,14 @@ class TasksAdapter(
     ) : LayoutContainer, RecyclerView.ViewHolder(containerView) {
         lateinit var task: Task
 
-        private val rowClickListener = View.OnClickListener { _ -> itemListener.openTask(task) }
+        private val rowClickListener = View.OnClickListener { _ -> itemListener.onTaskRowClicked(task) }
 
         private val context = containerView.context
 
         init {
             containerView.setOnClickListener(rowClickListener)
             complete.onClick {
-                if (!task.isCompleted) {
-                    itemListener.completeTask(task)
-                } else {
-                    itemListener.uncompleteTask(task)
-                }
+                itemListener.onTaskCheckClicked(task)
             }
         }
 
@@ -61,11 +57,9 @@ class TasksAdapter(
     }
 
     interface TaskItemListener {
-        fun openTask(task: Task)
+        fun onTaskRowClicked(task: Task)
 
-        fun completeTask(task: Task)
-
-        fun uncompleteTask(task: Task)
+        fun onTaskCheckClicked(task: Task)
     }
 
     init {

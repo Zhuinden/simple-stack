@@ -249,6 +249,10 @@ class ScopeManager {
                 return getService(scopeTag, serviceTag);
             }
         }
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes! Is the scope tag registered via a ScopeKey?");
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes! " +
+                "Is the scope tag registered via a ScopeKey? " +
+                "If yes, make sure the StateChanger has been set by this time, " +
+                "and that you've bound and are trying to lookup the service with the correct service tag. " +
+                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
     }
 }

@@ -3,17 +3,28 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statisti
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
+import com.zhuinden.simplestackdemoexamplefragments.util.MvpPresenter
+import com.zhuinden.simplestackdemoexamplefragments.util.backstackDelegate
 import kotlinx.android.synthetic.main.path_statistics.*
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class StatisticsFragment : BaseFragment<StatisticsPresenter.ViewContract, StatisticsPresenter>(), StatisticsPresenter.ViewContract {
+class StatisticsFragment : BaseFragment<StatisticsFragment, StatisticsFragment.Presenter>() {
     private val myResources = Injector.get().resources()
-    private val statisticsPresenter = Injector.get().statisticsPresenter()
 
-    override val presenter: StatisticsPresenter = statisticsPresenter
+    companion object {
+        const val CONTROLLER_TAG = "AddOrEditTaskPresenter"
+    }
+
+    interface Presenter: MvpPresenter<StatisticsFragment> {
+    }
+
+    override val presenter: Presenter by lazy {
+        backstackDelegate.lookupService<StatisticsFragment.Presenter>(CONTROLLER_TAG)
+    }
+
     override fun getThis(): StatisticsFragment = this
 
     fun setProgressIndicator(active: Boolean) {
@@ -23,7 +34,7 @@ class StatisticsFragment : BaseFragment<StatisticsPresenter.ViewContract, Statis
         }
     }
 
-    override fun showStatistics(numberOfIncompleteTasks: Int, numberOfCompletedTasks: Int) {
+    fun showStatistics(numberOfIncompleteTasks: Int, numberOfCompletedTasks: Int) {
         textStatistics.text = when {
             numberOfCompletedTasks == 0 && numberOfIncompleteTasks == 0 -> myResources.getString(R.string.statistics_no_tasks)
             else ->

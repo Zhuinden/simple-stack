@@ -2,27 +2,35 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdeta
 
 import android.view.MenuItem
 import com.zhuinden.simplestackdemoexamplefragments.R
-import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
-import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
-import com.zhuinden.simplestackdemoexamplefragments.util.Strings
-import com.zhuinden.simplestackdemoexamplefragments.util.hide
-import com.zhuinden.simplestackdemoexamplefragments.util.show
+import com.zhuinden.simplestackdemoexamplefragments.util.*
 import kotlinx.android.synthetic.main.path_taskdetail.*
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class TaskDetailFragment : BaseFragment<TaskDetailPresenter.ViewContract, TaskDetailPresenter>(), TaskDetailPresenter.ViewContract {
-    private val taskDetailPresenter = Injector.get().taskDetailPresenter()
+class TaskDetailFragment : BaseFragment<TaskDetailFragment, TaskDetailFragment.Presenter>() {
+    companion object {
+        const val CONTROLLER_TAG = "TaskDetailView.Presenter"
+    }
 
-    override val presenter: TaskDetailPresenter = taskDetailPresenter
+    interface Presenter: MvpPresenter<TaskDetailFragment> {
+        fun onTaskChecked(task: Task, checked: Boolean)
 
-    override fun getThis(): TaskDetailPresenter.ViewContract = this
+        fun onTaskEditButtonClicked()
+
+        fun onTaskDeleteButtonClicked()
+    }
+
+    override val presenter: Presenter by lazy {
+        backstackDelegate.lookupService<TaskDetailFragment.Presenter>(CONTROLLER_TAG)
+    }
+
+    override fun getThis(): TaskDetailFragment = this
 
     fun editTask() {
-        taskDetailPresenter.editTask()
+        presenter.onTaskEditButtonClicked()
     }
 
     fun showTitle(title: String) {
@@ -43,12 +51,12 @@ class TaskDetailFragment : BaseFragment<TaskDetailPresenter.ViewContract, TaskDe
         textTaskDetailDescription.hide()
     }
 
-    override fun showMissingTask() {
+    fun showMissingTask() {
         textTaskDetailTitle.text = ""
         textTaskDetailDescription.text = activity!!.getString(R.string.no_data)
     }
 
-    override fun showTask(task: Task) {
+    fun showTask(task: Task) {
         val title = task.title
         val description = task.description
 
@@ -69,22 +77,14 @@ class TaskDetailFragment : BaseFragment<TaskDetailPresenter.ViewContract, TaskDe
     private fun showCompletionStatus(task: Task, completed: Boolean) {
         checkboxTaskDetailComplete.isChecked = completed
         checkboxTaskDetailComplete.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                presenter.completeTask(task)
-            } else {
-                presenter.activateTask(task)
-            }
+            presenter.onTaskChecked(task, isChecked)
         }
-    }
-
-    fun deleteTask() {
-        taskDetailPresenter.deleteTask()
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.menu_delete -> {
-                deleteTask()
+                presenter.onTaskDeleteButtonClicked()
                 return true
             }
         }

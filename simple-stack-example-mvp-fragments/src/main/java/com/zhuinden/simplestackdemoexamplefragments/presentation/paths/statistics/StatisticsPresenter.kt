@@ -2,9 +2,7 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statisti
 
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter
-import com.zhuinden.simplestackdemoexamplefragments.util.BaseViewContract
 import com.zhuinden.simplestackdemoexamplefragments.util.combineTwo
-import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -16,14 +14,10 @@ import javax.inject.Inject
 
 class StatisticsPresenter @Inject constructor(
     private val taskRepository: TaskRepository
-) : BasePresenter<StatisticsPresenter.ViewContract>() {
-    interface ViewContract: BaseViewContract {
-        fun showStatistics(numberOfIncompleteTasks: Int, numberOfCompletedTasks: Int)
-    }
-
+) : BasePresenter<StatisticsFragment>(), StatisticsFragment.Presenter {
     private lateinit var disposable: Disposable
 
-    override fun onAttach(view: StatisticsPresenter.ViewContract) {
+    override fun onAttach(view: StatisticsFragment) {
         disposable = combineTwo(
             taskRepository.activeTasksWithChanges,
             taskRepository.completedTasksWithChanges)
@@ -34,12 +28,7 @@ class StatisticsPresenter @Inject constructor(
             }
     }
 
-    override fun onDetach(view: StatisticsPresenter.ViewContract) {
+    override fun onDetach(view: StatisticsFragment) {
         disposable.dispose()
-    }
-
-    override fun toBundle(): StateBundle = StateBundle()
-
-    override fun fromBundle(bundle: StateBundle?) {
     }
 }

@@ -6,8 +6,6 @@ import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskReposito
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter
-import com.zhuinden.simplestackdemoexamplefragments.util.BaseViewContract
-import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
@@ -18,11 +16,21 @@ import javax.inject.Inject
 class TaskDetailPresenter @Inject constructor(
     private val taskRepository: TaskRepository,
     private val backstack: Backstack
-) : BasePresenter<TaskDetailPresenter.ViewContract>() {
-    interface ViewContract: BaseViewContract {
-        fun showTask(task: Task)
+) : BasePresenter<TaskDetailFragment>(), TaskDetailFragment.Presenter {
+    override fun onTaskChecked(task: Task, checked: Boolean) {
+        if (checked) {
+            completeTask(task)
+        } else {
+            activateTask(task)
+        }
+    }
 
-        fun showMissingTask()
+    override fun onTaskEditButtonClicked() {
+        editTask()
+    }
+
+    override fun onTaskDeleteButtonClicked() {
+        deleteTask()
     }
 
     lateinit var taskDetailKey: TaskDetailKey
@@ -32,7 +40,7 @@ class TaskDetailPresenter @Inject constructor(
     var task: Task? = null
 
     @SuppressLint("CheckResult")
-    override fun onAttach(view: ViewContract) {
+    override fun onAttach(view: TaskDetailFragment) {
         this.taskDetailKey = view.getKey()
         this.taskId = taskDetailKey.taskId
 
@@ -49,11 +57,11 @@ class TaskDetailPresenter @Inject constructor(
             }
     }
 
-    override fun onDetach(view: ViewContract) {
+    override fun onDetach(view: TaskDetailFragment) {
 
     }
 
-    fun editTask() {
+    private fun editTask() {
         if (task == null) {
             view?.showMissingTask()
             return
@@ -61,23 +69,19 @@ class TaskDetailPresenter @Inject constructor(
         backstack.goTo(AddOrEditTaskKey.EditTaskKey(view!!.getKey(), taskId))
     }
 
-    fun completeTask(task: Task) {
+    private fun completeTask(task: Task) {
         taskRepository.setTaskCompleted(task)
     }
 
-    fun activateTask(task: Task) {
+    private fun activateTask(task: Task) {
         taskRepository.setTaskActive(task)
     }
 
-    fun deleteTask() {
+    private fun deleteTask() {
         val task = task
         if (task != null) {
             taskRepository.deleteTask(task)
             backstack.goBack()
         }
     }
-
-    override fun toBundle(): StateBundle = StateBundle()
-
-    override fun fromBundle(bundle: StateBundle?) {}
 }

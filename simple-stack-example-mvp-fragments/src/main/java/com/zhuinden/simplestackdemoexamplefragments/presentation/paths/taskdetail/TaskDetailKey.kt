@@ -2,8 +2,11 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdeta
 
 import android.support.v4.app.Fragment
 import android.view.View
+import com.zhuinden.simplestack.ScopedServices
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.BaseKey
+import com.zhuinden.simplestackdemoexamplefragments.application.Injector
+import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.HasServices
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -11,7 +14,13 @@ import kotlinx.android.parcel.Parcelize
  */
 
 @Parcelize
-data class TaskDetailKey(val taskId: String) : BaseKey() {
+data class TaskDetailKey(val taskId: String) : BaseKey(), HasServices {
+    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+        serviceBinder.add(TaskDetailFragment.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
+    }
+
+    override fun getScopeTag(): String = "TaskDetail[$taskId]"
+
     override fun layout(): Int = R.layout.path_taskdetail
 
     override val isFabVisible: Boolean

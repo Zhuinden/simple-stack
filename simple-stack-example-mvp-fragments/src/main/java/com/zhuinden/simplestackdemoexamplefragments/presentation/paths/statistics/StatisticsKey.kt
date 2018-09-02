@@ -2,15 +2,24 @@ package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statisti
 
 import android.support.v4.app.Fragment
 import android.view.View
+import com.zhuinden.simplestack.ScopedServices
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.BaseKey
+import com.zhuinden.simplestackdemoexamplefragments.application.Injector
+import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.HasServices
 import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
 @Parcelize
-data class StatisticsKey(val placeholder: String = "") : BaseKey() {
+data class StatisticsKey(val placeholder: String = "") : BaseKey(), HasServices {
+    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+        serviceBinder.add(StatisticsFragment.CONTROLLER_TAG, Injector.get().statisticsPresenter())
+    }
+
+    override fun getScopeTag(): String = "Statistics"
+
     constructor() : this("")
 
     override fun layout(): Int = R.layout.path_statistics

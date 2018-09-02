@@ -43,7 +43,7 @@ sealed class TasksFilterType: Parcelable {
         override fun filterTask(taskRepository: TaskRepository): Observable<List<Task>> =
             taskRepository.tasksWithChanges
 
-        override fun showEmptyViews(tasksFragment: TasksPresenter.ViewContract) {
+        override fun showEmptyViews(tasksFragment: TasksFragment) {
             tasksFragment.showNoTasks()
         }
     }
@@ -62,7 +62,7 @@ sealed class TasksFilterType: Parcelable {
             taskRepository.activeTasksWithChanges
 
 
-        override fun showEmptyViews(tasksFragment: TasksPresenter.ViewContract) {
+        override fun showEmptyViews(tasksFragment: TasksFragment) {
             tasksFragment.showNoActiveTasks()
         }
     }
@@ -80,7 +80,7 @@ sealed class TasksFilterType: Parcelable {
         override fun filterTask(taskRepository: TaskRepository): Observable<List<Task>> =
             taskRepository.completedTasksWithChanges
 
-        override fun showEmptyViews(tasksFragment: TasksPresenter.ViewContract) {
+        override fun showEmptyViews(tasksFragment: TasksFragment) {
             tasksFragment.showNoCompletedTasks()
         }
     }
@@ -89,5 +89,5 @@ sealed class TasksFilterType: Parcelable {
 
     abstract fun filterTask(taskRepository: TaskRepository): Observable<List<Task>>
 
-    abstract fun showEmptyViews(tasksFragment: TasksPresenter.ViewContract)
+    abstract fun showEmptyViews(tasksFragment: TasksFragment)
 }

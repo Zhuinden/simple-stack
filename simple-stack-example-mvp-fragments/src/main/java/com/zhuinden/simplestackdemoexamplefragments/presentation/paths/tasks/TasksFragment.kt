@@ -1,6 +1,5 @@
 package com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -17,41 +16,57 @@ import com.zhuinden.simplestackdemoexamplefragments.application.Key
 import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.*
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.path_tasks.*
 import org.jetbrains.anko.sdk15.listeners.onClick
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(), MessageQueue.Receiver, TasksPresenter.ViewContract {
-    private val tasksPresenter = Injector.get().tasksPresenter()
+class TasksFragment : BaseFragment<TasksFragment, TasksFragment.Presenter>(), MessageQueue.Receiver {
+    companion object {
+        const val CONTROLLER_TAG = "TasksView.Presenter"
+    }
+
+    interface Presenter: MvpPresenter<TasksFragment> {
+        fun onTaskCheckClicked(task: Task)
+
+        fun onTaskRowClicked(task: Task)
+
+        fun onNoTasksAddButtonClicked()
+
+        fun onFilterActiveSelected()
+
+        fun onFilterCompletedSelected()
+
+        fun onFilterAllSelected()
+
+        fun onClearCompletedClicked()
+
+        fun onRefreshClicked()
+    }
+
     private val myResources = Injector.get().resources()
     private val messageQueue = Injector.get().messageQueue()
 
     lateinit var tasksAdapter: TasksAdapter
 
     var taskItemListener: TasksAdapter.TaskItemListener = object : TasksAdapter.TaskItemListener {
-        override fun openTask(task: Task) {
-            tasksPresenter.openTaskDetails(task)
+        override fun onTaskRowClicked(task: Task) {
+            presenter.onTaskRowClicked(task)
         }
 
-        override fun completeTask(task: Task) {
-            tasksPresenter.completeTask(task)
-        }
-
-        override fun uncompleteTask(task: Task) {
-            tasksPresenter.uncompleteTask(task)
+        override fun onTaskCheckClicked(task: Task) {
+            presenter.onTaskCheckClicked(task)
         }
     }
 
     class SavedSuccessfullyMessage
 
-    override val presenter: TasksPresenter = tasksPresenter
+    override val presenter: Presenter by lazy {
+        backstackDelegate.lookupService<TasksFragment.Presenter>(CONTROLLER_TAG)
+    }
 
     override fun getThis(): TasksFragment = this
 
@@ -65,22 +80,18 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
         recyclerTasks.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         recyclerTasks.adapter = tasksAdapter
 
-        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.colorPrimary),
-            ContextCompat.getColor(context!!, R.color.colorAccent),
-            ContextCompat.getColor(context!!, R.color.colorPrimaryDark))
+        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.colorPrimary),
+            ContextCompat.getColor(requireContext(), R.color.colorAccent),
+            ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(recyclerTasks)
-        swipeRefreshLayout.setOnRefreshListener { this.refresh() }
+        swipeRefreshLayout.setOnRefreshListener { presenter.onRefreshClicked() }
 
         buttonNoTasksAdd.onClick {
-            openAddNewTask()
+            addTaskButtonClicked()
         }
 
         messageQueue.requestMessages(getKey<Key>(), this)
-    }
-
-    fun openAddNewTask() {
-        tasksPresenter.openAddNewTask()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -103,16 +114,19 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
         }
     }
 
-    override fun calculateDiff(tasks: List<Task>): Pair<DiffUtil.DiffResult, List<Task>> {
-        return Pair(DiffUtil.calculateDiff(TasksDiffCallback(tasksAdapter.data, tasks)), tasks)
+    fun addTaskButtonClicked() {
+        presenter.onNoTasksAddButtonClicked()
     }
+
+    fun calculateDiff(tasks: List<Task>): Pair<DiffUtil.DiffResult, List<Task>> =
+        Pair(DiffUtil.calculateDiff(TasksDiffCallback(tasksAdapter.data, tasks)), tasks)
 
     fun hideEmptyViews() {
         containerTasks.show()
         viewNoTasks.hide()
     }
 
-    override fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, filterType: TasksFilterType) {
+    fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, filterType: TasksFilterType) {
         val (diffResult, tasks) = pairOfDiffResultAndTasks
 
         tasksAdapter.data = tasks
@@ -129,11 +143,11 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
         popup.menuInflater.inflate(R.menu.filter_tasks, popup.menu)
 
         popup.setOnMenuItemClickListener { item ->
-            tasksPresenter.setFiltering(when(item.itemId) {
-                R.id.active -> TasksFilterType.ActiveTasks()
-                R.id.completed -> TasksFilterType.CompletedTasks()
-                else -> TasksFilterType.AllTasks()
-            })
+            when(item.itemId) {
+                R.id.active -> presenter.onFilterActiveSelected()
+                R.id.completed -> presenter.onFilterCompletedSelected()
+                else -> presenter.onFilterAllSelected()
+            }
             //loadTasks(false); // reactive data source ftw
             true
         }
@@ -141,45 +155,31 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
         popup.show()
     }
 
-    fun clearCompletedTasks() {
-        tasksPresenter.deleteCompletedTasks()
+    fun setRefreshing(isRefreshing: Boolean) {
+        swipeRefreshLayout.isRefreshing = isRefreshing
     }
 
-    @SuppressLint("CheckResult")
-    fun refresh() {
-        swipeRefreshLayout.isRefreshing = true
-        Single.just("")
-            .delay(2500, TimeUnit.MILLISECONDS)
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { _ ->
-                if (swipeRefreshLayout != null) {
-                    swipeRefreshLayout.isRefreshing = false
-                }
-            }
-    }
-
-    override fun showNoActiveTasks() {
+    fun showNoActiveTasks() {
         showNoTasksViews(myResources.getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false)
     }
 
-    override fun showNoTasks() {
+    fun showNoTasks() {
         showNoTasksViews(myResources.getString(R.string.no_tasks_all), R.drawable.ic_assignment_turned_in_24dp, false)
     }
 
-    override fun showNoCompletedTasks() {
+    fun showNoCompletedTasks() {
         showNoTasksViews(myResources.getString(R.string.no_tasks_completed), R.drawable.ic_verified_user_24dp, false)
     }
 
-    override fun showTaskMarkedComplete() {
+    fun showTaskMarkedComplete() {
         showMessage(myResources.getString(R.string.task_marked_complete))
     }
 
-    override fun showTaskMarkedActive() {
+    fun showTaskMarkedActive() {
         showMessage(myResources.getString(R.string.task_marked_active))
     }
 
-    override fun showCompletedTasksCleared() {
+    fun showCompletedTasksCleared() {
         showMessage(myResources.getString(R.string.completed_tasks_cleared))
     }
 
@@ -207,7 +207,7 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
         buttonNoTasksAdd.showIf { showAddView }
     }
 
-    override fun setFilterLabelText(filterText: Int) {
+    fun setFilterLabelText(filterText: Int) {
         textFilteringLabel.setText(filterText)
     }
 
@@ -218,11 +218,11 @@ class TasksFragment : BaseFragment<TasksPresenter.ViewContract, TasksPresenter>(
                 return true
             }
             R.id.menu_clear -> {
-                clearCompletedTasks()
+                presenter.onClearCompletedClicked()
                 return true
             }
             R.id.menu_refresh -> {
-                refresh()
+                presenter.onRefreshClicked()
                 return true
             }
         }

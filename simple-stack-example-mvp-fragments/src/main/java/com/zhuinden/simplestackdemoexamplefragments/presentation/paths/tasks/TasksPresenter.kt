@@ -10,11 +10,12 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail.TaskDetailKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter
-import com.zhuinden.simplestackdemoexamplefragments.util.BaseViewContract
 import com.zhuinden.statebundle.StateBundle
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -25,25 +26,48 @@ import javax.inject.Inject
 class TasksPresenter @Inject constructor(
     private val backstack: Backstack,
     private val taskRepository: TaskRepository
-) : BasePresenter<TasksPresenter.ViewContract>(), Bundleable {
-    interface ViewContract : BaseViewContract {
-        fun showNoActiveTasks()
-        fun showNoTasks()
-        fun showNoCompletedTasks()
+) : BasePresenter<TasksFragment>(), TasksFragment.Presenter, Bundleable {
+    override fun onTaskCheckClicked(task: Task) {
+        if (!task.isCompleted) {
+            completeTask(task)
+        } else {
+            uncompleteTask(task)
+        }
+    }
 
-        fun setFilterLabelText(filterText: Int)
-        fun calculateDiff(tasks: List<Task>): Pair<DiffUtil.DiffResult, List<Task>>
-        fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, tasksFilterType: TasksFilterType)
-        fun showTaskMarkedComplete()
-        fun showTaskMarkedActive()
-        fun showCompletedTasksCleared()
+    override fun onTaskRowClicked(task: Task) {
+        openTaskDetails(task)
+    }
+
+    override fun onNoTasksAddButtonClicked() {
+        openAddNewTask()
+    }
+
+    override fun onFilterActiveSelected() {
+        setFiltering(TasksFilterType.ActiveTasks())
+    }
+
+    override fun onFilterCompletedSelected() {
+        setFiltering(TasksFilterType.CompletedTasks())
+    }
+
+    override fun onFilterAllSelected() {
+        setFiltering(TasksFilterType.AllTasks())
+    }
+
+    override fun onClearCompletedClicked() {
+        deleteCompletedTasks()
+    }
+
+    override fun onRefreshClicked() {
+        refresh()
     }
 
     var filterType: BehaviorRelay<TasksFilterType> = BehaviorRelay.createDefault(TasksFilterType.AllTasks())
 
     lateinit var subscription: Disposable
 
-    public override fun onAttach(view: TasksPresenter.ViewContract) {
+    public override fun onAttach(view: TasksFragment) {
         subscription = filterType
             .doOnNext { tasksFilterType -> view.setFilterLabelText(tasksFilterType.filterText) } //
             .switchMap { tasksFilterType -> tasksFilterType.filterTask(taskRepository) } //
@@ -55,36 +79,47 @@ class TasksPresenter @Inject constructor(
             }
     }
 
-    public override fun onDetach(view: TasksPresenter.ViewContract) {
+    public override fun onDetach(view: TasksFragment) {
         subscription.dispose()
     }
 
-    fun openAddNewTask() {
+    private fun openAddNewTask() {
         val tasksFragment = view
         val parentKey = tasksFragment!!.getKey<Key>()
         backstack.goTo(AddOrEditTaskKey.AddTaskKey(parentKey))
     }
 
-    fun openTaskDetails(task: Task) {
+    private fun refresh() {
+        view?.setRefreshing(true)
+        Single.just("")
+            .delay(2500, TimeUnit.MILLISECONDS)
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { _ ->
+                view?.setRefreshing(false)
+            }
+    }
+
+    private fun openTaskDetails(task: Task) {
         backstack.goTo(TaskDetailKey(task.id))
     }
 
-    fun completeTask(task: Task) {
+    private fun completeTask(task: Task) {
         taskRepository.setTaskCompleted(task)
         view?.showTaskMarkedComplete()
     }
 
-    fun uncompleteTask(task: Task) {
+    private fun uncompleteTask(task: Task) {
         taskRepository.setTaskActive(task)
         view?.showTaskMarkedActive()
     }
 
-    fun deleteCompletedTasks() {
+    private fun deleteCompletedTasks() {
         taskRepository.deleteCompletedTasks()
         view?.showCompletedTasksCleared()
     }
 
-    fun setFiltering(filterType: TasksFilterType) {
+    private fun setFiltering(filterType: TasksFilterType) {
         this.filterType.accept(filterType)
     }
 

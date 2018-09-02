@@ -9,7 +9,6 @@ import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksFragment
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BasePresenter
-import com.zhuinden.simplestackdemoexamplefragments.util.BaseViewContract
 import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -23,15 +22,7 @@ class AddOrEditTaskPresenter @Inject constructor(
     private val taskRepository: TaskRepository,
     private val messageQueue: MessageQueue,
     private val backstack: Backstack
-) : BasePresenter<AddOrEditTaskPresenter.ViewContract>(), Bundleable {
-    interface ViewContract: BaseViewContract {
-        fun setTitle(title: String)
-
-        fun setDescription(description: String)
-
-        fun hideKeyboard()
-    }
-
+) : BasePresenter<AddOrEditTaskFragment>(), AddOrEditTaskFragment.Presenter, Bundleable {
     var title: String? = null
     var description: String? = null
 
@@ -48,7 +39,7 @@ class AddOrEditTaskPresenter @Inject constructor(
     }
 
     @SuppressLint("CheckResult")
-    override fun onAttach(view: ViewContract) {
+    override fun onAttach(view: AddOrEditTaskFragment) {
         val addOrEditTaskKey: AddOrEditTaskKey = view.getKey()
         taskId = addOrEditTaskKey.taskId
 
@@ -68,7 +59,21 @@ class AddOrEditTaskPresenter @Inject constructor(
         }
     }
 
-    override fun onDetach(view: ViewContract) {
+    override fun onDetach(view: AddOrEditTaskFragment) {
+    }
+
+    override fun onTitleChanged(title: String) {
+        updateTitle(title)
+    }
+
+    override fun onDescriptionChanged(description: String) {
+        updateDescription(description)
+    }
+
+    override fun onSaveButtonClicked() {
+        if (saveTask()) {
+            navigateBack()
+        }
     }
 
     override fun toBundle(): StateBundle = StateBundle().apply {
@@ -83,7 +88,7 @@ class AddOrEditTaskPresenter @Inject constructor(
         }
     }
 
-    fun saveTask(): Boolean {
+    private fun saveTask(): Boolean {
         val task = task
         val title = title
         val description = description
@@ -100,7 +105,7 @@ class AddOrEditTaskPresenter @Inject constructor(
         return false
     }
 
-    fun navigateBack() {
+    private fun navigateBack() {
         view!!.hideKeyboard()
         val addOrEditTaskKey = view!!.getKey<AddOrEditTaskKey>()
         when(addOrEditTaskKey) {

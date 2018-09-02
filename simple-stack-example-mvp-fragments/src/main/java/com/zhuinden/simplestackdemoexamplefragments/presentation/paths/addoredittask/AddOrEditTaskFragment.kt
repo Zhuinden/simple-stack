@@ -4,8 +4,9 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
+import com.zhuinden.simplestackdemoexamplefragments.util.MvpPresenter
+import com.zhuinden.simplestackdemoexamplefragments.util.backstackDelegate
 import kotlinx.android.synthetic.main.path_addoredittask.*
 import org.jetbrains.anko.sdk15.listeners.textChangedListener
 
@@ -14,10 +15,22 @@ import org.jetbrains.anko.sdk15.listeners.textChangedListener
  */
 
 // UNSCOPED!
-class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskPresenter.ViewContract, AddOrEditTaskPresenter>(), AddOrEditTaskPresenter.ViewContract {
-    private val addOrEditTaskPresenter = Injector.get().addOrEditTaskPresenter()
+class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskFragment.Presenter>() {
+    companion object {
+        const val CONTROLLER_TAG = "AddOrEditTaskPresenter"
+    }
 
-    override val presenter: AddOrEditTaskPresenter = addOrEditTaskPresenter
+    interface Presenter: MvpPresenter<AddOrEditTaskFragment> {
+        fun onTitleChanged(title: String)
+
+        fun onDescriptionChanged(description: String)
+
+        fun onSaveButtonClicked()
+    }
+    
+    override val presenter: Presenter by lazy {
+        backstackDelegate.lookupService<AddOrEditTaskFragment.Presenter>(CONTROLLER_TAG)
+    }
 
     override fun getThis(): AddOrEditTaskFragment = this
 
@@ -26,37 +39,35 @@ class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskPresenter.ViewContract, 
 
         textAddTaskTitle.textChangedListener {
             afterTextChanged { editable ->
-                addOrEditTaskPresenter.updateTitle(editable.toString())
+                presenter.onTitleChanged(editable.toString())
             }
         }
 
         textAddTaskDescription.textChangedListener {
             afterTextChanged { editable ->
-                addOrEditTaskPresenter.updateDescription(editable.toString())
+                presenter.onDescriptionChanged(editable.toString())
             }
         }
     }
 
-    fun saveTask() = addOrEditTaskPresenter.saveTask()
-
-    fun navigateBack() {
-        addOrEditTaskPresenter.navigateBack()
-    }
-
-    override fun setTitle(title: String) {
+    fun setTitle(title: String) {
         textAddTaskTitle.setText(title)
     }
 
-    override fun setDescription(description: String) {
+    fun setDescription(description: String) {
         textAddTaskDescription.setText(description)
     }
 
-    override fun hideKeyboard() {
+    fun hideKeyboard() {
         (requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).also { imm ->
             val view = view
             if(view != null) {
                 imm.hideSoftInputFromWindow(view.windowToken, 0);
             }
         }
+    }
+
+    fun onSaveButtonClicked() {
+        presenter.onSaveButtonClicked()
     }
 }
