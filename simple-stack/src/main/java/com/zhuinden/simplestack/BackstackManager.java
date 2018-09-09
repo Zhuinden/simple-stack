@@ -264,15 +264,25 @@ public class BackstackManager
             scopeManager.dispatchActivation(previousScopeTag, activeScope);
         }
 
-        List<Object> history = backstack.getHistory();
+        History<Object> history = backstack.getHistory();
         Set<String> scopeSet = new LinkedHashSet<>();
-        for(Object key : history) {
+        for(int i = 0, size = history.size(); i < size; i++) {
+            Object key = history.fromTop(i);
             if(key instanceof ScopeKey) {
                 scopeSet.add(((ScopeKey) key).getScopeTag());
             }
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                for(String parent : child.getParentScopes()) {
+                    if(scopeSet.contains(parent)) {
+                        scopeSet.remove(parent); // needed to setup the proper order
+                    }
+                    scopeSet.add(parent);
+                }
+            }
         }
+
         List<String> scopes = new ArrayList<>(scopeSet);
-        Collections.reverse(scopes);
         for(String scope : scopes) {
             scopeManager.destroyScope(scope);
         }

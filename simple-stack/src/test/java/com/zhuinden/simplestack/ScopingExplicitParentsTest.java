@@ -631,7 +631,7 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackManager.hasService("hello", "service")).isTrue();
         assertThat(backstackManager.hasService("parentScope", "service")).isTrue();
         assertThat(backstackManager.getService("hello", "service")).isSameAs(service2);
-        assertThat(backstackManager.hasService("parentScope", "service")).isSameAs(service1);
+        assertThat(backstackManager.getService("parentScope", "service")).isSameAs(service1);
 
         assertThat(enteredScope).containsExactly(service1, service2);
         assertThat(activated).containsExactly(service1, service2);
@@ -1148,4 +1148,6 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackManager.getService("boop", "service")).isSameAs(service1);
         assertThat(backstackManager.lookupService("service")).isSameAs(service1);
     }
+
+    // TODO: verify that parent scope services also have their states properly persisted by Bundleable
 }

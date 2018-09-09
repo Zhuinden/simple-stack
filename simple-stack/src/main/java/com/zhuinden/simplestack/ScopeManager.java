@@ -52,37 +52,48 @@ class ScopeManager {
         this.scopedServices = scopedServices;
     }
 
-    void buildScopes(List<Object> newState) {
-        for(Object key : newState) {
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String scopeTag = scopeKey.getScopeTag();
-                //noinspection ConstantConditions
-                if(scopeKey == null) {
-                    throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
-                }
-                if(!scopes.containsKey(scopeTag)) {
-                    Map<String, Object> scope = new LinkedHashMap<>();
-                    scopes.put(scopeTag, scope);
+    private void buildScope(Object key, String scopeTag) {
+        //noinspection ConstantConditions
+        if(scopeTag == null) {
+            throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
+        }
+        if(!scopes.containsKey(scopeTag)) {
+            Map<String, Object> scope = new LinkedHashMap<>();
+            scopes.put(scopeTag, scope);
 
-                    scopedServices.bindServices(new ScopedServices.ServiceBinder(this, key, scopeTag, scope));
+            scopedServices.bindServices(new ScopedServices.ServiceBinder(this, key, scopeTag, scope));
 
-                    for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
-                        String serviceTag = serviceEntry.getKey();
-                        Object service = serviceEntry.getValue();
-                        if(rootBundle.containsKey(scopeTag)) {
-                            if(service instanceof Bundleable) {
-                                StateBundle scopeBundle = rootBundle.getBundle(scopeTag);
-                                if(scopeBundle != null && scopeBundle.containsKey(serviceTag)) {
-                                    ((Bundleable) service).fromBundle(scopeBundle.getBundle(serviceTag));
-                                }
-                            }
-                        }
-                        if(service instanceof ScopedServices.Scoped) {
-                            ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
+            for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
+                String serviceTag = serviceEntry.getKey();
+                Object service = serviceEntry.getValue();
+                if(rootBundle.containsKey(scopeTag)) {
+                    if(service instanceof Bundleable) {
+                        StateBundle scopeBundle = rootBundle.getBundle(scopeTag);
+                        if(scopeBundle != null && scopeBundle.containsKey(serviceTag)) {
+                            ((Bundleable) service).fromBundle(scopeBundle.getBundle(serviceTag));
                         }
                     }
                 }
+                if(service instanceof ScopedServices.Scoped) {
+                    ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
+                }
+            }
+        }
+    }
+
+    void buildScopes(List<Object> newState) {
+        for(Object key : newState) {
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                for(String parent : child.getParentScopes()) {
+                    buildScope(key, parent);
+                }
+            }
+            if(key instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) key;
+                String scopeTag = scopeKey.getScopeTag();
+                buildScope(key, scopeTag);
             }
         }
     }
@@ -90,6 +101,11 @@ class ScopeManager {
     void clearScopesNotIn(List<Object> newState) {
         Set<String> currentScopes = new LinkedHashSet<>();
         for(Object key : newState) {
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                currentScopes.addAll(child.getParentScopes());
+            }
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 currentScopes.add(scopeKey.getScopeTag());
@@ -254,5 +270,12 @@ class ScopeManager {
                 "If yes, make sure the StateChanger has been set by this time, " +
                 "and that you've bound and are trying to lookup the service with the correct service tag. " +
                 "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+    }
+
+    static void checkParentScopes(ScopeKey.Child child) {
+        //noinspection ConstantConditions
+        if(child.getParentScopes() == null) {
+            throw new IllegalArgumentException("Parent scopes cannot be null!");
+        }
     }
 }
