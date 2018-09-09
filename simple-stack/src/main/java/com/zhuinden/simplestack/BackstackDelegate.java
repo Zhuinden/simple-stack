@@ -455,6 +455,17 @@ public class BackstackDelegate {
     }
 
     /**
+     * Returns if a service is bound to the scope identified by the provided tag.
+     *
+     * @param scopeTag   the tag of the scope
+     * @param serviceTag the service tag
+     * @return whether the service is bound in the given scope
+     */
+    public boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager().hasService(scopeTag, serviceTag);
+    }
+
+    /**
      * Returns the service bound to the scope of the {@link ScopeKey} by the provided tag.
      *
      * @param scopeKey   the scope key
@@ -465,6 +476,19 @@ public class BackstackDelegate {
     @NonNull
     public <T> T getService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
         return getManager().getService(scopeKey, serviceTag);
+    }
+
+    /**
+     * Returns the service bound to the scope identified by the provided tag.
+     *
+     * @param scopeTag   the tag of the scope
+     * @param serviceTag the service tag
+     * @param <T>        the type of the service
+     * @return the service
+     */
+    @NonNull
+    public <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager().getService(scopeTag, serviceTag);
     }
 
     /**

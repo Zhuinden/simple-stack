@@ -305,6 +305,17 @@ public class Navigator {
     }
 
     /**
+     * Returns if a service is bound to the scope identified by the provided tag.
+     *
+     * @param scopeTag   the scope tag
+     * @param serviceTag the service tag
+     * @return whether the service is bound in the given scope
+     */
+    public static boolean hasService(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager(context).hasService(scopeTag, serviceTag);
+    }
+
+    /**
      * Returns the service bound to the scope of the {@link ScopeKey} by the provided tag.
      *
      * @param scopeKey   the scope key
@@ -315,6 +326,19 @@ public class Navigator {
     @NonNull
     public static <T> T getService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
         return getManager(context).getService(scopeKey, serviceTag);
+    }
+
+    /**
+     * Returns the service bound to the scope identified by the provided tag.
+     *
+     * @param scopeTag   the scope tag
+     * @param serviceTag the service tag
+     * @param <T>        the type of the service
+     * @return the service
+     */
+    @NonNull
+    public static <T> T getService(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager(context).getService(scopeTag, serviceTag);
     }
 
     /**
