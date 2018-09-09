@@ -316,7 +316,7 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackManager.hasScope("hello")).isTrue();
         assertThat(backstackManager.hasScope("world")).isTrue();
 
-        assertThat(backstackManager.lookupService("service1")).isSameAs(service1);
+        assertThat(backstackManager.lookupService("service")).isSameAs(service1);
     }
 
     @Test
