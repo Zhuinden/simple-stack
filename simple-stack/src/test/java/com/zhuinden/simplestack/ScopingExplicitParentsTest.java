@@ -263,6 +263,73 @@ public class ScopingExplicitParentsTest {
     }
 
     @Test
+    public void explicitParentsArePreferredDuringScopeLookupOtherSetup() {
+        final Object service1 = new Object();
+        final Object service2 = new Object();
+
+        class ChildKey
+                extends TestKey
+                implements ScopeKey, ScopeKey.Child {
+            private final List<String> parentScopes;
+
+            ChildKey(String name, List<String> parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return parentScopes;
+            }
+        }
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                String tag = serviceBinder.getScopeTag();
+                if("hello".equals(tag)) {
+                    serviceBinder.add("SERVICE", service1);
+                }
+                if("parentScope1".equals(tag)) {
+                    serviceBinder.add("SERVICE", service2);
+                }
+            }
+        });
+
+        backstackManager.setup(History.of(
+                new ChildKey("hello", History.of("parentScope1")),
+                new ChildKey("world", History.of("parentScope1"))
+        ));
+        backstackManager.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstackManager.hasScope("hello")).isTrue();
+        assertThat(backstackManager.hasScope("world")).isTrue();
+        assertThat(backstackManager.hasScope("parentScope1")).isTrue();
+
+        assertThat(backstackManager.getService("hello", "SERVICE")).isSameAs(service1);
+        assertThat(backstackManager.getService("parentScope1", "SERVICE")).isSameAs(service2);
+
+        assertThat(backstackManager.lookupService("SERVICE")).isSameAs(service2);
+
+        backstackManager.getBackstack().goBack();
+
+        assertThat(backstackManager.lookupService("SERVICE")).isSameAs(service1);
+    }
+
+    @Test
     public void explicitParentsAreLookedUpEvenInPreviousKeysDuringLookup() {
         final Object service1 = new Object();
 

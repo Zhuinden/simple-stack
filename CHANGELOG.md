@@ -1,5 +1,18 @@
 # Change log
 
+-Simple Stack 1.13.0 (2018-??-??)
+--------------------------------
+- ADDED (EXPERIMENTAL): Adds `ScopeKey.Child` interface, which allows the definition of *explicit* parent hierarchy of a given scope.
+
+Even by default, there is an implicit hierarchy between screens.
+
+However, there are times when we must define scopes that are supersets of multiple screens. In this case, we know we are on a given screen, within a given state, and we require a superscope to exist that is shared across multiple screens.
+
+In this case, the key can define an explicit parent hierarchy of scopes. These scopes are created before the key's own scope (assuming the key is also a ScopeKey).
+
+`lookupService()` prefers explicit parents, however will also continue to seek the service across implicit parents, and their explicit parent chain as well. 
+
+
 -Simple Stack 1.12.3 (2018-09-02)
 --------------------------------
 - CHANGE: When `lookupService` cannot find the service, the exception message is improved (and tells you what *could* be wrong in your configuration).

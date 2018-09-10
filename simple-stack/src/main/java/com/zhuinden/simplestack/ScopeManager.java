@@ -80,7 +80,10 @@ class ScopeManager {
         }
     }
 
+    private List<Object> latestState = null;
+
     void buildScopes(List<Object> newState) {
+        this.latestState = newState;
         for(Object key : newState) {
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
@@ -258,7 +261,25 @@ class ScopeManager {
         if(serviceTag == null) {
             throw new IllegalArgumentException("Service tag cannot be null!");
         }
-        List<String> activeScopes = getActiveScopesReverse();
+
+        Set<String> activeScopes = new LinkedHashSet<>();
+        List<Object> latestState = this.latestState;
+        for(int i = latestState.size() - 1; i >= 0; i--) {
+            Object key = latestState.get(i);
+            if(key instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) key;
+                activeScopes.add(scopeKey.getScopeTag());
+            }
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                List<String> parentScopes = child.getParentScopes();
+                for(int j = parentScopes.size() - 1; j >= 0; j--) {
+                    activeScopes.add(parentScopes.get(j));
+                }
+            }
+        }
+
         for(String scopeTag : activeScopes) {
             if(hasService(scopeTag, serviceTag)) {
                 return getService(scopeTag, serviceTag);

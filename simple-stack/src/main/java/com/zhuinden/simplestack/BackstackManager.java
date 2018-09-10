@@ -139,7 +139,7 @@ public class BackstackManager
                         }
 
 
-                        if(!scopesToActivate.isEmpty() || !scopesToDeactivate.isEmpty()) {
+                        if(!scopesToActivate.isEmpty() || !scopesToDeactivate.isEmpty()) { // de-morgan is an ass, but the unit tests don't lie
                             scopeManager.dispatchActivation(scopesToDeactivate, scopesToActivate);
                         }
 
