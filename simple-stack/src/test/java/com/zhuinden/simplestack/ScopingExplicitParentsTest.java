@@ -900,8 +900,8 @@ public class ScopingExplicitParentsTest {
                         new ChildKey("C1", History.of("P0", "P1", "P2")),
                         new ChildKey("C2", History.of("P0", "P1", "P2")),
                         new ChildKey("C3", History.of("P0", "P1", "P3")),
-                        new ChildKey("C4", History.of("P4")),
-                        new ChildKey("C5", History.of("P4"))
+                        new ChildKey("C4", History.of("P0", "P4")),
+                        new ChildKey("C5", History.of("P0", "P4"))
                 )
         );
         backstackManager.setStateChanger(stateChanger);
@@ -930,7 +930,6 @@ public class ScopingExplicitParentsTest {
 
         /// verified set up
 
-        assertThat(activated).containsExactly(serviceP0, serviceP4, serviceC5);
         assertThat(enteredScope).containsExactly(serviceP0,
                                                  serviceP1,
                                                  serviceP2,
@@ -941,6 +940,7 @@ public class ScopingExplicitParentsTest {
                                                  serviceP4,
                                                  serviceC4,
                                                  serviceC5);
+        assertThat(activated).containsExactly(serviceP0, serviceP4, serviceC5);
         assertThat(inactivated).isEmpty();
         assertThat(exitedScope).isEmpty();
 
@@ -1049,6 +1049,328 @@ public class ScopingExplicitParentsTest {
     }
 
     @Test
+    public void explicitParentServicesReceiveCallbacksBeforeChildInAscendingOrderOtherSetup() {
+        final List<Object> enteredScope = new ArrayList<>();
+        final List<Object> exitedScope = new ArrayList<>();
+
+        final List<Object> activated = new ArrayList<>();
+        final List<Object> inactivated = new ArrayList<>();
+        class Service
+                implements ScopedServices.Scoped, ScopedServices.Activated {
+            private boolean didEnterScope;
+            private boolean didExitScope;
+            private boolean didScopeActivate;
+            private boolean didScopeInactivate;
+
+            @Override
+            public void onEnterScope(@NonNull String scope) {
+                this.didEnterScope = true;
+                enteredScope.add(this);
+            }
+
+            @Override
+            public void onExitScope(@NonNull String scope) {
+                this.didExitScope = true;
+                exitedScope.add(this);
+            }
+
+            @Override
+            public void onScopeActive(@NonNull String scope) {
+                this.didScopeActivate = true;
+                activated.add(this);
+            }
+
+            @Override
+            public void onScopeInactive(@NonNull String scope) {
+                this.didScopeInactivate = true;
+                inactivated.add(this);
+            }
+        }
+        final Service serviceP0 = new Service();
+        final Service serviceP1 = new Service();
+        final Service serviceP2 = new Service();
+        final Service serviceP3 = new Service();
+        final Service serviceP4 = new Service();
+        final Service serviceC1 = new Service();
+        final Service serviceC2 = new Service();
+        final Service serviceC3 = new Service();
+        final Service serviceC4 = new Service();
+        final Service serviceC5 = new Service();
+
+        class ChildKey
+                extends TestKey
+                implements ScopeKey, ScopeKey.Child {
+            private final List<String> parentScopes;
+
+            ChildKey(String name, List<String> parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return parentScopes;
+            }
+        }
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if(serviceBinder.getScopeTag().equals("P0")) {
+                    serviceBinder.add("service", serviceP0);
+                }
+                if(serviceBinder.getScopeTag().equals("P1")) {
+                    serviceBinder.add("service", serviceP1);
+                }
+                if(serviceBinder.getScopeTag().equals("P2")) {
+                    serviceBinder.add("service", serviceP2);
+                }
+                if(serviceBinder.getScopeTag().equals("P3")) {
+                    serviceBinder.add("service", serviceP3);
+                }
+                if(serviceBinder.getScopeTag().equals("P4")) {
+                    serviceBinder.add("service", serviceP4);
+                }
+                if(serviceBinder.getScopeTag().equals("C1")) {
+                    serviceBinder.add("service", serviceC1);
+                }
+                if(serviceBinder.getScopeTag().equals("C2")) {
+                    serviceBinder.add("service", serviceC2);
+                }
+                if(serviceBinder.getScopeTag().equals("C3")) {
+                    serviceBinder.add("service", serviceC3);
+                }
+                if(serviceBinder.getScopeTag().equals("C4")) {
+                    serviceBinder.add("service", serviceC4);
+                }
+                if(serviceBinder.getScopeTag().equals("C5")) {
+                    serviceBinder.add("service", serviceC5);
+                }
+            }
+        });
+
+        /*
+         *                    PARENT0       PARENT4
+         *            PARENT1           CHILD4   CHILD5
+         *     PARENT2       PARENT3
+         *   CHILD1 CHILD2    CHILD3
+         */
+        backstackManager.setup(
+                History.of(
+                        new ChildKey("C1", History.of("P0", "P1", "P2")),
+                        new ChildKey("C2", History.of("P0", "P1", "P2")),
+                        new ChildKey("C3", History.of("P0", "P1", "P3")),
+                        new ChildKey("C4", History.of("P4")),
+                        new ChildKey("C5", History.of("P4"))
+                )
+        );
+        backstackManager.setStateChanger(stateChanger);
+
+        assertThat(backstackManager.hasScope("C1")).isTrue();
+        assertThat(backstackManager.hasScope("C2")).isTrue();
+        assertThat(backstackManager.hasScope("C3")).isTrue();
+        assertThat(backstackManager.hasScope("C4")).isTrue();
+        assertThat(backstackManager.hasScope("C5")).isTrue();
+        assertThat(backstackManager.hasScope("P0")).isTrue();
+        assertThat(backstackManager.hasScope("P1")).isTrue();
+        assertThat(backstackManager.hasScope("P2")).isTrue();
+        assertThat(backstackManager.hasScope("P3")).isTrue();
+        assertThat(backstackManager.hasScope("P4")).isTrue();
+
+        assertThat(backstackManager.getService("C1", "service")).isSameAs(serviceC1);
+        assertThat(backstackManager.getService("C2", "service")).isSameAs(serviceC2);
+        assertThat(backstackManager.getService("C3", "service")).isSameAs(serviceC3);
+        assertThat(backstackManager.getService("C4", "service")).isSameAs(serviceC4);
+        assertThat(backstackManager.getService("C5", "service")).isSameAs(serviceC5);
+        assertThat(backstackManager.getService("P0", "service")).isSameAs(serviceP0);
+        assertThat(backstackManager.getService("P1", "service")).isSameAs(serviceP1);
+        assertThat(backstackManager.getService("P2", "service")).isSameAs(serviceP2);
+        assertThat(backstackManager.getService("P3", "service")).isSameAs(serviceP3);
+        assertThat(backstackManager.getService("P4", "service")).isSameAs(serviceP4);
+
+        /// verified set up
+
+        assertThat(enteredScope).containsExactly(serviceP0,
+                                                 serviceP1,
+                                                 serviceP2,
+                                                 serviceC1,
+                                                 serviceC2,
+                                                 serviceP3,
+                                                 serviceC3,
+                                                 serviceP4,
+                                                 serviceC4,
+                                                 serviceC5);
+        assertThat(activated).containsExactly(serviceP4, serviceC5);
+        assertThat(inactivated).isEmpty();
+        assertThat(exitedScope).isEmpty();
+
+        backstackManager.getBackstack().goBack(); // [C1, C2, C3, C4]
+
+        assertThat(activated).containsExactly(serviceP4, serviceC5, serviceC4);
+        assertThat(enteredScope).containsExactly(serviceP0,
+                                                 serviceP1,
+                                                 serviceP2,
+                                                 serviceC1,
+                                                 serviceC2,
+                                                 serviceP3,
+                                                 serviceC3,
+                                                 serviceP4,
+                                                 serviceC4,
+                                                 serviceC5);
+        assertThat(inactivated).containsExactly(serviceC5);
+        assertThat(exitedScope).containsExactly(serviceC5);
+
+        backstackManager.getBackstack().goBack(); // [C1, C2, C3]
+
+        assertThat(activated).containsExactly(serviceP4,
+                                              serviceC5,
+                                              serviceC4,
+                                              serviceP0,
+                                              serviceP1,
+                                              serviceP3,
+                                              serviceC3);
+        assertThat(enteredScope).containsExactly(serviceP0,
+                                                 serviceP1,
+                                                 serviceP2,
+                                                 serviceC1,
+                                                 serviceC2,
+                                                 serviceP3,
+                                                 serviceC3,
+                                                 serviceP4,
+                                                 serviceC4,
+                                                 serviceC5);
+        assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4);
+        assertThat(exitedScope).containsExactly(serviceC5, serviceC4, serviceP4);
+
+        backstackManager.getBackstack().jumpToRoot(); // [C1]
+
+        assertThat(activated).containsExactly(serviceP4,
+                                              serviceC5,
+                                              serviceC4,
+                                              serviceP0,
+                                              serviceP1,
+                                              serviceP3,
+                                              serviceC3,
+                                              serviceP2,
+                                              serviceC1);
+        assertThat(enteredScope).containsExactly(serviceP0,
+                                                 serviceP1,
+                                                 serviceP2,
+                                                 serviceC1,
+                                                 serviceC2,
+                                                 serviceP3,
+                                                 serviceC3,
+                                                 serviceP4,
+                                                 serviceC4,
+                                                 serviceC5);
+        assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3);
+        assertThat(exitedScope).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
+
+        backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
+
+        assertThat(activated).containsExactly(serviceP4,
+                                              serviceC5,
+                                              serviceC4,
+                                              serviceP0,
+                                              serviceP1,
+                                              serviceP3,
+                                              serviceC3,
+                                              serviceP2,
+                                              serviceC1);
+        assertThat(enteredScope).containsExactly(serviceP0,
+                                                 serviceP1,
+                                                 serviceP2,
+                                                 serviceC1,
+                                                 serviceC2,
+                                                 serviceP3,
+                                                 serviceC3,
+                                                 serviceP4,
+                                                 serviceC4,
+                                                 serviceC5);
+        assertThat(inactivated).containsExactly(serviceC5,
+                                                serviceC4,
+                                                serviceP4,
+                                                serviceC3,
+                                                serviceP3,
+                                                serviceC1,
+                                                serviceP2,
+                                                serviceP1,
+                                                serviceP0);
+        assertThat(exitedScope).containsExactly(serviceC5,
+                                                serviceC4,
+                                                serviceP4,
+                                                serviceC3,
+                                                serviceP3,
+                                                serviceC2,
+                                                serviceC1,
+                                                serviceP2,
+                                                serviceP1,
+                                                serviceP0);
+
+        backstackManager.getBackstack().setHistory(History.of(new ChildKey("C5", History.of("P4"))),
+                                                   StateChange.REPLACE);
+
+        assertThat(activated).containsExactly(serviceP4,
+                                              serviceC5,
+                                              serviceC4,
+                                              serviceP0,
+                                              serviceP1,
+                                              serviceP3,
+                                              serviceC3,
+                                              serviceP2,
+                                              serviceC1,
+                                              serviceP4,
+                                              serviceC5);
+        assertThat(enteredScope).containsExactly(serviceP0,
+                                                 serviceP1,
+                                                 serviceP2,
+                                                 serviceC1,
+                                                 serviceC2,
+                                                 serviceP3,
+                                                 serviceC3,
+                                                 serviceP4,
+                                                 serviceC4,
+                                                 serviceC5,
+                                                 serviceP4,
+                                                 serviceC5);
+        assertThat(inactivated).containsExactly(serviceC5,
+                                                serviceC4,
+                                                serviceP4,
+                                                serviceC3,
+                                                serviceP3,
+                                                serviceC1,
+                                                serviceP2,
+                                                serviceP1,
+                                                serviceP0);
+        assertThat(exitedScope).containsExactly(serviceC5,
+                                                serviceC4,
+                                                serviceP4,
+                                                serviceC3,
+                                                serviceP3,
+                                                serviceC2,
+                                                serviceC1,
+                                                serviceP2,
+                                                serviceP1,
+                                                serviceP0);
+
+    }
+
+    @Test
     public void explicitParentsAreCreatedEvenIfThereAreNoScopeKeys() {
         final List<Object> enteredScope = new ArrayList<>();
         final List<Object> exitedScope = new ArrayList<>();
@@ -1148,6 +1470,4 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackManager.getService("boop", "service")).isSameAs(service1);
         assertThat(backstackManager.lookupService("service")).isSameAs(service1);
     }
-
-    // TODO: verify that parent scope services also have their states properly persisted by Bundleable
 }

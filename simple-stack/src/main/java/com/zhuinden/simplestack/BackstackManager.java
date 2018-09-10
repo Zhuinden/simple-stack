@@ -26,6 +26,7 @@ import com.zhuinden.statebundle.StateBundle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class BackstackManager
         return SCOPES_TAG;
     }
 
-    private String activeScope = null;
+    private Object previousTopKeyWithAssociatedScope = null;
 
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
@@ -83,23 +84,63 @@ public class BackstackManager
                         History<Object> newState = stateChange.getNewState();
 
                         // activation/deactivation
-                        ScopeKey topScopeKey = null;
+                        Object newTopKeyWithAssociatedScope = null;
                         for(int i = 0, size = newState.size(); i < size; i++) {
                             Object key = newState.fromTop(i);
-                            if(key instanceof ScopeKey) {
-                                topScopeKey = (ScopeKey) key;
+                            if(key instanceof ScopeKey || key instanceof ScopeKey.Child) {
+                                newTopKeyWithAssociatedScope = key;
                                 break;
                             }
                         }
-                        String newScopeTag = null;
-                        if(topScopeKey != null) {
-                            newScopeTag = topScopeKey.getScopeTag();
+
+                        Set<String> scopesToDeactivate = new LinkedHashSet<>();
+                        Set<String> scopesToActivate = new LinkedHashSet<>();
+
+                        if(previousTopKeyWithAssociatedScope != null) {
+                            if(previousTopKeyWithAssociatedScope instanceof ScopeKey) {
+                                ScopeKey scopeKey = (ScopeKey) previousTopKeyWithAssociatedScope;
+                                scopesToDeactivate.add(scopeKey.getScopeTag());
+                            }
+
+                            if(previousTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
+                                ScopeKey.Child child = (ScopeKey.Child) previousTopKeyWithAssociatedScope;
+                                ScopeManager.checkParentScopes(child);
+                                List<String> parentScopes = child.getParentScopes();
+
+                                for(int i = parentScopes.size() - 1; i >= 0; i--) {
+                                    scopesToDeactivate.add(parentScopes.get(i));
+                                }
+                            }
                         }
-                        if(activeScope == null /* no active scope */
-                                || (activeScope != null && !activeScope.equals(newScopeTag)) /* new active scope */) {
-                            String previousScopeTag = activeScope;
-                            activeScope = newScopeTag;
-                            scopeManager.dispatchActivation(previousScopeTag, newScopeTag);
+
+                        if(newTopKeyWithAssociatedScope != null) {
+                            if(newTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
+                                ScopeKey.Child child = (ScopeKey.Child) newTopKeyWithAssociatedScope;
+                                ScopeManager.checkParentScopes(child);
+                                scopesToActivate.addAll(child.getParentScopes());
+                            }
+                            if(newTopKeyWithAssociatedScope instanceof ScopeKey) {
+                                ScopeKey scopeKey = (ScopeKey) newTopKeyWithAssociatedScope;
+                                scopesToActivate.add(scopeKey.getScopeTag());
+                            }
+                        }
+
+                        previousTopKeyWithAssociatedScope = newTopKeyWithAssociatedScope;
+
+                        // do not deactivate scopes that exist at this time
+                        Iterator<String> scopeToActivate = scopesToActivate.iterator();
+                        while(scopeToActivate.hasNext()) {
+                            String activeScope = scopeToActivate.next();
+                            if(scopesToDeactivate.contains(activeScope)) {
+                                scopesToDeactivate.remove(activeScope); // do not deactivate an already active scope
+                                scopeToActivate.remove(); // if the previous already contains it, then it is already activated.
+                                // we should make sure we never activate the same service twice.
+                            }
+                        }
+
+
+                        if(!scopesToActivate.isEmpty() || !scopesToDeactivate.isEmpty()) {
+                            scopeManager.dispatchActivation(scopesToDeactivate, scopesToActivate);
                         }
 
                         // scope eviction + scoped
@@ -257,11 +298,21 @@ public class BackstackManager
      * Note that if you use {@link BackstackDelegate} or {@link com.zhuinden.simplestack.navigator.Navigator}, then there is no need to call this method manually.
      */
     public void finalizeScopes() {
-        if(activeScope != null) {
-            String previousScopeTag = activeScope;
-            activeScope = null;
+        if(previousTopKeyWithAssociatedScope != null) {
+            Set<String> scopesToDeactivate = new LinkedHashSet<>();
+
+            if(previousTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) previousTopKeyWithAssociatedScope;
+                ScopeManager.checkParentScopes(child);
+                scopesToDeactivate.addAll(child.getParentScopes());
+            }
+            if(previousTopKeyWithAssociatedScope instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) previousTopKeyWithAssociatedScope;
+                scopesToDeactivate.add(scopeKey.getScopeTag());
+            }
+
             //noinspection ConstantConditions
-            scopeManager.dispatchActivation(previousScopeTag, activeScope);
+            scopeManager.dispatchActivation(scopesToDeactivate, Collections.<String>emptySet());
         }
 
         History<Object> history = backstack.getHistory();

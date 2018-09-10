@@ -1,7 +1,6 @@
 package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.zhuinden.statebundle.StateBundle;
 
@@ -143,8 +142,8 @@ class ScopeManager {
         }
     }
 
-    void dispatchActivation(@Nullable String previousScopeTag, @Nullable String newScopeTag) {
-        if(newScopeTag != null) {
+    void dispatchActivation(@NonNull Set<String> scopesToDeactivate, @NonNull Set<String> scopesToActivate) {
+        for(String newScopeTag : scopesToActivate) {
             if(!scopes.containsKey(newScopeTag)) {
                 throw new AssertionError(
                         "The new scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
@@ -157,7 +156,7 @@ class ScopeManager {
             }
         }
 
-        if(previousScopeTag != null) {
+        for(String previousScopeTag : scopesToDeactivate) {
             if(!scopes.containsKey(previousScopeTag)) {
                 throw new AssertionError(
                         "The previous scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
