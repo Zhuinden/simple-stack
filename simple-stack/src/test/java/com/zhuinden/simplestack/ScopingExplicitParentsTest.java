@@ -1435,6 +1435,52 @@ public class ScopingExplicitParentsTest {
                                                 serviceP1,
                                                 serviceP0);
 
+        backstackManager.detachStateChanger();
+        backstackManager.setStateChanger(stateChanger);
+
+        // no change should happen here
+        assertThat(activated).containsExactly(serviceP4,
+                                              serviceC5,
+                                              serviceC4,
+                                              serviceP0,
+                                              serviceP1,
+                                              serviceP3,
+                                              serviceC3,
+                                              serviceP2,
+                                              serviceC1,
+                                              serviceP4,
+                                              serviceC5);
+        assertThat(enteredScope).containsExactly(serviceP0,
+                                                 serviceP1,
+                                                 serviceP2,
+                                                 serviceC1,
+                                                 serviceC2,
+                                                 serviceP3,
+                                                 serviceC3,
+                                                 serviceP4,
+                                                 serviceC4,
+                                                 serviceC5,
+                                                 serviceP4,
+                                                 serviceC5);
+        assertThat(inactivated).containsExactly(serviceC5,
+                                                serviceC4,
+                                                serviceP4,
+                                                serviceC3,
+                                                serviceP3,
+                                                serviceC1,
+                                                serviceP2,
+                                                serviceP1,
+                                                serviceP0);
+        assertThat(exitedScope).containsExactly(serviceC5,
+                                                serviceC4,
+                                                serviceP4,
+                                                serviceC3,
+                                                serviceP3,
+                                                serviceC2,
+                                                serviceC1,
+                                                serviceP2,
+                                                serviceP1,
+                                                serviceP0);
     }
 
     @Test
