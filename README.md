@@ -92,124 +92,99 @@ Check out the details in [simple-stack-example-basic-fragment](https://github.co
 
 - **End result**
 
-``` java
-    public void navigateTo(Object key) {
-        backstackDelegate.getBackstack().goTo(key);
+``` kotlin
+    fun navigateTo(key: Key) {
+        backstack.goTo(key)
     }
 ```
 
 and
 
-``` java
-    @OnClick(R.id.home_button)
-    public void goToOtherView(View view) {
-        MainActivity.get(view.getContext()).navigateTo(OtherKey.create()); // using getSystemService()
+``` kotlin
+    homeButton.onClick {
+        navigateTo(OtherKey())
     }
 ```
 
 - **Activity**
 
-``` java
-public class MainActivity
-        extends AppCompatActivity
-        implements StateChanger {
-    private static final String TAG = "MainActivity";
+``` kotlin
+class MainActivity : AppCompatActivity(), StateChanger {
+    lateinit var backstackDelegate: BackstackDelegate
+    lateinit var fragmentStateChanger: FragmentStateChanger
 
-    @BindView(R.id.root)
-    ViewGroup root;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        backstackDelegate = BackstackDelegate()
+        backstackDelegate.onCreate(savedInstanceState,
+            lastCustomNonConfigurationInstance,
+            History.single(TasksKey()))
 
-    BackstackDelegate backstackDelegate;
-    FragmentStateChanger fragmentStateChanger;
+        backstackDelegate.registerForLifecycleCallbacks(this)
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate();
-        backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(),
-                                   History.single(HomeKey.create()));
-        backstackDelegate.registerForLifecycleCallbacks(this);
+        super.onCreate(savedInstanceState)
 
-        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main)
 
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        // ...
-        fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.root);
-        backstackDelegate.setStateChanger(this);
+        this.fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+        
+        backstackDelegate.setStateChanger(this)
     }
+    override fun onRetainCustomNonConfigurationInstance(): Any =
+        backstackDelegate.onRetainCustomNonConfigurationInstance()
 
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(!backstackDelegate.onBackPressed()) { // calls `backstack.goBack()`
-            super.onBackPressed();
+    override fun onBackPressed() {
+        if (!backstackDelegate.onBackPressed()) { // calls backstack.goBack()
+            super.onBackPressed()
         }
     }
 
-    // ...
-
-    @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
-            completionCallback.stateChangeComplete();
-            return;
+    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
+        if (stateChange.topNewState<Any>() == stateChange.topPreviousState()) {
+            // no-op
+            completionCallback.stateChangeComplete()
+            return
         }
-        fragmentStateChanger.handleStateChange(stateChange);
-        completionCallback.stateChangeComplete();
+
+        fragmentStateChanger.handleStateChange(stateChange)
+
+        completionCallback.stateChangeComplete()
     }
 }
 ```
 
 - **Key** for Fragments
 
-``` java
-@AutoValue
-public abstract class HomeKey 
-      extends BaseKey { // see sample for BaseKey/BaseFragment
-    public static HomeKey create() {
-        return new AutoValue_HomeKey();
-    }
-
-    @Override
-    protected BaseFragment createFragment() {
-        return new HomeFragment();
-    }
+``` kotlin
+@Parcelize
+data class TasksKey(val placeholder: String = "") : BaseKey() {
+    override fun createFragment(): Fragment = TasksFragment()
 }
 ```
 
 - **FragmentStateChanger**
 
-For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/504b2c44295c77a960ca34add68fdc685c3dbc19/simple-stack-example-basic-fragment/src/main/java/com/zhuinden/navigationexamplefrag/FragmentStateChanger.java).
+For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/6c7d4f8d9ba921980423972738b03b53c0b3d9ba/simple-stack-example-mvp-fragments/src/main/java/com/zhuinden/simplestackdemoexamplefragments/util/FragmentStateChanger.kt).
 
 ### Custom Views
 
 - **Activity**
 
-``` java
-public class MainActivity
-        extends AppCompatActivity {
-    public static final String TAG = "MainActivity";
-
-    @BindView(R.id.root)
-    RelativeLayout root;
+``` kotlin
+class MainActivity : AppCompatActivity() {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        Navigator.install(this, root, HistoryBuilder.single(FirstKey.create()));
+        Navigator.install(this, root, History.single(FirstKey()))
         // additional configuration possible with `Navigator.configure()...install()`
     }
 
     @Override
-    public void onBackPressed() {
+    override fun onBackPressed() {
         if(!Navigator.onBackPressed(this)) { // calls `backstack.goBack()`
-            super.onBackPressed();
+            super.onBackPressed()
         }
     }
 }
@@ -217,23 +192,11 @@ public class MainActivity
 
 - **StateKey**
 
-``` java
-@AutoValue
-public abstract class FirstKey
-        implements StateKey, Parcelable {
-    public static FirstKey create() {
-        return new AutoValue_FirstKey();
-    }
-
-    @Override
-    public int layout() {
-        return R.layout.path_first;
-    }
-
-    @Override
-    public ViewChangeHandler viewChangeHandler() {
-        return new SegueViewChangeHandler();
-    }
+``` kotlin
+@Parcelize
+data class TasksKey(val placeholder: String = "") : StateKey {
+    override fun layout(): Int = R.layout.path_tasks
+    override fun viewChangeHandler(): ViewChangeHandler = SegueViewChangeHandler()
 }
 ```
 
@@ -264,31 +227,24 @@ public abstract class FirstKey
 
 - **Custom Viewgroup**
 
-``` java
-public class FirstView
-        extends LinearLayout { // can implement Bundleable
-
-    public FirstView(Context context) {
-        super(context);
-    }
-
-    public FirstView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    //...
-
-    @OnClick(R.id.first_button)
-    public void firstButtonClick(View view) {
-        Navigator.getBackstack(view.getContext()).goTo(SecondKey.create());
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        ButterKnife.bind(this);
+``` kotlin
+class TasksView : FrameLayout {
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    @TargetApi(21)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+    
+    override fun onFinishInflate() {
+         super.onFinishInflate()
+         firstButton.onClick {
+             backstack.goTo(SeocndKey())
+         }
     }
 }
+
+val View.backstack 
+    get() = Navigator.getBackstack(context)
 ```
 
 ## More information
@@ -298,7 +254,7 @@ For more information, check the [wiki page](https://github.com/Zhuinden/simple-s
 
 ## License
 
-    Copyright 2017 Gabor Varadi
+    Copyright 2017-2018 Gabor Varadi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
