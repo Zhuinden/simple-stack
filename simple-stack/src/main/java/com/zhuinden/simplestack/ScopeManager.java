@@ -117,16 +117,7 @@ class ScopeManager {
         List<String> scopeSet = getActiveScopesReverse();
         for(String activeScope: scopeSet) {
             if(!currentScopes.contains(activeScope)) {
-                Map<String, Object> scope = scopes.get(activeScope);
-                List<Object> services = new ArrayList<>(scope.values());
-                Collections.reverse(services);
-                for(Object service : services) {
-                    if(service instanceof ScopedServices.Scoped) {
-                        ((ScopedServices.Scoped) service).onExitScope(activeScope);
-                    }
-                }
-                scopes.remove(activeScope);
-                rootBundle.remove(activeScope);
+                destroyScope(activeScope);
             }
         }
     }
