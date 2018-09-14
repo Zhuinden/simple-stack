@@ -88,7 +88,7 @@ Afterwards, the [Backstack](https://github.com/Zhuinden/simple-stack/blob/master
 
 ### Fragments
 
-Check out the details in [simple-stack-example-basic-fragment](https://github.com/Zhuinden/simple-stack/tree/master/simple-stack-example-basic-fragment) to see how to make Simple-Stack work with Fragments (or the relevant wiki page).
+Check out the Fragment samples to see how to make Simple-Stack work with Fragments (or the relevant wiki page).
 
 - **End result**
 
@@ -158,6 +158,23 @@ class MainActivity : AppCompatActivity(), StateChanger {
 @Parcelize
 data class TasksKey(val placeholder: String = "") : BaseKey() {
     override fun createFragment(): Fragment = TasksFragment()
+}
+```
+
+And
+
+``` kotlin
+abstract class BaseKey : Parcelable {
+    val fragmentTag: String
+        get() = toString()
+
+    fun newFragment(): BaseFragment = createFragment().apply {
+        arguments = (arguments ?: Bundle()).also { bundle ->
+            bundle.putParcelable("KEY", this@BaseKey)
+        }
+    }
+
+    protected abstract fun createFragment(): BaseFragment
 }
 ```
 
