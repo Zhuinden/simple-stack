@@ -12,9 +12,7 @@ In this case, the key can define an explicit parent hierarchy of scopes. These s
 
 The parent scopes are only destroyed after all their children are destroyed.
 
-`lookupService()` prefers explicit parents, however will also continue to seek the service across implicit parents, and their explicit parent chain as well.
-
-*This feature is a bit complex, so if you see any unexpected behavior, report it as soon as possible. There are however multiple unit tests to verify that behavior is generally as expected.* 
+`lookupService()` prefers explicit parents, however will also continue to seek the service across implicit parents, and their explicit parent chain as well. 
 
 
 -Simple Stack 1.12.3 (2018-09-02)
@@ -65,7 +63,7 @@ When navigating from one scope to another scope, the new scope becomes active be
 --------------------------------
 - ADDED: `Navigator.isNavigatorAvailable(Activity)` to ensure the ability to check if the `BackstackHost` is added to the Activity.
 
-- ADDED: `BackstackManager.lookupService(serviceTag)`, `BackstackDelegate.lookupService(serviceTag), and `Navigator.lookupService(Context, serviceTag)`, which attempts to look up the service in all currently existing scopes (starting from the newest added scope).
+- ADDED: `BackstackManager.lookupService(serviceTag)`, `BackstackDelegate.lookupService(serviceTag)`, and `Navigator.lookupService(Context, serviceTag)`, which attempts to look up the service in all currently existing scopes (starting from the newest added scope).
 
 -Simple Stack 1.11.2 (2018-07-26)
 --------------------------------
