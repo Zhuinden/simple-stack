@@ -30,7 +30,7 @@ class WordListFragment : BaseFragment() {
         recyclerView.adapter = adapter
 
         buttonGoToAddNewWord.onClick { view ->
-            view.backstack.goTo(NewWordKey())
+            backstack.goTo(NewWordKey())
         }
 
         wordList.observe(this /*getViewLifecycle()*/, Observer { words ->
