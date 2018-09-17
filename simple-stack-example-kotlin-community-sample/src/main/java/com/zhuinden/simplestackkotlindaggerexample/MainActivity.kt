@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
     private lateinit var fragmentStateChanger: FragmentStateChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        backstackDelegate = BackstackDelegate(null)
+        backstackDelegate = BackstackDelegate()
         backstackDelegate.onCreate(savedInstanceState,
             lastCustomNonConfigurationInstance,
             History.single(HomeKey()))
