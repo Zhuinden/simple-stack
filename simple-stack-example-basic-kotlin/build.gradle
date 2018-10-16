@@ -38,16 +38,14 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':simple-stack')
 
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
+    androidTestImplementation(Libs.espresso_core, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    testImplementation 'junit:junit:4.12'
+    implementation Libs.appcompat_v7
+    implementation Libs.design
+    testImplementation Libs.junit
 
-    implementation "org.jetbrains.anko:anko-commons:0.10.4"
-    implementation "org.jetbrains.anko:anko-sdk15-listeners:0.10.4"
-
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.21"
+    implementation Libs.anko_commons
+    implementation Libs.anko_sdk15_listeners
+    implementation Libs.kotlin_stdlib_jdk7
 }

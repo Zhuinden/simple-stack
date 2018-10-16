@@ -19,6 +19,9 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
+plugins { 
+  id("jmfayard.github.io.gradle-kotlin-dsl-libs") version "0.2.4" 
+} 
 
 allprojects {
     repositories {
