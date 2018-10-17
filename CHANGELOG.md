@@ -5,6 +5,8 @@
 
 - UPDATE: Added `simple-stack-example-scoping` to showcase the usage of `ScopeKey.Child`, with Fragments and Navigator.
 
+- ADDED: `lookupFromScope()` and `canFindFromScope()` methods that begin the lookup from the specified scope, instead of the active-most one.
+
 -Simple Stack 1.13.0 (2018-09-10)
 --------------------------------
 - ADDED: Adds `ScopeKey.Child` interface, which allows the definition of *explicit* parent hierarchy of a given scope.

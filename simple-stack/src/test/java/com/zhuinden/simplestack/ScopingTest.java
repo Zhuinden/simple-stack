@@ -70,7 +70,8 @@ public class ScopingTest {
         }
     };
 
-    public interface HasServices {
+    public interface HasServices
+            extends ScopeKey {
         void bindServices(ScopedServices.ServiceBinder serviceBinder);
     }
 
@@ -99,7 +100,7 @@ public class ScopingTest {
         @NonNull
         @Override
         public String getScopeTag() {
-            return "boop";
+            return name;
         }
 
         @Override
@@ -1520,5 +1521,101 @@ public class ScopingTest {
                 Pair.of(service2, ServiceEvent.DESTROY),
                 Pair.of(service1, ServiceEvent.DESTROY)
         );
+    }
+
+    @Test
+    public void lookupServiceFromScopeWorks() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final Object service1 = new Object();
+        final Object service2 = new Object();
+        final Object service0 = new Object();
+        final Object service3 = new Object();
+
+        class Key1
+                extends TestKey
+                implements HasServices {
+            Key1(String name) {
+                super(name);
+            }
+
+            protected Key1(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.has("service0")).isFalse();
+                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service0")).isFalse();
+                serviceBinder.add("service0", service0);
+                assertThat(serviceBinder.has("service0")).isTrue();
+                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service0")).isTrue();
+                assertThat(serviceBinder.get("service0")).isSameAs(service0);
+                assertThat(serviceBinder.lookup("service0")).isSameAs(service0);
+                assertThat(serviceBinder.lookupFrom(serviceBinder.getScopeTag(), "service0")).isSameAs(service0);
+                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service")).isFalse();
+                serviceBinder.add("service", service1);
+                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service")).isTrue();
+                assertThat(serviceBinder.lookupFrom(serviceBinder.getScopeTag(), "service")).isSameAs(service1);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        }
+
+        class Key2
+                extends TestKey
+                implements HasServices {
+            Key2(String name) {
+                super(name);
+            }
+
+            protected Key2(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.lookup("service0")).isSameAs(service0);
+                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service")).isTrue();
+                assertThat(serviceBinder.lookup("service")).isSameAs(service1);
+                serviceBinder.add("service", service2);
+                // the most important assertion here
+                assertThat(serviceBinder.lookup("service")).isSameAs(service2);
+                assertThat(serviceBinder.lookupFrom("beep", "service")).isSameAs(service1);
+
+                serviceBinder.add("service3", service3);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "boop";
+            }
+        }
+
+        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
+        backstackManager.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstackManager.lookupService("service")).isSameAs(service2);
+        assertThat(backstackManager.canFindService("service3")).isTrue();
+        assertThat(backstackManager.canFindFromScope("boop", "service3")).isTrue();
+        assertThat(backstackManager.lookupFromScope("boop", "service3")).isSameAs(service3);
+        assertThat(backstackManager.lookupFromScope("beep", "service")).isSameAs(service1);
+        assertThat(backstackManager.lookupFromScope("boop", "service")).isSameAs(service2);
+
+        backstackManager.getBackstack().goBack();
+
+        assertThat(backstackManager.canFindFromScope("boop", "service3")).isFalse();
+        assertThat(backstackManager.lookupService("service")).isSameAs(service1);
     }
 }
