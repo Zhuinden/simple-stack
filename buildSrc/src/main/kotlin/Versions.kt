@@ -7,174 +7,246 @@ import kotlin.String
  *   `$ ./gradlew syncLibs`
  * to update this file */
 object Versions {
-    const val adapters: String = "3.1.3" // available milestone: "3.3.0-alpha13" 
-
-    const val android_adapters: String = "3.0.0" // up-to-date
-
+    /**
+     * [compiler website](https://developer.android.com/topic/libraries/architecture/index.html) */
     const val android_arch_lifecycle_compiler: String = "1.1.0" // available milestone: "1.1.1" 
 
-    const val android_arch_lifecycle_extensions: String = "1.1.1" // up-to-date
+    /**
+     * [extensions website](https://developer.android.com/topic/libraries/architecture/index.html) */
+    const val android_arch_lifecycle_extensions: String = "1.1.0" // available milestone: "1.1.1" 
 
-    const val android_arch_lifecycle_runtime: String = "1.1.1" // up-to-date
+    /**
+     * [runtime website](https://developer.android.com/topic/libraries/architecture/index.html) */
+    const val android_arch_lifecycle_runtime: String = "1.1.0" // available milestone: "1.1.1" 
 
-    const val android_maven_gradle_plugin: String = "2.0" // available milestone: "2.1" 
+    /**
+     * [transitionseverywhere website](https://github.com/andkulikov/transitions-everywhere) */
+    const val transitionseverywhere: String = "1.7.0" // available milestone: "1.8.0" 
 
-    const val anko_commons: String = "0.10.5" // available milestone: "0.10.7" 
+    const val com_android_databinding: String = "3.1.3" // available milestone: "3.4.0-alpha01" 
 
-    const val anko_sdk15_listeners: String = "0.10.5" // available milestone: "0.10.7" 
+    /**
+     * [espresso-contrib website](https://developer.android.com/testing) */
+    const val com_android_support_test_espresso: String = "3.0.1" // available milestone: "3.0.2" 
 
+    /**
+     * [rules website](https://developer.android.com/testing) */
+    const val com_android_support_test: String = "1.0.1" // available milestone: "1.0.2" 
+
+    /**
+     * [appcompat-v7 website](http://developer.android.com/tools/extras/support-library.html) */
     const val appcompat_v7: String = "27.1.1" // available milestone: "28.0.0" 
 
-    const val assertj_android: String = "1.1.1" // available milestone: "1.2.0" 
-
-    const val assertj_android_appcompat_v7: String = "1.1.1" // available milestone: "1.2.0" 
-
-    const val assertj_android_design: String = "1.1.1" // available milestone: "1.2.0" 
-
-    const val assertj_android_recyclerview_v7: String = "1.1.1" // available milestone: "1.2.0" 
-
-    const val assertj_android_support_v4: String = "1.1.1" // available milestone: "1.2.0" 
-
-    const val assertj_core: String = "3.9.1" // available milestone: "3.11.1" 
-
-    const val auto_parcel: String = "1.0.3" // up-to-date
-
-    const val auto_value: String = "1.5.2" // available milestone: "1.6.3rc1" 
-
-    const val auto_value_ignore_hash_equals: String = "1.1.4" // up-to-date
-
-    const val baselibrary: String = "3.1.3" // available milestone: "3.3.0-alpha13" 
-
-    const val bottom_navigation: String = "2.0.1-rc1" // available milestone: "2.0.2" 
-
-    const val butterknife: String = "8.8.1" // available milestone: "9.0.0-rc1" 
-
-    const val butterknife_compiler: String = "8.8.1" // available milestone: "9.0.0-rc1" 
-
+    /**
+     * [cardview-v7 website](http://developer.android.com/tools/extras/support-library.html) */
     const val cardview_v7: String = "27.1.1" // available milestone: "28.0.0" 
 
-    const val com_android_databinding_compiler: String =
-            "3.1.3" // available milestone: "3.2.0-alpha10" 
-
-    const val com_android_support_test_rules: String = "1.0.1" // available milestone: "1.0.2" 
-
-    const val com_android_support_test_runner: String = "1.0.1" // available milestone: "1.0.2" 
-
-    const val com_android_tools_build_gradle: String =
-            "3.1.3" // available milestone: "3.3.0-alpha13" 
-
-    const val command_queue: String = "0.0.3" // available milestone: "0.1.1" 
-
-    const val conductor: String = "2.1.5-SNAPSHOT" // available milestone: "2.1.5" 
-
-    const val converter_gson: String = "2.4.0" // up-to-date
-
-    const val dagger: String = "2.16" // available milestone: "2.17" 
-
-    const val dagger_compiler: String = "2.16" // available milestone: "2.17" 
-
+    /**
+     * [design website](http://developer.android.com/tools/extras/support-library.html) */
     const val design: String = "27.1.1" // available milestone: "28.0.0" 
-
-    const val dexmaker: String = "1.2" // up-to-date
-
-    const val dexmaker_mockito: String = "1.2" // up-to-date
-
-    const val espresso_contrib: String = "3.0.1" // available milestone: "3.0.2" 
-
-    const val espresso_core: String = "3.0.1" // available milestone: "3.0.2" 
-
-    const val espresso_idling_resource: String = "3.0.1" // available milestone: "3.0.2" 
-
-    const val espresso_intents: String = "3.0.1" // available milestone: "3.0.2" 
-
-    const val gradle_retrolambda: String = "3.7.0" // up-to-date
-
-    const val hamcrest_all: String = "1.3" // up-to-date
-
-    const val javatuples: String = "1.2" // up-to-date
-
-    const val javax_annotation: String = "10.0-b28" // up-to-date
-
-    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
-            "0.2.4" // up-to-date
-
-    const val junit: String = "4.12" // up-to-date
-
-    const val kotlin_android_extensions_runtime: String = "1.2.41" // available milestone: "1.2.71" 
-
-    const val kotlin_annotation_processing_gradle: String =
-            "1.2.41" // available milestone: "1.2.71" 
-
-    const val kotlin_gradle_plugin: String = "1.2.41" // available milestone: "1.2.71" 
-
-    const val kotlin_stdlib_jdk7: String = "1.2.70" // available milestone: "1.2.71" 
-
-    const val kotlin_stdlib_jdk8: String = "1.2.41" // available milestone: "1.2.71" 
-
-    const val kotlin_stdlib_jre7: String = "1.2.21" // available milestone: "1.2.71" 
-
-    const val library: String = "3.1.3" // available milestone: "3.3.0-alpha13" 
-
-    const val lint_gradle: String = "26.1.3" // available milestone: "26.3.0-alpha13" 
-
-    const val logging_interceptor: String = "3.10.0" // available milestone: "3.11.0" 
-
-    const val maven_ant_tasks: String = "2.1.3" // up-to-date
-
-    const val mockito_all: String = "1.10.19" // available milestone: "2.0.2-beta" 
-
-    const val mockito_core: String = "2.15.0" // available milestone: "2.23.0" 
 
     const val multidex: String = "1.0.3" // up-to-date
 
-    const val okhttp: String = "3.10.0" // available milestone: "3.11.0" 
-
-    const val paperparcel: String = "2.0.4" // available milestone: "2.0.6" 
-
-    const val paperparcel_compiler: String = "2.0.4" // available milestone: "2.0.6" 
-
-    const val powermock_module_junit4: String = "1.6.5" // available milestone: "2.0.0-beta.5" 
-
-    const val realm_android_kotlin_extensions: String =
-            "5.1.0" // available milestone: "5.8.0-BETA1" 
-
-    const val realm_android_library: String = "5.1.0" // available milestone: "5.8.0-BETA1" 
-
-    const val realm_annotations: String = "5.1.0" // available milestone: "5.8.0-BETA1" 
-
-    const val realm_annotations_processor: String = "5.1.0" // available milestone: "5.8.0-BETA1" 
-
-    const val realm_gradle_plugin: String = "5.1.0" // available milestone: "5.8.0-BETA1" 
-
-    const val realmfieldnameshelper: String = "1.1.1" // up-to-date
-
+    /**
+     * [recyclerview-v7 website](http://developer.android.com/tools/extras/support-library.html) */
     const val recyclerview_v7: String = "27.1.1" // available milestone: "28.0.0" 
 
-    const val retrofit: String = "2.4.0" // up-to-date
+    /**
+     * [support-annotations website](http://developer.android.com/tools/extras/support-library.html) */
+    const val support_annotations: String = "27.1.1" // available milestone: "28.0.0" 
+
+    /**
+     * [support-v4 website](http://developer.android.com/tools/extras/support-library.html) */
+    const val support_v4: String = "27.1.1" // available milestone: "28.0.0" 
+
+    /**
+     * [support-vector-drawable website](http://developer.android.com/tools/extras/support-library.html) */
+    const val support_vector_drawable: String = "27.1.1" // available milestone: "28.0.0" 
+
+    /**
+     * [gradle website](https://developer.android.com/studio) */
+    const val com_android_tools_build_gradle: String =
+            "3.1.3" // available milestone: "3.4.0-alpha01" 
+
+    /**
+     * [lint-gradle website](https://developer.android.com/studio) */
+    const val lint_gradle: String = "26.1.3" // available milestone: "26.4.0-alpha01" 
+
+    /**
+     * [conductor website](https://github.com/bluelinelabs/Conductor) */
+    const val conductor: String = "2.1.5-SNAPSHOT" // available milestone: "2.1.5" 
+
+    const val command_queue: String = "0.0.3" // available milestone: "0.1.1" 
+
+    /**
+     * [state-bundle website](https://github.com/Zhuinden/state-bundle) */
+    const val state_bundle: String = "1.2.1" // up-to-date
+
+    /**
+     * [android-maven-gradle-plugin website](https://github.com/dcendents/android-maven-gradle-plugin) */
+    const val android_maven_gradle_plugin: String = "2.0" // available milestone: "2.1" 
+
+    /**
+     * [auto-value-ignore-hash-equals website](https://github.com/REggar/auto-value-ignore-hash-equals/) */
+    const val auto_value_ignore_hash_equals: String = "1.1.4" // up-to-date
+
+    /**
+     * [auto-value website](https://github.com/google/auto) */
+    const val auto_value: String = "1.5.2" // available milestone: "1.6.3rc1" 
+
+    /**
+     * [dagger-compiler website](https://github.com/google/dagger) */
+    const val com_google_dagger: String = "2.16" // available milestone: "2.18" 
+
+    /**
+     * [dexmaker-mockito website](http://code.google.com/p/dexmaker) */
+    const val com_google_dexmaker: String = "1.2" // up-to-date
 
     const val retrofit2_rxjava2_adapter: String = "1.0.0" // up-to-date
 
-    const val robolectric: String = "3.4.2" // available milestone: "4.0-beta-1" 
-
-    const val rxandroid: String = "2.0.2" // available milestone: "2.1.0" 
-
+    /**
+     * [rxbinding website](https://github.com/JakeWharton/RxBinding/) */
     const val rxbinding: String = "2.1.1" // available milestone: "2.2.0" 
-
-    const val rxjava: String = "2.1.16" // available milestone: "2.2.2" 
-
-    const val rxkotlin: String = "2.2.0" // available milestone: "2.3.0" 
 
     const val rxrelay: String = "2.0.0" // available milestone: "2.1.0" 
 
-    const val state_bundle: String = "1.2.1" // up-to-date
+    /**
+     * [butterknife-compiler website](https://github.com/JakeWharton/butterknife/) */
+    const val com_jakewharton: String = "8.8.1" // available milestone: "9.0.0-rc1" 
 
-    const val support_annotations: String = "27.1.1" // available milestone: "28.0.0" 
+    /**
+     * [assertj-android-appcompat-v7 website](http://github.com/square/assertj-android/) */
+    const val com_squareup_assertj: String = "1.1.1" // available milestone: "1.2.0" 
 
-    const val support_v4: String = "27.1.1" // available milestone: "28.0.0" 
+    /**
+     * [logging-interceptor website](https://github.com/square/okhttp) */
+    const val com_squareup_okhttp3: String = "3.10.0" // available milestone: "3.11.0" 
 
-    const val support_vector_drawable: String = "27.1.1" // available milestone: "28.0.0" 
+    /**
+     * [converter-gson website](https://github.com/square/retrofit/) */
+    const val com_squareup_retrofit2: String = "2.4.0" // up-to-date
 
-    const val transitionseverywhere: String = "1.7.0" // available milestone: "1.8.0" 
+    /**
+     * [realmfieldnameshelper website](https://github.com/cmelchior/realmfieldnameshelper) */
+    const val realmfieldnameshelper: String = "1.1.1" // up-to-date
+
+    /**
+     * [auto-parcel website](https://github.com/frankiesardo/auto-parcel) */
+    const val auto_parcel: String = "1.0.3" // up-to-date
+
+    /**
+     * [rxandroid website](https://github.com/ReactiveX/RxAndroid) */
+    const val rxandroid: String = "2.0.2" // available milestone: "2.1.0" 
+
+    /**
+     * [rxjava website](https://github.com/ReactiveX/RxJava) */
+    const val rxjava: String = "2.1.16" // available milestone: "2.2.2" 
+
+    /**
+     * [rxkotlin website](https://github.com/ReactiveX/RxKotlin) */
+    const val rxkotlin: String = "2.2.0" // available milestone: "2.3.0" 
+
+    /**
+     * [android-adapters website](http://realm.io) */
+    const val android_adapters: String = "3.0.0" // up-to-date
+
+    const val realm_android_kotlin_extensions: String =
+            "5.1.0" // available milestone: "5.8.0-BETA2" 
+
+    const val realm_android_library: String = "5.1.0" // available milestone: "5.8.0-BETA2" 
+
+    /**
+     * [realm-annotations-processor website](http://realm.io) */
+    const val realm_annotations_processor: String = "5.1.0" // available milestone: "5.8.0-BETA2" 
+
+    /**
+     * [realm-annotations website](http://realm.io) */
+    const val realm_annotations: String = "5.1.0" // available milestone: "5.8.0-BETA2" 
+
+    /**
+     * [realm-gradle-plugin website](http://realm.io) */
+    const val realm_gradle_plugin: String = "5.1.0" // available milestone: "5.8.0-BETA2" 
+
+    /**
+     * [bottom-navigation website](https://github.com/sephiroth74/Material-BottomNavigation) */
+    const val bottom_navigation: String = "2.0.1-rc1" // available milestone: "2.0.2" 
+
+    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
+            "0.2.5" // up-to-date
+
+    /**
+     * [junit website](http://junit.org) */
+    const val junit: String = "4.12" // up-to-date
+
+    /**
+     * [gradle-retrolambda website](https://github.com/evant/gradle-retrolambda) */
+    const val gradle_retrolambda: String = "3.7.0" // up-to-date
+
+    /**
+     * [paperparcel-compiler website](https://github.com/grandstaish/paperparcel) */
+    const val nz_bradcampbell: String = "2.0.4" // available milestone: "2.0.6" 
+
+    /**
+     * [maven-ant-tasks website](http://maven.apache.org/ant-tasks/) */
+    const val maven_ant_tasks: String = "2.1.3" // up-to-date
+
+    /**
+     * [assertj-core website](http://assertj.org) */
+    const val assertj_core: String = "3.9.1" // available milestone: "3.11.1" 
+
+    /**
+     * [javax.annotation website](http://glassfish.org/) */
+    const val javax_annotation: String = "10.0-b28" // up-to-date
+
+    /**
+     * [hamcrest-all website](https://github.com/hamcrest/JavaHamcrest) */
+    const val hamcrest_all: String = "1.3" // up-to-date
+
+    /**
+     * [javatuples website](http://www.javatuples.org) */
+    const val javatuples: String = "1.2" // up-to-date
+
+    /**
+     * [anko-commons website](https://github.com/JetBrains/anko) */
+    const val org_jetbrains_anko: String = "0.10.5" // available milestone: "0.10.7" 
+
+    /**
+     * [kotlin-android-extensions-runtime website](https://kotlinlang.org/) */
+    const val kotlin_android_extensions_runtime: String =
+            "1.2.41" // available milestone: "1.3.0-rc-190" 
+
+    /**
+     * [kotlin-annotation-processing-gradle website](https://kotlinlang.org/) */
+    const val kotlin_annotation_processing_gradle: String =
+            "1.2.41" // available milestone: "1.3.0-rc-190" 
+
+    /**
+     * [kotlin-gradle-plugin website](https://kotlinlang.org/) */
+    const val kotlin_gradle_plugin: String = "1.2.41" // available milestone: "1.3.0-rc-190" 
+
+    /**
+     * [kotlin-stdlib-jdk7 website](https://kotlinlang.org/) */
+    const val kotlin_stdlib_jdk7: String = "1.2.70" // available milestone: "1.3.0-rc-190" 
+
+    /**
+     * [kotlin-stdlib-jdk8 website](https://kotlinlang.org/) */
+    const val kotlin_stdlib_jdk8: String = "1.2.41" // available milestone: "1.3.0-rc-190" 
+
+    /**
+     * [mockito-all website](http://www.mockito.org) */
+    const val mockito_all: String = "1.10.19" // available milestone: "2.0.2-beta" 
+
+    /**
+     * [mockito-core website](https://github.com/mockito/mockito) */
+    const val mockito_core: String = "2.15.0" // available milestone: "2.23.0" 
+
+    /**
+     * [powermock-module-junit4 website](http://www.powermock.org) */
+    const val powermock_module_junit4: String = "1.6.5" // available milestone: "2.0.0-beta.5" 
+
+    /**
+     * [robolectric website](http://robolectric.org) */
+    const val robolectric: String = "3.4.2" // available milestone: "4.0-beta-1" 
 
     /**
      *
@@ -186,7 +258,7 @@ object Versions {
 
         const val currentVersion: String = "4.10.2"
 
-        const val nightlyVersion: String = "5.1-20181015235836+0000"
+        const val nightlyVersion: String = "5.1-20181022040056+0000"
 
         const val releaseCandidate: String = ""
     }

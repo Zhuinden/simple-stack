@@ -7,12 +7,6 @@ import kotlin.String
  *   `$ ./gradlew syncLibs`
  * to update this file */
 object Libs {
-    const val adapters: String = "com.android.databinding:adapters:" + Versions.adapters
-
-    /**
-     * [android-adapters website](http://realm.io) */
-    const val android_adapters: String = "io.realm:android-adapters:" + Versions.android_adapters
-
     /**
      * [compiler website](https://developer.android.com/topic/libraries/architecture/index.html) */
     const val android_arch_lifecycle_compiler: String =
@@ -29,59 +23,112 @@ object Libs {
             "android.arch.lifecycle:runtime:" + Versions.android_arch_lifecycle_runtime
 
     /**
-     * [android-maven-gradle-plugin website](https://github.com/dcendents/android-maven-gradle-plugin) */
-    const val android_maven_gradle_plugin: String =
-            "com.github.dcendents:android-maven-gradle-plugin:" + Versions.android_maven_gradle_plugin
+     * [transitionseverywhere website](https://github.com/andkulikov/transitions-everywhere) */
+    const val transitionseverywhere: String =
+            "com.andkulikov:transitionseverywhere:" + Versions.transitionseverywhere
+
+    const val adapters: String =
+            "com.android.databinding:adapters:" + Versions.com_android_databinding
 
     /**
-     * [anko-commons website](https://github.com/JetBrains/anko) */
-    const val anko_commons: String = "org.jetbrains.anko:anko-commons:" + Versions.anko_commons
+     * [baseLibrary website](https://developer.android.com/studio) */
+    const val baselibrary: String =
+            "com.android.databinding:baseLibrary:" + Versions.com_android_databinding
 
     /**
-     * [anko-sdk15-listeners website](https://github.com/JetBrains/anko) */
-    const val anko_sdk15_listeners: String =
-            "org.jetbrains.anko:anko-sdk15-listeners:" + Versions.anko_sdk15_listeners
+     * [compiler website](http://tools.android.com) */
+    const val com_android_databinding_compiler: String =
+            "com.android.databinding:compiler:" + Versions.com_android_databinding
+
+    const val library: String =
+            "com.android.databinding:library:" + Versions.com_android_databinding
+
+    /**
+     * [espresso-contrib website](https://developer.android.com/testing) */
+    const val espresso_contrib: String =
+            "com.android.support.test.espresso:espresso-contrib:" + Versions.com_android_support_test_espresso
+
+    /**
+     * [espresso-core website](https://developer.android.com/testing) */
+    const val espresso_core: String =
+            "com.android.support.test.espresso:espresso-core:" + Versions.com_android_support_test_espresso
+
+    /**
+     * [espresso-idling-resource website](https://developer.android.com/testing) */
+    const val espresso_idling_resource: String =
+            "com.android.support.test.espresso:espresso-idling-resource:" + Versions.com_android_support_test_espresso
+
+    /**
+     * [espresso-intents website](https://developer.android.com/testing) */
+    const val espresso_intents: String =
+            "com.android.support.test.espresso:espresso-intents:" + Versions.com_android_support_test_espresso
+
+    /**
+     * [rules website](https://developer.android.com/testing) */
+    const val com_android_support_test_rules: String =
+            "com.android.support.test:rules:" + Versions.com_android_support_test
+
+    /**
+     * [runner website](https://developer.android.com/testing) */
+    const val com_android_support_test_runner: String =
+            "com.android.support.test:runner:" + Versions.com_android_support_test
 
     /**
      * [appcompat-v7 website](http://developer.android.com/tools/extras/support-library.html) */
     const val appcompat_v7: String = "com.android.support:appcompat-v7:" + Versions.appcompat_v7
 
     /**
-     * [assertj-android website](http://github.com/square/assertj-android/) */
-    const val assertj_android: String =
-            "com.squareup.assertj:assertj-android:" + Versions.assertj_android
+     * [cardview-v7 website](http://developer.android.com/tools/extras/support-library.html) */
+    const val cardview_v7: String = "com.android.support:cardview-v7:" + Versions.cardview_v7
 
     /**
-     * [assertj-android-appcompat-v7 website](http://github.com/square/assertj-android/) */
-    const val assertj_android_appcompat_v7: String =
-            "com.squareup.assertj:assertj-android-appcompat-v7:" + Versions.assertj_android_appcompat_v7
+     * [design website](http://developer.android.com/tools/extras/support-library.html) */
+    const val design: String = "com.android.support:design:" + Versions.design
+
+    const val multidex: String = "com.android.support:multidex:" + Versions.multidex
 
     /**
-     * [assertj-android-design website](http://github.com/square/assertj-android/) */
-    const val assertj_android_design: String =
-            "com.squareup.assertj:assertj-android-design:" + Versions.assertj_android_design
+     * [recyclerview-v7 website](http://developer.android.com/tools/extras/support-library.html) */
+    const val recyclerview_v7: String =
+            "com.android.support:recyclerview-v7:" + Versions.recyclerview_v7
 
     /**
-     * [assertj-android-recyclerview-v7 website](http://github.com/square/assertj-android/) */
-    const val assertj_android_recyclerview_v7: String =
-            "com.squareup.assertj:assertj-android-recyclerview-v7:" + Versions.assertj_android_recyclerview_v7
+     * [support-annotations website](http://developer.android.com/tools/extras/support-library.html) */
+    const val support_annotations: String =
+            "com.android.support:support-annotations:" + Versions.support_annotations
 
     /**
-     * [assertj-android-support-v4 website](http://github.com/square/assertj-android/) */
-    const val assertj_android_support_v4: String =
-            "com.squareup.assertj:assertj-android-support-v4:" + Versions.assertj_android_support_v4
+     * [support-v4 website](http://developer.android.com/tools/extras/support-library.html) */
+    const val support_v4: String = "com.android.support:support-v4:" + Versions.support_v4
 
     /**
-     * [assertj-core website](http://assertj.org) */
-    const val assertj_core: String = "org.assertj:assertj-core:" + Versions.assertj_core
+     * [support-vector-drawable website](http://developer.android.com/tools/extras/support-library.html) */
+    const val support_vector_drawable: String =
+            "com.android.support:support-vector-drawable:" + Versions.support_vector_drawable
 
     /**
-     * [auto-parcel website](https://github.com/frankiesardo/auto-parcel) */
-    const val auto_parcel: String = "frankiesardo:auto-parcel:" + Versions.auto_parcel
+     * [gradle website](https://developer.android.com/studio) */
+    const val com_android_tools_build_gradle: String =
+            "com.android.tools.build:gradle:" + Versions.com_android_tools_build_gradle
 
     /**
-     * [auto-value website](https://github.com/google/auto) */
-    const val auto_value: String = "com.google.auto.value:auto-value:" + Versions.auto_value
+     * [lint-gradle website](https://developer.android.com/studio) */
+    const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
+
+    /**
+     * [conductor website](https://github.com/bluelinelabs/Conductor) */
+    const val conductor: String = "com.bluelinelabs:conductor:" + Versions.conductor
+
+    const val command_queue: String = "com.github.Zhuinden:command-queue:" + Versions.command_queue
+
+    /**
+     * [state-bundle website](https://github.com/Zhuinden/state-bundle) */
+    const val state_bundle: String = "com.github.Zhuinden:state-bundle:" + Versions.state_bundle
+
+    /**
+     * [android-maven-gradle-plugin website](https://github.com/dcendents/android-maven-gradle-plugin) */
+    const val android_maven_gradle_plugin: String =
+            "com.github.dcendents:android-maven-gradle-plugin:" + Versions.android_maven_gradle_plugin
 
     /**
      * [auto-value-ignore-hash-equals website](https://github.com/REggar/auto-value-ignore-hash-equals/) */
@@ -89,104 +136,173 @@ object Libs {
             "com.github.reggar:auto-value-ignore-hash-equals:" + Versions.auto_value_ignore_hash_equals
 
     /**
-     * [baseLibrary website](https://developer.android.com/studio) */
-    const val baselibrary: String = "com.android.databinding:baseLibrary:" + Versions.baselibrary
+     * [auto-value website](https://github.com/google/auto) */
+    const val auto_value: String = "com.google.auto.value:auto-value:" + Versions.auto_value
+
+    /**
+     * [dagger-compiler website](https://github.com/google/dagger) */
+    const val dagger_compiler: String =
+            "com.google.dagger:dagger-compiler:" + Versions.com_google_dagger
+
+    /**
+     * [dagger website](https://github.com/google/dagger) */
+    const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
+
+    /**
+     * [dexmaker-mockito website](http://code.google.com/p/dexmaker) */
+    const val dexmaker_mockito: String =
+            "com.google.dexmaker:dexmaker-mockito:" + Versions.com_google_dexmaker
+
+    /**
+     * [dexmaker website](http://code.google.com/p/dexmaker) */
+    const val dexmaker: String = "com.google.dexmaker:dexmaker:" + Versions.com_google_dexmaker
+
+    const val retrofit2_rxjava2_adapter: String =
+            "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:" + Versions.retrofit2_rxjava2_adapter
+
+    /**
+     * [rxbinding website](https://github.com/JakeWharton/RxBinding/) */
+    const val rxbinding: String = "com.jakewharton.rxbinding2:rxbinding:" + Versions.rxbinding
+
+    const val rxrelay: String = "com.jakewharton.rxrelay2:rxrelay:" + Versions.rxrelay
+
+    /**
+     * [butterknife-compiler website](https://github.com/JakeWharton/butterknife/) */
+    const val butterknife_compiler: String =
+            "com.jakewharton:butterknife-compiler:" + Versions.com_jakewharton
+
+    /**
+     * [butterknife website](https://github.com/JakeWharton/butterknife/) */
+    const val butterknife: String = "com.jakewharton:butterknife:" + Versions.com_jakewharton
+
+    /**
+     * [assertj-android-appcompat-v7 website](http://github.com/square/assertj-android/) */
+    const val assertj_android_appcompat_v7: String =
+            "com.squareup.assertj:assertj-android-appcompat-v7:" + Versions.com_squareup_assertj
+
+    /**
+     * [assertj-android-design website](http://github.com/square/assertj-android/) */
+    const val assertj_android_design: String =
+            "com.squareup.assertj:assertj-android-design:" + Versions.com_squareup_assertj
+
+    /**
+     * [assertj-android-recyclerview-v7 website](http://github.com/square/assertj-android/) */
+    const val assertj_android_recyclerview_v7: String =
+            "com.squareup.assertj:assertj-android-recyclerview-v7:" + Versions.com_squareup_assertj
+
+    /**
+     * [assertj-android-support-v4 website](http://github.com/square/assertj-android/) */
+    const val assertj_android_support_v4: String =
+            "com.squareup.assertj:assertj-android-support-v4:" + Versions.com_squareup_assertj
+
+    /**
+     * [assertj-android website](http://github.com/square/assertj-android/) */
+    const val assertj_android: String =
+            "com.squareup.assertj:assertj-android:" + Versions.com_squareup_assertj
+
+    /**
+     * [logging-interceptor website](https://github.com/square/okhttp) */
+    const val logging_interceptor: String =
+            "com.squareup.okhttp3:logging-interceptor:" + Versions.com_squareup_okhttp3
+
+    /**
+     * [okhttp website](https://github.com/square/okhttp) */
+    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.com_squareup_okhttp3
+
+    /**
+     * [converter-gson website](https://github.com/square/retrofit/) */
+    const val converter_gson: String =
+            "com.squareup.retrofit2:converter-gson:" + Versions.com_squareup_retrofit2
+
+    /**
+     * [retrofit website](https://github.com/square/retrofit/) */
+    const val retrofit: String =
+            "com.squareup.retrofit2:retrofit:" + Versions.com_squareup_retrofit2
+
+    /**
+     * [realmfieldnameshelper website](https://github.com/cmelchior/realmfieldnameshelper) */
+    const val realmfieldnameshelper: String =
+            "dk.ilios:realmfieldnameshelper:" + Versions.realmfieldnameshelper
+
+    /**
+     * [auto-parcel website](https://github.com/frankiesardo/auto-parcel) */
+    const val auto_parcel: String = "frankiesardo:auto-parcel:" + Versions.auto_parcel
+
+    /**
+     * [rxandroid website](https://github.com/ReactiveX/RxAndroid) */
+    const val rxandroid: String = "io.reactivex.rxjava2:rxandroid:" + Versions.rxandroid
+
+    /**
+     * [rxjava website](https://github.com/ReactiveX/RxJava) */
+    const val rxjava: String = "io.reactivex.rxjava2:rxjava:" + Versions.rxjava
+
+    /**
+     * [rxkotlin website](https://github.com/ReactiveX/RxKotlin) */
+    const val rxkotlin: String = "io.reactivex.rxjava2:rxkotlin:" + Versions.rxkotlin
+
+    /**
+     * [android-adapters website](http://realm.io) */
+    const val android_adapters: String = "io.realm:android-adapters:" + Versions.android_adapters
+
+    const val realm_android_kotlin_extensions: String =
+            "io.realm:realm-android-kotlin-extensions:" + Versions.realm_android_kotlin_extensions
+
+    const val realm_android_library: String =
+            "io.realm:realm-android-library:" + Versions.realm_android_library
+
+    /**
+     * [realm-annotations-processor website](http://realm.io) */
+    const val realm_annotations_processor: String =
+            "io.realm:realm-annotations-processor:" + Versions.realm_annotations_processor
+
+    /**
+     * [realm-annotations website](http://realm.io) */
+    const val realm_annotations: String = "io.realm:realm-annotations:" + Versions.realm_annotations
+
+    /**
+     * [realm-gradle-plugin website](http://realm.io) */
+    const val realm_gradle_plugin: String =
+            "io.realm:realm-gradle-plugin:" + Versions.realm_gradle_plugin
 
     /**
      * [bottom-navigation website](https://github.com/sephiroth74/Material-BottomNavigation) */
     const val bottom_navigation: String =
             "it.sephiroth.android.library.bottomnavigation:bottom-navigation:" + Versions.bottom_navigation
 
-    /**
-     * [butterknife website](https://github.com/JakeWharton/butterknife/) */
-    const val butterknife: String = "com.jakewharton:butterknife:" + Versions.butterknife
+    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
+            "jmfayard.github.io.gradle-kotlin-dsl-libs:jmfayard.github.io.gradle-kotlin-dsl-libs.gradle.plugin:" + Versions.jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin
 
     /**
-     * [butterknife-compiler website](https://github.com/JakeWharton/butterknife/) */
-    const val butterknife_compiler: String =
-            "com.jakewharton:butterknife-compiler:" + Versions.butterknife_compiler
-
-    /**
-     * [cardview-v7 website](http://developer.android.com/tools/extras/support-library.html) */
-    const val cardview_v7: String = "com.android.support:cardview-v7:" + Versions.cardview_v7
-
-    /**
-     * [compiler website](http://tools.android.com) */
-    const val com_android_databinding_compiler: String =
-            "com.android.databinding:compiler:" + Versions.com_android_databinding_compiler
-
-    /**
-     * [rules website](https://developer.android.com/testing) */
-    const val com_android_support_test_rules: String =
-            "com.android.support.test:rules:" + Versions.com_android_support_test_rules
-
-    /**
-     * [runner website](https://developer.android.com/testing) */
-    const val com_android_support_test_runner: String =
-            "com.android.support.test:runner:" + Versions.com_android_support_test_runner
-
-    /**
-     * [gradle website](https://developer.android.com/studio) */
-    const val com_android_tools_build_gradle: String =
-            "com.android.tools.build:gradle:" + Versions.com_android_tools_build_gradle
-
-    const val command_queue: String = "com.github.Zhuinden:command-queue:" + Versions.command_queue
-
-    /**
-     * [conductor website](https://github.com/bluelinelabs/Conductor) */
-    const val conductor: String = "com.bluelinelabs:conductor:" + Versions.conductor
-
-    /**
-     * [converter-gson website](https://github.com/square/retrofit/) */
-    const val converter_gson: String =
-            "com.squareup.retrofit2:converter-gson:" + Versions.converter_gson
-
-    /**
-     * [dagger website](https://github.com/google/dagger) */
-    const val dagger: String = "com.google.dagger:dagger:" + Versions.dagger
-
-    /**
-     * [dagger-compiler website](https://github.com/google/dagger) */
-    const val dagger_compiler: String =
-            "com.google.dagger:dagger-compiler:" + Versions.dagger_compiler
-
-    /**
-     * [design website](http://developer.android.com/tools/extras/support-library.html) */
-    const val design: String = "com.android.support:design:" + Versions.design
-
-    /**
-     * [dexmaker website](http://code.google.com/p/dexmaker) */
-    const val dexmaker: String = "com.google.dexmaker:dexmaker:" + Versions.dexmaker
-
-    /**
-     * [dexmaker-mockito website](http://code.google.com/p/dexmaker) */
-    const val dexmaker_mockito: String =
-            "com.google.dexmaker:dexmaker-mockito:" + Versions.dexmaker_mockito
-
-    /**
-     * [espresso-contrib website](https://developer.android.com/testing) */
-    const val espresso_contrib: String =
-            "com.android.support.test.espresso:espresso-contrib:" + Versions.espresso_contrib
-
-    /**
-     * [espresso-core website](https://developer.android.com/testing) */
-    const val espresso_core: String =
-            "com.android.support.test.espresso:espresso-core:" + Versions.espresso_core
-
-    /**
-     * [espresso-idling-resource website](https://developer.android.com/testing) */
-    const val espresso_idling_resource: String =
-            "com.android.support.test.espresso:espresso-idling-resource:" + Versions.espresso_idling_resource
-
-    /**
-     * [espresso-intents website](https://developer.android.com/testing) */
-    const val espresso_intents: String =
-            "com.android.support.test.espresso:espresso-intents:" + Versions.espresso_intents
+     * [junit website](http://junit.org) */
+    const val junit: String = "junit:junit:" + Versions.junit
 
     /**
      * [gradle-retrolambda website](https://github.com/evant/gradle-retrolambda) */
     const val gradle_retrolambda: String =
             "me.tatarka:gradle-retrolambda:" + Versions.gradle_retrolambda
+
+    /**
+     * [paperparcel-compiler website](https://github.com/grandstaish/paperparcel) */
+    const val paperparcel_compiler: String =
+            "nz.bradcampbell:paperparcel-compiler:" + Versions.nz_bradcampbell
+
+    /**
+     * [paperparcel website](https://github.com/grandstaish/paperparcel) */
+    const val paperparcel: String = "nz.bradcampbell:paperparcel:" + Versions.nz_bradcampbell
+
+    /**
+     * [maven-ant-tasks website](http://maven.apache.org/ant-tasks/) */
+    const val maven_ant_tasks: String =
+            "org.apache.maven:maven-ant-tasks:" + Versions.maven_ant_tasks
+
+    /**
+     * [assertj-core website](http://assertj.org) */
+    const val assertj_core: String = "org.assertj:assertj-core:" + Versions.assertj_core
+
+    /**
+     * [javax.annotation website](http://glassfish.org/) */
+    const val javax_annotation: String =
+            "org.glassfish:javax.annotation:" + Versions.javax_annotation
 
     /**
      * [hamcrest-all website](https://github.com/hamcrest/JavaHamcrest) */
@@ -197,16 +313,14 @@ object Libs {
     const val javatuples: String = "org.javatuples:javatuples:" + Versions.javatuples
 
     /**
-     * [javax.annotation website](http://glassfish.org/) */
-    const val javax_annotation: String =
-            "org.glassfish:javax.annotation:" + Versions.javax_annotation
-
-    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
-            "jmfayard.github.io.gradle-kotlin-dsl-libs:jmfayard.github.io.gradle-kotlin-dsl-libs.gradle.plugin:" + Versions.jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin
+     * [anko-commons website](https://github.com/JetBrains/anko) */
+    const val anko_commons: String =
+            "org.jetbrains.anko:anko-commons:" + Versions.org_jetbrains_anko
 
     /**
-     * [junit website](http://junit.org) */
-    const val junit: String = "junit:junit:" + Versions.junit
+     * [anko-sdk15-listeners website](https://github.com/JetBrains/anko) */
+    const val anko_sdk15_listeners: String =
+            "org.jetbrains.anko:anko-sdk15-listeners:" + Versions.org_jetbrains_anko
 
     /**
      * [kotlin-android-extensions-runtime website](https://kotlinlang.org/) */
@@ -234,27 +348,6 @@ object Libs {
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" + Versions.kotlin_stdlib_jdk8
 
     /**
-     * [kotlin-stdlib-jre7 website](https://kotlinlang.org/) */
-    const val kotlin_stdlib_jre7: String =
-            "org.jetbrains.kotlin:kotlin-stdlib-jre7:" + Versions.kotlin_stdlib_jre7
-
-    const val library: String = "com.android.databinding:library:" + Versions.library
-
-    /**
-     * [lint-gradle website](https://developer.android.com/studio) */
-    const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
-
-    /**
-     * [logging-interceptor website](https://github.com/square/okhttp) */
-    const val logging_interceptor: String =
-            "com.squareup.okhttp3:logging-interceptor:" + Versions.logging_interceptor
-
-    /**
-     * [maven-ant-tasks website](http://maven.apache.org/ant-tasks/) */
-    const val maven_ant_tasks: String =
-            "org.apache.maven:maven-ant-tasks:" + Versions.maven_ant_tasks
-
-    /**
      * [mockito-all website](http://www.mockito.org) */
     const val mockito_all: String = "org.mockito:mockito-all:" + Versions.mockito_all
 
@@ -262,105 +355,12 @@ object Libs {
      * [mockito-core website](https://github.com/mockito/mockito) */
     const val mockito_core: String = "org.mockito:mockito-core:" + Versions.mockito_core
 
-    const val multidex: String = "com.android.support:multidex:" + Versions.multidex
-
-    /**
-     * [okhttp website](https://github.com/square/okhttp) */
-    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
-
-    /**
-     * [paperparcel website](https://github.com/grandstaish/paperparcel) */
-    const val paperparcel: String = "nz.bradcampbell:paperparcel:" + Versions.paperparcel
-
-    /**
-     * [paperparcel-compiler website](https://github.com/grandstaish/paperparcel) */
-    const val paperparcel_compiler: String =
-            "nz.bradcampbell:paperparcel-compiler:" + Versions.paperparcel_compiler
-
     /**
      * [powermock-module-junit4 website](http://www.powermock.org) */
     const val powermock_module_junit4: String =
             "org.powermock:powermock-module-junit4:" + Versions.powermock_module_junit4
 
-    const val realm_android_kotlin_extensions: String =
-            "io.realm:realm-android-kotlin-extensions:" + Versions.realm_android_kotlin_extensions
-
-    const val realm_android_library: String =
-            "io.realm:realm-android-library:" + Versions.realm_android_library
-
-    /**
-     * [realm-annotations website](http://realm.io) */
-    const val realm_annotations: String = "io.realm:realm-annotations:" + Versions.realm_annotations
-
-    /**
-     * [realm-annotations-processor website](http://realm.io) */
-    const val realm_annotations_processor: String =
-            "io.realm:realm-annotations-processor:" + Versions.realm_annotations_processor
-
-    /**
-     * [realm-gradle-plugin website](http://realm.io) */
-    const val realm_gradle_plugin: String =
-            "io.realm:realm-gradle-plugin:" + Versions.realm_gradle_plugin
-
-    /**
-     * [realmfieldnameshelper website](https://github.com/cmelchior/realmfieldnameshelper) */
-    const val realmfieldnameshelper: String =
-            "dk.ilios:realmfieldnameshelper:" + Versions.realmfieldnameshelper
-
-    /**
-     * [recyclerview-v7 website](http://developer.android.com/tools/extras/support-library.html) */
-    const val recyclerview_v7: String =
-            "com.android.support:recyclerview-v7:" + Versions.recyclerview_v7
-
-    /**
-     * [retrofit website](https://github.com/square/retrofit/) */
-    const val retrofit: String = "com.squareup.retrofit2:retrofit:" + Versions.retrofit
-
-    const val retrofit2_rxjava2_adapter: String =
-            "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:" + Versions.retrofit2_rxjava2_adapter
-
     /**
      * [robolectric website](http://robolectric.org) */
     const val robolectric: String = "org.robolectric:robolectric:" + Versions.robolectric
-
-    /**
-     * [rxandroid website](https://github.com/ReactiveX/RxAndroid) */
-    const val rxandroid: String = "io.reactivex.rxjava2:rxandroid:" + Versions.rxandroid
-
-    /**
-     * [rxbinding website](https://github.com/JakeWharton/RxBinding/) */
-    const val rxbinding: String = "com.jakewharton.rxbinding2:rxbinding:" + Versions.rxbinding
-
-    /**
-     * [rxjava website](https://github.com/ReactiveX/RxJava) */
-    const val rxjava: String = "io.reactivex.rxjava2:rxjava:" + Versions.rxjava
-
-    /**
-     * [rxkotlin website](https://github.com/ReactiveX/RxKotlin) */
-    const val rxkotlin: String = "io.reactivex.rxjava2:rxkotlin:" + Versions.rxkotlin
-
-    const val rxrelay: String = "com.jakewharton.rxrelay2:rxrelay:" + Versions.rxrelay
-
-    /**
-     * [state-bundle website](https://github.com/Zhuinden/state-bundle) */
-    const val state_bundle: String = "com.github.Zhuinden:state-bundle:" + Versions.state_bundle
-
-    /**
-     * [support-annotations website](http://developer.android.com/tools/extras/support-library.html) */
-    const val support_annotations: String =
-            "com.android.support:support-annotations:" + Versions.support_annotations
-
-    /**
-     * [support-v4 website](http://developer.android.com/tools/extras/support-library.html) */
-    const val support_v4: String = "com.android.support:support-v4:" + Versions.support_v4
-
-    /**
-     * [support-vector-drawable website](http://developer.android.com/tools/extras/support-library.html) */
-    const val support_vector_drawable: String =
-            "com.android.support:support-vector-drawable:" + Versions.support_vector_drawable
-
-    /**
-     * [transitionseverywhere website](https://github.com/andkulikov/transitions-everywhere) */
-    const val transitionseverywhere: String =
-            "com.andkulikov:transitionseverywhere:" + Versions.transitionseverywhere
 }
