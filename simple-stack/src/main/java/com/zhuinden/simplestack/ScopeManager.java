@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -86,6 +87,11 @@ class ScopeManager {
     }
 
     private List<Object> latestState = null;
+
+    void finalizeScopes() {
+        // this logic is actually inside BackstackManager for some reason
+        this.latestState = Collections.emptyList();
+    }
 
     void buildScopes(List<Object> newState) {
         this.latestState = newState;
@@ -316,7 +322,8 @@ class ScopeManager {
             }
         }
 
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "]!");
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
+                activeScopes.toArray()) + "]!");
     }
 
     boolean canFindService(@NonNull String serviceTag) {
@@ -357,7 +364,8 @@ class ScopeManager {
                 return getService(scopeTag, serviceTag);
             }
         }
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes! " +
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
+                activeScopes.toArray()) + "! " +
                                                 "Is the scope tag registered via a ScopeKey? " +
                                                 "If yes, make sure the StateChanger has been set by this time, " +
                                                 "and that you've bound and are trying to lookup the service with the correct service tag. " +

@@ -1,11 +1,13 @@
 # Change log
 
--Simple Stack ?.??.? (????-??-??)
+-Simple Stack 1.13.1 (2018-11-25)
 --------------------------------
 
 - UPDATE: Added `simple-stack-example-scoping` to showcase the usage of `ScopeKey.Child`, with Fragments and Navigator.
 
-- ADDED: `lookupFromScope()` and `canFindFromScope()` methods that begin the lookup from the specified scope, instead of the active-most one.
+- ADDED: `lookupFromScope()` and `canFindFromScope()` methods that begin the lookup from the specified scope, instead of the active-most one. This is to allow safer look-ups when the same service tag is used in different scopes.
+
+- UPDATE: Better error message if the scope does not exist for lookup (also provides the currently accessed scopes).
 
 -Simple Stack 1.13.0 (2018-09-10)
 --------------------------------

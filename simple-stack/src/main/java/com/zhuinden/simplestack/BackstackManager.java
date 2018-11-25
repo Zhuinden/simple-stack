@@ -337,6 +337,7 @@ public class BackstackManager
         for(String scope : scopes) {
             scopeManager.destroyScope(scope);
         }
+        scopeManager.finalizeScopes();
     }
 
     /**
