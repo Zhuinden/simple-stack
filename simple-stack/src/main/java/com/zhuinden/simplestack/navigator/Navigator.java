@@ -368,6 +368,33 @@ public class Navigator {
     }
 
     /**
+     * Attempts to look-up the service in the scopes accessible from the provided scope tag.
+     * Returns whether the service exists in any of these scopes.
+     *
+     * @param scopeTag   the tag of the scope to start the lookup from
+     * @param serviceTag the tag of the service
+     * @return whether the service exists in any of the accessed scopes
+     */
+    public static boolean canFindFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager(context).canFindFromScope(scopeTag, serviceTag);
+    }
+
+    /**
+     * Attempts to look-up the service in the scopes accessible from the provided scope tag.
+     * If the service is not found, an exception is thrown.
+     *
+     * @param scopeTag   the tag of the scope to start the lookup from
+     * @param serviceTag the tag of the service
+     * @param <T>        the type of the service
+     * @return the service
+     * @throws IllegalStateException if the service doesn't exist in any accessed scopes
+     */
+    @NonNull
+    public static <T> T lookupFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager(context).lookupFromScope(scopeTag, serviceTag);
+    }
+
+    /**
      * A method to return the backstack manager, managed by the {@link BackstackHost}.
      * Typically not needed.
      *

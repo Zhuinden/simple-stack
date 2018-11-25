@@ -497,7 +497,6 @@ public class BackstackDelegate {
      *
      * @param serviceTag the tag of the service
      * @return whether the service exists in any active scopes
-     * @throws IllegalStateException if the service doesn't exist in any scope
      */
     public boolean canFindService(@NonNull String serviceTag) {
         return getManager().canFindService(serviceTag);
@@ -515,6 +514,33 @@ public class BackstackDelegate {
     @NonNull
     public <T> T lookupService(@NonNull String serviceTag) {
         return getManager().lookupService(serviceTag);
+    }
+
+    /**
+     * Attempts to look-up the service in the scopes accessible from the provided scope tag.
+     * Returns whether the service exists in any of these scopes.
+     *
+     * @param scopeTag   the tag of the scope to start the lookup from
+     * @param serviceTag the tag of the service
+     * @return whether the service exists in any of the accessed scopes
+     */
+    public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager().canFindFromScope(scopeTag, serviceTag);
+    }
+
+    /**
+     * Attempts to look-up the service in the scopes accessible from the provided scope tag.
+     * If the service is not found, an exception is thrown.
+     *
+     * @param scopeTag   the tag of the scope to start the lookup from
+     * @param serviceTag the tag of the service
+     * @param <T>        the type of the service
+     * @return the service
+     * @throws IllegalStateException if the service doesn't exist in any accessed scopes
+     */
+    @NonNull
+    public <T> T lookupFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
+        return getManager().lookupFromScope(scopeTag, serviceTag);
     }
 
     /**

@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1582,5 +1583,108 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackManager.hasScope("beep")).isFalse();
         assertThat(backstackManager.getService("boop", "service")).isSameAs(service1);
         assertThat(backstackManager.lookupService("service")).isSameAs(service1);
+    }
+
+    @Test
+    public void lookupFromScopeWorksWithExplicitParentsInTheCorrectOrder() {
+        class ChildKey
+                extends TestKey
+                implements ScopeKey, ScopeKey.Child {
+            private final List<String> parentScopes;
+
+            ChildKey(String name, List<String> parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return parentScopes;
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+        }
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+
+        final Object service1 = new Object();
+        final Object service2 = new Object();
+        final Object common1 = new Object();
+        final Object common2 = new Object();
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if(serviceBinder.getScopeTag().equals("boop")) {
+                    serviceBinder.add("service1", service1);
+                    serviceBinder.add("common", common1);
+                }
+                if(serviceBinder.getScopeTag().equals("beep")) {
+                    serviceBinder.add("service2", service2);
+                    serviceBinder.add("common", common2);
+                }
+            }
+        });
+
+        backstackManager.setup(History.of(
+                new ChildKey("hello", History.of("beep")),
+                new ChildKey("world", History.of("beep", "boop")),
+                new ChildKey("kappa", Collections.<String>emptyList())
+        ));
+        backstackManager.setStateChanger(stateChanger);
+
+        assertThat(backstackManager.lookupService("service1")).isSameAs(service1);
+
+        assertThat(backstackManager.canFindFromScope("hello", "service1")).isFalse();
+        assertThat(backstackManager.canFindFromScope("world", "service1")).isTrue();
+        assertThat(backstackManager.canFindFromScope("hello", "service2")).isTrue();
+        try {
+            assertThat(backstackManager.lookupFromScope("hello", "service1"));
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+        assertThat(backstackManager.lookupFromScope("hello", "service2")).isSameAs(service2);
+        assertThat(backstackManager.lookupFromScope("world", "service1")).isSameAs(service1);
+        assertThat(backstackManager.lookupFromScope("world", "service2")).isSameAs(service2);
+
+        assertThat(backstackManager.canFindFromScope("world", "common")).isTrue();
+        assertThat(backstackManager.canFindFromScope("hello", "common")).isTrue();
+        assertThat(backstackManager.lookupFromScope("hello", "common")).isSameAs(common2);
+        assertThat(backstackManager.lookupFromScope("world", "common")).isSameAs(common1);
+
+        assertThat(backstackManager.canFindFromScope("boop", "service2")).isTrue();
+        assertThat(backstackManager.lookupFromScope("boop", "service2")).isSameAs(service2);
+        assertThat(backstackManager.canFindFromScope("boop", "service1")).isTrue();
+        assertThat(backstackManager.lookupFromScope("boop", "service1")).isSameAs(service1);
+
+        assertThat(backstackManager.canFindFromScope("beep", "service1")).isFalse();
+        assertThat(backstackManager.canFindFromScope("beep", "service2")).isTrue();
+        assertThat(backstackManager.lookupFromScope("beep", "service2")).isSameAs(service2);
+
+        assertThat(backstackManager.lookupFromScope("boop", "common")).isSameAs(common1);
+        assertThat(backstackManager.lookupFromScope("beep", "common")).isSameAs(common2);
+
+        backstackManager.getBackstack().jumpToRoot();
+
+        assertThat(backstackManager.canFindFromScope("boop", "common")).isFalse();
+        assertThat(backstackManager.canFindFromScope("beep", "common")).isTrue();
+        assertThat(backstackManager.lookupFromScope("beep", "common")).isSameAs(common2);
+
+        backstackManager.finalizeScopes();
+
+        assertThat(backstackManager.canFindFromScope("boop", "common")).isFalse();
+        assertThat(backstackManager.canFindFromScope("beep", "common")).isFalse();
     }
 }

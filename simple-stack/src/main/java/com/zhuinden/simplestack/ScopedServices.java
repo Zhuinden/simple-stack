@@ -175,6 +175,30 @@ public interface ScopedServices {
         }
 
         /**
+         * Returns whether the service can be found if looked up from the provided scope.
+         *
+         * @param scopeTag   the scope tag
+         * @param serviceTag the service tag
+         * @return whether the service can be looked up from the provided scope
+         */
+        public boolean canFindFrom(String scopeTag, String serviceTag) {
+            return scopeManager.canFindFromScope(scopeTag, serviceTag);
+        }
+
+        /**
+         * Retrieves the service from the current scope or any of its parents, if the service exists.
+         *
+         * @param serviceTag the service tag
+         * @param <T>        the type of the service
+         * @return the service
+         * @throws IllegalArgumentException if the service is not found in the scope or any of its parents
+         */
+        @NonNull
+        public <T> T lookupFrom(String scopeTag, String serviceTag) {
+            return scopeManager.lookupFromScope(scopeTag, serviceTag);
+        }
+
+        /**
          * Returns the {@link Backstack} that belongs to the {@link BackstackManager} that manages the scopes.
          *
          * @return the backstack
@@ -182,6 +206,16 @@ public interface ScopedServices {
         @NonNull
         public Backstack getBackstack() {
             return scopeManager.getBackstack();
+        }
+
+        /**
+         * Returns the {@link BackstackManager} that manages the scopes.
+         *
+         * @return the backstack manager
+         */
+        @NonNull
+        public BackstackManager getManager() {
+            return scopeManager.getManager();
         }
     }
 

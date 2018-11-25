@@ -337,6 +337,7 @@ public class BackstackManager
         for(String scope : scopes) {
             scopeManager.destroyScope(scope);
         }
+        scopeManager.finalizeScopes();
     }
 
     /**
@@ -406,10 +407,20 @@ public class BackstackManager
      *
      * @param serviceTag the tag of the service
      * @return whether the service exists in any active scopes
-     * @throws IllegalStateException if the service doesn't exist in any scope
      */
     public boolean canFindService(@NonNull String serviceTag) {
         return scopeManager.canFindService(serviceTag);
+    }
+
+    /**
+     * Attempts to look-up the service in the provided scope and all its parents, starting from the provided scope.
+     * Returns whether the service exists in any of these scopes.
+     *
+     * @param serviceTag the tag of the service
+     * @return whether the service exists in any scopes from the current scope or its parents
+     */
+    public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
+        return scopeManager.canFindFromScope(scopeTag, serviceTag);
     }
 
     /**
@@ -424,6 +435,20 @@ public class BackstackManager
     @NonNull
     public <T> T lookupService(@NonNull String serviceTag) {
         return scopeManager.lookupService(serviceTag);
+    }
+
+    /**
+     * Attempts to look-up the service in the provided scope and its parents, starting from the provided scope.
+     * If the service is not found, an exception is thrown.
+     *
+     * @param serviceTag the tag of the service
+     * @param <T>        the type of the service
+     * @return the service
+     * @throws IllegalStateException if the service doesn't exist in any of the scopes
+     */
+    @NonNull
+    public <T> T lookupFromScope(String scopeTag, String serviceTag) {
+        return scopeManager.lookupFromScope(scopeTag, serviceTag);
     }
 
     /**

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -15,6 +16,7 @@ import java.util.Set;
 class ScopeManager {
     static class AssertingScopedServices
             implements ScopedServices {
+
         @Override
         public void bindServices(@NonNull ServiceBinder serviceBinder) {
             throw new IllegalStateException(
@@ -31,6 +33,10 @@ class ScopeManager {
 
     void setBackstackManager(BackstackManager backstackManager) {
         this.backstackManager = backstackManager;
+    }
+
+    BackstackManager getManager() {
+        return backstackManager;
     }
 
     Backstack getBackstack() {
@@ -82,6 +88,11 @@ class ScopeManager {
 
     private List<Object> latestState = null;
 
+    void finalizeScopes() {
+        // this logic is actually inside BackstackManager for some reason
+        this.latestState = Collections.emptyList();
+    }
+
     void buildScopes(List<Object> newState) {
         this.latestState = newState;
         for(Object key : newState) {
@@ -115,7 +126,7 @@ class ScopeManager {
         }
 
         List<String> scopeSet = getActiveScopesReverse();
-        for(String activeScope: scopeSet) {
+        for(String activeScope : scopeSet) {
             if(!currentScopes.contains(activeScope)) {
                 destroyScope(activeScope);
             }
@@ -192,12 +203,8 @@ class ScopeManager {
     }
 
     boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
-        if(scopeTag == null) {
-            throw new IllegalArgumentException("Scope tag cannot be null!");
-        }
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("Service tag cannot be null!");
-        }
+        checkScopeTag(scopeTag);
+        checkServiceTag(serviceTag);
         if(!scopes.containsKey(scopeTag)) {
             return false;
         }
@@ -208,12 +215,8 @@ class ScopeManager {
 
     @NonNull
     <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
-        if(scopeTag == null) {
-            throw new IllegalArgumentException("Scope tag cannot be null!");
-        }
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("Service tag cannot be null!");
-        }
+        checkScopeTag(scopeTag);
+        checkServiceTag(serviceTag);
 
         if(!scopes.containsKey(scopeTag)) {
             throw new IllegalArgumentException("The specified scope with tag [" + scopeTag + "] does not exist!");
@@ -228,16 +231,103 @@ class ScopeManager {
     }
 
     boolean hasScope(@NonNull String scopeTag) {
-        if(scopeTag == null) {
-            throw new IllegalArgumentException("Scope tag cannot be null!");
-        }
+        checkScopeTag(scopeTag);
         return scopes.containsKey(scopeTag);
     }
 
-    boolean canFindService(@NonNull String serviceTag) {
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("Service tag cannot be null!");
+    public boolean canFindFromScope(String scopeTag, String serviceTag) {
+        checkServiceTag(serviceTag);
+        checkScopeTag(scopeTag);
+
+        Set<String> activeScopes = new LinkedHashSet<>();
+        List<Object> latestState = this.latestState;
+
+        boolean isScopeFound = false;
+        for(int i = latestState.size() - 1; i >= 0; i--) {
+            Object key = latestState.get(i);
+            if(key instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) key;
+                String currentScope = scopeKey.getScopeTag();
+                if(currentScope.equals(scopeTag)) {
+                    isScopeFound = true;
+                }
+                if(isScopeFound) {
+                    activeScopes.add(currentScope);
+                }
+            }
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                List<String> parentScopes = child.getParentScopes();
+                for(int j = parentScopes.size() - 1; j >= 0; j--) {
+                    String currentScope = parentScopes.get(j);
+                    if(currentScope.equals(scopeTag)) {
+                        isScopeFound = true;
+                    }
+                    if(isScopeFound) {
+                        activeScopes.add(currentScope);
+                    }
+                }
+            }
         }
+
+        for(String scope : activeScopes) {
+            if(hasService(scope, serviceTag)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public <T> T lookupFromScope(String scopeTag, String serviceTag) {
+        checkServiceTag(serviceTag);
+        checkScopeTag(scopeTag);
+
+        Set<String> activeScopes = new LinkedHashSet<>();
+        List<Object> latestState = this.latestState;
+
+        boolean isScopeFound = false;
+        for(int i = latestState.size() - 1; i >= 0; i--) {
+            Object key = latestState.get(i);
+            if(key instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) key;
+                String currentScope = scopeKey.getScopeTag();
+                if(currentScope.equals(scopeTag)) {
+                    isScopeFound = true;
+                }
+                if(isScopeFound) {
+                    activeScopes.add(currentScope);
+                }
+            }
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                List<String> parentScopes = child.getParentScopes();
+                for(int j = parentScopes.size() - 1; j >= 0; j--) {
+                    String currentScope = parentScopes.get(j);
+                    if(currentScope.equals(scopeTag)) {
+                        isScopeFound = true;
+                    }
+                    if(isScopeFound) {
+                        activeScopes.add(currentScope);
+                    }
+                }
+            }
+        }
+
+        for(String scope : activeScopes) {
+            if(hasService(scope, serviceTag)) {
+                return getService(scope, serviceTag);
+            }
+        }
+
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
+                activeScopes.toArray()) + "]!");
+    }
+
+    boolean canFindService(@NonNull String serviceTag) {
+        checkServiceTag(serviceTag);
         List<String> activeScopes = getActiveScopesReverse();
         for(String scopeTag : activeScopes) {
             if(hasService(scopeTag, serviceTag)) {
@@ -249,9 +339,7 @@ class ScopeManager {
 
     @NonNull
     <T> T lookupService(@NonNull String serviceTag) {
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("Service tag cannot be null!");
-        }
+        checkServiceTag(serviceTag);
 
         Set<String> activeScopes = new LinkedHashSet<>();
         List<Object> latestState = this.latestState;
@@ -276,11 +364,24 @@ class ScopeManager {
                 return getService(scopeTag, serviceTag);
             }
         }
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes! " +
-                "Is the scope tag registered via a ScopeKey? " +
-                "If yes, make sure the StateChanger has been set by this time, " +
-                "and that you've bound and are trying to lookup the service with the correct service tag. " +
-                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
+                activeScopes.toArray()) + "! " +
+                                                "Is the scope tag registered via a ScopeKey? " +
+                                                "If yes, make sure the StateChanger has been set by this time, " +
+                                                "and that you've bound and are trying to lookup the service with the correct service tag. " +
+                                                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+    }
+
+    static private void checkScopeTag(@NonNull String scopeTag) {
+        if(scopeTag == null) {
+            throw new IllegalArgumentException("Scope tag cannot be null!");
+        }
+    }
+
+    static private void checkServiceTag(@NonNull String serviceTag) {
+        if(serviceTag == null) {
+            throw new IllegalArgumentException("Service tag cannot be null!");
+        }
     }
 
     static void checkParentScopes(ScopeKey.Child child) {
