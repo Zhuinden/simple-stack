@@ -15,7 +15,7 @@ This way, you can easily create a single-Activity application using either views
 The [Backstack](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/Backstack.java) provides 3 primary operators for manipulating state.
 
 - `goTo()`: if state does not previously exist in the backstack, then adds it to the stack. Otherwise navigate back to given state.
-- `goBack()`: returns boolean if [StateChange](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java) is in progress, or if there are more than 1 entries in history (and handled the back press). Otherwise, return false.
+- `goBack()`: returns true if [StateChange](https://github.com/Zhuinden/simple-stack/blob/master/simple-stack/src/main/java/com/zhuinden/simplestack/StateChange.java) is in progress, or if there are more than 1 entries in history (and handled the back press). Otherwise, return false.
 - `setHistory()`: sets the state to the provided elements, with the direction that is specified.
 
 The secondary operators are:
