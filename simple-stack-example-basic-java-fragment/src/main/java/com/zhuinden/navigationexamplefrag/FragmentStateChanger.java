@@ -36,8 +36,8 @@ public class FragmentStateChanger {
             if(fragment != null) {
                 if(!newState.contains(oldKey)) {
                     fragmentTransaction.remove(fragment);
-                } else if(!fragment.isDetached()) {
-                    fragmentTransaction.detach(fragment);
+                } else if(!fragment.isHidden()) {
+                    fragmentTransaction.hide(fragment);
                 }
             }
         }
@@ -45,19 +45,19 @@ public class FragmentStateChanger {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {
-                    if(fragment.isDetached()) {
-                        fragmentTransaction.attach(fragment);
+                    if(fragment.isHidden()) {
+                        fragmentTransaction.show(fragment);
                     }
                 } else {
                     fragment = newKey.newFragment();
                     fragmentTransaction.add(containerId, fragment, newKey.getFragmentTag());
                 }
             } else {
-                if(fragment != null && !fragment.isDetached()) {
-                    fragmentTransaction.detach(fragment);
+                if(fragment != null && !fragment.isHidden()) {
+                    fragmentTransaction.hide(fragment);
                 }
             }
         }
-        fragmentTransaction.commitNow();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 }
