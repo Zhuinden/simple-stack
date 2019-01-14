@@ -60,6 +60,8 @@ public class Backstack {
 
     private StateChanger stateChanger;
 
+    private final long threadId = Thread.currentThread().getId();
+
     /**
      * Creates the Backstack with the provided initial keys.
      *
@@ -407,6 +409,7 @@ public class Backstack {
      * You generally don't need to use this method.
      */
     public void forceClear() {
+        assertCorrectThread();
         assertNoStateChange();
         resetBackstack();
     }
@@ -541,6 +544,8 @@ public class Backstack {
     }
 
     private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization) {
+        assertCorrectThread();
+
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
@@ -699,6 +704,13 @@ public class Backstack {
         if(isStateChangePending()) {
             throw new IllegalStateException(
                     "This operation is not allowed while there are enqueued state changes.");
+        }
+    }
+
+    private void assertCorrectThread() {
+        if(Thread.currentThread().getId() != threadId) {
+            throw new IllegalStateException(
+                    "The backstack is not thread-safe, and must be manipulated only from the thread where it was originally created.");
         }
     }
 }

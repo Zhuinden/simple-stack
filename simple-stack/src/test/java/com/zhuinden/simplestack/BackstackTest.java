@@ -24,6 +24,8 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1164,5 +1166,39 @@ public class BackstackTest {
         backstack.removeStateChanger();
 
         backstack.setStateChanger(stateChanger);
+    }
+
+    @Test
+    public void illegalThreadAccessThrowsException()
+            throws InterruptedException {
+        TestKey testKey = new TestKey("a");
+
+        final Backstack backstack = new Backstack(testKey);
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicReference<Throwable> ref = new AtomicReference<>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    backstack.setHistory(History.of(new TestKey("b")), StateChange.REPLACE);
+                } catch(Exception e) {
+                    ref.set(e);
+                } finally {
+                    latch.countDown();
+                }
+            }
+        }).start();
+
+        latch.await();
+
+        assertThat(ref.get()).isInstanceOf(IllegalStateException.class);
+        assertThat(ref.get().getMessage()).contains("backstack is not thread-safe");
+
     }
 }

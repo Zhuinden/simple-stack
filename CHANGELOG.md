@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack ?.??.? (2019-01-14+)
+--------------------------------
+
+- UPDATE: `Backstack` now checks if altering methods are called from the thread where the backstack was created. 
+
 -Simple Stack 1.13.1 (2018-11-25)
 --------------------------------
 
