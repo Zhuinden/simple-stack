@@ -192,6 +192,64 @@ public class ScopingTest {
     }
 
     @Test
+    public void serviceBinderAddThrowsForNullServiceTag() {
+        final String nullTag = null;
+        final Object service = new Service();
+        TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(nullTag, service);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+        backstackManager.setup(History.of(testKeyWithScope));
+        try {
+            backstackManager.setStateChanger(stateChanger);
+            Assert.fail();
+        } catch(Exception e) {
+            assertThat(e.getMessage()).isEqualTo("Service tag cannot be null!");
+        }
+    }
+
+    @Test
+    public void serviceBinderAddThrowsForNullService() {
+        final String serviceTag = "serviceTag";
+        final Object nullService = null;
+        TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(serviceTag, null);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+        backstackManager.setup(History.of(testKeyWithScope));
+        try {
+            backstackManager.setStateChanger(stateChanger);
+            Assert.fail();
+        } catch(Exception e) {
+            assertThat(e.getMessage()).isEqualTo("The provided service should not be null!");
+        }
+    }
+
+    @Test
     public void scopeIsDestroyedForClearedScopeKeys() {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());

@@ -108,7 +108,7 @@ public interface ScopedServices {
          */
         public void add(@NonNull String serviceTag, @NonNull Object service) {
             //noinspection ConstantConditions
-            if(service == null) {
+            if(serviceTag == null) {
                 throw new IllegalArgumentException("Service tag cannot be null!");
             }
             //noinspection ConstantConditions
