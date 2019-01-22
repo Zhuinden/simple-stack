@@ -126,6 +126,9 @@ public class Backstack {
         if(stateChanger == null) {
             throw new NullPointerException("New state changer cannot be null");
         }
+
+        assertCorrectThread();
+
         this.stateChanger = stateChanger;
         if(registerMode == INITIALIZE && (queuedStateChanges.size() <= 1 || stack.isEmpty())) {
             if(!beginStateChangeIfPossible()) {
@@ -144,6 +147,8 @@ public class Backstack {
      * Removes the {@link StateChanger}.
      */
     public void removeStateChanger() {
+        assertCorrectThread();
+
         this.stateChanger = null;
     }
 
@@ -540,6 +545,8 @@ public class Backstack {
      * @return true if there is at least one enqueued {@link StateChange}.
      */
     public boolean isStateChangePending() {
+        assertCorrectThread();
+
         return !queuedStateChanges.isEmpty();
     }
 
@@ -643,6 +650,9 @@ public class Backstack {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be added!");
         }
+
+        assertCorrectThread();
+
         completionListeners.add(completionListener);
     }
 
@@ -655,6 +665,9 @@ public class Backstack {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be removed!");
         }
+
+        assertCorrectThread();
+
         completionListeners.remove(completionListener);
     }
 
