@@ -160,7 +160,7 @@ public class MainActivity
 
     @Override
     public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(!stateChange.topNewState().equals(stateChange.topPreviousState())) {
+        if(!stateChange.isTopNewStateEqualToPrevious()) {
             fragmentStateChanger.handleStateChange(stateChange);
             setupViewsForKey(stateChange.topNewState());
             String title = stateChange.<BaseKey>topNewState().title(getResources());

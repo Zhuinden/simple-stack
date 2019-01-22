@@ -61,6 +61,15 @@ public class StateChange {
         return backstack;
     }
 
+    /**
+     * Convenience method to help short-circuit if the top new key is the same as the previous one.
+     *
+     * @return if the top new state is equal to the top previous state
+     */
+    public final boolean isTopNewStateEqualToPrevious() {
+        return topNewState().equals(topPreviousState());
+    }
+
     // create a copy list where each item is casted to <T>
     private <T> History<T> createParametricCopyList(List<Object> list) {
         List<T> copyList = new LinkedList<>();

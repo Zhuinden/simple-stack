@@ -517,7 +517,7 @@ public final class DefaultStateChanger
         externalStateChanger.handleStateChange(stateChange, new Callback() {
             @Override
             public void stateChangeComplete() {
-                if(stateChange.topNewState().equals(stateChange.topPreviousState())) {
+                if(stateChange.isTopNewStateEqualToPrevious()) {
                     completionCallback.stateChangeComplete();
                     return;
                 }

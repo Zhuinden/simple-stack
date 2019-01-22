@@ -1199,6 +1199,25 @@ public class BackstackTest {
 
         assertThat(ref.get()).isInstanceOf(IllegalStateException.class);
         assertThat(ref.get().getMessage()).contains("backstack is not thread-safe");
+    }
 
+    @Test
+    public void stateChangeShouldKnowIfTopNewAndPreviousAreEqual() {
+        TestKey testKey = new TestKey("a");
+        TestKey testKey2 = new TestKey("b");
+
+        final Backstack backstack = new Backstack(testKey);
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                assertThat(stateChange.topNewState().equals(stateChange.topPreviousState())).isEqualTo(stateChange.isTopNewStateEqualToPrevious());
+
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.goTo(testKey2);
+        backstack.goBack();
+        backstack.setHistory(History.of(testKey2), StateChange.REPLACE);
     }
 }

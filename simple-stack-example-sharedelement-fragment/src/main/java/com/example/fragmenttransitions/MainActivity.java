@@ -50,7 +50,7 @@ public class MainActivity
 
     @Override
     public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(!stateChange.topNewState().equals(stateChange.topPreviousState())) {
+        if(!stateChange.isTopNewStateEqualToPrevious()) {
             fragmentStateChanger.handleStateChange(stateChange);
         }
         completionCallback.stateChangeComplete();

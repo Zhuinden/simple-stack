@@ -3,6 +3,10 @@
 -Simple Stack ?.??.? (2019-01-14+)
 --------------------------------
 
+- ADD: Convenience method `stateChange.isTopNewStateEqualToPrevious()` to replace `stateChange.topNewState<Any>() == stateChange.topPreviousState()` condition check. It does the same thing, but maybe it's a bit easier to read.
+
+- FIX: Fix a typo which resulted in not throwing if the provided service tag was `null` (whoops. -_-)
+
 - UPDATE: `Backstack` now checks if altering methods are called from the thread where the backstack was created. 
 
 -Simple Stack 1.13.1 (2018-11-25)
