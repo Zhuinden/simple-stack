@@ -17,6 +17,7 @@ package com.zhuinden.simplestack;
 
 import android.content.Context;
 import android.support.annotation.IntDef;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
@@ -103,7 +104,10 @@ public class Backstack {
      *
      * @return true if a {@link StateChanger} is set, false otherwise.
      */
+    @MainThread
     public boolean hasStateChanger() {
+        assertCorrectThread();
+
         return stateChanger != null;
     }
 
@@ -112,6 +116,7 @@ public class Backstack {
      *
      * @param stateChanger the new {@link StateChanger}, which cannot be null.
      */
+    @MainThread
     public void setStateChanger(@NonNull StateChanger stateChanger) {
         setStateChanger(stateChanger, INITIALIZE);
     }
@@ -122,6 +127,7 @@ public class Backstack {
      * @param stateChanger the new {@link StateChanger}, which cannot be null.
      * @param registerMode indicates whether the {@link StateChanger} is to be initialized, or is just reattached.
      */
+    @MainThread
     public void setStateChanger(@NonNull StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
         if(stateChanger == null) {
             throw new NullPointerException("New state changer cannot be null");
@@ -146,6 +152,7 @@ public class Backstack {
     /**
      * Removes the {@link StateChanger}.
      */
+    @MainThread
     public void removeStateChanger() {
         assertCorrectThread();
 
@@ -159,8 +166,11 @@ public class Backstack {
      *
      * @param newKey the target state.
      */
+    @MainThread
     public void goTo(@NonNull Object newKey) {
         checkNewKey(newKey);
+
+        assertCorrectThread();
 
         List<?> activeHistory = selectActiveHistory();
         HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
@@ -183,8 +193,11 @@ public class Backstack {
      * @param newTop the new top key
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
+    @MainThread
     public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
         checkNewKey(newTop);
+
+        assertCorrectThread();
 
         HistoryBuilder historyBuilder = History.builderFrom(selectActiveHistory());
         if(!historyBuilder.isEmpty()) {
@@ -203,6 +216,7 @@ public class Backstack {
      *
      * @param newKey the new key to go up to
      */
+    @MainThread
     public void goUp(@NonNull Object newKey) {
         goUp(newKey, false);
     }
@@ -217,8 +231,11 @@ public class Backstack {
      * @param newKey the new key to go up to
      * @param fallbackToBack specifies that if the key is found in the backstack, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
      */
+    @MainThread
     public void goUp(@NonNull Object newKey, boolean fallbackToBack) {
         checkNewKey(newKey);
+
+        assertCorrectThread();
 
         List<?> activeHistory = selectActiveHistory();
         int size = activeHistory.size();
@@ -246,8 +263,11 @@ public class Backstack {
      * @param newKey the new key
      * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
      */
+    @MainThread
     public void moveToTop(@NonNull Object newKey, boolean asReplace) {
         checkNewKey(newKey);
+
+        assertCorrectThread();
 
         List<?> activeHistory = selectActiveHistory();
         int direction = asReplace ? StateChange.REPLACE : StateChange.FORWARD;
@@ -269,6 +289,7 @@ public class Backstack {
      *
      * @param newKey the new key
      */
+    @MainThread
     public void moveToTop(@NonNull Object newKey) {
         moveToTop(newKey, false);
     }
@@ -278,6 +299,7 @@ public class Backstack {
      *
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
+    @MainThread
     public void jumpToRoot() {
         jumpToRoot(StateChange.BACKWARD);
     }
@@ -287,7 +309,10 @@ public class Backstack {
      *
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
+    @MainThread
     public void jumpToRoot(@StateChange.StateChangeDirection int direction) {
+        assertCorrectThread();
+
         List<?> activeHistory = selectActiveHistory();
         History<?> currentHistory = History.from(activeHistory);
         setHistory(History.of(currentHistory.root()), direction);
@@ -303,6 +328,7 @@ public class Backstack {
      *
      * @param parentChain the chain of parents, from oldest to newest.
      */
+    @MainThread
     public void goUpChain(@NonNull List<?> parentChain) {
         goUpChain(parentChain, false);
     }
@@ -318,8 +344,11 @@ public class Backstack {
      * @param parentChain the chain of parents, from oldest to newest.
      * @param fallbackToBack determines that if the chain is fully found in the backstack, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
      */
+    @MainThread
     public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
         checkNewHistory(parentChain);
+
+        assertCorrectThread();
 
         int parentChainSize = parentChain.size();
         if(parentChainSize == 1) {
@@ -386,7 +415,10 @@ public class Backstack {
      *
      * @return true if a state change is pending or is handled with a state change, false if there is only one state left.
      */
+    @MainThread
     public boolean goBack() {
+        assertCorrectThread();
+
         if(isStateChangePending()) {
             return true;
         }
@@ -413,6 +445,7 @@ public class Backstack {
      *
      * You generally don't need to use this method.
      */
+    @MainThread
     public void forceClear() {
         assertCorrectThread();
         assertNoStateChange();
@@ -437,8 +470,12 @@ public class Backstack {
      * @param newHistory the new active history.
      * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
+    @MainThread
     public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
+
+        assertCorrectThread();
+
         enqueueStateChange(newHistory, direction, false); // must use enqueue!
     }
 
@@ -551,8 +588,6 @@ public class Backstack {
     }
 
     private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization) {
-        assertCorrectThread();
-
         PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
@@ -598,6 +633,8 @@ public class Backstack {
         StateChanger.Callback completionCallback = new StateChanger.Callback() {
             @Override
             public void stateChangeComplete() {
+                assertCorrectThread();
+
                 if(!pendingStateChange.didForceExecute) {
                     if(pendingStateChange.getStatus() == PendingStateChange.Status.COMPLETED) {
                         throw new IllegalStateException("State change completion cannot be called multiple times!");
@@ -690,7 +727,10 @@ public class Backstack {
      * If there is a state change in progress, then calling this method will force it to be completed immediately.
      * Any future calls to {@link StateChanger.Callback#stateChangeComplete()} for that given state change are ignored.
      */
+    @MainThread
     public void executePendingStateChange() {
+        assertCorrectThread();
+
         if(isStateChangePending()) {
             PendingStateChange pendingStateChange = queuedStateChanges.getFirst();
             if(pendingStateChange.getStatus() == PendingStateChange.Status.IN_PROGRESS) {
