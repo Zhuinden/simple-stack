@@ -63,6 +63,8 @@ class ScopeManager {
             throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
         }
         if(!scopes.containsKey(scopeTag)) {
+            lifecycleInvocationTracker.clear();
+
             Map<String, Object> scope = new LinkedHashMap<>();
             scopes.put(scopeTag, scope);
 
@@ -80,13 +82,18 @@ class ScopeManager {
                     }
                 }
                 if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
+                    if(!lifecycleInvocationTracker.containsKey(service)) {
+                        lifecycleInvocationTracker.add(service);
+                        ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
+                    }
                 }
             }
         }
     }
 
     private List<Object> latestState = null;
+
+    private final IdentitySet<Object> lifecycleInvocationTracker = new IdentitySet<>();
 
     void finalizeScopes() {
         // this logic is actually inside BackstackManager for some reason
@@ -135,12 +142,17 @@ class ScopeManager {
 
     void destroyScope(String scopeTag) {
         if(scopes.containsKey(scopeTag)) {
+            lifecycleInvocationTracker.clear();
+
             Map<String, Object> serviceMap = scopes.remove(scopeTag);
             List<Object> services = new ArrayList<>(serviceMap.values());
             Collections.reverse(services);
             for(Object service : services) {
                 if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onExitScope(scopeTag);
+                    if(!lifecycleInvocationTracker.containsKey(service)) {
+                        lifecycleInvocationTracker.add(service);
+                        ((ScopedServices.Scoped) service).onExitScope(scopeTag);
+                    }
                 }
             }
             rootBundle.remove(scopeTag);
@@ -153,10 +165,16 @@ class ScopeManager {
                 throw new AssertionError(
                         "The new scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
             }
+
+            lifecycleInvocationTracker.clear();
+
             Map<String, Object> newServiceMap = scopes.get(newScopeTag);
             for(Object service : newServiceMap.values()) {
                 if(service instanceof ScopedServices.Activated) {
-                    ((ScopedServices.Activated) service).onScopeActive(newScopeTag);
+                    if(!lifecycleInvocationTracker.containsKey(service)) {
+                        lifecycleInvocationTracker.add(service);
+                        ((ScopedServices.Activated) service).onScopeActive(newScopeTag);
+                    }
                 }
             }
         }
@@ -166,12 +184,18 @@ class ScopeManager {
                 throw new AssertionError(
                         "The previous scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
             }
+
+            lifecycleInvocationTracker.clear();
+
             Map<String, Object> previousServiceMap = scopes.get(previousScopeTag);
             List<Object> previousServices = new ArrayList<>(previousServiceMap.values());
             Collections.reverse(previousServices);
             for(Object service : previousServices) {
                 if(service instanceof ScopedServices.Activated) {
-                    ((ScopedServices.Activated) service).onScopeInactive(previousScopeTag);
+                    if(!lifecycleInvocationTracker.containsKey(service)) {
+                        lifecycleInvocationTracker.add(service);
+                        ((ScopedServices.Activated) service).onScopeInactive(previousScopeTag);
+                    }
                 }
             }
         }

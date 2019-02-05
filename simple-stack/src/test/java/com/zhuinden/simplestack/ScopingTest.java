@@ -1676,4 +1676,87 @@ public class ScopingTest {
         assertThat(backstackManager.canFindFromScope("boop", "service3")).isFalse();
         assertThat(backstackManager.lookupService("service")).isSameAs(service1);
     }
+
+    @Test
+    public void sameServiceRegisteredInScopeMultipleTimesReceivesCallbackOnlyOnce() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final List<Object> activated = new ArrayList<>();
+        final List<Object> inactivated = new ArrayList<>();
+        final List<Object> entered = new ArrayList<>();
+        final List<Object> exited = new ArrayList<>();
+
+        class MyService
+                implements ScopedServices.Activated, ScopedServices.Scoped {
+
+            @Override
+            public void onScopeActive(@NonNull String scope) {
+                activated.add(this);
+            }
+
+            @Override
+            public void onScopeInactive(@NonNull String scope) {
+                inactivated.add(this);
+            }
+
+            @Override
+            public void onEnterScope(@NonNull String scope) {
+                entered.add(this);
+            }
+
+            @Override
+            public void onExitScope(@NonNull String scope) {
+                exited.add(this);
+            }
+        }
+
+        final MyService service = new MyService();
+
+        final String serviceTag1 = "service1";
+        final String serviceTag2 = "service2";
+
+        TestKeyWithScope beep = new TestKeyWithScope("beep") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.add(serviceTag1, service);
+                serviceBinder.add(serviceTag2, service);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        TestKey clear = new TestKey("clear");
+
+        backstackManager.setup(History.of(beep));
+
+        assertThat(activated).isEmpty();
+        assertThat(inactivated).isEmpty();
+        assertThat(entered).isEmpty();
+        assertThat(exited).isEmpty();
+        backstackManager.setStateChanger(stateChanger);
+
+        assertThat(activated).isNotEmpty();
+        assertThat(inactivated).isEmpty();
+        assertThat(entered).isNotEmpty();
+        assertThat(exited).isEmpty();
+
+        assertThat(activated).containsOnlyOnce(service);
+        assertThat(entered).containsOnlyOnce(service);
+
+        backstackManager.getBackstack().setHistory(History.of(clear), StateChange.REPLACE);
+
+        assertThat(activated).isNotEmpty();
+        assertThat(inactivated).isNotEmpty();
+        assertThat(entered).isNotEmpty();
+        assertThat(exited).isNotEmpty();
+
+        assertThat(inactivated).containsOnlyOnce(service);
+        assertThat(exited).containsOnlyOnce(service);
+    }
 }
