@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack ?.??.? (2019-01-14+)
+-Simple Stack 1.13.2 (2019-02-05)
 --------------------------------
 
 - FIX: Fix that a service registered multiple times in the same scope with different tags would receive service lifecycle callbacks as many times as it was registered.
