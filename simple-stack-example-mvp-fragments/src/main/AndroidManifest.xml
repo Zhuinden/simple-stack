@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zhuinden.simplestackdemoexamplefragments">
+<manifest package="com.zhuinden.simplestackdemoexamplefragments"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:name=".application.CustomApplication"
@@ -9,12 +9,13 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.zhuinden.demo.DemoActivity"></activity>
-        <activity android:name="com.zhuinden.simplestackdemoexamplefragments.application.MainActivity">
+        <activity
+            android:name="com.zhuinden.simplestackdemoexamplefragments.application.MainActivity"
+            android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     </application>
