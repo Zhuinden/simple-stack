@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.zhuinden.simplestackkotlindaggerexample.userdetail.UsersKey
 import kotlinx.android.synthetic.main.fragment_home.*
-import org.jetbrains.anko.sdk15.listeners.onClick
 
 class HomeFragment : BaseFragment() {
 

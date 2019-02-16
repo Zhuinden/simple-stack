@@ -7,8 +7,8 @@ import android.view.inputmethod.InputMethodManager
 import com.zhuinden.simplestackdemoexamplefragments.util.BaseFragment
 import com.zhuinden.simplestackdemoexamplefragments.util.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.util.backstackDelegate
+import com.zhuinden.simplestackdemoexamplefragments.util.onTextChanged
 import kotlinx.android.synthetic.main.path_addoredittask.*
-import org.jetbrains.anko.sdk15.listeners.textChangedListener
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
@@ -37,16 +37,12 @@ class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskF
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        textAddTaskTitle.textChangedListener {
-            afterTextChanged { editable ->
-                presenter.onTitleChanged(editable.toString())
-            }
+        textAddTaskTitle.onTextChanged { title ->
+            presenter.onTitleChanged(title)
         }
 
-        textAddTaskDescription.textChangedListener {
-            afterTextChanged { editable ->
-                presenter.onDescriptionChanged(editable.toString())
-            }
+        textAddTaskDescription.onTextChanged { description ->
+            presenter.onDescriptionChanged(description)
         }
     }
 

@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.zhuinden.simplestackkotlindaggerexample.MainActivity
 import com.zhuinden.simplestackkotlindaggerexample.R
+import com.zhuinden.simplestackkotlindaggerexample.onClick
 import com.zhuinden.simplestackkotlindaggerexample.realmobjects.UserRO
 import io.realm.RealmRecyclerViewAdapter
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.view_item_contact.view.*
-import org.jetbrains.anko.sdk15.listeners.onClick
 
 class UsersAdapter(
     items: RealmResults<UserRO>

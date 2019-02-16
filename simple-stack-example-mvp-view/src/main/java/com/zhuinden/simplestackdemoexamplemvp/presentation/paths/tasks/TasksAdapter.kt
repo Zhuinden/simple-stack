@@ -1,6 +1,5 @@
 package com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks
 
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -8,9 +7,9 @@ import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.Preconditions.checkNotNull
 import com.zhuinden.simplestackdemoexamplemvp.util.inflate
+import com.zhuinden.simplestackdemoexamplemvp.util.onClick
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.task_item.*
-import org.jetbrains.anko.sdk15.listeners.onClick
 import java.util.*
 
 class TasksAdapter(
@@ -45,10 +44,10 @@ class TasksAdapter(
             this.task = task
             title.text = task.titleForList
             complete.isChecked = task.isCompleted
-            containerView.setBackgroundDrawable(ContextCompat.getDrawable(context, when {
+            containerView.setBackgroundResource(when {
                 task.isCompleted -> R.drawable.list_completed_touch_feedback
                 else -> R.drawable.touch_feedback
-            }))
+            })
         }
     }
 

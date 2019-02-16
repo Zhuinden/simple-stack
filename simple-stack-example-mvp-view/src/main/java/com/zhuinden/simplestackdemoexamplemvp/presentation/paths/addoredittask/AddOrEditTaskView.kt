@@ -6,8 +6,8 @@ import android.util.AttributeSet
 import android.widget.ScrollView
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.util.MvpPresenter
+import com.zhuinden.simplestackdemoexamplemvp.util.onTextChanged
 import kotlinx.android.synthetic.main.path_addoredittask.view.*
-import org.jetbrains.anko.sdk15.listeners.textChangedListener
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -18,7 +18,7 @@ class AddOrEditTaskView : ScrollView {
         const val CONTROLLER_TAG = "AddOrEditTaskView.Presenter"
     }
 
-    interface Presenter: MvpPresenter<AddOrEditTaskView> {
+    interface Presenter : MvpPresenter<AddOrEditTaskView> {
         fun onTitleChanged(title: String)
 
         fun onDescriptionChanged(description: String)
@@ -44,16 +44,12 @@ class AddOrEditTaskView : ScrollView {
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        textAddTaskTitle.textChangedListener {
-            afterTextChanged { editable ->
-                addOrEditTaskPresenter.onTitleChanged(editable.toString())
-            }
+        textAddTaskTitle.onTextChanged { title ->
+            addOrEditTaskPresenter.onTitleChanged(title)
         }
 
-        textAddTaskDescription.textChangedListener {
-            afterTextChanged { editable ->
-                addOrEditTaskPresenter.onDescriptionChanged(editable.toString())
-            }
+        textAddTaskDescription.onTextChanged { description ->
+            addOrEditTaskPresenter.onDescriptionChanged(description)
         }
     }
 

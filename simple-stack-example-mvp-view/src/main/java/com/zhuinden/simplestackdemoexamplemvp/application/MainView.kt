@@ -47,7 +47,7 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
         // Close the navigation drawer when an item is selected.
         drawerLayout.closeDrawers()
         true
-    } as NavigationView.OnNavigationItemSelectedListener
+    }
 
     private fun setCheckedItem(navigationItemId: Int) {
         val menu = navigationView.menu
@@ -86,8 +86,10 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (root != null && root.getChildAt(0) != null) {
             var handled = false
-            if (root.getChildAt(0) is MainActivity.OptionsItemSelectedListener) {
-                handled = (root.getChildAt(0) as MainActivity.OptionsItemSelectedListener).onOptionsItemSelected(item)
+
+            val child = root.getChildAt(0)
+            if (child is MainActivity.OptionsItemSelectedListener) {
+                handled = child.onOptionsItemSelected(item)
             }
             if (handled) {
                 return handled
@@ -147,8 +149,9 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
 
     override fun handleStateChange(stateChange: StateChange, callback: StateChanger.Callback) {
         if (root != null && root.getChildAt(0) != null) {
-            if (root.getChildAt(0) is StateChanger) {
-                (root.getChildAt(0) as StateChanger).handleStateChange(stateChange, callback)
+            val child = root.getChildAt(0)
+            if (child is StateChanger) {
+                child.handleStateChange(stateChange, callback)
                 return
             }
         }

@@ -16,7 +16,6 @@ import io.realm.Realm
 import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.fragment_users.*
 import kotlinx.android.synthetic.main.view_loading.*
-import org.jetbrains.anko.sdk15.listeners.textChangedListener
 import javax.inject.Inject
 
 class UsersFragment : BaseFragment() {
@@ -47,13 +46,12 @@ class UsersFragment : BaseFragment() {
         indexOfLoadingView = viewAnimator.indexOfChild(loadingView)
         realm = Realm.getDefaultInstance()
         usersAdapter = UsersAdapter(realm.where<UserRO>().findAllAsync())
-        usersSearchView.textChangedListener {
-            afterTextChanged { editable ->
-                usersAdapter.updateData(
-                    realm.where<UserRO>()
-                        .contains("userName", editable.toString()).findAllAsync()
-                )
+        usersSearchView.onTextChanged { username ->
+            val query = when {
+                username.isNotEmpty() -> realm.where<UserRO>().contains("userName", username)
+                else -> realm.where<UserRO>()
             }
+            usersAdapter.updateData(query.findAllAsync())
         }
         contactsView.layoutManager = LinearLayoutManager(context, VERTICAL, false)
         contactsView.adapter = usersAdapter
@@ -68,7 +66,7 @@ class UsersFragment : BaseFragment() {
             .subscribeOn(schedulerProvider.io())
             .doOnNext { users ->
                 val userROs = users.result.map { user -> UserRO.createFromUser(user) }
-                println("Thread doOnNext: %s" + Thread.currentThread().name)
+
                 Realm.getDefaultInstance().use { r ->
                     r.executeTransaction { realm ->
                         realm.insertOrUpdate(userROs)
@@ -79,13 +77,12 @@ class UsersFragment : BaseFragment() {
             .doFinally { loadingView.hide() }
             .subscribeBy(
                 onNext = {
-                    println("onNext!")
+                    println("Saved users to Realm.")
                 },
                 onError = {
                     it.printStackTrace()
                 },
                 onComplete = {
-                    println("Done!")
                 }
             )
     }

@@ -87,7 +87,9 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
         val newKey = stateChange.topNewState<Key>()
         val previousKey = stateChange.topPreviousState<Key?>()
-        val newView = LayoutInflater.from(stateChange.createContext(this, newKey)).inflate(newKey.layout(), root, false)
+
+        val newView = LayoutInflater.from(stateChange.createContext(this, newKey))
+            .inflate(newKey.layout(), root, false)
 
         val previousView = root.getChildAt(0)
         Navigator.persistViewToState(previousView)

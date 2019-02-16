@@ -17,7 +17,6 @@ import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.*
 import kotlinx.android.synthetic.main.path_tasks.*
-import org.jetbrains.anko.sdk15.listeners.onClick
 import java.util.*
 
 /**

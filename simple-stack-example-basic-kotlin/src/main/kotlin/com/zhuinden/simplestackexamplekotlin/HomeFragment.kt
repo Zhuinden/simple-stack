@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 
 import kotlinx.android.synthetic.main.home_view.*
-import org.jetbrains.anko.sdk15.listeners.onClick
 
 /**
  * Created by Owner on 2017.11.13.

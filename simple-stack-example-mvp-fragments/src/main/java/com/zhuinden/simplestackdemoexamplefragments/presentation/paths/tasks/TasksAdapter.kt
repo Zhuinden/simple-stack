@@ -8,9 +8,9 @@ import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.Preconditions.checkNotNull
 import com.zhuinden.simplestackdemoexamplefragments.util.inflate
+import com.zhuinden.simplestackdemoexamplefragments.util.onClick
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.task_item.*
-import org.jetbrains.anko.sdk15.listeners.onClick
 import java.util.*
 
 /**

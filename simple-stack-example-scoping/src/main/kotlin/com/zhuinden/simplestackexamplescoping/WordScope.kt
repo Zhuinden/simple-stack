@@ -8,5 +8,5 @@ interface WordScope : ScopeKey.Child {
         const val SCOPE_TAG = "WORD"
     }
 
-    override fun getParentScopes(): MutableList<String> = History.of(SCOPE_TAG)
+    override fun getParentScopes(): List<String> = History.of(SCOPE_TAG)
 }
