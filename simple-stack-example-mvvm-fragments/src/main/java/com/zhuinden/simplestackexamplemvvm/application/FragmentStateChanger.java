@@ -70,6 +70,6 @@ public class FragmentStateChanger {
                 fragment.bindViewModel(activity.backstackDelegate.getService(newKey, newKey.getViewModelTag()));
             }
         }
-        fragmentTransaction.commitAllowingStateLoss();
+        fragmentTransaction.commitNow();
     }
 }
