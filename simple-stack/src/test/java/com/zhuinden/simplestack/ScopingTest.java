@@ -70,7 +70,7 @@ public class ScopingTest {
         }
     };
 
-    public interface HasServices
+    private interface HasServices
             extends ScopeKey {
         void bindServices(ScopedServices.ServiceBinder serviceBinder);
     }
