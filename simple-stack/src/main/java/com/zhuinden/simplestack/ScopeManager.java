@@ -259,9 +259,74 @@ class ScopeManager {
         return scopes.containsKey(scopeTag);
     }
 
-    public boolean canFindFromScope(String scopeTag, String serviceTag) {
+    boolean canFindFromScope(String scopeTag, String serviceTag, ScopeLookupMode lookupMode) {
         checkServiceTag(serviceTag);
         checkScopeTag(scopeTag);
+        checkScopeLookupMode(lookupMode);
+
+        if(lookupMode == ScopeLookupMode.ALL) {
+            return canFindFromScopeAll(scopeTag, serviceTag);
+        } else if(lookupMode == ScopeLookupMode.EXPLICIT) {
+            return canFindFromScopeExplicit(scopeTag, serviceTag);
+        } else {
+            throw new AssertionError("Mode was not handled.");
+        }
+    }
+
+    private boolean canFindFromScopeExplicit(String scopeTag, String serviceTag) {
+        if(this.latestState == null) {
+            return false;
+        }
+
+        Set<String> activeScopes = new LinkedHashSet<>();
+        List<Object> latestState = this.latestState;
+
+        boolean isScopeFound = false;
+        for(int i = latestState.size() - 1; i >= 0; i--) {
+            Object key = latestState.get(i);
+            if(key instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) key;
+                String currentScope = scopeKey.getScopeTag();
+                if(currentScope.equals(scopeTag)) {
+                    isScopeFound = true;
+                }
+                if(isScopeFound) {
+                    activeScopes.add(currentScope);
+                }
+            }
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                List<String> parentScopes = child.getParentScopes();
+                for(int j = parentScopes.size() - 1; j >= 0; j--) {
+                    String currentScope = parentScopes.get(j);
+                    if(currentScope.equals(scopeTag)) {
+                        isScopeFound = true;
+                    }
+                    if(isScopeFound) {
+                        activeScopes.add(currentScope);
+                    }
+                }
+            }
+
+            if(isScopeFound) { // force explicit only in this mode.
+                break;
+            }
+        }
+
+        for(String scope : activeScopes) {
+            if(hasService(scope, serviceTag)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean canFindFromScopeAll(String scopeTag, String serviceTag) {
+        if(this.latestState == null) {
+            return false;
+        }
 
         Set<String> activeScopes = new LinkedHashSet<>();
         List<Object> latestState = this.latestState;
@@ -304,9 +369,75 @@ class ScopeManager {
         return false;
     }
 
-    public <T> T lookupFromScope(String scopeTag, String serviceTag) {
-        checkServiceTag(serviceTag);
+    <T> T lookupFromScope(String scopeTag, String serviceTag) {
+        return lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
+    }
+
+    <T> T lookupFromScope(String scopeTag, String serviceTag, ScopeLookupMode lookupMode) {
         checkScopeTag(scopeTag);
+        checkServiceTag(serviceTag);
+        checkScopeLookupMode(lookupMode);
+
+        if(lookupMode == ScopeLookupMode.ALL) {
+            return lookupFromScopeAll(scopeTag, serviceTag);
+        } else if(lookupMode == ScopeLookupMode.EXPLICIT) {
+            return lookupFromScopeExplicit(scopeTag, serviceTag);
+        } else {
+            throw new AssertionError("Mode was not handled.");
+        }
+    }
+
+    private <T> T lookupFromScopeExplicit(String scopeTag, String serviceTag) {
+        verifyStackIsInitialized();
+
+        Set<String> activeScopes = new LinkedHashSet<>();
+        List<Object> latestState = this.latestState;
+
+        boolean isScopeFound = false;
+        for(int i = latestState.size() - 1; i >= 0; i--) {
+            Object key = latestState.get(i);
+            if(key instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) key;
+                String currentScope = scopeKey.getScopeTag();
+                if(currentScope.equals(scopeTag)) {
+                    isScopeFound = true;
+                }
+                if(isScopeFound) {
+                    activeScopes.add(currentScope);
+                }
+            }
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                List<String> parentScopes = child.getParentScopes();
+                for(int j = parentScopes.size() - 1; j >= 0; j--) {
+                    String currentScope = parentScopes.get(j);
+                    if(currentScope.equals(scopeTag)) {
+                        isScopeFound = true;
+                    }
+                    if(isScopeFound) {
+                        activeScopes.add(currentScope);
+                    }
+                }
+            }
+
+            if(isScopeFound) { // force explicit only in this mode.
+                break;
+            }
+        }
+
+        for(String scope : activeScopes) {
+            if(hasService(scope, serviceTag)) {
+                return getService(scope, serviceTag);
+            }
+        }
+
+        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
+                activeScopes.toArray()) + "]!");
+    }
+
+    private <T> T lookupFromScopeAll(String scopeTag, String serviceTag) {
+        verifyStackIsInitialized();
 
         Set<String> activeScopes = new LinkedHashSet<>();
         List<Object> latestState = this.latestState;
@@ -365,6 +496,8 @@ class ScopeManager {
     <T> T lookupService(@NonNull String serviceTag) {
         checkServiceTag(serviceTag);
 
+        verifyStackIsInitialized();
+
         Set<String> activeScopes = new LinkedHashSet<>();
         List<Object> latestState = this.latestState;
         for(int i = latestState.size() - 1; i >= 0; i--) {
@@ -390,10 +523,16 @@ class ScopeManager {
         }
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
                 activeScopes.toArray()) + "! " +
-                                                "Is the scope tag registered via a ScopeKey? " +
-                                                "If yes, make sure the StateChanger has been set by this time, " +
-                                                "and that you've bound and are trying to lookup the service with the correct service tag. " +
-                                                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+                "Is the scope tag registered via a ScopeKey? " +
+                "If yes, make sure the StateChanger has been set by this time, " +
+                "and that you've bound and are trying to lookup the service with the correct service tag. " +
+                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+    }
+
+    private void verifyStackIsInitialized() {
+        if(this.latestState == null) {
+            throw new IllegalStateException("Cannot lookup from an empty stack.");
+        }
     }
 
     static private void checkScopeTag(@NonNull String scopeTag) {
@@ -412,6 +551,12 @@ class ScopeManager {
         //noinspection ConstantConditions
         if(child.getParentScopes() == null) {
             throw new IllegalArgumentException("Parent scopes cannot be null!");
+        }
+    }
+
+    private static void checkScopeLookupMode(ScopeLookupMode mode) {
+        if(mode == null) {
+            throw new IllegalArgumentException("Mode cannot be null!");
         }
     }
 }

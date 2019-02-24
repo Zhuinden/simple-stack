@@ -416,11 +416,26 @@ public class BackstackManager
      * Attempts to look-up the service in the provided scope and all its parents, starting from the provided scope.
      * Returns whether the service exists in any of these scopes.
      *
+     * @param scopeTag the tag of the scope to look up from
      * @param serviceTag the tag of the service
      * @return whether the service exists in any scopes from the current scope or its parents
      */
     public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
-        return scopeManager.canFindFromScope(scopeTag, serviceTag);
+        return scopeManager.canFindFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
+    }
+
+    /**
+     * Attempts to look-up the service in the provided scope and the specified type of parents, starting from the provided scope.
+     * Returns whether the service exists in any of these scopes.
+     *
+     * @param scopeTag the tag of the scope to look up from
+     * @param serviceTag the tag of the service
+     * @param lookupMode determine what type of parents are checked during the lookup
+     *
+     * @return whether the service exists in any scopes from the current scope or its parents
+     */
+    public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+        return scopeManager.canFindFromScope(scopeTag, serviceTag, lookupMode);
     }
 
     /**
@@ -449,6 +464,21 @@ public class BackstackManager
     @NonNull
     public <T> T lookupFromScope(String scopeTag, String serviceTag) {
         return scopeManager.lookupFromScope(scopeTag, serviceTag);
+    }
+
+    /**
+     * Attempts to look-up the service in the provided scope and its parents, starting from the provided scope.
+     * If the service is not found, an exception is thrown.
+     *
+     * @param serviceTag the tag of the service
+     * @param <T>        the type of the service
+     * @param lookupMode determine what type of parents are checked during the lookup
+     * @return the service
+     * @throws IllegalStateException if the service doesn't exist in any of the scopes
+     */
+    @NonNull
+    public <T> T lookupFromScope(String scopeTag, String serviceTag, ScopeLookupMode lookupMode) {
+        return scopeManager.lookupFromScope(scopeTag, serviceTag, lookupMode);
     }
 
     /**

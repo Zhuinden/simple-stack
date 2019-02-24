@@ -182,7 +182,7 @@ public interface ScopedServices {
          * @return whether the service can be looked up from the provided scope
          */
         public boolean canFindFrom(String scopeTag, String serviceTag) {
-            return scopeManager.canFindFromScope(scopeTag, serviceTag);
+            return scopeManager.canFindFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
         }
 
         /**
