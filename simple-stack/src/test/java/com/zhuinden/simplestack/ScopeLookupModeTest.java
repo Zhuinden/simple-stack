@@ -11,13 +11,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopeLookupModeTest {
-
-    public interface HasServices
+    private interface HasServices
             extends ScopeKey {
         void bindServices(ScopedServices.ServiceBinder serviceBinder);
     }
 
-    public interface HasParentServices
+    private interface HasParentServices
             extends ScopeKey.Child {
         void bindServices(ScopedServices.ServiceBinder serviceBinder);
     }
