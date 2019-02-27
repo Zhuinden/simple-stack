@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack ?.??.? (????-??-??)
+-Simple Stack 1.13.3 (2019-02-27)
 --------------------------------
 
 - FIX: NPE when `canFindFromScope()` was used on an uninitialized stack, instead of returning `false`.
