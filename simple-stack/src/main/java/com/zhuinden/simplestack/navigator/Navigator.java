@@ -35,6 +35,7 @@ import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.ScopeKey;
+import com.zhuinden.simplestack.ScopeLookupMode;
 import com.zhuinden.simplestack.ScopedServices;
 import com.zhuinden.simplestack.StateChanger;
 
@@ -401,6 +402,20 @@ public class Navigator {
     }
 
     /**
+     * Attempts to look-up the service in the provided scope and the specified type of parents, starting from the provided scope.
+     * Returns whether the service exists in any of these scopes.
+     *
+     * @param scopeTag the tag of the scope to look up from
+     * @param serviceTag the tag of the service
+     * @param lookupMode determine what type of parents are checked during the lookup
+     *
+     * @return whether the service exists in any scopes from the current scope or its parents
+     */
+    public static boolean canFindFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+        return getManager(context).canFindFromScope(scopeTag, serviceTag, lookupMode);
+    }
+
+    /**
      * Attempts to look-up the service in the scopes accessible from the provided scope tag.
      * If the service is not found, an exception is thrown.
      *
@@ -414,6 +429,23 @@ public class Navigator {
     public static <T> T lookupFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
         return getManager(context).lookupFromScope(scopeTag, serviceTag);
     }
+
+
+    /**
+     * Attempts to look-up the service in the provided scope and its parents, starting from the provided scope.
+     * If the service is not found, an exception is thrown.
+     *
+     * @param serviceTag the tag of the service
+     * @param <T>        the type of the service
+     * @param lookupMode determine what type of parents are checked during the lookup
+     * @return the service
+     * @throws IllegalStateException if the service doesn't exist in any of the scopes
+     */
+    @NonNull
+    public static <T> T lookupFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+        return getManager(context).lookupFromScope(scopeTag, serviceTag, lookupMode);
+    }
+
 
     /**
      * A method to return the backstack manager, managed by the {@link BackstackHost}.
