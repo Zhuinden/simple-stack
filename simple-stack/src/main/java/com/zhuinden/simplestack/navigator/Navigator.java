@@ -30,6 +30,7 @@ import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.DefaultKeyFilter;
 import com.zhuinden.simplestack.DefaultKeyParceler;
 import com.zhuinden.simplestack.DefaultStateClearStrategy;
+import com.zhuinden.simplestack.GlobalServices;
 import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.SavedState;
@@ -61,6 +62,7 @@ public class Navigator {
         KeyParceler keyParceler = new DefaultKeyParceler();
         BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
         ScopedServices scopedServices = null;
+        GlobalServices globalServices = null;
         boolean isInitializeDeferred = false;
         boolean shouldPersistContainerChild = true;
         List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
@@ -128,7 +130,10 @@ public class Navigator {
         }
 
         /**
+         * Sets the scoped services.
          *
+         * @param scopedServices the scoped services
+         * @return the installer
          */
         @NonNull
         public Installer setScopedServices(@NonNull ScopedServices scopedServices) {
@@ -136,6 +141,21 @@ public class Navigator {
                 throw new IllegalArgumentException("If set, scoped services cannot be null!");
             }
             this.scopedServices = scopedServices;
+            return this;
+        }
+
+        /**
+         * Sets the global services.
+         *
+         * @param globalServices the global services
+         * @return the installer
+         */
+        @NonNull
+        public Installer setGlobalServices(@NonNull GlobalServices globalServices) {
+            if(globalServices == null) {
+                throw new IllegalArgumentException("If set, global services cannot be null!");
+            }
+            this.globalServices = globalServices;
             return this;
         }
 
@@ -242,6 +262,7 @@ public class Navigator {
         backstackHost.keyParceler = installer.keyParceler;
         backstackHost.stateClearStrategy = installer.stateClearStrategy;
         backstackHost.scopedServices = installer.scopedServices;
+        backstackHost.globalServices = installer.globalServices;
         backstackHost.stateChangeCompletionListeners = installer.stateChangeCompletionListeners;
         backstackHost.shouldPersistContainerChild = installer.shouldPersistContainerChild;
         backstackHost.container = container;

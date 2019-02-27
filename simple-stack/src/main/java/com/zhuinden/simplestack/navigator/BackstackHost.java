@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackManager;
+import com.zhuinden.simplestack.GlobalServices;
 import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.ScopedServices;
@@ -47,6 +48,7 @@ public final class BackstackHost
     KeyParceler keyParceler;
     BackstackManager.StateClearStrategy stateClearStrategy;
     ScopedServices scopedServices;
+    GlobalServices globalServices;
     List<Backstack.CompletionListener> stateChangeCompletionListeners;
 
     boolean shouldPersistContainerChild;
@@ -72,6 +74,9 @@ public final class BackstackHost
             backstackManager.setStateClearStrategy(stateClearStrategy);
             if(scopedServices != null) {
                 backstackManager.setScopedServices(scopedServices);
+            }
+            if(globalServices != null) {
+                backstackManager.setGlobalServices(globalServices);
             }
             backstackManager.setup(initialKeys);
             for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
