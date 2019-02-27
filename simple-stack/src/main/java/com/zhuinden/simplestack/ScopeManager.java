@@ -1,3 +1,18 @@
+/*
+ * Copyright 2018 Gabor Varadi
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
@@ -14,6 +29,19 @@ import java.util.Map;
 import java.util.Set;
 
 class ScopeManager {
+    private static final String GLOBAL_SCOPE_TAG = "__SIMPLE_STACK_INTERNAL_GLOBAL_SCOPE__";
+    private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
+
+    private boolean isGlobalScopePendingActivation = true;
+
+    void activateGlobalScope() {
+        notifyScopeActivation(GLOBAL_SCOPE_TAG, globalServices.getServices());
+    }
+
+    void deactivateGlobalScope() {
+        notifyScopeDeactivation(GLOBAL_SCOPE_TAG, globalServices.getServices());
+    }
+
     static class AssertingScopedServices
             implements ScopedServices {
 
@@ -24,6 +52,7 @@ class ScopeManager {
         }
     }
 
+    private GlobalServices globalServices = EMPTY_GLOBAL_SERVICES;
     private ScopedServices scopedServices = new AssertingScopedServices();
 
     ScopeManager() {
@@ -57,35 +86,52 @@ class ScopeManager {
         this.scopedServices = scopedServices;
     }
 
+    void setGlobalServices(GlobalServices globalServices) {
+        this.globalServices = globalServices;
+    }
+
+
+    private void buildGlobalScope() {
+        if(!scopes.containsKey(GLOBAL_SCOPE_TAG)) {
+            Map<String, Object> scope = globalServices.getServices();
+            scopes.put(GLOBAL_SCOPE_TAG, scope);
+
+            restoreAndNotifyServices(GLOBAL_SCOPE_TAG, scope);
+        }
+    }
+
     private void buildScope(Object key, String scopeTag) {
         //noinspection ConstantConditions
         if(scopeTag == null) {
             throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
         }
         if(!scopes.containsKey(scopeTag)) {
-            lifecycleInvocationTracker.clear();
-
             Map<String, Object> scope = new LinkedHashMap<>();
             scopes.put(scopeTag, scope);
 
             scopedServices.bindServices(new ScopedServices.ServiceBinder(this, key, scopeTag, scope));
 
-            for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
-                String serviceTag = serviceEntry.getKey();
-                Object service = serviceEntry.getValue();
-                if(rootBundle.containsKey(scopeTag)) {
-                    if(service instanceof Bundleable) {
-                        StateBundle scopeBundle = rootBundle.getBundle(scopeTag);
-                        if(scopeBundle != null && scopeBundle.containsKey(serviceTag)) {
-                            ((Bundleable) service).fromBundle(scopeBundle.getBundle(serviceTag));
-                        }
+            restoreAndNotifyServices(scopeTag, scope);
+        }
+    }
+
+    private void restoreAndNotifyServices(String scopeTag, Map<String, Object> scope) {
+        lifecycleInvocationTracker.clear();
+        for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
+            String serviceTag = serviceEntry.getKey();
+            Object service = serviceEntry.getValue();
+            if(rootBundle.containsKey(scopeTag)) {
+                if(service instanceof Bundleable) {
+                    StateBundle scopeBundle = rootBundle.getBundle(scopeTag);
+                    if(scopeBundle != null && scopeBundle.containsKey(serviceTag)) {
+                        ((Bundleable) service).fromBundle(scopeBundle.getBundle(serviceTag));
                     }
                 }
-                if(service instanceof ScopedServices.Scoped) {
-                    if(!lifecycleInvocationTracker.containsKey(service)) {
-                        lifecycleInvocationTracker.add(service);
-                        ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
-                    }
+            }
+            if(service instanceof ScopedServices.Scoped) {
+                if(!lifecycleInvocationTracker.containsKey(service)) {
+                    lifecycleInvocationTracker.add(service);
+                    ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
                 }
             }
         }
@@ -96,12 +142,18 @@ class ScopeManager {
     private final IdentitySet<Object> lifecycleInvocationTracker = new IdentitySet<>();
 
     void finalizeScopes() {
-        // this logic is actually inside BackstackManager for some reason
+        // this logic is actually mostly inside BackstackManager for some reason
+        destroyServicesAndRemoveState(GLOBAL_SCOPE_TAG, globalServices.getServices());
+
         this.latestState = Collections.emptyList();
     }
 
     void buildScopes(List<Object> newState) {
+        if(this.latestState == null) { // this seems to be the best way to track that we can safely register and initialize the global scope.
+            buildGlobalScope();
+        }
         this.latestState = newState;
+
         for(Object key : newState) {
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
@@ -120,6 +172,8 @@ class ScopeManager {
 
     void clearScopesNotIn(List<Object> newState) {
         Set<String> currentScopes = new LinkedHashSet<>();
+        currentScopes.add(GLOBAL_SCOPE_TAG); // prevent global scope from being destroyed
+
         for(Object key : newState) {
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
@@ -142,41 +196,41 @@ class ScopeManager {
 
     void destroyScope(String scopeTag) {
         if(scopes.containsKey(scopeTag)) {
-            lifecycleInvocationTracker.clear();
-
             Map<String, Object> serviceMap = scopes.remove(scopeTag);
-            List<Object> services = new ArrayList<>(serviceMap.values());
-            Collections.reverse(services);
-            for(Object service : services) {
-                if(service instanceof ScopedServices.Scoped) {
-                    if(!lifecycleInvocationTracker.containsKey(service)) {
-                        lifecycleInvocationTracker.add(service);
-                        ((ScopedServices.Scoped) service).onExitScope(scopeTag);
-                    }
-                }
-            }
-            rootBundle.remove(scopeTag);
+            destroyServicesAndRemoveState(scopeTag, serviceMap);
         }
     }
 
+    private void destroyServicesAndRemoveState(String scopeTag, Map<String, Object> serviceMap) {
+        lifecycleInvocationTracker.clear();
+
+        List<Object> services = new ArrayList<>(serviceMap.values());
+        Collections.reverse(services);
+        for(Object service : services) {
+            if(service instanceof ScopedServices.Scoped) {
+                if(!lifecycleInvocationTracker.containsKey(service)) {
+                    lifecycleInvocationTracker.add(service);
+                    ((ScopedServices.Scoped) service).onExitScope(scopeTag);
+                }
+            }
+        }
+        rootBundle.remove(scopeTag);
+    }
+
     void dispatchActivation(@NonNull Set<String> scopesToDeactivate, @NonNull Set<String> scopesToActivate) {
+        if(isGlobalScopePendingActivation) {
+            isGlobalScopePendingActivation = false;
+            activateGlobalScope(); // TODO there must be a better way to do this?
+        }
+
         for(String newScopeTag : scopesToActivate) {
             if(!scopes.containsKey(newScopeTag)) {
                 throw new AssertionError(
                         "The new scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
-            lifecycleInvocationTracker.clear();
-
             Map<String, Object> newServiceMap = scopes.get(newScopeTag);
-            for(Object service : newServiceMap.values()) {
-                if(service instanceof ScopedServices.Activated) {
-                    if(!lifecycleInvocationTracker.containsKey(service)) {
-                        lifecycleInvocationTracker.add(service);
-                        ((ScopedServices.Activated) service).onScopeActive(newScopeTag);
-                    }
-                }
-            }
+            notifyScopeActivation(newScopeTag, newServiceMap);
         }
 
         for(String previousScopeTag : scopesToDeactivate) {
@@ -185,17 +239,32 @@ class ScopeManager {
                         "The previous scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
-            lifecycleInvocationTracker.clear();
-
             Map<String, Object> previousServiceMap = scopes.get(previousScopeTag);
-            List<Object> previousServices = new ArrayList<>(previousServiceMap.values());
-            Collections.reverse(previousServices);
-            for(Object service : previousServices) {
-                if(service instanceof ScopedServices.Activated) {
-                    if(!lifecycleInvocationTracker.containsKey(service)) {
-                        lifecycleInvocationTracker.add(service);
-                        ((ScopedServices.Activated) service).onScopeInactive(previousScopeTag);
-                    }
+            notifyScopeDeactivation(previousScopeTag, previousServiceMap);
+        }
+    }
+
+    private void notifyScopeActivation(String newScopeTag, Map<String, Object> newServiceMap) {
+        lifecycleInvocationTracker.clear();
+        for(Object service : newServiceMap.values()) {
+            if(service instanceof ScopedServices.Activated) {
+                if(!lifecycleInvocationTracker.containsKey(service)) {
+                    lifecycleInvocationTracker.add(service);
+                    ((ScopedServices.Activated) service).onScopeActive(newScopeTag);
+                }
+            }
+        }
+    }
+
+    private void notifyScopeDeactivation(String previousScopeTag, Map<String, Object> previousServiceMap) {
+        lifecycleInvocationTracker.clear();
+        List<Object> previousServices = new ArrayList<>(previousServiceMap.values());
+        Collections.reverse(previousServices);
+        for(Object service : previousServices) {
+            if(service instanceof ScopedServices.Activated) {
+                if(!lifecycleInvocationTracker.containsKey(service)) {
+                    lifecycleInvocationTracker.add(service);
+                    ((ScopedServices.Activated) service).onScopeInactive(previousScopeTag);
                 }
             }
         }
@@ -320,6 +389,11 @@ class ScopeManager {
             }
         }
 
+        //noinspection RedundantIfStatement
+        if(globalServices.hasService(serviceTag)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -366,11 +440,12 @@ class ScopeManager {
             }
         }
 
-        return false;
-    }
+        //noinspection RedundantIfStatement
+        if(globalServices.hasService(serviceTag)) {
+            return true;
+        }
 
-    <T> T lookupFromScope(String scopeTag, String serviceTag) {
-        return lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
+        return false;
     }
 
     <T> T lookupFromScope(String scopeTag, String serviceTag, ScopeLookupMode lookupMode) {
@@ -432,6 +507,10 @@ class ScopeManager {
             }
         }
 
+        if(globalServices.hasService(serviceTag)) {
+            return globalServices.getService(serviceTag);
+        }
+
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
                 activeScopes.toArray()) + "]!");
     }
@@ -477,6 +556,10 @@ class ScopeManager {
             }
         }
 
+        if(globalServices.hasService(serviceTag)) {
+            return globalServices.getService(serviceTag);
+        }
+
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
                 activeScopes.toArray()) + "]!");
     }
@@ -489,6 +572,12 @@ class ScopeManager {
                 return true;
             }
         }
+
+        //noinspection RedundantIfStatement
+        if(globalServices.hasService(serviceTag)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -521,6 +610,11 @@ class ScopeManager {
                 return getService(scopeTag, serviceTag);
             }
         }
+
+        if(globalServices.hasService(serviceTag)) {
+            return globalServices.getService(serviceTag);
+        }
+
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
                 activeScopes.toArray()) + "! " +
                 "Is the scope tag registered via a ScopeKey? " +

@@ -222,6 +222,21 @@ public class BackstackManager
         this.scopeManager.setScopedServices(scopedServices);
     }
 
+    /**
+     * Specifies a {@link GlobalServices} that describes the services of the global scope.
+     *
+     * @param globalServices the {@link GlobalServices}.
+     */
+    public void setGlobalServices(@NonNull GlobalServices globalServices) {
+        if(backstack != null) {
+            throw new IllegalStateException("Global scope should be set before calling `setup()`");
+        }
+        if(globalServices == null) {
+            throw new IllegalArgumentException("The global services cannot be null!");
+        }
+        this.scopeManager.setGlobalServices(globalServices);
+    }
+
     Backstack backstack;
 
     Map<Object, SavedState> keyStateMap = new HashMap<>();
@@ -315,6 +330,8 @@ public class BackstackManager
             scopeManager.dispatchActivation(scopesToDeactivate, Collections.<String>emptySet());
         }
 
+        scopeManager.deactivateGlobalScope(); // TODO there must be a better way to do this
+
         History<Object> history = backstack.getHistory();
         Set<String> scopeSet = new LinkedHashSet<>();
         for(int i = 0, size = history.size(); i < size; i++) {
@@ -325,6 +342,7 @@ public class BackstackManager
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
                 for(String parent : child.getParentScopes()) {
+                    //noinspection RedundantCollectionOperation
                     if(scopeSet.contains(parent)) {
                         scopeSet.remove(parent); // needed to setup the proper order
                     }
@@ -463,7 +481,7 @@ public class BackstackManager
      */
     @NonNull
     public <T> T lookupFromScope(String scopeTag, String serviceTag) {
-        return scopeManager.lookupFromScope(scopeTag, serviceTag);
+        return scopeManager.lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
     }
 
     /**

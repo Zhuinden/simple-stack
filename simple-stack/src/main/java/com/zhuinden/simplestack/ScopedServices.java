@@ -195,7 +195,7 @@ public interface ScopedServices {
          */
         @NonNull
         public <T> T lookupFrom(String scopeTag, String serviceTag) {
-            return scopeManager.lookupFromScope(scopeTag, serviceTag);
+            return scopeManager.lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
         }
 
         /**
@@ -219,5 +219,10 @@ public interface ScopedServices {
         }
     }
 
+    /**
+     * Used to configure the services that belong to given scopes.
+     *
+     * @param serviceBinder the binder that allows binding services to scopes.
+     */
     void bindServices(@NonNull ServiceBinder serviceBinder);
 }
