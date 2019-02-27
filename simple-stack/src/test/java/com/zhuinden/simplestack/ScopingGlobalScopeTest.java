@@ -478,4 +478,9 @@ public class ScopingGlobalScopeTest {
         assertThat(scopeManager.<Service>lookupService("service").blah).isEqualTo(2);
         assertThat(scopeManager2.<Service>lookupService("service").blah).isEqualTo(5);
     }
+
+    @Test
+    public void lookupServiceShouldPreferGlobalToImplicit() {
+        throw new IllegalStateException("TODO");
+    }
 }
