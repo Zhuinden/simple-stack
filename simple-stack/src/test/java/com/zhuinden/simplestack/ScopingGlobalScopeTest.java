@@ -207,6 +207,116 @@ public class ScopingGlobalScopeTest {
         assertThat(backstackManager.lookupService("parentService2")).isSameAs(globalService);
     }
 
+    @Test
+    public void globalScopeLookupPrefersImplicitsToGlobal() {
+        final BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final Object globalService = new Object();
+
+        backstackManager.setGlobalServices(GlobalServices.builder()
+                .addService("parentService1", globalService)
+                .build());
+
+        final Object parentService1 = new Object();
+        final Object parentService2 = new Object();
+
+        final Object service1 = new Object();
+        final Object service2 = new Object();
+
+        class Key1
+                extends TestKey
+                implements HasServices, HasParentServices {
+            Key1(String name) {
+                super(name);
+            }
+
+            protected Key1(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if("parent1".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("parentService1", parentService1);
+                } else if(name.equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("service1", service1);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1");
+            }
+        }
+
+        class Key2
+                extends TestKey
+                implements HasServices, HasParentServices {
+            Key2(String name) {
+                super(name);
+            }
+
+            protected Key2(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if("parent2".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("parentService2", parentService2);
+                } else if(name.equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("service2", service2);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent2");
+            }
+        }
+
+        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
+        backstackManager.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstackManager.canFindFromScope("boop", "parentService1", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstackManager.canFindFromScope("beep", "parentService1", ScopeLookupMode.EXPLICIT)).isTrue();
+
+        assertThat(backstackManager.lookupFromScope("boop", "parentService1", ScopeLookupMode.EXPLICIT)).isSameAs(globalService);
+        assertThat(backstackManager.lookupFromScope("beep", "parentService1", ScopeLookupMode.EXPLICIT)).isSameAs(parentService1);
+
+        assertThat(backstackManager.canFindFromScope("boop", "parentService1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstackManager.canFindFromScope("beep", "parentService1", ScopeLookupMode.ALL)).isTrue();
+
+        assertThat(backstackManager.lookupFromScope("boop", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
+        assertThat(backstackManager.lookupFromScope("beep", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
+
+        assertThat(backstackManager.lookupService("parentService1")).isSameAs(parentService1);
+
+        backstackManager.getBackstack().setHistory(History.of(new Key2("boop")), StateChange.REPLACE);
+
+        assertThat(backstackManager.lookupService("parentService1")).isSameAs(globalService);
+    }
+
     private enum ServiceEvent {
         CREATE,
         ACTIVE,
@@ -477,10 +587,5 @@ public class ScopingGlobalScopeTest {
         assertThat(scopeManager2.lookupService("service")).isNotSameAs(service);
         assertThat(scopeManager.<Service>lookupService("service").blah).isEqualTo(2);
         assertThat(scopeManager2.<Service>lookupService("service").blah).isEqualTo(5);
-    }
-
-    @Test
-    public void lookupServiceShouldPreferGlobalToImplicit() {
-        throw new IllegalStateException("TODO");
     }
 }

@@ -7,7 +7,7 @@
 
 - ADD: `ScopeLookupMode` for `canFindFromScope()` and `lookupFromScope()` methods, which allows restricting the lookup only to the explicit parent chain).
 
-- ADD: `setGlobalServices()` to allow setting global services (that functions as the explicit parent of all explicit parent chains).
+- ADD: `setGlobalServices()` to allow setting global services (that functions as the last parent of any parent chains).
 
 -Simple Stack 1.13.2 (2019-02-05)
 --------------------------------
