@@ -588,4 +588,187 @@ public class ScopingGlobalScopeTest {
         assertThat(scopeManager.<Service>lookupService("service").blah).isEqualTo(2);
         assertThat(scopeManager2.<Service>lookupService("service").blah).isEqualTo(5);
     }
+
+    @Test
+    public void newHistoryShouldReinitializeScopes() {
+        final List<Pair<Object, ServiceEvent>> events = new ArrayList<>();
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        class MyService
+                implements ScopedServices.Activated, ScopedServices.Scoped {
+            private int id = 0;
+
+            MyService(int id) {
+                this.id = id;
+            }
+
+            @Override
+            public void onScopeActive(@NonNull String scope) {
+                events.add(Pair.of((Object) this, ServiceEvent.ACTIVE));
+            }
+
+            @Override
+            public void onScopeInactive(@NonNull String scope) {
+                events.add(Pair.of((Object) this, ServiceEvent.INACTIVE));
+            }
+
+            @Override
+            public void onEnterScope(@NonNull String scope) {
+                events.add(Pair.of((Object) this, ServiceEvent.CREATE));
+            }
+
+            @Override
+            public void onExitScope(@NonNull String scope) {
+                events.add(Pair.of((Object) this, ServiceEvent.DESTROY));
+            }
+
+            @Override
+            public String toString() {
+                return "MyService{" +
+                        "id=" + id +
+                        '}';
+            }
+        }
+
+
+        final MyService globalService = new MyService(0);
+        final MyService explicitParentService = new MyService(1);
+        final MyService implicitParentService = new MyService(2);
+        final MyService currentScopeService = new MyService(3);
+
+        abstract class TestKeyWithExplicitParent extends TestKeyWithScope implements HasParentServices {
+            TestKeyWithExplicitParent(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("explicitParentScope");
+            }
+
+            @Override
+            public final void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if("explicitParentScope".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("explicitParentService", explicitParentService);
+                }
+                if(name.equals(serviceBinder.getScopeTag())) {
+                    bindOwnServices(serviceBinder);
+                }
+            }
+
+            abstract void bindOwnServices(ScopedServices.ServiceBinder serviceBinder);
+        }
+
+        TestKeyWithScope beep = new TestKeyWithExplicitParent("beep") {
+            @Override
+            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+
+                serviceBinder.add("implicitParentService", implicitParentService);
+            }
+        };
+
+        TestKeyWithScope boop = new TestKeyWithExplicitParent("boop") {
+            @Override
+            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+
+                serviceBinder.add("currentScopeService", currentScopeService);
+            }
+        };
+
+        backstackManager.setGlobalServices(GlobalServices.builder()
+                .addService("globalService", globalService)
+                .build()
+        );
+        backstackManager.setup(History.of(beep, boop));
+        backstackManager.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstackManager.canFindService("globalService")).isTrue();
+        assertThat(backstackManager.canFindService("currentScopeService")).isTrue();
+        assertThat(backstackManager.canFindService("implicitParentService")).isTrue();
+        assertThat(backstackManager.canFindService("explicitParentService")).isTrue();
+
+        backstackManager.finalizeScopes();
+
+        assertThat(backstackManager.canFindService("currentScopeService")).isFalse();
+        assertThat(backstackManager.canFindService("implicitParentService")).isFalse();
+        assertThat(backstackManager.canFindService("explicitParentService")).isFalse();
+        assertThat(backstackManager.canFindService("globalService")).isFalse();
+
+        backstackManager.getBackstack().setHistory(History.of(beep, boop), StateChange.REPLACE);
+
+        assertThat(backstackManager.canFindService("globalService")).isTrue();
+        assertThat(backstackManager.canFindService("currentScopeService")).isTrue();
+        assertThat(backstackManager.canFindService("implicitParentService")).isTrue();
+        assertThat(backstackManager.canFindService("explicitParentService")).isTrue();
+
+        assertThat(backstackManager.hasService("explicitParentScope", "explicitParentService")).isTrue();
+
+        assertThat(events).containsExactly(
+                Pair.of((Object)globalService, ServiceEvent.CREATE),
+                Pair.of((Object)explicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)implicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)currentScopeService, ServiceEvent.CREATE),
+                Pair.of((Object)globalService, ServiceEvent.ACTIVE),
+                Pair.of((Object)explicitParentService, ServiceEvent.ACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.ACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.INACTIVE),
+                Pair.of((Object)explicitParentService, ServiceEvent.INACTIVE),
+                Pair.of((Object)globalService, ServiceEvent.INACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.DESTROY),
+                Pair.of((Object)implicitParentService, ServiceEvent.DESTROY),
+                Pair.of((Object)explicitParentService, ServiceEvent.DESTROY),
+                Pair.of((Object)globalService, ServiceEvent.DESTROY),
+                Pair.of((Object)globalService, ServiceEvent.CREATE),
+                Pair.of((Object)explicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)implicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)currentScopeService, ServiceEvent.CREATE),
+                Pair.of((Object)globalService, ServiceEvent.ACTIVE),
+                Pair.of((Object)explicitParentService, ServiceEvent.ACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.ACTIVE)
+        );
+
+        // this is just to check things, the test's important part is the one above
+        backstackManager.getBackstack().goBack();
+
+        assertThat(events).containsExactly(
+                Pair.of((Object)globalService, ServiceEvent.CREATE),
+                Pair.of((Object)explicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)implicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)currentScopeService, ServiceEvent.CREATE),
+                Pair.of((Object)globalService, ServiceEvent.ACTIVE),
+                Pair.of((Object)explicitParentService, ServiceEvent.ACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.ACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.INACTIVE),
+                Pair.of((Object)explicitParentService, ServiceEvent.INACTIVE),
+                Pair.of((Object)globalService, ServiceEvent.INACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.DESTROY),
+                Pair.of((Object)implicitParentService, ServiceEvent.DESTROY),
+                Pair.of((Object)explicitParentService, ServiceEvent.DESTROY),
+                Pair.of((Object)globalService, ServiceEvent.DESTROY),
+                Pair.of((Object)globalService, ServiceEvent.CREATE),
+                Pair.of((Object)explicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)implicitParentService, ServiceEvent.CREATE),
+                Pair.of((Object)currentScopeService, ServiceEvent.CREATE),
+                Pair.of((Object)globalService, ServiceEvent.ACTIVE),
+                Pair.of((Object)explicitParentService, ServiceEvent.ACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.ACTIVE),
+                Pair.of((Object)implicitParentService, ServiceEvent.ACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.INACTIVE),
+                Pair.of((Object)currentScopeService, ServiceEvent.DESTROY)
+        );
+    }
 }

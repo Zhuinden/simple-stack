@@ -1774,4 +1774,26 @@ public class ScopingTest {
         assertThat(inactivated).containsOnlyOnce(service);
         assertThat(exited).containsOnlyOnce(service);
     }
+
+    @Test
+    public void finalizingScopeTwiceShouldBeNoOp() {
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+        backstackManager.setup(History.of(testKey2));
+        backstackManager.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
+
+        backstackManager.finalizeScopes();
+
+        try {
+            backstackManager.finalizeScopes();
+        } catch(Throwable e) {
+            Assert.fail("Should be no-op.");
+        }
+    }
 }

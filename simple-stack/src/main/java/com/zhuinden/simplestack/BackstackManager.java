@@ -311,26 +311,32 @@ public class BackstackManager
      * Typically called when Activity is finishing, and the remaining scopes should be destroyed for proper clean-up.
      *
      * Note that if you use {@link BackstackDelegate} or {@link com.zhuinden.simplestack.navigator.Navigator}, then there is no need to call this method manually.
+     *
+     * If the scopes are already finalized, then calling this method has no effect (until scopes are re-built by any future navigation events).
      */
     public void finalizeScopes() {
+        if(scopeManager.isFinalized()) {
+            return;
+        }
+
         if(previousTopKeyWithAssociatedScope != null) {
             Set<String> scopesToDeactivate = new LinkedHashSet<>();
 
+            if(previousTopKeyWithAssociatedScope instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) previousTopKeyWithAssociatedScope;
+                scopesToDeactivate.add(scopeKey.getScopeTag());
+            }
             if(previousTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) previousTopKeyWithAssociatedScope;
                 ScopeManager.checkParentScopes(child);
                 scopesToDeactivate.addAll(child.getParentScopes());
-            }
-            if(previousTopKeyWithAssociatedScope instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) previousTopKeyWithAssociatedScope;
-                scopesToDeactivate.add(scopeKey.getScopeTag());
             }
 
             //noinspection ConstantConditions
             scopeManager.dispatchActivation(scopesToDeactivate, Collections.<String>emptySet());
         }
 
-        scopeManager.deactivateGlobalScope(); // TODO there must be a better way to do this
+        scopeManager.deactivateGlobalScope();
 
         History<Object> history = backstack.getHistory();
         Set<String> scopeSet = new LinkedHashSet<>();
@@ -356,6 +362,8 @@ public class BackstackManager
             scopeManager.destroyScope(scope);
         }
         scopeManager.finalizeScopes();
+
+        previousTopKeyWithAssociatedScope = null; // this enables activation after finalization.
     }
 
     /**
@@ -363,7 +371,6 @@ public class BackstackManager
      *
      * @param scopeKey   the scope key
      * @param serviceTag the service tag
-     *
      * @return whether the service is bound in the given scope
      */
     public boolean hasService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
@@ -388,7 +395,6 @@ public class BackstackManager
      *
      * @param scopeTag   the scope tag
      * @param serviceTag the service tag
-     *
      * @return whether the service is bound in the given scope
      */
     public boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
@@ -398,7 +404,7 @@ public class BackstackManager
     /**
      * Returns the service bound to the scope specified by the provided tag for the provided service tag.
      *
-     * @param scopeTag the scope tag
+     * @param scopeTag   the scope tag
      * @param serviceTag the service tag
      * @param <T>        the type of the service
      * @return the service
@@ -411,8 +417,7 @@ public class BackstackManager
     /**
      * Returns if a given scope exists.
      *
-     * @param scopeTag   the scope tag
-     *
+     * @param scopeTag the scope tag
      * @return whether the scope exists
      */
     public boolean hasScope(@NonNull String scopeTag) {
@@ -434,7 +439,7 @@ public class BackstackManager
      * Attempts to look-up the service in the provided scope and all its parents, starting from the provided scope.
      * Returns whether the service exists in any of these scopes.
      *
-     * @param scopeTag the tag of the scope to look up from
+     * @param scopeTag   the tag of the scope to look up from
      * @param serviceTag the tag of the service
      * @return whether the service exists in any scopes from the current scope or its parents
      */
@@ -446,10 +451,9 @@ public class BackstackManager
      * Attempts to look-up the service in the provided scope and the specified type of parents, starting from the provided scope.
      * Returns whether the service exists in any of these scopes.
      *
-     * @param scopeTag the tag of the scope to look up from
+     * @param scopeTag   the tag of the scope to look up from
      * @param serviceTag the tag of the service
      * @param lookupMode determine what type of parents are checked during the lookup
-     *
      * @return whether the service exists in any scopes from the current scope or its parents
      */
     public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {

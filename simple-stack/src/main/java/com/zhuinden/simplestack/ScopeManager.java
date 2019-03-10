@@ -141,14 +141,27 @@ class ScopeManager {
 
     private final IdentitySet<Object> lifecycleInvocationTracker = new IdentitySet<>();
 
-    void finalizeScopes() {
-        // this logic is actually mostly inside BackstackManager for some reason
-        destroyServicesAndRemoveState(GLOBAL_SCOPE_TAG, globalServices.getServices());
+    private boolean isFinalized = false;
 
-        this.latestState = Collections.emptyList();
+    boolean isFinalized() {
+        return isFinalized;
+    }
+
+    void finalizeScopes() {
+        this.isFinalized = true;
+
+        // this logic is actually mostly inside BackstackManager for some reason
+        destroyScope(GLOBAL_SCOPE_TAG);
+
+        this.latestState = null; // don't use `emptyList()` so that Globals can be re-initialized.
     }
 
     void buildScopes(List<Object> newState) {
+        if(isFinalized) {
+            this.isFinalized = false; // reset this for future travellers, I guess.
+            this.isGlobalScopePendingActivation = true; // if we allow scopes to be rebuilt once finalized, we need to enable activation of globals.
+        }
+
         if(this.latestState == null) { // this seems to be the best way to track that we can safely register and initialize the global scope.
             buildGlobalScope();
         }
@@ -220,7 +233,7 @@ class ScopeManager {
     void dispatchActivation(@NonNull Set<String> scopesToDeactivate, @NonNull Set<String> scopesToActivate) {
         if(isGlobalScopePendingActivation) {
             isGlobalScopePendingActivation = false;
-            activateGlobalScope(); // TODO there must be a better way to do this?
+            activateGlobalScope();
         }
 
         for(String newScopeTag : scopesToActivate) {
@@ -390,7 +403,7 @@ class ScopeManager {
         }
 
         //noinspection RedundantIfStatement
-        if(globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasService(serviceTag)) {
             return true;
         }
 
@@ -441,7 +454,7 @@ class ScopeManager {
         }
 
         //noinspection RedundantIfStatement
-        if(globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasService(serviceTag)) {
             return true;
         }
 
@@ -507,7 +520,7 @@ class ScopeManager {
             }
         }
 
-        if(globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasService(serviceTag)) {
             return globalServices.getService(serviceTag);
         }
 
@@ -556,7 +569,7 @@ class ScopeManager {
             }
         }
 
-        if(globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasService(serviceTag)) {
             return globalServices.getService(serviceTag);
         }
 
@@ -574,7 +587,7 @@ class ScopeManager {
         }
 
         //noinspection RedundantIfStatement
-        if(globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasService(serviceTag)) {
             return true;
         }
 
@@ -611,7 +624,7 @@ class ScopeManager {
             }
         }
 
-        if(globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasService(serviceTag)) {
             return globalServices.getService(serviceTag);
         }
 

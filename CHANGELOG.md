@@ -1,5 +1,15 @@
 # Change log
 
+-Simple Stack 1.13.4 (????-??-??)
+--------------------------------
+
+- FIX: calling `backstackManager.finalizeScopes()` multiple times now results in consistent and defined behavior (namely, it gets ignored).
+
+- CHANGE: navigation that occurs after `backstackManager.finalizeScopes()` will now trigger reconstruction and proper callbacks of services in a consistent manner.
+
+- FIX: `ScopedServices.Activated`'s `onScopeInactive()` during scope finalization was called in order from explicit parent to child, instead of child to explicit parent.
+
+
 -Simple Stack 1.13.3 (2019-02-27)
 --------------------------------
 
