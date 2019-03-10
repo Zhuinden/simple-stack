@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 1.13.4 (????-??-??)
+-Simple Stack 1.13.4 (2019-03-10)
 --------------------------------
 
 - FIX: calling `backstackManager.finalizeScopes()` multiple times now results in consistent and defined behavior (namely, it gets ignored).
