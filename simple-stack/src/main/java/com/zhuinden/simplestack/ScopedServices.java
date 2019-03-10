@@ -59,6 +59,21 @@ public interface ScopedServices {
     }
 
     /**
+     * When a service implements {@link Registered}, then it will receive a callback when the service has been registered to at least one scope.
+     */
+    public static interface Registered {
+        /**
+         * Called when the service has been registered to any scopes, and this is the first scope it was registered to.
+         */
+        void onServiceRegistered();
+
+        /**
+         * Called when the service is no longer registered in any scopes.
+         */
+        void onServiceUnregistered();
+    }
+
+    /**
      * The {@link ServiceBinder} allows binding services to a given scope, when that scope is created for the first time.
      *
      * Please note that the service binder is only called when the scope is created, but not called if the scope already exists.
