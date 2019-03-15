@@ -322,18 +322,20 @@ public class BackstackManager
         if(previousTopKeyWithAssociatedScope != null) {
             Set<String> scopesToDeactivate = new LinkedHashSet<>();
 
+            if(previousTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) previousTopKeyWithAssociatedScope;
+                ScopeManager.checkParentScopes(child);
+                List<String> parentScopes = new ArrayList<>(child.getParentScopes());
+                scopesToDeactivate.addAll(parentScopes);
+            }
             if(previousTopKeyWithAssociatedScope instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) previousTopKeyWithAssociatedScope;
                 scopesToDeactivate.add(scopeKey.getScopeTag());
             }
-            if(previousTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) previousTopKeyWithAssociatedScope;
-                ScopeManager.checkParentScopes(child);
-                scopesToDeactivate.addAll(child.getParentScopes());
-            }
 
-            //noinspection ConstantConditions
-            scopeManager.dispatchActivation(scopesToDeactivate, Collections.<String>emptySet());
+            List<String> scopesToDeactivateList = new ArrayList<>(scopesToDeactivate);
+            Collections.reverse(scopesToDeactivateList);
+            scopeManager.dispatchActivation(new LinkedHashSet<>(scopesToDeactivateList), Collections.<String>emptySet());
         }
 
         scopeManager.deactivateGlobalScope();
@@ -347,7 +349,9 @@ public class BackstackManager
             }
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
-                for(String parent : child.getParentScopes()) {
+                List<String> parentScopes = new ArrayList<>(child.getParentScopes());
+                Collections.reverse(parentScopes);
+                for(String parent : parentScopes) {
                     //noinspection RedundantCollectionOperation
                     if(scopeSet.contains(parent)) {
                         scopeSet.remove(parent); // needed to setup the proper order

@@ -9,6 +9,8 @@
 
 Now, a service will only receive `fromBundle` callback before its `onServiceRegistered()` callback, and not before each `onEnterScope(scopeTag)` callbacks.
 
+- FIX: during `backstackManager.finalizeScopes()`, `onExitScope` and `onScopeInactive` were dispatched in an incorrect order across nested explicit parents.
+
 -Simple Stack 1.13.4 (2019-03-10)
 --------------------------------
 
