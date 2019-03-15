@@ -22,6 +22,7 @@ import com.zhuinden.statebundle.StateBundle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,6 +32,9 @@ import java.util.Set;
 class ScopeManager {
     private static final String GLOBAL_SCOPE_TAG = "__SIMPLE_STACK_INTERNAL_GLOBAL_SCOPE__";
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
+
+    private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
+    private final IdentityHashMap<Object, Set<String>> scopeActivatedServices = new IdentityHashMap<>();
 
     private boolean isGlobalScopePendingActivation = true;
 
@@ -116,30 +120,60 @@ class ScopeManager {
     }
 
     private void restoreAndNotifyServices(String scopeTag, Map<String, Object> scope) {
-        lifecycleInvocationTracker.clear();
         for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
             String serviceTag = serviceEntry.getKey();
             Object service = serviceEntry.getValue();
-            if(rootBundle.containsKey(scopeTag)) {
-                if(service instanceof Bundleable) {
-                    StateBundle scopeBundle = rootBundle.getBundle(scopeTag);
-                    if(scopeBundle != null && scopeBundle.containsKey(serviceTag)) {
-                        ((Bundleable) service).fromBundle(scopeBundle.getBundle(serviceTag));
+
+            if(isServiceNotRegistered(service)) {
+                if(rootBundle.containsKey(scopeTag)) {
+                    if(service instanceof Bundleable) {
+                        StateBundle scopeBundle = rootBundle.getBundle(scopeTag);
+                        if(scopeBundle != null && scopeBundle.containsKey(serviceTag)) {
+                            ((Bundleable) service).fromBundle(scopeBundle.getBundle(serviceTag));
+                        }
                     }
                 }
+
+                if(service instanceof ScopedServices.Registered) {
+                    ((ScopedServices.Registered) service).onServiceRegistered();
+                }
             }
-            if(service instanceof ScopedServices.Scoped) {
-                if(!lifecycleInvocationTracker.containsKey(service)) {
-                    lifecycleInvocationTracker.add(service);
+
+            if(isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
+                trackServiceInScope(scopeEnteredServices, service, scopeTag);
+                if(service instanceof ScopedServices.Scoped) {
                     ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
                 }
             }
         }
     }
 
-    private List<Object> latestState = null;
+    private boolean isServiceNotRegistered(Object service) {
+        return !scopeEnteredServices.containsKey(service) || scopeEnteredServices.get(service).isEmpty();
+    }
 
-    private final IdentitySet<Object> lifecycleInvocationTracker = new IdentitySet<>();
+    private boolean isServiceNotTrackedInScope(Map<Object, Set<String>> scopeEventTracker, Object service, String scopeTag) {
+        return !scopeEventTracker.containsKey(service) || !scopeEventTracker.get(service).contains(scopeTag);
+    }
+
+    private void trackServiceInScope(Map<Object, Set<String>> scopeEventTracker, Object service, String scopeTag) {
+        Set<String> trackedScopes = scopeEventTracker.get(service);
+        if(trackedScopes == null) {
+            trackedScopes = new LinkedHashSet<>();
+            scopeEventTracker.put(service, trackedScopes);
+        }
+        trackedScopes.add(scopeTag);
+    }
+
+    private void untrackServiceInScope(Map<Object, Set<String>> scopeEventTracker, Object service, String scopeTag) {
+        Set<String> trackedScopes = scopeEventTracker.get(service);
+        trackedScopes.remove(scopeTag);
+        if(trackedScopes.isEmpty()) {
+            scopeEventTracker.remove(service);
+        }
+    }
+
+    private List<Object> latestState = null;
 
     private boolean isFinalized = false;
 
@@ -215,18 +249,23 @@ class ScopeManager {
     }
 
     private void destroyServicesAndRemoveState(String scopeTag, Map<String, Object> serviceMap) {
-        lifecycleInvocationTracker.clear();
-
         List<Object> services = new ArrayList<>(serviceMap.values());
         Collections.reverse(services);
         for(Object service : services) {
-            if(service instanceof ScopedServices.Scoped) {
-                if(!lifecycleInvocationTracker.containsKey(service)) {
-                    lifecycleInvocationTracker.add(service);
+            if(!isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
+                untrackServiceInScope(scopeEnteredServices, service, scopeTag);
+                if(service instanceof ScopedServices.Scoped) {
                     ((ScopedServices.Scoped) service).onExitScope(scopeTag);
                 }
             }
+
+            if(isServiceNotRegistered(service)) {
+                if(service instanceof ScopedServices.Registered) {
+                    ((ScopedServices.Registered) service).onServiceUnregistered();
+                }
+            }
         }
+
         rootBundle.remove(scopeTag);
     }
 
@@ -258,11 +297,11 @@ class ScopeManager {
     }
 
     private void notifyScopeActivation(String newScopeTag, Map<String, Object> newServiceMap) {
-        lifecycleInvocationTracker.clear();
         for(Object service : newServiceMap.values()) {
-            if(service instanceof ScopedServices.Activated) {
-                if(!lifecycleInvocationTracker.containsKey(service)) {
-                    lifecycleInvocationTracker.add(service);
+            if(isServiceNotTrackedInScope(scopeActivatedServices, service, newScopeTag)) {
+                trackServiceInScope(scopeActivatedServices, service, newScopeTag);
+
+                if(service instanceof ScopedServices.Activated) {
                     ((ScopedServices.Activated) service).onScopeActive(newScopeTag);
                 }
             }
@@ -270,13 +309,13 @@ class ScopeManager {
     }
 
     private void notifyScopeDeactivation(String previousScopeTag, Map<String, Object> previousServiceMap) {
-        lifecycleInvocationTracker.clear();
         List<Object> previousServices = new ArrayList<>(previousServiceMap.values());
         Collections.reverse(previousServices);
         for(Object service : previousServices) {
-            if(service instanceof ScopedServices.Activated) {
-                if(!lifecycleInvocationTracker.containsKey(service)) {
-                    lifecycleInvocationTracker.add(service);
+            if(!isServiceNotTrackedInScope(scopeActivatedServices, service, previousScopeTag)) {
+                untrackServiceInScope(scopeActivatedServices, service, previousScopeTag);
+
+                if(service instanceof ScopedServices.Activated) {
                     ((ScopedServices.Activated) service).onScopeInactive(previousScopeTag);
                 }
             }
