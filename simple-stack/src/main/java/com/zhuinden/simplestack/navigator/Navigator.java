@@ -390,6 +390,20 @@ public class Navigator {
     }
 
     /**
+     * Returns a list of the scopes accessible from the given key.
+     *
+     * The order of the scopes is that the 0th index is the current scope (if available), followed by parents.
+     *
+     * @param key        the key
+     * @param lookupMode determine what type of parents are checked during the lookup
+     * @return the list of scope tags
+     */
+    @NonNull
+    public static List<String> findScopesForKey(@NonNull Context context, @NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
+        return getManager(context).findScopesForKey(key, lookupMode);
+    }
+
+    /**
      * Attempts to look-up the service in the scopes accessible from the provided scope tag.
      * Returns whether the service exists in any of these scopes.
      *

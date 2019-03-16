@@ -479,6 +479,21 @@ public class BackstackManager
     }
 
     /**
+     * Returns a list of the scopes accessible from the given key.
+     *
+     * The order of the scopes is that the 0th index is the current scope (if available), followed by parents.
+     *
+     * @param key        the key
+     * @param lookupMode determine what type of parents are checked during the lookup
+     * @return the list of scope tags
+     */
+    @NonNull
+    public List<String> findScopesForKey(@NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
+        Set<String> scopes = scopeManager.findScopesForKey(key, lookupMode);
+        return Collections.unmodifiableList(new ArrayList<>(scopes));
+    }
+
+    /**
      * Attempts to look-up the service in the provided scope and its parents, starting from the provided scope.
      * If the service is not found, an exception is thrown.
      *

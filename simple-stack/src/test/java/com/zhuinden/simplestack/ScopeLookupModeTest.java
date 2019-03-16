@@ -383,4 +383,361 @@ public class ScopeLookupModeTest {
             // OK!
         }
     }
+
+    @Test
+    public void findScopesForKeyWorks() {
+        final BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        final Object parentService1 = new Object();
+        final Object parentService2 = new Object();
+
+        final Object service1 = new Object();
+        final Object service2 = new Object();
+
+        class Key1
+                extends TestKey
+                implements HasServices, HasParentServices {
+            Key1(String name) {
+                super(name);
+            }
+
+            protected Key1(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if("parent1".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("parentService1", parentService1);
+                } else if(name.equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("service1", service1);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1");
+            }
+        }
+
+        class Key2
+                extends TestKey
+                implements HasServices, HasParentServices {
+            Key2(String name) {
+                super(name);
+            }
+
+            protected Key2(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if("parent2".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("parentService2", parentService2);
+                } else if(name.equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("service2", service2);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent2");
+            }
+        }
+
+        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
+
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
+
+        backstackManager.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2");
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1");
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1");
+    }
+
+    @Test
+    public void findScopesForKeyIncludesGlobalScopeIfAvailable() {
+        final BackstackManager backstackManager = new BackstackManager();
+
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        Object globalService = new Object();
+        backstackManager.setGlobalServices(
+                GlobalServices.builder()
+                        .addService("globalService", globalService)
+                        .build()
+        );
+
+        final Object parentService1 = new Object();
+        final Object parentService2 = new Object();
+
+        final Object service1 = new Object();
+        final Object service2 = new Object();
+
+        class Key1
+                extends TestKey
+                implements HasServices, HasParentServices {
+            Key1(String name) {
+                super(name);
+            }
+
+            protected Key1(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if("parent1".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("parentService1", parentService1);
+                } else if(name.equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("service1", service1);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1");
+            }
+        }
+
+        class Key2
+                extends TestKey
+                implements HasServices, HasParentServices {
+            Key2(String name) {
+                super(name);
+            }
+
+            protected Key2(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if("parent2".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("parentService2", parentService2);
+                } else if(name.equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.add("service2", service2);
+                }
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent2");
+            }
+        }
+
+        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
+
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
+
+        backstackManager.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+    }
+
+    @Test
+    public void findScopesForKeyOtherSetup() {
+        abstract class TestKeyWithScope
+                extends TestKey
+                implements HasServices {
+            TestKeyWithScope(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithScope(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+        }
+
+        class ServiceProvider
+                implements ScopedServices {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                Object key = serviceBinder.getKey();
+                if(key instanceof HasServices) {
+                    ((HasServices) key).bindServices(serviceBinder);
+                    return;
+                }
+                if(key instanceof HasParentServices) {
+                    ((HasParentServices) key).bindServices(serviceBinder);
+                    //noinspection UnnecessaryReturnStatement
+                    return;
+                }
+            }
+        }
+
+
+        BackstackManager backstackManager = new BackstackManager();
+        backstackManager.setScopedServices(new ServiceProvider());
+
+        class MyService {
+            private final String id;
+
+            MyService(String id) {
+                this.id = id;
+            }
+
+            @Override
+            public String toString() {
+                return "MyService{" +
+                        "id=" + id +
+                        '}';
+            }
+        }
+
+        final Object service0 = new MyService("service0");
+
+        backstackManager.setGlobalServices(GlobalServices.builder()
+                .addService("service0", service0)
+                .build());
+
+        TestKeyWithScope beep = new TestKeyWithScope("scope1") {
+            @Override
+            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            }
+        };
+
+        abstract class TestKeyWithExplicitParent extends TestKeyWithScope implements HasParentServices {
+            TestKeyWithExplicitParent(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public final void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+                if(name.equals(serviceBinder.getScopeTag())) {
+                    bindOwnServices(serviceBinder);
+                } else {
+                    bindParentServices(serviceBinder);
+                }
+            }
+
+            abstract void bindParentServices(ScopedServices.ServiceBinder serviceBinder);
+
+            abstract void bindOwnServices(ScopedServices.ServiceBinder serviceBinder);
+        }
+
+        TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent2");
+            }
+
+            @Override
+            void bindParentServices(ScopedServices.ServiceBinder serviceBinder) {
+            }
+
+            @Override
+            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+            }
+        };
+
+        TestKeyWithExplicitParent braap = new TestKeyWithExplicitParent("scope3") {
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent3");
+            }
+
+            @Override
+            void bindParentServices(ScopedServices.ServiceBinder serviceBinder) {
+            }
+
+            @Override
+            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+            }
+        };
+
+        /*                      GLOBAL
+         *                                PARENT1
+         *                        PARENT2        PARENT3
+         *   BEEP               BOOP                 BRAAP
+         */
+        backstackManager.setup(History.of(beep, boop, braap));
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+        backstackManager.setStateChanger(stateChanger);
+
+        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.ALL)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.ALL)).containsExactly("scope2", "parent2", "parent1", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).containsExactly("scope2", "parent2", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.ALL)).containsExactly("scope3", "parent3", "parent1", "scope2", "parent2", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).containsExactly("scope3", "parent3", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+
+        backstackManager.finalizeScopes();
+
+        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).isEmpty();
+    }
 }

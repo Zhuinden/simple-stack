@@ -5,9 +5,11 @@
 
 - ADD: `ScopedServices.Registered` to receive a service lifecycle callback when a service is added to a scope for the first time (it was not in any other scopes).
 
+- ADD: `findScopesForKey(Object key, ScopeLookupMode mode)` to retrieve the list of scopes accessible from a given key.
+
 - FIX: A service registered in multiple scopes would receive `fromBundle(stateBundle)` callback in each scope where it was registered and when that given scope was entered, restoring potentially outdated state on back navigation.
 
-Now, a service will only receive `fromBundle` callback before its `onServiceRegistered()` callback, and not before each `onEnterScope(scopeTag)` callbacks.
+Now, a service will only receive `fromBundle` callback before its `onServiceRegistered()` callback, and not before *each* `onEnterScope(scopeTag)` callbacks.
 
 - FIX: during `backstackManager.finalizeScopes()`, `onExitScope` and `onScopeInactive` were dispatched in an incorrect order across nested explicit parents.
 
