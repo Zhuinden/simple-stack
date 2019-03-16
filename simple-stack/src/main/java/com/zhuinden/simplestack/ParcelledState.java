@@ -15,6 +15,7 @@ class ParcelledState
     Parcelable parcelableKey;
     SparseArray<Parcelable> viewHierarchyState;
     StateBundle bundle;
+    StateBundle viewBundle;
 
     ParcelledState() {
     }
@@ -26,6 +27,10 @@ class ParcelledState
         boolean hasBundle = in.readByte() > 0;
         if(hasBundle) {
             bundle = in.readParcelable(getClass().getClassLoader());
+        }
+        boolean hasViewBundle = in.readByte() > 0;
+        if(hasViewBundle) {
+            viewBundle = in.readParcelable(getClass().getClassLoader());
         }
     }
 
@@ -55,6 +60,10 @@ class ParcelledState
         dest.writeByte(bundle != null ? (byte) 0x01 : 0x00);
         if(bundle != null) {
             dest.writeParcelable(bundle, 0);
+        }
+        dest.writeByte(viewBundle != null ? (byte) 0x01 : 0x00);
+        if(viewBundle != null) {
+            dest.writeParcelable(viewBundle, 0);
         }
     }
 }

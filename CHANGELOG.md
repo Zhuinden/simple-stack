@@ -13,6 +13,8 @@ Now, a service will only receive `fromBundle` callback before its `onServiceRegi
 
 - FIX: during `backstackManager.finalizeScopes()`, `onExitScope` and `onScopeInactive` were dispatched in an incorrect order across nested explicit parents.
 
+- CHANGE: `persistViewToState()`/`restoreViewFromState()` now use a separate bundle from the one that's publicly visible on SavedState.
+
 -Simple Stack 1.13.4 (2019-03-10)
 --------------------------------
 

@@ -32,6 +32,7 @@ public class SavedState {
     private Object key;
     private SparseArray<Parcelable> viewHierarchyState;
     private StateBundle bundle;
+    private StateBundle viewBundle;
 
     private SavedState() {
     }
@@ -55,8 +56,17 @@ public class SavedState {
         return bundle;
     }
 
+    @Nullable
+    StateBundle getViewBundle() {
+        return viewBundle;
+    }
+
     public void setBundle(@Nullable StateBundle bundle) {
         this.bundle = bundle;
+    }
+
+    void setViewBundle(@Nullable StateBundle viewBundle) {
+        this.viewBundle = viewBundle;
     }
 
     public static Builder builder() {
@@ -72,6 +82,7 @@ public class SavedState {
         private Object key;
         private SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
         private StateBundle bundle;
+        private StateBundle viewBundle;
 
         Builder() {
         }
@@ -97,6 +108,11 @@ public class SavedState {
             return this;
         }
 
+        Builder setViewBundle(@Nullable StateBundle viewBundle) {
+            this.viewBundle = viewBundle;
+            return this;
+        }
+
         public SavedState build() {
             if(key == null) {
                 throw new IllegalStateException("You cannot create a SavedState without associating a Key with it.");
@@ -105,6 +121,7 @@ public class SavedState {
             savedState.key = key;
             savedState.viewHierarchyState = viewHierarchyState;
             savedState.bundle = bundle;
+            savedState.viewBundle = viewBundle;
             return savedState;
         }
     }
@@ -117,7 +134,7 @@ public class SavedState {
         if(!(obj instanceof SavedState)) {
             return false;
         }
-        return ((SavedState)obj).getKey().equals(this.key);
+        return ((SavedState) obj).getKey().equals(this.key);
     }
 
     @Override

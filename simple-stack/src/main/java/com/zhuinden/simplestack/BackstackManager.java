@@ -563,7 +563,7 @@ public class BackstackManager
             SavedState previousSavedState = SavedState.builder() //
                     .setKey(key) //
                     .setViewHierarchyState(viewHierarchyState) //
-                    .setBundle(bundle) //
+                    .setViewBundle(bundle) //
                     .build();
             keyStateMap.put(key, previousSavedState);
         }
@@ -582,7 +582,7 @@ public class BackstackManager
         SavedState savedState = getSavedState(newKey);
         view.restoreHierarchyState(savedState.getViewHierarchyState());
         if(view instanceof Bundleable) {
-            ((Bundleable) view).fromBundle(savedState.getBundle());
+            ((Bundleable) view).fromBundle(savedState.getViewBundle());
         }
     }
 
@@ -660,6 +660,7 @@ public class BackstackManager
                     SavedState savedState = SavedState.builder().setKey(key)
                             .setViewHierarchyState(parcelledState.viewHierarchyState)
                             .setBundle(parcelledState.bundle)
+                            .setViewBundle(parcelledState.viewBundle)
                             .build();
                     keyStateMap.put(savedState.getKey(), savedState);
                 }
@@ -696,6 +697,7 @@ public class BackstackManager
             parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
             parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
             parcelledState.bundle = savedState.getBundle();
+            parcelledState.viewBundle = savedState.getViewBundle();
             states.add(parcelledState);
         }
         stateBundle.putParcelableArrayList(getStatesTag(), states);
