@@ -68,7 +68,7 @@ In order to use Simple Stack, you need to add jitpack to your project root gradl
 
 and add the compile dependency to your module level gradle.
 
-    compile 'com.github.Zhuinden:simple-stack:1.13.4'
+    compile 'com.github.Zhuinden:simple-stack:1.14.0'
 
 ## How does it work?
 
@@ -255,7 +255,7 @@ class TasksView : FrameLayout {
     override fun onFinishInflate() {
          super.onFinishInflate()
          firstButton.onClick {
-             backstack.goTo(SeocndKey())
+             backstack.goTo(SecondKey())
          }
     }
 }
@@ -271,7 +271,7 @@ For more information, check the [wiki page](https://github.com/Zhuinden/simple-s
 
 ## License
 
-    Copyright 2017-2018 Gabor Varadi
+    Copyright 2017-2019 Gabor Varadi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

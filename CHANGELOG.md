@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 1.14.0 (2019-??-??)
+-Simple Stack 1.14.0 (2019-03-16)
 --------------------------------
 
 - ADD: `ScopedServices.Registered` to receive a service lifecycle callback when a service is added to a scope for the first time (it was not in any other scopes).
