@@ -112,6 +112,7 @@ class AddOrEditTaskPresenter @Inject constructor(
             is AddOrEditTaskKey.AddTaskKey -> {
                 messageQueue.pushMessageTo(backstack.root<TasksKey>(), TasksFragment.SavedSuccessfullyMessage())
                 backstack.goBack()
+                backstack.goTo(addOrEditTaskKey)
             }
             is AddOrEditTaskKey.EditTaskKey -> {
                 backstack.jumpToRoot(StateChange.BACKWARD)

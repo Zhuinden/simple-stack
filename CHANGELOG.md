@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack ?.??.? (????-??-??)
+--------------------------------
+
+- ADD: Safer version of the FragmentStateChanger that handles re-entrancy of `back` and going to the same target as where we were (`simple-stack-example-mvp-fragments`).
+
+
 -Simple Stack 1.14.0 (2019-03-16)
 --------------------------------
 
