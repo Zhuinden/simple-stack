@@ -53,7 +53,10 @@ public class FragmentStateChanger {
             BaseFragment fragment = (BaseFragment) fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {
-                    if(fragment.isDetached()) {
+                    if(fragment.isRemoving()) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
+                        fragment = newKey.newFragment();
+                        fragmentTransaction.replace(containerId, fragment, newKey.getFragmentTag());
+                    } else if(fragment.isDetached()) {
                         fragmentTransaction.attach(fragment);
                     }
                 } else {

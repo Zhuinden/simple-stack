@@ -1,11 +1,8 @@
 package com.zhuinden.simplestackdemoexamplefragments.util
 
-import android.os.Handler
-import android.os.Looper
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Key
 
@@ -13,51 +10,11 @@ import com.zhuinden.simplestackdemoexamplefragments.application.Key
  * Created by Zhuinden on 2019. 03. 20.
  */
 
-class SaferFragmentStateChanger(
+class FragmentStateChanger(
     private val fragmentManager: FragmentManager,
     private val containerId: Int
 ) {
-    private val handler: Handler = Handler(Looper.getMainLooper())
-
-    fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        tryExecutingFragmentTransaction(stateChange, completionCallback)
-    }
-
-    fun stopPendingCallback() {
-        val pendingCallback = pendingCallback
-        if (pendingCallback != null) {
-            handler.removeCallbacks(pendingCallback)
-        }
-    }
-
-    private var pendingCallback: Runnable? = null
-
-    // we must ensure that we execute the fragment transaction only when no fragments are in transient state
-    private fun isAnyFragmentRemoving(stateChange: StateChange): Boolean {
-        for (newState in stateChange.getNewState<Key>()) {
-            val fragment = fragmentManager.findFragmentByTag(newState.fragmentTag)
-            if (fragment != null && fragment.isRemoving) {
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun tryExecutingFragmentTransaction(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        val anyRemoving = isAnyFragmentRemoving(stateChange)
-        if (anyRemoving) {
-            pendingCallback = Runnable {
-                tryExecutingFragmentTransaction(stateChange, completionCallback)
-            }
-            handler.postDelayed(pendingCallback, 125L)
-        } else {
-            executeFragmentTransaction(stateChange, completionCallback)
-        }
-    }
-
-    private fun executeFragmentTransaction(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        pendingCallback = null
-
+    fun handleStateChange(stateChange: StateChange) {
         val fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack()
         when (stateChange.direction) {
             StateChange.FORWARD -> {
@@ -87,7 +44,9 @@ class SaferFragmentStateChanger(
             val fragment: Fragment? = fragmentManager.findFragmentByTag(newKey.fragmentTag)
             if (newKey == stateChange.topNewState<Any>()) {
                 if (fragment != null) {
-                    if (fragment.isHidden) {
+                    if (fragment.isRemoving) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
+                        fragmentTransaction.replace(containerId, newKey.newFragment(), newKey.fragmentTag)
+                    } else if (fragment.isHidden) {
                         fragmentTransaction.show(fragment)
                     }
                 } else {
@@ -100,6 +59,5 @@ class SaferFragmentStateChanger(
             }
         }
         fragmentTransaction.commitNow() // must be `now` in this sample
-        completionCallback.stateChangeComplete()
     }
 }

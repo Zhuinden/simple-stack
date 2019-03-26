@@ -45,7 +45,9 @@ public class FragmentStateChanger {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
             if(newKey.equals(stateChange.topNewState())) {
                 if(fragment != null) {
-                    if(fragment.isHidden()) {
+                    if(fragment.isRemoving()) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
+                        fragmentTransaction.replace(containerId, newKey.newFragment(), newKey.getFragmentTag());
+                    } else if(fragment.isHidden()) {
                         fragmentTransaction.show(fragment);
                     }
                 } else {

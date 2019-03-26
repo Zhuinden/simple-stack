@@ -13,13 +13,13 @@ import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
-import com.zhuinden.simplestackdemoexamplefragments.util.SaferFragmentStateChanger
+import com.zhuinden.simplestackdemoexamplefragments.util.FragmentStateChanger
 import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.ServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), StateChanger {
     lateinit var backstackDelegate: BackstackDelegate
-    lateinit var saferFragmentStateChanger: SaferFragmentStateChanger
+    lateinit var fragmentStateChanger: FragmentStateChanger
 
     private val databaseManager: DatabaseManager = Injector.get().databaseManager()
     private val backstackHolder: BackstackHolder = Injector.get().backstackHolder()
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
         setContentView(R.layout.activity_main)
 
-        this.saferFragmentStateChanger = SaferFragmentStateChanger(supportFragmentManager, R.id.root)
+        this.fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
         mainView.onCreate()
 
         backstackDelegate.setStateChanger(this)
@@ -98,11 +98,6 @@ class MainActivity : AppCompatActivity(), StateChanger {
         else -> super.getSystemService(name)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        saferFragmentStateChanger.stopPendingCallback()
-    }
-
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
         if (stateChange.isTopNewStateEqualToPrevious) {
             // no-op
@@ -110,10 +105,9 @@ class MainActivity : AppCompatActivity(), StateChanger {
             return
         }
 
-        saferFragmentStateChanger.handleStateChange(stateChange, StateChanger.Callback {
-            mainView.setupViewsForKey(stateChange.topNewState())
-            completionCallback.stateChangeComplete()
-        })
+        fragmentStateChanger.handleStateChange(stateChange)
+        mainView.setupViewsForKey(stateChange.topNewState())
+        completionCallback.stateChangeComplete()
     }
 
     companion object {

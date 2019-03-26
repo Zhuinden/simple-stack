@@ -34,7 +34,9 @@ class FragmentStateChanger(
                 var fragment: Fragment? = fragmentManager.findFragmentByTag(newKey.fragmentTag)
                 if (newKey == stateChange.topNewState<Any>()) {
                     if (fragment != null) {
-                        if (fragment.isDetached) {
+                        if (fragment.isRemoving) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
+                            replace(containerId, newKey.newFragment(), newKey.fragmentTag)
+                        } else if (fragment.isDetached) {
                             attach(fragment)
                         }
                     } else {
