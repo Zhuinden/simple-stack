@@ -180,7 +180,7 @@ abstract class BaseKey : Parcelable {
 
 - **FragmentStateChanger**
 
-For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/6c7d4f8d9ba921980423972738b03b53c0b3d9ba/simple-stack-example-mvp-fragments/src/main/java/com/zhuinden/simplestackdemoexamplefragments/util/FragmentStateChanger.kt).
+For `FragmentStateChanger`, see the example [here](https://github.com/Zhuinden/simple-stack/blob/dfc5fef9c2f2236651162b8ec8b36062615a1cf6/simple-stack-example-mvp-fragments/src/main/java/com/zhuinden/simplestackdemoexamplefragments/util/FragmentStateChanger.kt).
 
 ### Custom Views
 
