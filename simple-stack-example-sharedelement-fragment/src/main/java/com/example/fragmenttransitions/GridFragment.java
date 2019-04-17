@@ -25,7 +25,7 @@ public class GridFragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setAdapter(new KittenGridAdapter(6));
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }

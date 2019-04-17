@@ -1,6 +1,5 @@
 package com.example.fragmenttransitions;
 
-import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -51,11 +50,15 @@ public class KittenViewHolder
         // because then we would have conflicting transition names.
         // By appending "_image" to the position, we can support having multiple shared elements in each
         // grid cell in the future.
-        ViewCompat.setTransitionName(image, String.valueOf(position) + "_image");
+        ViewCompat.setTransitionName(image, position + "_image");
 
         image.setOnClickListener(v -> {
             int kittenNumber = (position % 6) + 1;
-            DetailsKey detailsKey = DetailsKey.create(Pair.create(image, "kittenImage"), kittenNumber);
+
+            // we cannot risk the transition name being nulled out, so we'll just set it again...
+            ViewCompat.setTransitionName(image, position + "_image");
+
+            DetailsKey detailsKey = DetailsKey.create(SharedElement.create(ViewCompat.getTransitionName(image), "kittenImage"), kittenNumber);
             MainActivity.get(v.getContext()).getBackstack().goTo(detailsKey);
         });
     }

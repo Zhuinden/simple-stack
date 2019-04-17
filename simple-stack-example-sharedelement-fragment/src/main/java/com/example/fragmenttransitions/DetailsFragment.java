@@ -2,7 +2,6 @@ package com.example.fragmenttransitions;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,7 @@ import butterknife.ButterKnife;
  * @author bherbst
  */
 public class DetailsFragment
-        extends BaseFragment
-        implements HasSharedElement.Target {
+        extends BaseFragment {
     @BindView(R.id.image)
     ImageView image;
 
@@ -56,15 +54,5 @@ public class DetailsFragment
                 image.setImageResource(R.drawable.placekitten_6);
                 break;
         }
-    }
-
-    @Override
-    public Pair<View, String> sharedElement() {
-        DetailsKey detailsKey = getKey();
-        String transitionName = detailsKey.transitionName();
-        if(image == null) {
-            return null; // View is not yet initialized.
-        }
-        return Pair.create(image, transitionName);
     }
 }

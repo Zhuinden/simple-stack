@@ -1,6 +1,7 @@
 package com.example.fragmenttransitions;
 
 import android.os.Build;
+import android.support.v4.app.BackstackRecordAccessor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -36,13 +37,14 @@ public class FragmentStateChanger {
         if(topNewFragment == null) {
             topNewFragment = topNewKey.newFragment();
         }
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if(topPreviousFragment != null) {
                 topPreviousFragment.setExitTransition(new Fade());
             }
             topNewFragment.setEnterTransition(new Fade());
 
-            if(topNewKey instanceof HasSharedElement || topPreviousFragment instanceof HasSharedElement.Target) {
+            if(topNewKey instanceof HasSharedElement || topPreviousKey instanceof HasSharedElement) {
                 topNewFragment.setSharedElementEnterTransition(new DetailsTransition());
                 topNewFragment.setSharedElementReturnTransition(new DetailsTransition());
                 if(topPreviousFragment != null) {
@@ -52,20 +54,22 @@ public class FragmentStateChanger {
             }
         }
 
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack();
-
-        fragmentTransaction.setReorderingAllowed(true); // WITHOUT THIS LINE, SHARED ELEMENT TRANSITIONS WON'T WORK.
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction() //
+                .disallowAddToBackStack() //
+                .setReorderingAllowed(true); // WITHOUT THIS LINE, SHARED ELEMENT TRANSITIONS WON'T WORK.
 
         if(topNewKey instanceof HasSharedElement) {
-            HasSharedElement elementKey = (HasSharedElement) topNewKey;
-            if(elementKey.sharedElement() != null) {
-                fragmentTransaction.addSharedElement(elementKey.sharedElement().first, elementKey.sharedElement().second);
+            HasSharedElement forwardKey = (HasSharedElement) topNewKey;
+            if(forwardKey.sharedElement() != null) {
+                // to eliminate use of WeakReference<View>, we add the view's transition name to the FragmentTransaction directly.
+                BackstackRecordAccessor.addSharedElement(fragmentTransaction, forwardKey.sharedElement().sourceTransitionName(), forwardKey.sharedElement().targetTransitionName());
             }
         }
-        if(topPreviousFragment != null && topPreviousFragment instanceof HasSharedElement.Target) {
-            HasSharedElement.Target target = (HasSharedElement.Target) topPreviousFragment;
-            if(target.sharedElement() != null) {
-                fragmentTransaction.addSharedElement(target.sharedElement().first, target.sharedElement().second);
+        if(topPreviousKey instanceof HasSharedElement) {
+            HasSharedElement backwardKey = (HasSharedElement) topPreviousKey;
+            if(backwardKey.sharedElement() != null) {
+                // during back navigation, we must invert the received "source" and "target".
+                BackstackRecordAccessor.addSharedElement(fragmentTransaction, backwardKey.sharedElement().targetTransitionName(), backwardKey.sharedElement().sourceTransitionName());
             }
         }
 
