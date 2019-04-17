@@ -6,8 +6,4 @@ package com.example.fragmenttransitions;
 
 public interface HasSharedElement {
     SharedElement sharedElement();
-
-    interface Target {
-        SharedElement sharedElement();
-    }
 }
