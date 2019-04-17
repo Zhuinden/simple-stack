@@ -4,6 +4,9 @@ import android.os.Parcelable;
 
 import com.google.auto.value.AutoValue;
 
+/**
+ * @author zhuinden
+ */
 @AutoValue
 public abstract class SharedElement implements Parcelable {
     public abstract String sourceTransitionName();
