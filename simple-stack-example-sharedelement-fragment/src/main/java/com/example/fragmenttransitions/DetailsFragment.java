@@ -2,6 +2,7 @@ package com.example.fragmenttransitions;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,9 @@ public class DetailsFragment
     @Override
     public SharedElement sharedElement() {
         DetailsKey detailsKey = getKey();
-        return detailsKey.sharedElement();
+        return SharedElement.create(
+                ViewCompat.getTransitionName(image) /* inverse new source */,
+                detailsKey.sharedElement().sourceTransitionName() /* inverse old source */
+        );
     }
 }
