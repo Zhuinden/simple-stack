@@ -1,6 +1,7 @@
 package com.example.fragmenttransitions;
 
 import android.os.Build;
+import android.support.v4.app.BackstackRecordAccessor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -36,6 +37,7 @@ public class FragmentStateChanger {
         if(topNewFragment == null) {
             topNewFragment = topNewKey.newFragment();
         }
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if(topPreviousFragment != null) {
                 topPreviousFragment.setExitTransition(new Fade());
@@ -52,20 +54,20 @@ public class FragmentStateChanger {
             }
         }
 
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack();
-
-        fragmentTransaction.setReorderingAllowed(true); // WITHOUT THIS LINE, SHARED ELEMENT TRANSITIONS WON'T WORK.
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction() //
+                .disallowAddToBackStack() //
+                .setReorderingAllowed(true); // WITHOUT THIS LINE, SHARED ELEMENT TRANSITIONS WON'T WORK.
 
         if(topNewKey instanceof HasSharedElement) {
             HasSharedElement elementKey = (HasSharedElement) topNewKey;
             if(elementKey.sharedElement() != null) {
-                fragmentTransaction.addSharedElement(elementKey.sharedElement().first, elementKey.sharedElement().second);
+                BackstackRecordAccessor.addSharedElement(fragmentTransaction, elementKey.sharedElement().sourceTransitionName(), elementKey.sharedElement().targetTransitionName());
             }
         }
-        if(topPreviousFragment != null && topPreviousFragment instanceof HasSharedElement.Target) {
+        if(topPreviousFragment instanceof HasSharedElement.Target) {
             HasSharedElement.Target target = (HasSharedElement.Target) topPreviousFragment;
             if(target.sharedElement() != null) {
-                fragmentTransaction.addSharedElement(target.sharedElement().first, target.sharedElement().second);
+                BackstackRecordAccessor.addSharedElement(fragmentTransaction, target.sharedElement().sourceTransitionName(), target.sharedElement().targetTransitionName());
             }
         }
 
