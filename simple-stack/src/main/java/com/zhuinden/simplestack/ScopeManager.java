@@ -246,11 +246,13 @@ class ScopeManager {
         }
     }
 
+    private final IdentityHashMap<Object, Integer> unregisterInvocationTracker = new IdentityHashMap<>(); // call unregister only once!
+
     private void destroyServicesAndRemoveState(String scopeTag, Map<String, Object> serviceMap) {
         List<Object> services = new ArrayList<>(serviceMap.values());
         Collections.reverse(services);
 
-        IdentityHashMap<Object, Integer> unregisterInvocationTracker = new IdentityHashMap<>(); // call unregister only once!
+        unregisterInvocationTracker.clear();
 
         for(Object service : services) {
             if(!isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
