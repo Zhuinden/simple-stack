@@ -173,7 +173,7 @@ public class Backstack {
         assertCorrectThread();
 
         List<?> activeHistory = selectActiveHistory();
-        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
+        History.Builder historyBuilder = History.builderFrom(activeHistory);
 
         int direction;
         if(historyBuilder.contains(newKey)) {
@@ -199,7 +199,7 @@ public class Backstack {
 
         assertCorrectThread();
 
-        HistoryBuilder historyBuilder = History.builderFrom(selectActiveHistory());
+        History.Builder historyBuilder = History.builderFrom(selectActiveHistory());
         if(!historyBuilder.isEmpty()) {
             historyBuilder.removeLast();
         }
@@ -272,7 +272,7 @@ public class Backstack {
         List<?> activeHistory = selectActiveHistory();
         int direction = asReplace ? StateChange.REPLACE : StateChange.FORWARD;
 
-        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
+        History.Builder historyBuilder = History.builderFrom(activeHistory);
         if(historyBuilder.contains(newKey)) {
             historyBuilder.remove(newKey);
         }
@@ -356,7 +356,7 @@ public class Backstack {
             return;
         }
 
-        HistoryBuilder historyBuilder = History.builderFrom(selectActiveHistory());
+        History.Builder historyBuilder = History.builderFrom(selectActiveHistory());
         historyBuilder.removeLast(); // we will never keep the current key on "up" navigation.
 
         int indexOfSubList = Collections.indexOfSubList(historyBuilder.build(), parentChain);
@@ -383,7 +383,7 @@ public class Backstack {
                     // if any elements in the chain are duplicates,
                     // they are ordered according to the provided chain.
                     int indexOfKey = historyBuilder.indexOf(key);
-                    HistoryBuilder newHistory = History.newBuilder();
+                    History.Builder newHistory = History.newBuilder();
                     for(int j = 0; j < indexOfKey; j++) {
                         newHistory.add(historyBuilder.get(j)); // preserve equivalent prefix
                     }
@@ -403,7 +403,7 @@ public class Backstack {
 
             // no elements in the current history were found in the parent chain
             // default behavior is to add the newly received list in place of the original key
-            HistoryBuilder newHistory = historyBuilder.addAll(parentChain);
+            History.Builder newHistory = historyBuilder.addAll(parentChain);
             setHistory(newHistory.build(), StateChange.BACKWARD);
         }
     }
@@ -427,7 +427,7 @@ public class Backstack {
         }
 
         List<?> activeHistory = selectActiveHistory();
-        HistoryBuilder historyBuilder = History.builderFrom(activeHistory);
+        History.Builder historyBuilder = History.builderFrom(activeHistory);
         historyBuilder.removeLast();
         setHistory(historyBuilder.build(), StateChange.BACKWARD);
         return true;

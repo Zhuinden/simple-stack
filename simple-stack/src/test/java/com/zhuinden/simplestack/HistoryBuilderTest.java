@@ -19,7 +19,6 @@ package com.zhuinden.simplestack;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,21 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HistoryBuilderTest {
     @Test
-    public void historyBuilderThrowsForListThatContainsNull() {
-        List<Object> nullList = new ArrayList<>();
-        nullList.add(null);
-        try {
-            HistoryBuilder.from(nullList);
-            Assert.fail();
-        } catch(IllegalArgumentException e) {
-            // OK!
-        }
-    }
-
-    @Test
     public void historyBuilderThrowsForNullBackstack() {
         try {
-            HistoryBuilder historyBuilder = History.builderFrom((Backstack)null);
+            History.Builder historyBuilder = History.builderFrom((Backstack) null);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK!
@@ -54,7 +41,7 @@ public class HistoryBuilderTest {
 
     @Test
     public void historyBuilderThrowsForAddingNull() {
-        HistoryBuilder historyBuilder = History.newBuilder();
+        History.Builder historyBuilder = History.newBuilder();
         try {
             historyBuilder.add(null);
             Assert.fail();
@@ -76,7 +63,7 @@ public class HistoryBuilderTest {
     @Test
     public void removeUntilThrowsIfKeyNotFound() {
         try {
-            HistoryBuilder builder = History.newBuilder().add(new TestKey("hello"));
+            History.Builder builder = History.newBuilder().add(new TestKey("hello"));
             builder.removeUntil(new TestKey("bye"));
             Assert.fail();
         } catch(IllegalArgumentException e) {
@@ -122,7 +109,7 @@ public class HistoryBuilderTest {
         TestKey hi = new TestKey("hi");
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
-        HistoryBuilder builder = History.newBuilder().add(hi).add(hello).add(bye);
+        History.Builder builder = History.newBuilder().add(hi).add(hello).add(bye);
         List<Object> history = builder.removeLast().build();
         assertThat(history).containsExactly(hi, hello);
     }
@@ -132,9 +119,9 @@ public class HistoryBuilderTest {
         TestKey hi = new TestKey("hi");
         TestKey hello = new TestKey("hello");
         TestKey bye = new TestKey("bye");
-        HistoryBuilder historyBuilder = History.newBuilder().add(hi).add(hello).add(bye);
+        History.Builder historyBuilder = History.newBuilder().add(hi).add(hello).add(bye);
         assertThat(historyBuilder.getLast()).isEqualTo(bye);
-        assertThat(historyBuilder.build().get(historyBuilder.build().size()-1)).isEqualTo(bye);
+        assertThat(historyBuilder.build().get(historyBuilder.build().size() - 1)).isEqualTo(bye);
     }
 
     @Test
@@ -149,7 +136,7 @@ public class HistoryBuilderTest {
 
     @Test
     public void historyBuilderWorksAsIterable() {
-        HistoryBuilder historyBuilder = History.newBuilder().add(new TestKey("hello")).add(new TestKey("bye"));
+        History.Builder historyBuilder = History.newBuilder().add(new TestKey("hello")).add(new TestKey("bye"));
         int i = 0;
         for(Object _key : historyBuilder) {
             TestKey key = (TestKey) _key;
