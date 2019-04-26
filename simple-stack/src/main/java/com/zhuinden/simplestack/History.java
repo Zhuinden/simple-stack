@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Spliterator;
@@ -101,12 +102,12 @@ public class History<T> extends AbstractList<T> implements List<T> {
     // factories
 
     /**
-     * Creates a {@link HistoryBuilder} from this {@link History} to create a modified version of it.
+     * Creates a {@link Builder} from this {@link History} to create a modified version of it.
      *
      * @return the history builder
      */
     @NonNull
-    public HistoryBuilder buildUpon() {
+    public Builder buildUpon() {
         return History.builderFrom(this);
     }
     
@@ -147,10 +148,10 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * Creates a new history builder based on the {@link Backstack}'s history.
      *
      * @param backstack the {@link Backstack}.
-     * @return the newly created {@link HistoryBuilder}.
+     * @return the newly created {@link Builder}.
      */
     @NonNull
-    public static HistoryBuilder builderFrom(@NonNull Backstack backstack) {
+    public static Builder builderFrom(@NonNull Backstack backstack) {
         if(backstack == null) {
             throw new IllegalArgumentException("Backstack cannot be null!");
         }
@@ -161,10 +162,10 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * Creates a new history builder based on the {@link BackstackDelegate}'s managed backstack history.
      *
      * @param backstackDelegate the {@link BackstackDelegate}.
-     * @return the newly created {@link HistoryBuilder}.
+     * @return the newly created {@link Builder}.
      */
     @NonNull
-    public static HistoryBuilder builderFrom(@NonNull BackstackDelegate backstackDelegate) {
+    public static Builder builderFrom(@NonNull BackstackDelegate backstackDelegate) {
         if(backstackDelegate == null) {
             throw new IllegalArgumentException("BackstackDelegate cannot be null!");
         }
@@ -175,11 +176,11 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * Creates a new history builder from the provided ordered elements.
      *
      * @param keys
-     * @return the newly created {@link HistoryBuilder}.
+     * @return the newly created {@link Builder}.
      */
     @SuppressWarnings("unchecked") // @SafeVarargs is API 19+
     @NonNull
-    public static HistoryBuilder builderOf(Object... keys) {
+    public static Builder builderOf(Object... keys) {
         return builderFrom(Arrays.asList(keys));
     }
 
@@ -187,10 +188,10 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * Creates a new history builder from the provided ordered collection.
      *
      * @param keys
-     * @return the newly created {@link HistoryBuilder}.
+     * @return the newly created {@link Builder}.
      */
     @NonNull
-    public static HistoryBuilder builderFrom(@NonNull List<?> keys) {
+    public static Builder builderFrom(@NonNull List<?> keys) {
         for(Object key : keys) {
             if(key == null) {
                 throw new IllegalArgumentException("Cannot provide `null` as a key!");
@@ -202,11 +203,11 @@ public class History<T> extends AbstractList<T> implements List<T> {
     /**
      * Creates a new empty history builder.
      *
-     * @return the newly created {@link HistoryBuilder}.
+     * @return the newly created {@link Builder}.
      */
     @NonNull
-    public static HistoryBuilder newBuilder() {
-        return new HistoryBuilder();
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     /**
@@ -407,5 +408,273 @@ public class History<T> extends AbstractList<T> implements List<T> {
     @TargetApi(24)
     public void forEach(Consumer<? super T> action) {
         elements.forEach(action);
+    }
+
+    /**
+     * Builder for {@link History}.
+     */
+    public static class Builder
+            implements Iterable<Object> {
+        private ArrayList<Object> list = new ArrayList<>();
+
+        Builder() { // use History.newBuilder()
+        }
+
+        /**
+         * Adds the keys to the builder.
+         *
+         * @param keys
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder addAll(@NonNull List<?> keys) {
+            if(keys == null) {
+                throw new IllegalArgumentException("Provided collection cannot be null");
+            }
+            this.list.addAll(keys);
+            return this;
+        }
+
+        /**
+         * Adds the keys to the builder at a given index.
+         *
+         * @param keys
+         * @param index
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder addAllAt(@NonNull List<?> keys, int index) {
+            if(keys == null) {
+                throw new IllegalArgumentException("Provided collection cannot be null");
+            }
+            this.list.addAll(index, keys);
+            return this;
+        }
+
+        /**
+         * Clears the history builder.
+         *
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder clear() {
+            list.clear();
+            return this;
+        }
+
+        /**
+         * Returns if the given key is contained within the builder.
+         *
+         * @param key
+         * @return true if the builder contains the given key.
+         */
+        public boolean contains(@NonNull Object key) {
+            checkKey(key);
+            return list.contains(key);
+        }
+
+        /**
+         * Returns if the builder contains all provided keys.
+         *
+         * @param keys
+         * @return true if the builder contains all keys.
+         */
+        public boolean containsAll(@NonNull Collection<?> keys) {
+            if(keys == null) {
+                throw new IllegalArgumentException("Keys cannot be null!");
+            }
+            return list.containsAll(keys);
+        }
+
+        /**
+         * Returns the size of the builder.
+         *
+         * @return the number of keys in the builder.
+         */
+        public int size() {
+            return list.size();
+        }
+
+        /**
+         * Removes the given key from the builder.
+         *
+         * @param key
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder remove(@NonNull Object key) {
+            checkKey(key);
+            list.remove(key);
+            return this;
+        }
+
+        /**
+         * Remove the key at the given index.
+         *
+         * @param index
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder removeAt(int index) {
+            list.remove(index);
+            return this;
+        }
+
+        /**
+         * Removes all keys from the builder not contained inside the provided keys.
+         *
+         * @param keys
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder retainAll(@NonNull Collection<?> keys) {
+            checkKeys(keys);
+            list.retainAll(keys);
+            return this;
+        }
+
+        /**
+         * Returns if the builder is empty.
+         *
+         * @return true if the builder does not contain any keys
+         */
+        public boolean isEmpty() {
+            return list.isEmpty();
+        }
+
+        /**
+         * Removes the last entry in the builder.
+         * If the builder is empty, an exception is thrown.
+         *
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder removeLast() {
+            if(list.isEmpty()) {
+                throw new IllegalStateException("Cannot remove element from empty builder");
+            }
+            list.remove(list.size() - 1);
+            return this;
+        }
+
+        /**
+         * Removes all keys until the provided key is found (exclusive).
+         * If the key is not found, an exception is thrown.
+         *
+         * @param key
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder removeUntil(@NonNull Object key) {
+            checkKey(key);
+            while(!list.isEmpty() && !getLast().equals(key)) {
+                removeLast();
+            }
+            if(list.isEmpty()) {
+                throw new IllegalArgumentException("[" + key + "] was not found in history!");
+            }
+            return this;
+        }
+
+        /**
+         * Returns the index of the provided key.
+         *
+         * @param key
+         * @return the index, -1 if not found.
+         */
+        public int indexOf(@NonNull Object key) {
+            checkKey(key);
+            return list.indexOf(key);
+        }
+
+        /**
+         * Returns the key at the given index.
+         *
+         * @param index
+         * @return the key at the given index
+         */
+        @NonNull
+        public <T> T get(int index) {
+            // noinspection unchecked
+            return (T) list.get(index);
+        }
+
+        /**
+         * Returns the last element of the builder.
+         * If the builder is empty, null is returned.
+         *
+         * @return the key at the last index
+         */
+        @Nullable
+        public <T> T getLast() {
+            // noinspection unchecked
+            return (T) (list.isEmpty() ? null : list.get(list.size() - 1));
+        }
+
+        /**
+         * Adds the provided key as the last element of the builder.
+         *
+         * @param key
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder add(@NonNull Object key) {
+            checkKey(key);
+            list.add(key);
+            return this;
+        }
+
+        /**
+         * Adds the provided key at the provided index.
+         *
+         * @param key
+         * @param index
+         * @return the current builder.
+         */
+        @NonNull
+        public Builder add(@NonNull Object key, int index) {
+            checkKey(key);
+            list.add(index, key);
+            return this;
+        }
+
+        /**
+         * Provides an iterator for the builder.
+         *
+         * @return the iterator
+         */
+        @NonNull
+        @Override
+        public Iterator<Object> iterator() {
+            return list.iterator();
+        }
+
+        /**
+         * Creates the history, which is immutable.
+         *
+         * @return the built history.
+         */
+        @NonNull
+        public <T> History<T> build() {
+            List<T> list = new LinkedList<>();
+            for(Object obj : this.list) {
+                // noinspection unchecked
+                list.add((T) obj);
+            }
+            return new History<>(list);
+        }
+
+        // validations
+        private void checkKey(Object key) {
+            if(key == null) {
+                throw new IllegalArgumentException("History key cannot be null!");
+            }
+        }
+
+        private void checkKeys(Collection<?> keys) {
+            if(keys == null) {
+                throw new IllegalArgumentException("Keys cannot be null!");
+            }
+        }
     }
 }
