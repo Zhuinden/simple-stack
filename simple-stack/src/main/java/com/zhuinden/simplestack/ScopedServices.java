@@ -23,18 +23,14 @@ public interface ScopedServices {
      */
     public static interface Activated {
         /**
-         * Called when the scope the service is bound to becomes the top-most scope.
-         *
-         * @param scope the tag of the scope
+         * Called when the explicit parent chain the service is bound to becomes the top-most scope.
          */
-        void onScopeActive(@NonNull String scope);
+        void onServiceActive();
 
         /**
-         * Called when the scope is no longer the top-most scope.
-         *
-         * @param scope the tag of the scope
+         * Called when the explicit parent chain the service is bound to is no longer the top-most scope.
          */
-        void onScopeInactive(@NonNull String scope);
+        void onServiceInactive();
     }
 
     /**
