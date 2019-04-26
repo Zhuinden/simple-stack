@@ -29,30 +29,30 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 /**
  * Contains the previous and the new state that represents the change in state.
  */
-public class StateChange {
+public class KeyChange {
     @Retention(SOURCE)
     @IntDef({FORWARD, BACKWARD, REPLACE})
-    @interface StateChangeDirection {
+    @interface KeyChangeDirection {
     }
 
     public static final int REPLACE = 0;
     public static final int BACKWARD = -1;
     public static final int FORWARD = 1;
 
-    StateChange(Backstack backstack, List<Object> previousState, List<Object> newState, @StateChangeDirection int direction) {
+    KeyChange(Backstack backstack, List<Object> previousKeys, List<Object> newKeys, @KeyChangeDirection int direction) {
         this.backstack = backstack;
-        this.previousState = previousState;
-        this.newState = newState;
+        this.previousKeys = previousKeys;
+        this.newKeys = newKeys;
         this.direction = direction;
     }
 
     Backstack backstack;
-    List<Object> previousState;
-    List<Object> newState;
+    List<Object> previousKeys;
+    List<Object> newKeys;
     int direction;
 
     /**
-     * The backstack this state change was executed by.
+     * The backstack this key change was executed by.
      *
      * @return the backstack
      */
@@ -64,10 +64,10 @@ public class StateChange {
     /**
      * Convenience method to help short-circuit if the top new key is the same as the previous one.
      *
-     * @return if the top new state is equal to the top previous state
+     * @return if the top new key is equal to the top previous key
      */
-    public final boolean isTopNewStateEqualToPrevious() {
-        return topNewState().equals(topPreviousState());
+    public final boolean isTopNewKeyEqualToPrevious() {
+        return topNewKey().equals(topPreviousKey());
     }
 
     // create a copy list where each item is casted to <T>
@@ -81,36 +81,36 @@ public class StateChange {
     }
 
     /**
-     * The previous state from before the new keys were set.
-     * If empty, then this is an initialize {@link StateChange}.
+     * The previous keys from before the new keys were set.
+     * If empty, then this is an initialize {@link KeyChange}.
      *
      * @param <T> the type of the key
      *
-     * @return the previous state.
+     * @return the previous keys.
      */
     @NonNull
-    public <T> History<T> getPreviousState() {
-        return createParametricCopyList(previousState);
+    public <T> History<T> getPreviousKeys() {
+        return createParametricCopyList(previousKeys);
     }
 
     /**
-     * The new state after the state change is complete.
+     * The new keys after the key change is complete.
      *
      * @param <T> the type of the key
      *
-     * @return the new state.
+     * @return the new keys.
      */
     @NonNull
-    public <T> History<T> getNewState() {
-        return createParametricCopyList(newState);
+    public <T> History<T> getNewKeys() {
+        return createParametricCopyList(newKeys);
     }
 
     /**
-     * The direction of the state change.
+     * The direction of the key change.
      *
      * @return the direction: FORWARD, BACKWARD or REPLACE.
      */
-    @StateChangeDirection
+    @KeyChangeDirection
     public int getDirection() {
         return direction;
     }
@@ -121,10 +121,10 @@ public class StateChange {
      * @return the last element in previous state, or null if empty.
      */
     @Nullable
-    public <T> T topPreviousState() {
-        if(previousState.size() > 0) {
+    public <T> T topPreviousKey() {
+        if(previousKeys.size() > 0) {
             // noinspection unchecked
-            return (T) previousState.get(previousState.size() - 1);
+            return (T) previousKeys.get(previousKeys.size() - 1);
         } else {
             return null;
         }
@@ -136,9 +136,9 @@ public class StateChange {
      * @return the last element in new state.
      */
     @NonNull
-    public <T> T topNewState() {
+    public <T> T topNewKey() {
         // noinspection unchecked
-        return (T) newState.get(newState.size() - 1);
+        return (T) newKeys.get(newKeys.size() - 1);
     }
 
     /**

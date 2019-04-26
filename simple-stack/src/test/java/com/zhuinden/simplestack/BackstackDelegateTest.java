@@ -63,10 +63,10 @@ public class BackstackDelegateTest {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
-    StateChanger stateChanger = new StateChanger() {
+    KeyChanger keyChanger = new KeyChanger() {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-            completionCallback.stateChangeComplete();
+        public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+            completionCallback.keyChangeComplete();
         }
     };
 
@@ -129,7 +129,7 @@ public class BackstackDelegateTest {
         Mockito.when(savedInstanceState.getParcelable(backstackDelegate.getHistoryTag())).thenReturn(stateBundle);
         backstackDelegate.onCreate(savedInstanceState, null, History.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isNotNull();
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(restoredKey);
     }
 
@@ -140,7 +140,7 @@ public class BackstackDelegateTest {
         ArrayList<Parcelable> restoredKeys = new ArrayList<>();
         backstackDelegate.onCreate(savedInstanceState, null, History.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isNotNull();
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(testKey);
     }
 
@@ -196,7 +196,7 @@ public class BackstackDelegateTest {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, History.single(key));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
 
         Mockito.when(view.getContext()).thenReturn(context);
         StateBundle stateBundle = new StateBundle();
@@ -215,18 +215,18 @@ public class BackstackDelegateTest {
         TestKey a = new TestKey("hello");
         TestKey b = new TestKey("hello");
         backstackDelegate.onCreate(null, null, History.of(a, b));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a, b);
         backstackDelegate.onBackPressed();
         assertThat(backstackDelegate.getBackstack().getHistory()).containsExactly(a);
     }
 
     @Test
-    public void onPostResumeThrowsExceptionIfStateChangerNotSet() {
+    public void onPostResumeThrowsExceptionIfKeyChangerNotSet() {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, History.single(key));
-        // no state changer set
+        // no key changer set
         try {
             backstackDelegate.onPostResume();
             Assert.fail();
@@ -236,25 +236,25 @@ public class BackstackDelegateTest {
     }
 
     @Test
-    public void onPauseRemovesStateChanger() {
+    public void onPauseRemovesKeyChanger() {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, History.single(key));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
         backstackDelegate.onPause();
-        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isFalse();
+        assertThat(backstackDelegate.getBackstack().hasKeyChanger()).isFalse();
     }
 
     @Test
-    public void onPostResumeReattachesStateChanger() {
+    public void onPostResumeReattachesKeyChanger() {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey key = new TestKey("hello");
         backstackDelegate.onCreate(null, null, History.single(key));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
         backstackDelegate.onPause();
-        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isFalse();
+        assertThat(backstackDelegate.getBackstack().hasKeyChanger()).isFalse();
         backstackDelegate.onPostResume();
-        assertThat(backstackDelegate.getBackstack().hasStateChanger()).isTrue();
+        assertThat(backstackDelegate.getBackstack().hasKeyChanger()).isTrue();
     }
 
     @Test
@@ -269,36 +269,36 @@ public class BackstackDelegateTest {
     }
 
     @Test
-    public void addStateChangeListenerAddsCompletionListener() {
+    public void addKeyChangeListenerAddsCompletionListener() {
         TestKey testKey = new TestKey("hello");
-        final List<StateChange> called = new LinkedList<>();
+        final List<KeyChange> called = new LinkedList<>();
         Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
-                called.add(stateChange);
+            public void keyChangeCompleted(@NonNull KeyChange keyChange) {
+                called.add(keyChange);
             }
         };
         BackstackDelegate backstackDelegate = new BackstackDelegate();
-        backstackDelegate.addStateChangeCompletionListener(completionListener);
+        backstackDelegate.addKeyChangeCompletionListener(completionListener);
         backstackDelegate.onCreate(null, null, History.single(testKey));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
 
-        assertThat(called.get(0).topNewState()).isSameAs(testKey);
+        assertThat(called.get(0).topNewKey()).isSameAs(testKey);
     }
 
     @Test
-    public void addStateChangeListenerAfterOnCreateThrows() {
+    public void addKeyChangeListenerAfterOnCreateThrows() {
         TestKey testKey = new TestKey("hello");
         Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+            public void keyChangeCompleted(@NonNull KeyChange keyChange) {
                 // do nothing
             }
         };
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, History.single(testKey));
         try {
-            backstackDelegate.addStateChangeCompletionListener(completionListener);
+            backstackDelegate.addKeyChangeCompletionListener(completionListener);
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK
@@ -306,11 +306,11 @@ public class BackstackDelegateTest {
     }
 
     @Test
-    public void addNullStateChangeListenerThrows() {
+    public void addNullKeyChangeListenerThrows() {
         TestKey testKey = new TestKey("hello");
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
-            backstackDelegate.addStateChangeCompletionListener(null);
+            backstackDelegate.addKeyChangeCompletionListener(null);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK
@@ -463,7 +463,7 @@ public class BackstackDelegateTest {
     @Test
     public void callingOnPostResumeBeforeOnCreateShouldThrow() {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
         try {
             backstackDelegate.onPostResume();
             Assert.fail();

@@ -144,30 +144,30 @@ public class BackstackDelegate {
      *
      * This can only be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
-     * @param stateChangeCompletionListener the state change completion listener
+     * @param keyChangeCompletionListener the key change completion listener
      */
-    public void addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
+    public void addKeyChangeCompletionListener(@NonNull Backstack.CompletionListener keyChangeCompletionListener) {
         if(backstackManager != null && backstackManager.getBackstack() != null) {
             throw new IllegalStateException("If adding, completion listener must be added before calling `onCreate()`");
         }
-        if(stateChangeCompletionListener == null) {
-            throw new IllegalArgumentException("Specified state change completion listener should not be null!");
+        if(keyChangeCompletionListener == null) {
+            throw new IllegalArgumentException("Specified key change completion listener should not be null!");
         }
-        this.stateChangeCompletionListeners.add(stateChangeCompletionListener);
+        this.keyChangeCompletionListeners.add(keyChangeCompletionListener);
     }
 
     private static final String HISTORY = "simplestack.HISTORY";
 
     private Activity activity;
 
-    private StateChanger stateChanger;
+    private KeyChanger keyChanger;
 
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private ScopedServices scopedServices = null;
     private GlobalServices globalServices = null;
     private BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
-    private List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
+    private List<Backstack.CompletionListener> keyChangeCompletionListeners = new LinkedList<>();
 
     /**
      * Persistence tag allows you to have multiple {@link BackstackDelegate}s in the same activity.
@@ -199,7 +199,7 @@ public class BackstackDelegate {
     /**
      * Creates the {@link BackstackDelegate}.
      *
-     * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
+     * The {@link KeyChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
      */
     public BackstackDelegate() {
         this(null);
@@ -207,13 +207,13 @@ public class BackstackDelegate {
 
     /**
      * Creates the {@link BackstackDelegate}.
-     * If {@link StateChanger} is null, then the initialize {@link StateChange} is postponed until it is explicitly set.
-     * The {@link StateChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
+     * If {@link KeyChanger} is null, then the initialize {@link KeyChange} is postponed until it is explicitly set.
+     * The {@link KeyChanger} must be set at some point before {@link BackstackDelegate#onPostResume()}.
      *
-     * @param stateChanger The {@link StateChanger} to be set. Allowed to be null at initialization.
+     * @param keyChanger The {@link KeyChanger} to be set. Allowed to be null at initialization.
      */
-    public BackstackDelegate(@Nullable StateChanger stateChanger) {
-        this.stateChanger = stateChanger;
+    public BackstackDelegate(@Nullable KeyChanger keyChanger) {
+        this.keyChanger = keyChanger;
     }
 
     /**
@@ -291,7 +291,7 @@ public class BackstackDelegate {
      * The onCreate() delegate for the Activity.
      * It initializes the backstack from either the non-configuration instance, the saved state, or creates a new one.
      * Restores the {@link SavedState} that belongs to persisted view state.
-     * Begins an initialize {@link StateChange} if the {@link StateChanger} is set.
+     * Begins an initialize {@link KeyChange} if the {@link KeyChanger} is set.
      *
      * @param savedInstanceState       The Activity saved instance state bundle.
      * @param nonConfigurationInstance The {@link NonConfigurationInstance} that is typically obtained with getLastCustomNonConfigurationInstance().
@@ -318,26 +318,26 @@ public class BackstackDelegate {
                 backstackManager.setGlobalServices(globalServices);
             }
             backstackManager.setup(initialKeys);
-            for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
-                backstackManager.addStateChangeCompletionListener(completionListener);
+            for(Backstack.CompletionListener completionListener : keyChangeCompletionListeners) {
+                backstackManager.addKeyChangeCompletionListener(completionListener);
             }
             if(savedInstanceState != null) {
                 backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable(getHistoryTag()));
             }
         }
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
     }
 
     /**
-     * Sets the {@link StateChanger} to the {@link Backstack}. Removes the previous one if it there was already one set.
-     * This call begins an initialize {@link StateChange}.
+     * Sets the {@link KeyChanger} to the {@link Backstack}. Removes the previous one if it there was already one set.
+     * This call begins an initialize {@link KeyChange}.
      *
-     * @param stateChanger The {@link StateChanger} to be set.
+     * @param keyChanger The {@link KeyChanger} to be set.
      */
-    public void setStateChanger(@Nullable StateChanger stateChanger) {
-        this.stateChanger = stateChanger;
+    public void setKeyChanger(@Nullable KeyChanger keyChanger) {
+        this.keyChanger = keyChanger;
         if(backstackManager != null) { // allowed before `onCreate()`
-            backstackManager.setStateChanger(stateChanger);
+            backstackManager.setKeyChanger(keyChanger);
         }
     }
 
@@ -375,27 +375,27 @@ public class BackstackDelegate {
 
     /**
      * The onPostResume() delegate for the Activity.
-     * It re-attaches the {@link StateChanger} if it is not already set.
+     * It re-attaches the {@link KeyChanger} if it is not already set.
      */
     public void onPostResume() {
-        if(stateChanger == null) {
-            throw new IllegalStateException("State changer is still not set in `onPostResume`!");
+        if(keyChanger == null) {
+            throw new IllegalStateException("key changer is still not set in `onPostResume`!");
         }
-        getManager().reattachStateChanger();
+        getManager().reattachKeyChanger();
     }
 
     /**
      * The onPause() delegate for the Activity.
-     * It removes the {@link StateChanger} if it is set.
+     * It removes the {@link KeyChanger} if it is set.
      */
     public void onPause() {
-        getManager().detachStateChanger();
+        getManager().detachKeyChanger();
     }
 
     /**
      * The onDestroy() delegate for the Activity.
      *
-     * Forces any pending state change to execute with {@link Backstack#executePendingStateChange()}.
+     * Forces any pending key change to execute with {@link Backstack#executePendingKeyChange()}.
      *
      * Also, if {@link ScopedServices} are used, this is what destroys the remaining scopes if the Activity is finishing.
      *
@@ -403,7 +403,7 @@ public class BackstackDelegate {
      */
     public void onDestroy() {
         activityWasDestroyed = true;
-        getBackstack().executePendingStateChange();
+        getBackstack().executePendingKeyChange();
 
         //noinspection ConstantConditions
         if(activity == null || (activity != null && activity.isFinishing())) {

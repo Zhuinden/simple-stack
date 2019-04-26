@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.transition.Fade;
 
-import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.KeyChange;
 
 import java.util.List;
 
@@ -15,20 +15,20 @@ import java.util.List;
  * Created by Owner on 2017. 08. 08..
  */
 
-public class FragmentStateChanger {
+public class FragmentKeyChanger {
     private FragmentManager fragmentManager;
     private int containerId;
 
-    public FragmentStateChanger(FragmentManager fragmentManager, int containerId) {
+    public FragmentKeyChanger(FragmentManager fragmentManager, int containerId) {
         this.fragmentManager = fragmentManager;
         this.containerId = containerId;
     }
 
-    public void handleStateChange(StateChange stateChange) {
-        List<BaseKey> previousState = stateChange.getPreviousState();
-        List<BaseKey> newState = stateChange.getNewState();
-        BaseKey topPreviousKey = stateChange.topPreviousState();
-        BaseKey topNewKey = stateChange.topNewState();
+    public void handleKeyChange(KeyChange keyChange) {
+        List<BaseKey> previousState = keyChange.getPreviousKeys();
+        List<BaseKey> newState = keyChange.getNewKeys();
+        BaseKey topPreviousKey = keyChange.topPreviousKey();
+        BaseKey topNewKey = keyChange.topNewKey();
         Fragment topPreviousFragment = null;
         if(topPreviousKey != null) {
             topPreviousFragment = fragmentManager.findFragmentByTag(topPreviousKey.getFragmentTag());
@@ -85,7 +85,7 @@ public class FragmentStateChanger {
         }
         for(BaseKey newKey : newState) {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
-            if(newKey.equals(stateChange.topNewState())) {
+            if(newKey.equals(keyChange.topNewKey())) {
                 if(fragment != null) {
                     if(fragment.isRemoving()) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
                         fragmentTransaction.replace(containerId, newKey.newFragment(), newKey.getFragmentTag());

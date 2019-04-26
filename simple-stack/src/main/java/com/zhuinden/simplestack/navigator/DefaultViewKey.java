@@ -19,12 +19,12 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 
 /**
- * This must be implemented by the key to represent state using {@link DefaultStateChanger},
- * unless {@link com.zhuinden.simplestack.navigator.DefaultStateChanger.LayoutInflationStrategy} and {@link com.zhuinden.simplestack.navigator.DefaultStateChanger.GetViewChangeHandlerStrategy} are redefined.
+ * This must be implemented by the key to represent state using {@link DefaultViewKeyChanger},
+ * unless {@link DefaultViewKeyChanger.LayoutInflationStrategy} and {@link DefaultViewKeyChanger.GetViewChangeHandlerStrategy} are redefined.
  *
  * It is assumed that equals() and hashCode() are properly implemented.
  */
-public interface StateKey {
+public interface DefaultViewKey {
     @LayoutRes
     int layout();
 

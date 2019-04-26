@@ -86,10 +86,10 @@ public class ScopingGlobalScopeTest {
                 .addService("service", service)
                 .build());
         backstackManager.setup(History.of(new TestKey("hello!")));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -181,10 +181,10 @@ public class ScopingGlobalScopeTest {
         }
 
         backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -291,10 +291,10 @@ public class ScopingGlobalScopeTest {
         }
 
         backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -312,7 +312,7 @@ public class ScopingGlobalScopeTest {
 
         assertThat(backstackManager.lookupService("parentService1")).isSameAs(parentService1);
 
-        backstackManager.getBackstack().setHistory(History.of(new Key2("boop")), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(new Key2("boop")), KeyChange.REPLACE);
 
         assertThat(backstackManager.lookupService("parentService1")).isSameAs(globalService);
     }
@@ -460,18 +460,18 @@ public class ScopingGlobalScopeTest {
 
         backstackManager.setup(History.of(beep, boop));
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         backstackManager.getBackstack().goTo(braap);
 
-        backstackManager.getBackstack().removeStateChanger(); // just to make sure
-        backstackManager.setStateChanger(stateChanger); // just to make sure
+        backstackManager.getBackstack().removeKeyChanger(); // just to make sure
+        backstackManager.setKeyChanger(keyChanger); // just to make sure
 
         backstackManager.getBackstack().goBack();
 
@@ -550,16 +550,16 @@ public class ScopingGlobalScopeTest {
 
         scopeManager.setGlobalServices(GlobalServices.builder().addService("service", service).build());
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                scopeManager.buildScopes(keyChange.getNewKeys());
+                completionCallback.keyChangeComplete();
             }
         };
 
         Backstack backstack = new Backstack(History.of(testKey2));
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
         assertThat(scopeManager.canFindService("service")).isTrue();
 
@@ -570,11 +570,11 @@ public class ScopingGlobalScopeTest {
                 .addService("service", new Service())
                 .build());
 
-        StateChanger stateChanger2 = new StateChanger() {
+        KeyChanger keyChanger2 = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager2.buildScopes(stateChange.getNewState());
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                scopeManager2.buildScopes(keyChange.getNewKeys());
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -582,7 +582,7 @@ public class ScopingGlobalScopeTest {
 
         Backstack backstack2 = new Backstack(History.of(testKey2));
 
-        backstack2.setStateChanger(stateChanger2);
+        backstack2.setKeyChanger(keyChanger2);
 
         assertThat(scopeManager2.lookupService("service")).isNotSameAs(service);
         assertThat(scopeManager.<Service>lookupService("service").blah).isEqualTo(2);
@@ -689,10 +689,10 @@ public class ScopingGlobalScopeTest {
                 .build()
         );
         backstackManager.setup(History.of(beep, boop));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -708,7 +708,7 @@ public class ScopingGlobalScopeTest {
         assertThat(backstackManager.canFindService("explicitParentService")).isFalse();
         assertThat(backstackManager.canFindService("globalService")).isFalse();
 
-        backstackManager.getBackstack().setHistory(History.of(beep, boop), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(beep, boop), KeyChange.REPLACE);
 
         assertThat(backstackManager.canFindService("globalService")).isTrue();
         assertThat(backstackManager.canFindService("currentScopeService")).isTrue();

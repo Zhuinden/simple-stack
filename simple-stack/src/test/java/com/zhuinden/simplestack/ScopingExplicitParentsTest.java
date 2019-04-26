@@ -57,10 +57,10 @@ public class ScopingExplicitParentsTest {
         backstackManager.setup(History.of(new ChildKey("hello")));
         boolean success = false;
         try {
-            backstackManager.setStateChanger(new StateChanger() {
+            backstackManager.setKeyChanger(new KeyChanger() {
                 @Override
-                public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                    completionCallback.stateChangeComplete();
+                public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                    completionCallback.keyChangeComplete();
                 }
             });
         } catch(IllegalArgumentException e) {
@@ -90,10 +90,10 @@ public class ScopingExplicitParentsTest {
         backstackManager.setup(History.of(new ChildKey("hello")));
         boolean success = false;
         try {
-            backstackManager.setStateChanger(new StateChanger() {
+            backstackManager.setKeyChanger(new KeyChanger() {
                 @Override
-                public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                    completionCallback.stateChangeComplete();
+                public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                    completionCallback.keyChangeComplete();
                 }
             });
         } catch(IllegalStateException e) {
@@ -122,10 +122,10 @@ public class ScopingExplicitParentsTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new DefaultScopedServices());
         backstackManager.setup(History.of(new ChildKey("hello")));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -177,10 +177,10 @@ public class ScopingExplicitParentsTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new DefaultScopedServices());
         backstackManager.setup(History.of(new ChildKey1("hello"), new ChildKey2("world")));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -253,10 +253,10 @@ public class ScopingExplicitParentsTest {
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope2", "parentScope3"))
         ));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -324,10 +324,10 @@ public class ScopingExplicitParentsTest {
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope1"))
         ));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -386,10 +386,10 @@ public class ScopingExplicitParentsTest {
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope2", "parentScope3"))
         ));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -468,10 +468,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
         BackstackDelegate backstackDelegate = new BackstackDelegate();
@@ -487,7 +487,7 @@ public class ScopingExplicitParentsTest {
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope2", "parentScope3"))
         ));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
 
         backstackDelegate.onPostResume();
         backstackDelegate.onPause();
@@ -584,10 +584,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
         BackstackManager backstackManager = new BackstackManager();
@@ -604,7 +604,7 @@ public class ScopingExplicitParentsTest {
                 new ChildKey("world", History.of("parentScope")),
                 new ChildKey("bye", History.of("parentScope"))
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.hasScope("parentScope")).isTrue();
         assertThat(backstackManager.lookupService("service")).isSameAs(service);
@@ -686,10 +686,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
         BackstackManager backstackManager = new BackstackManager();
@@ -707,7 +707,7 @@ public class ScopingExplicitParentsTest {
         backstackManager.setup(History.of(
                 new ChildKey("hello", History.of("parentScope"))
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.hasScope("hello")).isTrue();
         assertThat(backstackManager.hasScope("parentScope")).isTrue();
@@ -721,7 +721,7 @@ public class ScopingExplicitParentsTest {
 
         backstackManager.getBackstack().setHistory(
                 History.of(new ChildKey("bye", History.of("boop"))),
-                StateChange.BACKWARD);
+                KeyChange.BACKWARD);
 
         assertThat(serviceUnregistered).containsExactly(service2, service1);
         assertThat(inactivated).containsExactly(service2, service1);
@@ -794,10 +794,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -826,7 +826,7 @@ public class ScopingExplicitParentsTest {
                         new ChildKey("world", History.of("parentScope2"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.hasScope("parentScope1")).isTrue();
         assertThat(backstackManager.hasScope("parentScope2")).isTrue();
@@ -839,7 +839,7 @@ public class ScopingExplicitParentsTest {
 
         backstackManager.getBackstack().setHistory(
                 History.of(new ChildKey("bye", History.of("boop"))),
-                StateChange.BACKWARD);
+                KeyChange.BACKWARD);
 
         assertThat(backstackManager.hasScope("parentScope1")).isFalse();
         assertThat(backstackManager.hasScope("parentScope2")).isFalse();
@@ -928,10 +928,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -987,7 +987,7 @@ public class ScopingExplicitParentsTest {
                         new ChildKey("C5", History.of("P0", "P4"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.hasScope("C1")).isTrue();
         assertThat(backstackManager.hasScope("C2")).isTrue();
@@ -1089,7 +1089,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3);
         assertThat(unregistered).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
 
-        backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
+        backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), KeyChange.REPLACE); // ["bye"]
 
         assertThat(activated).containsExactly(serviceP0,
                 serviceP4,
@@ -1203,10 +1203,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -1262,7 +1262,7 @@ public class ScopingExplicitParentsTest {
                         new ChildKey("C5", History.of("P4"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.hasScope("C1")).isTrue();
         assertThat(backstackManager.hasScope("C2")).isTrue();
@@ -1364,7 +1364,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3);
         assertThat(serviceUnregistered).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
 
-        backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
+        backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), KeyChange.REPLACE); // ["bye"]
 
         assertThat(activated).containsExactly(serviceP4,
                 serviceC5,
@@ -1406,7 +1406,7 @@ public class ScopingExplicitParentsTest {
                 serviceP0);
 
         backstackManager.getBackstack().setHistory(History.of(new ChildKey("C5", History.of("P4"))),
-                StateChange.REPLACE);
+                KeyChange.REPLACE);
 
         assertThat(activated).containsExactly(serviceP4,
                 serviceC5,
@@ -1451,8 +1451,8 @@ public class ScopingExplicitParentsTest {
                 serviceP1,
                 serviceP0);
 
-        backstackManager.detachStateChanger();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.detachKeyChanger();
+        backstackManager.setKeyChanger(keyChanger);
 
         // no change should happen here
         assertThat(activated).containsExactly(serviceP4,
@@ -1556,10 +1556,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -1583,7 +1583,7 @@ public class ScopingExplicitParentsTest {
                 new ChildKey("hello", History.of("boop")),
                 new ChildKey("world", History.of("beep"))
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.hasScope("boop")).isTrue();
         assertThat(backstackManager.hasScope("beep")).isTrue();
@@ -1625,10 +1625,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -1657,7 +1657,7 @@ public class ScopingExplicitParentsTest {
                 new ChildKey("world", History.of("beep", "boop")),
                 new ChildKey("kappa", Collections.<String>emptyList())
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.lookupService("service1")).isSameAs(service1);
 
@@ -1780,10 +1780,10 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -1817,7 +1817,7 @@ public class ScopingExplicitParentsTest {
                         new ChildKey("C1", History.of("P0", "P1", "P2"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.hasScope("C1")).isTrue();
         assertThat(backstackManager.hasScope("P0")).isTrue();

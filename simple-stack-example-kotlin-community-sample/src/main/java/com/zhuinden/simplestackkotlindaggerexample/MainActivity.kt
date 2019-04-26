@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.zhuinden.simplestack.BackstackDelegate
 import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.KeyChange
+import com.zhuinden.simplestack.KeyChanger
 
-class MainActivity : AppCompatActivity(), StateChanger {
+class MainActivity : AppCompatActivity(), KeyChanger {
     private lateinit var backstackDelegate: BackstackDelegate
-    private lateinit var fragmentStateChanger: FragmentStateChanger
+    private lateinit var fragmentKeyChanger: FragmentKeyChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         backstackDelegate = BackstackDelegate()
@@ -23,8 +23,8 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
         setContentView(R.layout.activity_main)
 
-        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
-        backstackDelegate.setStateChanger(this)
+        fragmentKeyChanger = FragmentKeyChanger(supportFragmentManager, R.id.root)
+        backstackDelegate.setKeyChanger(this)
     }
 
     override fun onRetainCustomNonConfigurationInstance() =
@@ -37,20 +37,20 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     private fun replaceHistory(rootKey: BaseKey) {
-        backstackDelegate.backstack.setHistory(History.single(rootKey), StateChange.REPLACE)
+        backstackDelegate.backstack.setHistory(History.single(rootKey), KeyChange.REPLACE)
     }
 
     fun navigateTo(key: BaseKey) {
         backstackDelegate.backstack.goTo(key)
     }
 
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
-            completionCallback.stateChangeComplete()
+    override fun handleKeyChange(keyChange: KeyChange, completionCallback: KeyChanger.Callback) {
+        if (keyChange.isTopNewKeyEqualToPrevious) {
+            completionCallback.keyChangeComplete()
             return
         }
-        fragmentStateChanger.handleStateChange(stateChange)
-        completionCallback.stateChangeComplete()
+        fragmentKeyChanger.handleKeyChange(keyChange)
+        completionCallback.keyChangeComplete()
     }
 
     // share activity through context

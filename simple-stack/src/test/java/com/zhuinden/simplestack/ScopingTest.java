@@ -78,10 +78,10 @@ public class ScopingTest {
         }
     }
 
-    StateChanger stateChanger = new StateChanger() {
+    KeyChanger keyChanger = new KeyChanger() {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-            completionCallback.stateChangeComplete();
+        public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+            completionCallback.keyChangeComplete();
         }
     };
 
@@ -169,7 +169,7 @@ public class ScopingTest {
         backstackManager.setup(History.of(testKey2));
 
         try {
-            backstackManager.setStateChanger(stateChanger);
+            backstackManager.setKeyChanger(keyChanger);
             Assert.fail();
         } catch(IllegalStateException e) {
             assertThat(e.getMessage()).contains("scoped services");
@@ -182,7 +182,7 @@ public class ScopingTest {
         backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.single(testKey2));
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
 
         Service service = backstackManager.getService(testKey2, SERVICE_TAG);
@@ -195,7 +195,7 @@ public class ScopingTest {
         backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.single(testKey2));
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
 
         try {
@@ -228,7 +228,7 @@ public class ScopingTest {
         backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.of(testKeyWithScope));
         try {
-            backstackManager.setStateChanger(stateChanger);
+            backstackManager.setKeyChanger(keyChanger);
             Assert.fail();
         } catch(Exception e) {
             assertThat(e.getMessage()).isEqualTo("Service tag cannot be null!");
@@ -257,7 +257,7 @@ public class ScopingTest {
         backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.of(testKeyWithScope));
         try {
-            backstackManager.setStateChanger(stateChanger);
+            backstackManager.setKeyChanger(keyChanger);
             Assert.fail();
         } catch(Exception e) {
             assertThat(e.getMessage()).isEqualTo("The provided service should not be null!");
@@ -271,10 +271,10 @@ public class ScopingTest {
         backstackManager.setup(History.single(testKey2));
 
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
 
-        backstackManager.getBackstack().setHistory(History.of(testKey1), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(testKey1), KeyChange.REPLACE);
 
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
     }
@@ -300,11 +300,11 @@ public class ScopingTest {
         };
 
         Backstack backstack = new Backstack(History.of(testKeyWithScope));
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                scopeManager.buildScopes(keyChange.getNewKeys());
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -322,16 +322,16 @@ public class ScopingTest {
         final ScopeManager scopeManager = new ScopeManager();
         scopeManager.setScopedServices(new ServiceProvider());
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                scopeManager.buildScopes(keyChange.getNewKeys());
+                completionCallback.keyChangeComplete();
             }
         };
 
         Backstack backstack = new Backstack(History.of(testKey2));
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
         assertThat(scopeManager.hasService(testKey2.getScopeTag(), SERVICE_TAG));
 
@@ -340,11 +340,11 @@ public class ScopingTest {
         final ScopeManager scopeManager2 = new ScopeManager();
         scopeManager2.setScopedServices(new ServiceProvider());
 
-        StateChanger stateChanger2 = new StateChanger() {
+        KeyChanger keyChanger2 = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager2.buildScopes(stateChange.getNewState());
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                scopeManager2.buildScopes(keyChange.getNewKeys());
+                completionCallback.keyChangeComplete();
             }
         };
 
@@ -352,7 +352,7 @@ public class ScopingTest {
 
         Backstack backstack2 = new Backstack(History.of(testKey2));
 
-        backstack2.setStateChanger(stateChanger2);
+        backstack2.setKeyChanger(keyChanger2);
         assertThat(scopeManager2.<Service>getService(testKey2.getScopeTag(), SERVICE_TAG).blah).isEqualTo(5);
     }
 
@@ -395,12 +395,12 @@ public class ScopingTest {
         assertThat(service.didServiceRegister).isFalse();
         assertThat(service.didServiceUnregister).isFalse();
 
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(service.didServiceRegister).isTrue();
         assertThat(service.didServiceUnregister).isFalse();
 
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.single(testKey1), KeyChange.REPLACE);
 
         assertThat(service.didServiceRegister).isTrue();
         assertThat(service.didServiceUnregister).isTrue();
@@ -426,16 +426,16 @@ public class ScopingTest {
             }
         };
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.setScopedServices(activity, new ServiceProvider());
         backstackDelegate.onCreate(null, null, History.of(testKeyWithScope));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
 
         backstackDelegate.onPostResume();
         backstackDelegate.onPause();
@@ -485,14 +485,14 @@ public class ScopingTest {
         backstackManager.setup(History.of(beep, boop));
 
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
         backstackManager.getBackstack().goBack();
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.single(testKey1), KeyChange.REPLACE);
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
         try {
             backstackManager.lookupService(SERVICE_TAG);
@@ -543,7 +543,7 @@ public class ScopingTest {
         assertThat(backstackManager.hasScope("boop")).isFalse();
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.hasScope("beep")).isTrue();
         assertThat(backstackManager.hasScope("boop")).isTrue();
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
@@ -555,7 +555,7 @@ public class ScopingTest {
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service1);
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.single(testKey1), KeyChange.REPLACE);
         assertThat(backstackManager.hasScope("beep")).isFalse();
         assertThat(backstackManager.hasScope("boop")).isFalse();
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
@@ -603,14 +603,14 @@ public class ScopingTest {
         backstackManager.setup(History.of(beep, boop));
 
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
         backstackManager.getBackstack().goBack();
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.single(testKey1), KeyChange.REPLACE);
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.canFindService(SERVICE_TAG)).isFalse();
     }
@@ -653,7 +653,7 @@ public class ScopingTest {
 
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
@@ -661,7 +661,7 @@ public class ScopingTest {
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.single(testKey1), KeyChange.REPLACE);
         assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
         assertThat(backstackManager.canFindService(SERVICE_TAG)).isFalse();
@@ -720,7 +720,7 @@ public class ScopingTest {
 
         backstackManager.setup(History.of(beep, boop));
 
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
     }
 
     @Test
@@ -782,12 +782,12 @@ public class ScopingTest {
 
         assertThat(serviceRegistered).isEmpty();
         assertThat(serviceUnregistered).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(serviceRegistered).containsExactly(service1, service2);
         assertThat(serviceUnregistered).isEmpty();
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(bye), KeyChange.REPLACE);
 
         assertThat(serviceRegistered).containsExactly(service1, service2);
         assertThat(serviceUnregistered).containsExactly(service2, service1);
@@ -839,12 +839,12 @@ public class ScopingTest {
 
         assertThat(serviceRegistered).isEmpty();
         assertThat(serviceUnregistered).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(serviceRegistered).containsExactly(service1, service2);
         assertThat(serviceUnregistered).isEmpty();
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(bye), KeyChange.REPLACE);
 
         assertThat(serviceRegistered).containsExactly(service1, service2);
         assertThat(serviceUnregistered).containsExactly(service2, service1);
@@ -879,7 +879,7 @@ public class ScopingTest {
         };
 
         backstackManager.setup(History.of(beep));
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(backstackManager.getBackstack()).isSameAs(backstack.get());
     }
 
@@ -943,7 +943,7 @@ public class ScopingTest {
 
         assertThat(activatedServices).isEmpty();
         assertThat(deactivatedServices).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(activatedServices).containsExactly(service2);
         assertThat(deactivatedServices).isEmpty();
@@ -953,7 +953,7 @@ public class ScopingTest {
         assertThat(activatedServices).containsExactly(service2, service1);
         assertThat(deactivatedServices).containsExactly(service2);
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(bye), KeyChange.REPLACE);
 
         assertThat(activatedServices).containsExactly(service2, service1);
         assertThat(deactivatedServices).containsExactly(service2, service1);
@@ -1026,7 +1026,7 @@ public class ScopingTest {
         backstackManager.setup(History.of(beep));
 
         assertThat(activatedServices).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(activatedServices).containsExactly(service1, service2, service3);
 
@@ -1100,14 +1100,14 @@ public class ScopingTest {
         backstackManager.setup(History.of(beep));
 
         assertThat(deactivatedServices).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         backstackManager.getBackstack().goTo(boop);
 
         assertThat(deactivatedServices).containsExactly(service3, service2, service1);
 
         TestKey bye = new TestKey("bye");
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(bye), KeyChange.REPLACE);
 
         assertThat(deactivatedServices).containsExactly(service3, service2, service1, service6, service5, service4);
     }
@@ -1154,12 +1154,12 @@ public class ScopingTest {
 
         assertThat(activatedServices).isEmpty();
         assertThat(deactivatedServices).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(activatedServices).containsExactly(service1);
 
-        backstackManager.getBackstack().removeStateChanger();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.getBackstack().removeKeyChanger();
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(activatedServices).containsExactly(service1);
     }
@@ -1207,37 +1207,37 @@ public class ScopingTest {
 
         assertThat(activatedServices).isEmpty();
         assertThat(deactivatedServices).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(activatedServices).containsExactly(service1);
         assertThat(deactivatedServices).isEmpty();
 
-        backstackManager.getBackstack().removeStateChanger();
+        backstackManager.getBackstack().removeKeyChanger();
         assertThat(deactivatedServices).isEmpty();
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(bye), KeyChange.REPLACE);
         assertThat(deactivatedServices).isEmpty();
 
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(deactivatedServices).containsExactly(service1);
 
-        backstackManager.getBackstack().removeStateChanger();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.getBackstack().removeKeyChanger();
+        backstackManager.setKeyChanger(keyChanger);
         assertThat(deactivatedServices).containsExactly(service1);
     }
 
     @Test
-    public void activationHappensEvenWithForceExecutedStateChangeAndInitializeStateChange() {
+    public void activationHappensEvenWithForceExecutedKeyChangeAndInitializeKeyChange() {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
 
         final List<Object> activatedServices = new ArrayList<>();
         final List<Object> deactivatedServices = new ArrayList<>();
 
-        final AtomicReference<StateChanger.Callback> callback = new AtomicReference<>();
-        StateChanger pendingStateChanger = new StateChanger() {
+        final AtomicReference<KeyChanger.Callback> callback = new AtomicReference<>();
+        KeyChanger pendingKeyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
                 callback.set(completionCallback);
             }
         };
@@ -1301,17 +1301,17 @@ public class ScopingTest {
         backstackManager.setup(History.of(beep));
 
         assertThat(activatedServices).isEmpty();
-        backstackManager.setStateChanger(pendingStateChanger);
-        callback.get().stateChangeComplete();
+        backstackManager.setKeyChanger(pendingKeyChanger);
+        callback.get().keyChangeComplete();
 
         assertThat(activatedServices).containsExactly(service1, service2, service3);
 
-        backstackManager.getBackstack().setHistory(History.of(boop), StateChange.BACKWARD);
-        backstackManager.getBackstack().removeStateChanger();
-        backstackManager.getBackstack().executePendingStateChange();
+        backstackManager.getBackstack().setHistory(History.of(boop), KeyChange.BACKWARD);
+        backstackManager.getBackstack().removeKeyChanger();
+        backstackManager.getBackstack().executePendingKeyChange();
 
-        backstackManager.setStateChanger(pendingStateChanger);
-        callback.get().stateChangeComplete();
+        backstackManager.setKeyChanger(pendingKeyChanger);
+        callback.get().keyChangeComplete();
 
         assertThat(activatedServices).containsExactly(service1, service2, service3, service4, service5, service6);
         assertThat(deactivatedServices).containsExactly(service3, service2, service1);
@@ -1353,16 +1353,16 @@ public class ScopingTest {
             }
         };
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.setScopedServices(activity, new ServiceProvider());
         backstackDelegate.onCreate(null, null, History.of(testKeyWithScope));
-        backstackDelegate.setStateChanger(stateChanger);
+        backstackDelegate.setKeyChanger(keyChanger);
 
         assertThat(backstackDelegate.canFindService(SERVICE_TAG)).isTrue();
 
@@ -1536,17 +1536,17 @@ public class ScopingTest {
 
         backstackManager.setup(History.of(beep, boop));
 
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         backstackManager.getBackstack().goTo(braap);
 
-        backstackManager.getBackstack().removeStateChanger(); // just to make sure
-        backstackManager.setStateChanger(stateChanger); // just to make sure
+        backstackManager.getBackstack().removeKeyChanger(); // just to make sure
+        backstackManager.setKeyChanger(keyChanger); // just to make sure
 
         backstackManager.getBackstack().goBack();
 
         TestKey bye = new TestKey("bye");
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(bye), KeyChange.REPLACE);
 
         assertThat(events).containsExactly(
                 Pair.of(service1, ServiceEvent.CREATE),
@@ -1664,10 +1664,10 @@ public class ScopingTest {
         }
 
         backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -1746,7 +1746,7 @@ public class ScopingTest {
         assertThat(inactivated).isEmpty();
         assertThat(registered).isEmpty();
         assertThat(unregistered).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(activated).isNotEmpty();
         assertThat(inactivated).isEmpty();
@@ -1756,7 +1756,7 @@ public class ScopingTest {
         assertThat(activated).containsOnlyOnce(service);
         assertThat(registered).containsOnlyOnce(service);
 
-        backstackManager.getBackstack().setHistory(History.of(clear), StateChange.REPLACE);
+        backstackManager.getBackstack().setHistory(History.of(clear), KeyChange.REPLACE);
 
         assertThat(activated).isNotEmpty();
         assertThat(inactivated).isNotEmpty();
@@ -1772,10 +1772,10 @@ public class ScopingTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
         backstackManager.setup(History.of(testKey2));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
         assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();

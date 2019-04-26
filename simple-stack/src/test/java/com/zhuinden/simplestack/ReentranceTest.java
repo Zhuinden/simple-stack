@@ -34,10 +34,9 @@ import static org.assertj.core.api.Fail.fail;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ReentranceTest {
-
     Backstack flow;
     List<Object> lastStack;
-    StateChanger.Callback lastCallback;
+    KeyChanger.Callback lastCallback;
 
     @Before
     public void setUp() {
@@ -46,34 +45,34 @@ public class ReentranceTest {
 
     @Test
     public void reentrantGo() {
-        StateChanger dispatcher = new StateChanger() {
+        KeyChanger dispatcher = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange navigation, @NonNull StateChanger.Callback callback) {
-                lastStack = navigation.getNewState();
-                Parcelable next = navigation.topNewState();
+            public void handleKeyChange(@NonNull KeyChange navigation, @NonNull KeyChanger.Callback callback) {
+                lastStack = navigation.getNewKeys();
+                Parcelable next = navigation.topNewKey();
                 if(next instanceof Detail) {
                     flow.goTo(new Loading());
                 } else if(next instanceof Loading) {
                     flow.goTo(new Error());
                 }
-                callback.stateChangeComplete();
+                callback.keyChangeComplete();
             }
         };
         flow = new Backstack(History.single(new Catalog()));
-        flow.setStateChanger(dispatcher);
+        flow.setKeyChanger(dispatcher);
         flow.goTo(new Detail());
         verifyHistory(lastStack, new Error(), new Loading(), new Detail(), new Catalog());
     }
 
     @Test
     public void reentrantGoThenBack() {
-        StateChanger dispatcher = new StateChanger() {
+        KeyChanger dispatcher = new KeyChanger() {
             boolean loading = true;
 
             @Override
-            public void handleStateChange(@NonNull StateChange navigation, @NonNull StateChanger.Callback onComplete) {
-                lastStack = navigation.getNewState();
-                Object next = navigation.topNewState();
+            public void handleKeyChange(@NonNull KeyChange navigation, @NonNull KeyChanger.Callback onComplete) {
+                lastStack = navigation.getNewKeys();
+                Object next = navigation.topNewKey();
                 if(loading) {
                     if(next instanceof Detail) {
                         flow.goTo(new Loading());
@@ -81,18 +80,18 @@ public class ReentranceTest {
                         flow.goTo(new Error());
                     } else if(next instanceof Error) {
                         loading = false;
-                        flow.setHistory(History.builderFrom(flow).removeLast().build(), StateChange.BACKWARD);
+                        flow.setHistory(History.builderFrom(flow).removeLast().build(), KeyChange.BACKWARD);
                     }
                 } else {
                     if(next instanceof Loading) {
-                        flow.setHistory(History.builderFrom(flow).removeLast().build(), StateChange.BACKWARD);
+                        flow.setHistory(History.builderFrom(flow).removeLast().build(), KeyChange.BACKWARD);
                     }
                 }
-                onComplete.stateChangeComplete();
+                onComplete.keyChangeComplete();
             }
         };
         flow = new Backstack(History.single(new Catalog()));
-        flow.setStateChanger(dispatcher);
+        flow.setKeyChanger(dispatcher);
         verifyHistory(lastStack, new Catalog());
         flow.goTo(new Detail());
         verifyHistory(lastStack, new Detail(), new Catalog());
@@ -101,21 +100,21 @@ public class ReentranceTest {
     @Test
     public void reentrantForwardThenGo() {
         Backstack flow = new Backstack(History.single(new Catalog()));
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
-                Object next = traversal.topNewState();
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
+                lastStack = traversal.getNewKeys();
+                Object next = traversal.topNewKey();
                 if(next instanceof Detail) {
                     ReentranceTest.this.flow.setHistory(History.newBuilder() //
                                     .add(new Detail()) //
                                     .add(new Loading())  //
                                     .build(), //
-                            StateChange.FORWARD);
+                            KeyChange.FORWARD);
                 } else if(next instanceof Loading) {
                     ReentranceTest.this.flow.goTo(new Error());
                 }
-                callback.stateChangeComplete();
+                callback.keyChangeComplete();
             }
         });
         this.flow = flow;
@@ -125,12 +124,12 @@ public class ReentranceTest {
 
     @Test
     public void reentranceWaitsForCallback() {
-        StateChanger dispatcher = new StateChanger() {
+        KeyChanger dispatcher = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
+                lastStack = traversal.getNewKeys();
                 lastCallback = callback;
-                Object next = traversal.topNewState();
+                Object next = traversal.topNewKey();
                 if(next instanceof Detail) {
                     flow.goTo(new Loading());
                 } else if(next instanceof Loading) {
@@ -139,33 +138,33 @@ public class ReentranceTest {
             }
         };
         flow = new Backstack(History.single(new Catalog()));
-        flow.setStateChanger(dispatcher);
-        lastCallback.stateChangeComplete();
+        flow.setKeyChanger(dispatcher);
+        lastCallback.keyChangeComplete();
 
         flow.goTo(new Detail());
         verifyHistory(flow.getHistory(), new Catalog());
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         verifyHistory(flow.getHistory(), new Detail(), new Catalog());
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         verifyHistory(flow.getHistory(), new Loading(), new Detail(), new Catalog());
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         verifyHistory(flow.getHistory(), new Error(), new Loading(), new Detail(), new Catalog());
     }
 
     @Test
     public void onCompleteThrowsIfCalledTwice() {
         flow = new Backstack(History.single(new Catalog()));
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
+                lastStack = traversal.getNewKeys();
                 lastCallback = callback;
             }
         });
 
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         try {
-            lastCallback.stateChangeComplete();
+            lastCallback.keyChangeComplete();
         } catch(IllegalStateException e) {
             return;
         }
@@ -176,11 +175,11 @@ public class ReentranceTest {
     public void bootstrapTraversal() {
         flow = new Backstack(History.single(new Catalog()));
 
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
-                callback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
+                lastStack = traversal.getNewKeys();
+                callback.keyChangeComplete();
             }
         });
 
@@ -193,12 +192,12 @@ public class ReentranceTest {
         flow = new Backstack(History.single(new Catalog()));
         flow.goTo(new Detail());
 
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 dispatchCount.incrementAndGet();
-                lastStack = traversal.getNewState();
-                callback.stateChangeComplete();
+                lastStack = traversal.getNewKeys();
+                callback.keyChangeComplete();
             }
         });
 
@@ -213,17 +212,17 @@ public class ReentranceTest {
         flow.goTo(new Detail());
         flow.goTo(new Error());
 
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 lastCallback = callback;
             }
         });
 
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         verifyHistory(flow.getHistory(), new Loading(), new Catalog());
 
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         verifyHistory(flow.getHistory(), new Detail(), new Loading(), new Catalog());
     }
 
@@ -231,21 +230,21 @@ public class ReentranceTest {
     public void clearingDispatcherMidTraversalPauses() {
         flow = new Backstack(History.single(new Catalog()));
 
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 flow.goTo(new Loading());
-                flow.removeStateChanger();
-                callback.stateChangeComplete();
+                flow.removeKeyChanger();
+                callback.keyChangeComplete();
             }
         });
 
         verifyHistory(flow.getHistory(), new Catalog());
 
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                callback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
+                callback.keyChangeComplete();
             }
         });
 
@@ -253,49 +252,49 @@ public class ReentranceTest {
     }
 
     @Test
-    public void handleStateChangerSetInMidFlightWaitsForBootstrap() {
+    public void handleKeyChangerSetInMidFlightWaitsForBootstrap() {
         flow = new Backstack(History.single(new Catalog()));
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 lastCallback = callback;
             }
         });
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
-                callback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
+                lastStack = traversal.getNewKeys();
+                callback.keyChangeComplete();
             }
         });
 
         assertThat(lastStack).isNull();
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         verifyHistory(lastStack, new Catalog());
     }
 
     @Test
-    public void handleStateChangeerSetInMidFlightWithBigQueueNeedsNoBootstrap() {
+    public void handleKeyChangeerSetInMidFlightWithBigQueueNeedsNoBootstrap() {
         final AtomicInteger secondDispatcherCount = new AtomicInteger(0);
         flow = new Backstack(History.single(new Catalog()));
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 flow.goTo(new Detail());
                 lastCallback = callback;
             }
         });
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 secondDispatcherCount.incrementAndGet();
-                lastStack = traversal.getNewState();
-                callback.stateChangeComplete();
+                lastStack = traversal.getNewKeys();
+                callback.keyChangeComplete();
             }
         });
 
         assertThat(lastStack).isNull();
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
         verifyHistory(lastStack, new Detail(), new Catalog());
         assertThat(secondDispatcherCount.get()).isEqualTo(1);
     }
@@ -305,27 +304,27 @@ public class ReentranceTest {
         final AtomicInteger secondDispatcherCount = new AtomicInteger(0);
         flow = new Backstack(History.single(new Catalog()));
 
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 lastCallback = callback;
-                flow.removeStateChanger();
+                flow.removeKeyChanger();
                 flow.goTo(new Loading());
             }
         });
 
         verifyHistory(flow.getHistory(), new Catalog());
 
-        flow.setStateChanger(new StateChanger() {
+        flow.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
+            public void handleKeyChange(@NonNull KeyChange traversal, @NonNull KeyChanger.Callback callback) {
                 secondDispatcherCount.incrementAndGet();
-                callback.stateChangeComplete();
+                callback.keyChangeComplete();
             }
         });
 
         assertThat(secondDispatcherCount.get()).isZero();
-        lastCallback.stateChangeComplete();
+        lastCallback.keyChangeComplete();
 
         assertThat(secondDispatcherCount.get()).isEqualTo(1);
         verifyHistory(flow.getHistory(), new Loading(), new Catalog());

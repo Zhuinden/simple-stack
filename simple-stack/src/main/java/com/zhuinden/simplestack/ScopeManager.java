@@ -780,7 +780,7 @@ class ScopeManager {
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
                 activeScopes.toArray()) + "! " +
                 "Is the scope tag registered via a ScopeKey? " +
-                "If yes, make sure the StateChanger has been set by this time, " +
+                "If yes, make sure the KeyChanger has been set by this time, " +
                 "and that you've bound and are trying to lookup the service with the correct service tag. " +
                 "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
     }

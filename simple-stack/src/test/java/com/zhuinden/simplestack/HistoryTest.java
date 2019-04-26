@@ -134,10 +134,10 @@ public class HistoryTest {
 
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, History.of(testKey1, testKey2));
-        backstackDelegate.setStateChanger(new StateChanger() {
+        backstackDelegate.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
         assertThat(History.builderFrom(backstackDelegate)).containsExactly(testKey1, testKey2);
@@ -150,10 +150,10 @@ public class HistoryTest {
 
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, History.of(testKey1, testKey2));
-        backstackDelegate.setStateChanger(new StateChanger() {
+        backstackDelegate.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
         assertThat(History.builderFrom(backstackDelegate.getBackstack())).containsExactly(testKey1, testKey2);

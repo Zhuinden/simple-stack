@@ -17,9 +17,9 @@ import android.widget.RelativeLayout;
 
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
+import com.zhuinden.simplestack.KeyChange;
+import com.zhuinden.simplestack.KeyChanger;
 import com.zhuinden.simplestack.KeyContextWrapper;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackdemomultistack.R;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.chromecast.ChromeCastKey;
 import com.zhuinden.simplestackdemomultistack.presentation.paths.main.cloudsync.CloudSyncKey;
@@ -39,7 +39,7 @@ import static com.zhuinden.simplestackdemomultistack.application.MainActivity.St
 
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements KeyChanger {
     public enum StackType {
         CLOUDSYNC,
         CHROMECAST,
@@ -94,7 +94,7 @@ public class MainActivity
 
             }
         });
-        multistack.setStateChanger(this);
+        multistack.setKeyChanger(this);
     }
 
     @Override
@@ -154,8 +154,8 @@ public class MainActivity
         multistack.restoreViewFromState(newView);
         root.addView(newView);
 
-        if(direction == StateChange.REPLACE) {
-            finishStateChange(previousView);
+        if(direction == KeyChange.REPLACE) {
+            finishKeyChange(previousView);
         } else {
             isAnimating = true;
             ViewUtils.waitForMeasure(newView, (view, width, height) -> {
@@ -163,7 +163,7 @@ public class MainActivity
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         isAnimating = false;
-                        finishStateChange(previousView);
+                        finishKeyChange(previousView);
                     }
                 });
             });
@@ -176,24 +176,24 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(stateChange.isTopNewStateEqualToPrevious()) {
+    public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+        if(keyChange.isTopNewKeyEqualToPrevious()) {
             // no-op
-            completionCallback.stateChangeComplete();
+            completionCallback.keyChangeComplete();
             return;
         }
-        int direction = StateChange.REPLACE;
+        int direction = KeyChange.REPLACE;
         if(root.getChildAt(0) != null) {
             Key previousKey = Backstack.getKey(root.getChildAt(0).getContext());
             StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
-            StackType newStack = StackType.valueOf(((Key) stateChange.topNewState()).stackIdentifier());
-            direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
+            StackType newStack = StackType.valueOf(((Key) keyChange.topNewKey()).stackIdentifier());
+            direction = previousStack.ordinal() < newStack.ordinal() ? KeyChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? KeyChange.BACKWARD : KeyChange.REPLACE;
         }
-        exchangeViewForKey(stateChange.topNewState(), direction);
-        completionCallback.stateChangeComplete();
+        exchangeViewForKey(keyChange.topNewKey(), direction);
+        completionCallback.keyChangeComplete();
     }
 
-    private void finishStateChange(View previousView) {
+    private void finishKeyChange(View previousView) {
         root.removeView(previousView);
     }
 
@@ -205,7 +205,7 @@ public class MainActivity
     }
 
     private Animator createSegue(View from, View to, int direction) {
-        boolean backward = direction == StateChange.BACKWARD;
+        boolean backward = direction == KeyChange.BACKWARD;
         int fromTranslation = backward ? from.getWidth() : -from.getWidth();
         int toTranslation = backward ? -to.getWidth() : to.getWidth();
 

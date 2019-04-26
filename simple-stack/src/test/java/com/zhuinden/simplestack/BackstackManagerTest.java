@@ -35,10 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 
 public class BackstackManagerTest {
-    StateChanger stateChanger = new StateChanger() {
+    KeyChanger keyChanger = new KeyChanger() {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-            completionCallback.stateChangeComplete();
+        public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+            completionCallback.keyChangeComplete();
         }
     };
 
@@ -55,14 +55,14 @@ public class BackstackManagerTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         Backstack backstack = backstackManager.getBackstack();
         if(!backstack.goBack()) {
             backstack.reset();
         }
         assertThat(backstack.getHistory()).isEmpty();
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
         assertThat(backstack.getHistory()).doesNotContain(restored);
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
@@ -81,13 +81,13 @@ public class BackstackManagerTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         Backstack backstack = backstackManager.getBackstack();
         backstack.goBack();
         assertThat(backstack.getHistory()).isNotEmpty();
         assertThat(backstack.getHistory()).containsExactly(restored);
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
         assertThat(backstack.getHistory()).containsExactly(restored);
     }
 
@@ -114,7 +114,7 @@ public class BackstackManagerTest {
         });
         backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         Backstack backstack = backstackManager.getBackstack();
         assertThat(backstack.getHistory()).contains(restored);
@@ -124,7 +124,7 @@ public class BackstackManagerTest {
         backstackManager = new BackstackManager();
         backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         backstack = backstackManager.getBackstack();
         assertThat(backstack.getHistory()).contains(restored, filtered);
@@ -143,7 +143,7 @@ public class BackstackManagerTest {
 
         backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         backstack = backstackManager.getBackstack();
         assertThat(backstack.getHistory()).doesNotContain(restored, filtered);
@@ -171,59 +171,59 @@ public class BackstackManagerTest {
     }
 
     @Test
-    public void stateChangeCompletionListenerIsCalledCorrectly() {
+    public void keyChangeCompletionListenerIsCalledCorrectly() {
         final TestKey initial = new TestKey("initial");
         final TestKey other = new TestKey("other");
         final AtomicInteger atomicInteger = new AtomicInteger(0);
         final List<Integer> integers = new ArrayList<>();
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setup(History.single(initial));
-        Backstack.CompletionListener stateChangeCompletionListener = new Backstack.CompletionListener() {
+        Backstack.CompletionListener keyChangeCompletionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+            public void keyChangeCompleted(@NonNull KeyChange keyChange) {
                 integers.add(atomicInteger.getAndIncrement());
             }
         };
-        backstackManager.addStateChangeCompletionListener(stateChangeCompletionListener);
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.addKeyChangeCompletionListener(keyChangeCompletionListener);
+        backstackManager.setKeyChanger(keyChanger);
         backstackManager.getBackstack().goTo(other);
         backstackManager.getBackstack().goBack();
         assertThat(integers).containsExactly(0, 1, 2);
-        backstackManager.removeStateChangeCompletionListener(stateChangeCompletionListener);
-        backstackManager.getBackstack().setHistory(History.single(other), StateChange.REPLACE);
+        backstackManager.removeKeyChangeCompletionListener(keyChangeCompletionListener);
+        backstackManager.getBackstack().setHistory(History.single(other), KeyChange.REPLACE);
         assertThat(integers).containsExactly(0, 1, 2);
-        backstackManager.addStateChangeCompletionListener(stateChangeCompletionListener);
-        backstackManager.getBackstack().setHistory(History.single(initial), StateChange.REPLACE);
+        backstackManager.addKeyChangeCompletionListener(keyChangeCompletionListener);
+        backstackManager.getBackstack().setHistory(History.single(initial), KeyChange.REPLACE);
         assertThat(integers).containsExactly(0, 1, 2, 3);
-        backstackManager.removeAllStateChangeCompletionListeners();
+        backstackManager.removeAllKeyChangeCompletionListeners();
         backstackManager.getBackstack().goTo(other);
         assertThat(integers).containsExactly(0, 1, 2, 3);
     }
 
     @Test
-    public void stateChangeCompletionListenerIsCalledInCorrectOrder() {
+    public void keyChangeCompletionListenerIsCalledInCorrectOrder() {
         final TestKey initial = new TestKey("initial");
         final TestKey other = new TestKey("other");
         final List<TestKey> integers = new ArrayList<>();
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setup(History.single(initial));
         Backstack backstack = backstackManager.getBackstack();
-        Backstack.CompletionListener stateChangeCompletionListener = new Backstack.CompletionListener() {
+        Backstack.CompletionListener keyChangeCompletionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
-                integers.add(stateChange.<TestKey>topNewState());
+            public void keyChangeCompleted(@NonNull KeyChange keyChange) {
+                integers.add(keyChange.<TestKey>topNewKey());
             }
         };
-        backstackManager.addStateChangeCompletionListener(stateChangeCompletionListener);
-        backstackManager.setStateChanger(stateChanger);
-        backstackManager.detachStateChanger();
+        backstackManager.addKeyChangeCompletionListener(keyChangeCompletionListener);
+        backstackManager.setKeyChanger(keyChanger);
+        backstackManager.detachKeyChanger();
         backstack.goTo(other);
-        backstack.setHistory(History.single(initial), StateChange.REPLACE);
-        backstack.setHistory(History.single(other), StateChange.REPLACE);
-        backstack.setHistory(History.single(initial), StateChange.REPLACE);
-        backstack.setHistory(History.single(initial), StateChange.REPLACE);
+        backstack.setHistory(History.single(initial), KeyChange.REPLACE);
+        backstack.setHistory(History.single(other), KeyChange.REPLACE);
+        backstack.setHistory(History.single(initial), KeyChange.REPLACE);
+        backstack.setHistory(History.single(initial), KeyChange.REPLACE);
         backstack.goTo(other);
-        backstackManager.reattachStateChanger();
+        backstackManager.reattachKeyChanger();
         assertThat(integers).containsExactly(initial, other, initial, other, initial, initial, other);
     }
 
@@ -240,11 +240,11 @@ public class BackstackManagerTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setup(History.single(initial));
         backstackManager.fromBundle(stateBundle);
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         Backstack backstack = backstackManager.getBackstack();
         backstack.goBack();
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
         assertThat(backstack.getInitialKeys()).containsExactly(initial);
     }

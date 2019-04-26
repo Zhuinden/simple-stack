@@ -12,15 +12,15 @@ import com.bluelinelabs.conductor.Conductor;
 import com.bluelinelabs.conductor.Router;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.KeyChange;
+import com.zhuinden.simplestack.KeyChanger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements KeyChanger {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.navigation)
@@ -32,7 +32,7 @@ public class MainActivity
     BackstackDelegate backstackDelegate;
     Router router;
 
-    ControllerStateChanger controllerStateChanger;
+    ControllerKeyChanger controllerKeyChanger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +61,8 @@ public class MainActivity
             return false;
         });
         router = Conductor.attachRouter(this, root, savedInstanceState);
-        controllerStateChanger = new ControllerStateChanger(router);
-        backstackDelegate.setStateChanger(this);
+        controllerKeyChanger = new ControllerKeyChanger(router);
+        backstackDelegate.setKeyChanger(this);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MainActivity
     }
 
     private void replaceHistory(Object rootKey) {
-        backstackDelegate.getBackstack().setHistory(History.single(rootKey), StateChange.REPLACE);
+        backstackDelegate.getBackstack().setHistory(History.single(rootKey), KeyChange.REPLACE);
     }
 
     public void navigateTo(Object key) {
@@ -100,12 +100,12 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(stateChange.isTopNewStateEqualToPrevious()) {
-            completionCallback.stateChangeComplete();
+    public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+        if(keyChange.isTopNewKeyEqualToPrevious()) {
+            completionCallback.keyChangeComplete();
             return;
         }
-        controllerStateChanger.handleStateChange(stateChange);
-        completionCallback.stateChangeComplete();
+        controllerKeyChanger.handleKeyChange(keyChange);
+        completionCallback.keyChangeComplete();
     }
 }

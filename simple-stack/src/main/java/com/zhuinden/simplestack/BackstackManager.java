@@ -35,21 +35,21 @@ import java.util.Set;
 /**
  * The backstack manager manages a {@link Backstack} internally, and wraps it with the ability of persisting view state and the backstack history itself.
  *
- * The backstack is created by {@link BackstackManager#setup(List)}, and initialized by {@link BackstackManager#setStateChanger(StateChanger)}.
+ * The backstack is created by {@link BackstackManager#setup(List)}, and initialized by {@link BackstackManager#setKeyChanger(KeyChanger)}.
  */
 public class BackstackManager
         implements Bundleable {
     /**
-     * Specifies the strategy to be used in order to delete {@link SavedState}s that are no longer needed after a {@link StateChange}, when there is no pending {@link StateChange} left.
+     * Specifies the strategy to be used in order to delete {@link SavedState}s that are no longer needed after a {@link KeyChange}, when there is no pending {@link KeyChange} left.
      */
     public interface StateClearStrategy {
         /**
          * Allows a hook to clear the {@link SavedState} for obsolete keys.
          *
          * @param keyStateMap the map that contains the keys and their corresponding retained saved state.
-         * @param stateChange the last state change
+         * @param keyChange the last key change
          */
-        void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange);
+        void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull KeyChange keyChange);
     }
 
     private static final String HISTORY_TAG = "HISTORY";
@@ -70,18 +70,18 @@ public class BackstackManager
 
     private Object previousTopKeyWithAssociatedScope = null;
 
-    private final StateChanger managedStateChanger = new StateChanger() {
+    private final KeyChanger managedKeyChanger = new KeyChanger() {
         @Override
-        public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
-            scopeManager.buildScopes(stateChange.getNewState());
-            stateChanger.handleStateChange(stateChange, new Callback() {
+        public void handleKeyChange(@NonNull final KeyChange keyChange, @NonNull final Callback completionCallback) {
+            scopeManager.buildScopes(keyChange.getNewKeys());
+            keyChanger.handleKeyChange(keyChange, new Callback() {
                 @Override
-                public void stateChangeComplete() {
-                    completionCallback.stateChangeComplete();
-                    if(!backstack.isStateChangePending()) {
-                        stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
+                public void keyChangeComplete() {
+                    completionCallback.keyChangeComplete();
+                    if(!backstack.isKeyChangePending()) {
+                        stateClearStrategy.clearStatesNotIn(keyStateMap, keyChange);
 
-                        History<Object> newState = stateChange.getNewState();
+                        History<Object> newState = keyChange.getNewKeys();
 
                         // activation/deactivation
                         Object newTopKeyWithAssociatedScope = null;
@@ -246,7 +246,7 @@ public class BackstackManager
         scopeManager.setBackstackManager(this);
     }
 
-    StateChanger stateChanger;
+    KeyChanger keyChanger;
 
     /**
      * Setup creates the {@link Backstack} with the specified initial keys.
@@ -267,43 +267,43 @@ public class BackstackManager
         return backstack;
     }
 
-    private void initializeBackstack(StateChanger stateChanger) {
-        if(stateChanger != null) {
-            backstack.setStateChanger(managedStateChanger);
+    private void initializeBackstack(KeyChanger keyChanger) {
+        if(keyChanger != null) {
+            backstack.setKeyChanger(managedKeyChanger);
         }
     }
 
     /**
-     * Sets the {@link StateChanger} for the given {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     * Sets the {@link KeyChanger} for the given {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
      *
-     * @param stateChanger the state changer
+     * @param keyChanger the key changer
      */
-    public void setStateChanger(@Nullable StateChanger stateChanger) {
-        checkBackstack("You must call `setup()` before calling `setStateChanger().");
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
+    public void setKeyChanger(@Nullable KeyChanger keyChanger) {
+        checkBackstack("You must call `setup()` before calling `setKeyChanger().");
+        if(backstack.hasKeyChanger()) {
+            backstack.removeKeyChanger();
         }
-        this.stateChanger = stateChanger;
-        initializeBackstack(stateChanger);
+        this.keyChanger = keyChanger;
+        initializeBackstack(keyChanger);
     }
 
     /**
-     * Detaches the {@link StateChanger} from the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     * Detaches the {@link KeyChanger} from the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
      */
-    public void detachStateChanger() {
-        checkBackstack("You must call `setup()` before calling `detachStateChanger().`");
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
+    public void detachKeyChanger() {
+        checkBackstack("You must call `setup()` before calling `detachKeyChanger().`");
+        if(backstack.hasKeyChanger()) {
+            backstack.removeKeyChanger();
         }
     }
 
     /**
-     * Reattaches the {@link StateChanger} to the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     * Reattaches the {@link KeyChanger} to the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
      */
-    public void reattachStateChanger() {
-        checkBackstack("You must call `setup()` before calling `reattachStateChanger().`");
-        if(!backstack.hasStateChanger()) {
-            backstack.setStateChanger(managedStateChanger, Backstack.REATTACH);
+    public void reattachKeyChanger() {
+        checkBackstack("You must call `setup()` before calling `reattachKeyChanger().`");
+        if(!backstack.hasKeyChanger()) {
+            backstack.setKeyChanger(managedKeyChanger, Backstack.REATTACH);
         }
     }
 
@@ -552,7 +552,7 @@ public class BackstackManager
         if(view != null) {
             Object key = KeyContextWrapper.getKey(view.getContext());
             if(key == null) {
-                throw new IllegalArgumentException("The view [" + view + "] contained no key in its context hierarchy. The view or its parent hierarchy should be inflated by a layout inflater from `stateChange.createContext(baseContext, key)`, or a KeyContextWrapper.");
+                throw new IllegalArgumentException("The view [" + view + "] contained no key in its context hierarchy. The view or its parent hierarchy should be inflated by a layout inflater from `keyChange.createContext(baseContext, key)`, or a KeyContextWrapper.");
             }
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             view.saveHierarchyState(viewHierarchyState);
@@ -587,7 +587,7 @@ public class BackstackManager
     }
 
     /**
-     * Allows adding a {@link Backstack.CompletionListener} to the internal {@link Backstack} that is called when the state change is completed, but before the state is cleared.
+     * Allows adding a {@link Backstack.CompletionListener} to the internal {@link Backstack} that is called when the key change is completed, but before the state is cleared.
      *
      * Please note that a strong reference is kept to the listener, and the {@link Backstack} is typically preserved across configuration change.
      * It is recommended that it is NOT an anonymous inner class or normal inner class in an Activity,
@@ -595,34 +595,34 @@ public class BackstackManager
      *
      * Instead, it should be a class, or a static inner class.
      *
-     * @param stateChangeCompletionListener the state change completion listener.
+     * @param keyChangeCompletionListener the key change completion listener.
      */
-    public void addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
-        checkBackstack("A backstack must be set up before a state change completion listener is added to it.");
-        if(stateChangeCompletionListener == null) {
-            throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
+    public void addKeyChangeCompletionListener(@NonNull Backstack.CompletionListener keyChangeCompletionListener) {
+        checkBackstack("A backstack must be set up before a key change completion listener is added to it.");
+        if(keyChangeCompletionListener == null) {
+            throw new IllegalArgumentException("KeyChangeCompletionListener cannot be null!");
         }
-        this.backstack.addCompletionListener(stateChangeCompletionListener);
+        this.backstack.addCompletionListener(keyChangeCompletionListener);
     }
 
     /**
      * Removes the provided {@link Backstack.CompletionListener}.
      *
-     * @param stateChangeCompletionListener the state change completion listener.
+     * @param keyChangeCompletionListener the key change completion listener.
      */
-    public void removeStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
-        checkBackstack("A backstack must be set up before a state change completion listener is removed from it.");
-        if(stateChangeCompletionListener == null) {
-            throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
+    public void removeKeyChangeCompletionListener(@NonNull Backstack.CompletionListener keyChangeCompletionListener) {
+        checkBackstack("A backstack must be set up before a key change completion listener is removed from it.");
+        if(keyChangeCompletionListener == null) {
+            throw new IllegalArgumentException("KeyChangeCompletionListener cannot be null!");
         }
-        this.backstack.removeCompletionListener(stateChangeCompletionListener);
+        this.backstack.removeCompletionListener(keyChangeCompletionListener);
     }
 
     /**
      * Removes all {@link Backstack.CompletionListener}s added to the {@link Backstack}.
      */
-    public void removeAllStateChangeCompletionListeners() {
-        checkBackstack("A backstack must be set up before state change completion listeners are removed from it.");
+    public void removeAllKeyChangeCompletionListeners() {
+        checkBackstack("A backstack must be set up before key change completion listeners are removed from it.");
         this.backstack.removeCompletionListeners();
     }
 

@@ -8,16 +8,16 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.KeyChange
+import com.zhuinden.simplestack.KeyChanger
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewStateChanger
+import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKeyChanger
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), StateChanger {
+class MainActivity : AppCompatActivity(), KeyChanger {
     private val databaseManager = Injector.get().databaseManager()
     private val backstackHolder = Injector.get().backstackHolder()
 
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
     override fun onCreateOptionsMenu(menu: Menu): Boolean =
         mainView.onCreateOptionsMenu(menu)
 
-    private lateinit var viewStateChanger: ViewStateChanger
+    private lateinit var viewKeyChanger: ViewKeyChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         databaseManager.init(this)
@@ -40,11 +40,11 @@ class MainActivity : AppCompatActivity(), StateChanger {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewStateChanger = ViewStateChanger(this, root)
+        viewKeyChanger = ViewKeyChanger(this, root)
         val backstack = Navigator.configure()
             .setScopedServices(ServiceProvider())
             .setDeferredInitialization(true)
-            .setStateChanger(this)
+            .setKeyChanger(this)
             .install(this, root, History.single(TasksKey()))
         backstackHolder.backstack = backstack
 
@@ -82,16 +82,16 @@ class MainActivity : AppCompatActivity(), StateChanger {
         else -> super.getSystemService(name)
     }
 
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
-            completionCallback.stateChangeComplete()
+    override fun handleKeyChange(keyChange: KeyChange, completionCallback: KeyChanger.Callback) {
+        if (keyChange.isTopNewKeyEqualToPrevious) {
+            completionCallback.keyChangeComplete()
             return
         }
 
-        viewStateChanger.handleStateChange(stateChange) {
-            mainView.handleStateChange(stateChange) {
-                mainView.setupViewsForKey(stateChange.topNewState(), root.getChildAt(0))
-                completionCallback.stateChangeComplete()
+        viewKeyChanger.handleKeyChange(keyChange) {
+            mainView.handleKeyChange(keyChange) {
+                mainView.setupViewsForKey(keyChange.topNewKey(), root.getChildAt(0))
+                completionCallback.keyChangeComplete()
             }
         }
     }

@@ -19,27 +19,27 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
 /**
- * The StateChanger handles the {@link StateChange}s that occur within the {@link Backstack}.
+ * The KeyChanger handles the {@link KeyChange}s that occur within the {@link Backstack}.
  *
- * {@link StateChange} cannot be cancelled, a {@link StateChange} set during an active {@link StateChange} gets enqueued.
+ * {@link KeyChange} cannot be cancelled, a {@link KeyChange} set during an active {@link KeyChange} gets enqueued.
  */
-public interface StateChanger {
+public interface KeyChanger {
     /**
-     * When the {@link StateChange} is complete, then the callback must be called.
+     * When the {@link KeyChange} is complete, then the callback must be called.
      *
      * The callback MUST be called on the thread where the backstack was created.
      */
     interface Callback {
         @MainThread
-        void stateChangeComplete();
+        void keyChangeComplete();
     }
 
     /**
-     * This is called when a {@link StateChange} occurs.
-     * When the {@link StateChange} is handled, {@link Callback#stateChangeComplete()} must be called.
+     * This is called when a {@link KeyChange} occurs.
+     * When the {@link KeyChange} is handled, {@link Callback#keyChangeComplete()} must be called.
      *
-     * @param stateChange        the currently active state change in progress.
-     * @param completionCallback the callback that must be called to signal that the state change is completed.
+     * @param keyChange        the currently active key change in progress.
+     * @param completionCallback the callback that must be called to signal that the key change is completed.
      */
-    void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback);
+    void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback);
 }

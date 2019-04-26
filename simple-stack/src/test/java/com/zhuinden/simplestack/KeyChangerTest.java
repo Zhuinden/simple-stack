@@ -34,19 +34,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-public class StateChangerTest {
-    private static class TestStateChanger
-            implements StateChanger {
-        private StateChange stateChange;
+public class KeyChangerTest {
+    private static class TestKeyChanger
+            implements KeyChanger {
+        private KeyChange keyChange;
         private List<Object> originalState;
         private List<Object> newState;
 
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-            this.stateChange = stateChange;
-            originalState = stateChange.getPreviousState();
-            newState = stateChange.getNewState();
-            completionCallback.stateChangeComplete();
+        public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+            this.keyChange = keyChange;
+            originalState = keyChange.getPreviousKeys();
+            newState = keyChange.getNewKeys();
+            completionCallback.keyChangeComplete();
         }
     }
 
@@ -267,64 +267,64 @@ public class StateChangerTest {
 
     Backstack backstack;
 
-    TestStateChanger testStateChanger;
+    TestKeyChanger testKeyChanger;
 
     @Before
     public void before() {
         backstack = new Backstack(new A(), new B(), new C(), new D());
-        testStateChanger = new TestStateChanger();
-        backstack.setStateChanger(testStateChanger);
+        testKeyChanger = new TestKeyChanger();
+        backstack.setKeyChanger(testKeyChanger);
     }
 
     @Test
-    public void stateChangeExposesBackstack() {
-        assertThat(testStateChanger.stateChange.backstack()).isSameAs(backstack);
+    public void keyChangeExposesBackstack() {
+        assertThat(testKeyChanger.keyChange.backstack()).isSameAs(backstack);
     }
 
     @Test
-    public void stateChangeCreatesContextThatExposesKey() {
+    public void keyChangeCreatesContextThatExposesKey() {
         Context context = Mockito.mock(Context.class);
-        Context newContext = testStateChanger.stateChange.createContext(context, testStateChanger.stateChange.topNewState());
-        assertThat(Backstack.getKey(newContext)).isSameAs(testStateChanger.stateChange.topNewState());
+        Context newContext = testKeyChanger.keyChange.createContext(context, testKeyChanger.keyChange.topNewKey());
+        assertThat(Backstack.getKey(newContext)).isSameAs(testKeyChanger.keyChange.topNewKey());
     }
 
     @Test
     public void initialStateIsABCD()
             throws Exception {
-        assertThat(testStateChanger.originalState).isEmpty();
-        assertThat(testStateChanger.newState).containsExactly(new A(), new B(), new C(), new D());
-        assertThat(backstack.getHistory()).containsExactlyElementsOf(testStateChanger.newState);
+        assertThat(testKeyChanger.originalState).isEmpty();
+        assertThat(testKeyChanger.newState).containsExactly(new A(), new B(), new C(), new D());
+        assertThat(backstack.getHistory()).containsExactlyElementsOf(testKeyChanger.newState);
     }
 
     @Test
     public void goToBgoestoAB() {
         backstack.goTo(new B());
-        assertThat(testStateChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
-        assertThat(testStateChanger.newState).containsExactly(new A(), new B());
-        assertThat(backstack.getHistory()).containsExactlyElementsOf(testStateChanger.newState);
+        assertThat(testKeyChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
+        assertThat(testKeyChanger.newState).containsExactly(new A(), new B());
+        assertThat(backstack.getHistory()).containsExactlyElementsOf(testKeyChanger.newState);
     }
 
     @Test
     public void goToEgoestoABCDE() {
         backstack.goTo(new E());
-        assertThat(testStateChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
-        assertThat(testStateChanger.newState).containsExactly(new A(), new B(), new C(), new D(), new E());
-        assertThat(backstack.getHistory()).containsExactlyElementsOf(testStateChanger.newState);
+        assertThat(testKeyChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
+        assertThat(testKeyChanger.newState).containsExactly(new A(), new B(), new C(), new D(), new E());
+        assertThat(backstack.getHistory()).containsExactlyElementsOf(testKeyChanger.newState);
     }
 
     @Test
     public void goBackGoesToC() {
         boolean didGoBack = backstack.goBack();
         assertThat(didGoBack).isTrue();
-        assertThat(testStateChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
-        assertThat(testStateChanger.newState).containsExactly(new A(), new B(), new C());
-        assertThat(backstack.getHistory()).containsExactlyElementsOf(testStateChanger.newState);
+        assertThat(testKeyChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
+        assertThat(testKeyChanger.newState).containsExactly(new A(), new B(), new C());
+        assertThat(backstack.getHistory()).containsExactlyElementsOf(testKeyChanger.newState);
     }
 
     @Test
     public void goBackOneElementReturnsFalse() {
         backstack = new Backstack(new A());
-        backstack.setStateChanger(testStateChanger);
+        backstack.setKeyChanger(testKeyChanger);
         boolean didGoBack = backstack.goBack();
         assertThat(didGoBack).isFalse();
     }
@@ -335,10 +335,10 @@ public class StateChangerTest {
         newHistory.add(new C());
         newHistory.add(new B());
         newHistory.add(new D());
-        backstack.setHistory(newHistory, StateChange.FORWARD);
+        backstack.setHistory(newHistory, KeyChange.FORWARD);
 
-        assertThat(testStateChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
-        assertThat(testStateChanger.newState).containsExactly(new C(), new B(), new D());
-        assertThat(backstack.getHistory()).containsExactlyElementsOf(testStateChanger.newState);
+        assertThat(testKeyChanger.originalState).containsExactly(new A(), new B(), new C(), new D());
+        assertThat(testKeyChanger.newState).containsExactly(new C(), new B(), new D());
+        assertThat(backstack.getHistory()).containsExactlyElementsOf(testKeyChanger.newState);
     }
 }

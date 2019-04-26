@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.KeyChange;
 import com.zhuinden.simplestack.navigator.Navigator;
 
 import butterknife.BindView;
@@ -57,7 +57,7 @@ public class MainActivity
     private void replaceHistory(Object rootKey) {
         Navigator.getBackstack(this)
                 .setHistory(History.single(rootKey),
-                        StateChange.REPLACE);
+                        KeyChange.REPLACE);
     }
 
     public void navigateTo(Object key) {

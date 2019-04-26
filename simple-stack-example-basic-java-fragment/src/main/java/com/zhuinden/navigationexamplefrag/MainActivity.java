@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.KeyChange;
+import com.zhuinden.simplestack.KeyChanger;
 
 import java.util.Arrays;
 
@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements KeyChanger {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.navigation)
@@ -31,7 +31,7 @@ public class MainActivity
     ViewGroup root;
 
     BackstackDelegate backstackDelegate;
-    FragmentStateChanger fragmentStateChanger;
+    FragmentKeyChanger fragmentKeyChanger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +60,8 @@ public class MainActivity
             return false;
         });
         Log.i(TAG, "History [" + Arrays.toString(backstackDelegate.getBackstack().getHistory().toArray()) + "]");
-        fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.root);
-        backstackDelegate.setStateChanger(this);
+        fragmentKeyChanger = new FragmentKeyChanger(getSupportFragmentManager(), R.id.root);
+        backstackDelegate.setKeyChanger(this);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class MainActivity
     }
 
     private void replaceHistory(Object rootKey) {
-        backstackDelegate.getBackstack().setHistory(History.single(rootKey), StateChange.REPLACE);
+        backstackDelegate.getBackstack().setHistory(History.single(rootKey), KeyChange.REPLACE);
     }
 
     public void navigateTo(Object key) {
@@ -99,12 +99,12 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(stateChange.isTopNewStateEqualToPrevious()) {
-            completionCallback.stateChangeComplete();
+    public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+        if(keyChange.isTopNewKeyEqualToPrevious()) {
+            completionCallback.keyChangeComplete();
             return;
         }
-        fragmentStateChanger.handleStateChange(stateChange);
-        completionCallback.stateChangeComplete();
+        fragmentKeyChanger.handleKeyChange(keyChange);
+        completionCallback.keyChangeComplete();
     }
 }

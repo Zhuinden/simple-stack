@@ -18,9 +18,9 @@ package com.zhuinden.simplestack;
 import java.util.List;
 
 /**
- * Represents the state that will be available once state change is complete.
+ * Represents the state that will be available once key change is complete.
  */
-class PendingStateChange {
+class PendingKeyChange {
     enum Status {
         ENQUEUED,
         IN_PROGRESS,
@@ -33,10 +33,10 @@ class PendingStateChange {
 
     private Status status = Status.ENQUEUED;
 
-    StateChanger.Callback completionCallback;
+    KeyChanger.Callback completionCallback;
     boolean didForceExecute = false;
 
-    PendingStateChange(List<?> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
+    PendingKeyChange(List<?> newHistory, @KeyChange.KeyChangeDirection int direction, boolean initialization) {
         this.newHistory = newHistory;
         this.direction = direction;
         this.initialization = initialization;
@@ -48,10 +48,10 @@ class PendingStateChange {
 
     void setStatus(Status status) {
         if(status == null) {
-            throw new NullPointerException("Status of pending state change cannot be null!");
+            throw new NullPointerException("Status of pending key change cannot be null!");
         }
         if(status.ordinal() < this.status.ordinal()) {
-            throw new IllegalStateException("A pending state change cannot go to one of its previous states: [" + this.status + "] to [" + status + "]");
+            throw new IllegalStateException("A pending key change cannot go to one of its previous states: [" + this.status + "] to [" + status + "]");
         }
         this.status = status;
     }

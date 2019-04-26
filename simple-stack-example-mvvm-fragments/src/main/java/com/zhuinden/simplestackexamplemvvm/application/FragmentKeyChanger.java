@@ -3,7 +3,7 @@ package com.zhuinden.simplestackexamplemvvm.application;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.KeyChange;
 import com.zhuinden.simplestackexamplemvvm.R;
 
 import java.util.List;
@@ -12,33 +12,33 @@ import java.util.List;
  * Created by Owner on 2017. 06. 29..
  */
 
-public class FragmentStateChanger {
+public class FragmentKeyChanger {
     private final MainActivity activity;
     private final FragmentManager fragmentManager;
     private final int containerId;
 
-    public FragmentStateChanger(MainActivity activity, FragmentManager fragmentManager, int containerId) {
+    public FragmentKeyChanger(MainActivity activity, FragmentManager fragmentManager, int containerId) {
         this.activity = activity;
         this.fragmentManager = fragmentManager;
         this.containerId = containerId;
     }
 
-    public void handleStateChange(StateChange stateChange) {
+    public void handleKeyChange(KeyChange keyChange) {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack();
-        if(stateChange.getDirection() == StateChange.FORWARD) {
+        if(keyChange.getDirection() == KeyChange.FORWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_right,
                     R.anim.slide_out_to_left,
                     R.anim.slide_in_from_right,
                     R.anim.slide_out_to_left);
-        } else if(stateChange.getDirection() == StateChange.BACKWARD) {
+        } else if(keyChange.getDirection() == KeyChange.BACKWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left,
                     R.anim.slide_out_to_right,
                     R.anim.slide_in_from_left,
                     R.anim.slide_out_to_right);
         }
 
-        List<BaseKey<?>> previousState = stateChange.getPreviousState();
-        List<BaseKey<?>> newState = stateChange.getNewState();
+        List<BaseKey<?>> previousState = keyChange.getPreviousKeys();
+        List<BaseKey<?>> newState = keyChange.getNewKeys();
         for(BaseKey oldKey : previousState) {
             BaseFragment fragment = (BaseFragment) fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
@@ -51,7 +51,7 @@ public class FragmentStateChanger {
         }
         for(BaseKey newKey : newState) {
             BaseFragment fragment = (BaseFragment) fragmentManager.findFragmentByTag(newKey.getFragmentTag());
-            if(newKey.equals(stateChange.topNewState())) {
+            if(newKey.equals(keyChange.topNewKey())) {
                 if(fragment != null) {
                     if(fragment.isRemoving()) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
                         fragment = newKey.newFragment();

@@ -7,7 +7,7 @@ import android.view.View;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.KeyChanger;
 import com.zhuinden.simplestackdemomultistack.application.Key;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class Multistack {
     private Map<String, BackstackDelegate> backstackDelegates = new LinkedHashMap<>();
     private String selectedStack = null;
-    private StateChanger stateChanger;
+    private KeyChanger keyChanger;
 
     private boolean isPaused = false;
 
@@ -65,13 +65,13 @@ public class Multistack {
         return nonConfigurationInstance;
     }
 
-    public void setStateChanger(StateChanger stateChanger) {
-        this.stateChanger = stateChanger;
+    public void setKeyChanger(KeyChanger keyChanger) {
+        this.keyChanger = keyChanger;
         for(Map.Entry<String, BackstackDelegate> entry : backstackDelegates.entrySet()) {
             if(!entry.getKey().equals(selectedStack)) {
                 entry.getValue().onPause(); // FIXME maybe this should be exposed better.
             } else {
-                entry.getValue().setStateChanger(stateChanger);
+                entry.getValue().setKeyChanger(keyChanger);
             }
         }
     }
@@ -110,7 +110,7 @@ public class Multistack {
         }
         if(!selectedStack.equals(identifier)) {
             this.selectedStack = identifier;
-            setStateChanger(stateChanger);
+            setKeyChanger(keyChanger);
         }
     }
 

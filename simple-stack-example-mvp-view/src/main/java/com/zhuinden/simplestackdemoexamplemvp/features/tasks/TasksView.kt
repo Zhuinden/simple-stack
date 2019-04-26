@@ -11,8 +11,8 @@ import android.util.AttributeSet
 import android.view.MenuItem
 import butterknife.ButterKnife
 import butterknife.OnClick
-import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.KeyChange
+import com.zhuinden.simplestack.KeyChanger
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
@@ -27,7 +27,7 @@ import java.util.*
  * Created by Owner on 2017. 01. 26..
  */
 
-class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelectedListener, StateChanger, MessageQueue.Receiver {
+class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelectedListener, KeyChanger, MessageQueue.Receiver {
     companion object {
         const val CONTROLLER_TAG = "TasksView.Presenter"
     }
@@ -87,13 +87,13 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
         return false
     }
 
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
+    override fun handleKeyChange(keyChange: KeyChange, completionCallback: KeyChanger.Callback) {
         // hack fix from  http://stackoverflow.com/a/27073879/2413303 to fix view staying on screen
         isRefreshing = false
         destroyDrawingCache()
         clearAnimation()
         // end
-        completionCallback.stateChangeComplete()
+        completionCallback.keyChangeComplete()
     }
 
     @OnClick(R.id.buttonNoTasksAdd)

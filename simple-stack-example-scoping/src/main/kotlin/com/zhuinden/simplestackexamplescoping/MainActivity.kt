@@ -3,26 +3,26 @@ package com.zhuinden.simplestackexamplescoping
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.KeyChange
+import com.zhuinden.simplestack.KeyChanger
 import com.zhuinden.simplestack.navigator.Navigator
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
  * Created by Zhuinden on 2018.09.17.
  */
-class MainActivity : AppCompatActivity(), StateChanger {
-    private lateinit var fragmentStateChanger: FragmentStateChanger
+class MainActivity : AppCompatActivity(), KeyChanger {
+    private lateinit var fragmentKeyChanger: FragmentKeyChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
-        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+        fragmentKeyChanger = FragmentKeyChanger(supportFragmentManager, R.id.root)
 
         Navigator.configure()
-            .setStateChanger(this)
+            .setKeyChanger(this)
             .setScopedServices(ScopeConfiguration())
             .setShouldPersistContainerChild(false)
             .install(this, root, History.of(WordListKey()))
@@ -34,12 +34,12 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
     }
 
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
-            completionCallback.stateChangeComplete()
+    override fun handleKeyChange(keyChange: KeyChange, completionCallback: KeyChanger.Callback) {
+        if (keyChange.isTopNewKeyEqualToPrevious) {
+            completionCallback.keyChangeComplete()
             return
         }
-        fragmentStateChanger.handleStateChange(stateChange)
-        completionCallback.stateChangeComplete()
+        fragmentKeyChanger.handleKeyChange(keyChange)
+        completionCallback.keyChangeComplete()
     }
 }

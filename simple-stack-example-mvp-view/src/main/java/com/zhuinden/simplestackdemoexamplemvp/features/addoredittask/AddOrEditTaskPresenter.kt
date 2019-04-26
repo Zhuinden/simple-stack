@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemoexamplemvp.features.addoredittask
 
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.KeyChange
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplemvp.domain.Task
@@ -72,7 +72,7 @@ class AddOrEditTaskPresenter @Inject constructor(
                 backstack.goBack()
             }
             is AddOrEditTaskKey.EditTaskKey -> {
-                backstack.jumpToRoot(StateChange.BACKWARD)
+                backstack.jumpToRoot(KeyChange.BACKWARD)
             }
         }
     }

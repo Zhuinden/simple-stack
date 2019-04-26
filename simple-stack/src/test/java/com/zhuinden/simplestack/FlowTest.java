@@ -55,12 +55,12 @@ public class FlowTest {
     int lastDirection;
 
     class FlowDispatcher
-            implements StateChanger {
+            implements KeyChanger {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback callback) {
-            lastStack = stateChange.getNewState();
-            lastDirection = stateChange.getDirection();
-            callback.stateChangeComplete();
+        public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull KeyChanger.Callback callback) {
+            lastStack = keyChange.getNewKeys();
+            lastDirection = keyChange.getDirection();
+            callback.keyChangeComplete();
         }
     }
 
@@ -73,23 +73,23 @@ public class FlowTest {
     public void oneTwoThree() {
         History<?> history = History.single(new Uno());
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
 
         flow.goTo(new Dos());
         assertThat(lastStack.top()).isInstanceOf(Dos.class);
-        assertThat(lastDirection).isSameAs(StateChange.FORWARD);
+        assertThat(lastDirection).isSameAs(KeyChange.FORWARD);
 
         flow.goTo(new Tres());
         assertThat(lastStack.top()).isInstanceOf(Tres.class);
-        assertThat(lastDirection).isSameAs(StateChange.FORWARD);
+        assertThat(lastDirection).isSameAs(KeyChange.FORWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isInstanceOf(Dos.class);
-        assertThat(lastDirection).isSameAs(StateChange.BACKWARD);
+        assertThat(lastDirection).isSameAs(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isInstanceOf(Uno.class);
-        assertThat(lastDirection).isSameAs(StateChange.BACKWARD);
+        assertThat(lastDirection).isSameAs(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isFalse();
     }
@@ -99,21 +99,21 @@ public class FlowTest {
         final History<?> firstHistory = History.single(new Uno());
 
         class Ourrobouros
-                implements StateChanger {
+                implements KeyChanger {
             Backstack flow = new Backstack(firstHistory);
 
             {
-                flow.setStateChanger(this);
+                flow.setKeyChanger(this);
             }
 
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback onComplete) {
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull KeyChanger.Callback onComplete) {
                 assertThat(firstHistory).hasSameSizeAs(flow.getHistory());
                 Iterator<?> original = firstHistory.iterator();
                 for(Object o : flow.getHistory()) {
                     assertThat(o).isEqualTo(original.next());
                 }
-                onComplete.stateChangeComplete();
+                onComplete.keyChangeComplete();
             }
         }
 
@@ -127,7 +127,7 @@ public class FlowTest {
         assertThat(history.size()).isEqualTo(3);
 
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isEqualTo(baker);
@@ -142,12 +142,12 @@ public class FlowTest {
     public void setHistoryWorks() {
         History<?> history = History.from(Arrays.asList(able, baker));
         Backstack flow = new Backstack(history);
-        FlowDispatcher handleStateChangeer = new FlowDispatcher();
-        flow.setStateChanger(handleStateChangeer);
+        FlowDispatcher handleKeyChangeer = new FlowDispatcher();
+        flow.setKeyChanger(handleKeyChangeer);
 
         History<?> newHistory = History.from(Arrays.asList(charlie, delta));
-        flow.setHistory(newHistory, StateChange.FORWARD);
-        assertThat(lastDirection).isSameAs(StateChange.FORWARD);
+        flow.setHistory(newHistory, KeyChange.FORWARD);
+        assertThat(lastDirection).isSameAs(KeyChange.FORWARD);
         assertThat(lastStack.top()).isSameAs(delta);
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isSameAs(charlie);
@@ -158,22 +158,22 @@ public class FlowTest {
     public void setObjectGoesBack() {
         History<?> history = History.from(Arrays.asList(able, baker, charlie, delta));
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
 
         assertThat(history.size()).isEqualTo(4);
 
         flow.goTo(charlie);
         assertThat(lastStack.top()).isEqualTo(charlie);
         assertThat(lastStack.size()).isEqualTo(3);
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isEqualTo(baker);
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isEqualTo(able);
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isFalse();
     }
@@ -182,21 +182,21 @@ public class FlowTest {
     public void setObjectToMissingObjectPushes() {
         History<?> history = History.from(Arrays.asList(able, baker));
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(2);
 
         flow.goTo(charlie);
         assertThat(lastStack.top()).isEqualTo(charlie);
         assertThat(lastStack.size()).isEqualTo(3);
-        assertThat(lastDirection).isEqualTo(StateChange.FORWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.FORWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isEqualTo(baker);
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isEqualTo(able);
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
         assertThat(flow.goBack()).isFalse();
     }
 
@@ -204,7 +204,7 @@ public class FlowTest {
     public void setObjectKeepsOriginal() {
         History<?> history = History.from(Arrays.asList(able, baker));
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(2);
 
         flow.goTo(new TestKey("Able"));
@@ -212,37 +212,37 @@ public class FlowTest {
         assertThat(lastStack.top() == able).isTrue();
         assertThat(lastStack.top()).isSameAs(able);
         assertThat(lastStack.size()).isEqualTo(1);
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
     }
 
     @Test
     public void replaceHistoryResultsInLengthOneHistory() {
         History<?> history = History.from(Arrays.asList(able, baker, charlie));
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
 
-        flow.setHistory(History.single(delta), StateChange.REPLACE);
+        flow.setHistory(History.single(delta), KeyChange.REPLACE);
         assertThat(lastStack.top()).isEqualTo(new TestKey("Delta"));
         assertThat(lastStack.top() == delta).isTrue();
         assertThat(lastStack.top()).isSameAs(delta);
         assertThat(lastStack.size()).isEqualTo(1);
-        assertThat(lastDirection).isEqualTo(StateChange.REPLACE);
+        assertThat(lastDirection).isEqualTo(KeyChange.REPLACE);
     }
 
     @Test
     public void replaceTopDoesNotAlterHistoryLength() {
         History<?> history = History.from(Arrays.asList(able, baker, charlie));
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
 
-        flow.setHistory(History.builderFrom(flow).removeLast().add(delta).build(), StateChange.REPLACE);
+        flow.setHistory(History.builderFrom(flow).removeLast().add(delta).build(), KeyChange.REPLACE);
         assertThat(lastStack.top()).isEqualTo(new TestKey("Delta"));
         assertThat(lastStack.top() == delta).isTrue();
         assertThat(lastStack.top()).isSameAs(delta);
         assertThat(lastStack.size()).isEqualTo(3);
-        assertThat(lastDirection).isEqualTo(StateChange.REPLACE);
+        assertThat(lastDirection).isEqualTo(KeyChange.REPLACE);
     }
 
     @SuppressWarnings({"CheckResult"})
@@ -254,13 +254,13 @@ public class FlowTest {
         TestKey delta = new TestKey("Delta");
         History<?> history = History.from(Arrays.asList(able, baker, charlie, delta));
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(4);
 
         TestKey echo = new TestKey("Echo");
         TestKey foxtrot = new TestKey("Foxtrot");
         History<?> newHistory = History.from(Arrays.asList(able, baker, echo, foxtrot));
-        flow.setHistory(newHistory, StateChange.REPLACE);
+        flow.setHistory(newHistory, KeyChange.REPLACE);
         assertThat(lastStack.size()).isEqualTo(4);
         assertThat(lastStack.top()).isEqualTo(foxtrot);
         flow.goBack();
@@ -333,22 +333,22 @@ public class FlowTest {
                 .addAll(Arrays.asList(new Picky("Able"), new Picky("Baker"), new Picky("Charlie"), new Picky("Delta")))
                 .build();
         Backstack flow = new Backstack(history);
-        flow.setStateChanger(new FlowDispatcher());
+        flow.setKeyChanger(new FlowDispatcher());
 
         assertThat(history.size()).isEqualTo(4);
 
         flow.goTo(new Picky("Charlie"));
         assertThat(lastStack.top()).isEqualTo(new Picky("Charlie"));
         assertThat(lastStack.size()).isEqualTo(3);
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isEqualTo(new Picky("Baker"));
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isTrue();
         assertThat(lastStack.top()).isEqualTo(new Picky("Able"));
-        assertThat(lastDirection).isEqualTo(StateChange.BACKWARD);
+        assertThat(lastDirection).isEqualTo(KeyChange.BACKWARD);
 
         assertThat(flow.goBack()).isFalse();
     }

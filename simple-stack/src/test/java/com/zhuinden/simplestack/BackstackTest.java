@@ -34,8 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 
 public class BackstackTest {
-    StateChanger.Callback callback = null;
-    StateChange stateChange = null;
+    KeyChanger.Callback callback = null;
+    KeyChange keyChange = null;
 
     @Test
     public void initialKeysShouldNotBeEmpty() {
@@ -69,10 +69,10 @@ public class BackstackTest {
     }
 
     @Test
-    public void stateChangerShouldNotBeNull() {
+    public void keyChangerShouldNotBeNull() {
         try {
             Backstack backstack = new Backstack(new TestKey("Hi"));
-            backstack.setStateChanger(null);
+            backstack.setKeyChanger(null);
             Assert.fail();
         } catch(NullPointerException e) {
             // good!
@@ -83,7 +83,7 @@ public class BackstackTest {
     public void newHistoryShouldNotBeNull() {
         try {
             Backstack backstack = new Backstack(new TestKey("Hi"));
-            backstack.setHistory(null, StateChange.FORWARD);
+            backstack.setHistory(null, KeyChange.FORWARD);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // good!
@@ -102,18 +102,18 @@ public class BackstackTest {
     }
 
     @Test
-    public void goBackShouldReturnTrueDuringActiveStateChange() {
+    public void goBackShouldReturnTrueDuringActiveKeyChange() {
         TestKey hi = new TestKey("hi");
         Backstack backstack = new Backstack(hi, new TestKey("bye"));
 
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
         });
 
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
 
         backstack.goTo(hi);
 
@@ -125,32 +125,32 @@ public class BackstackTest {
         TestKey hi = new TestKey("hi");
         Backstack backstack = new Backstack(hi);
 
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
         });
 
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.goBack()).isFalse();
     }
 
 
     @Test
-    public void topPreviousStateReturnsNullDuringInitializeStateChange() {
+    public void topPreviousStateReturnsNullDuringInitializeKeyChange() {
         TestKey hi = new TestKey("hi");
         Backstack backstack = new Backstack(hi);
 
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                assertThat(stateChange.topPreviousState()).isNull();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                assertThat(keyChange.topPreviousKey()).isNull();
                 callback = completionCallback;
             }
         });
 
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
     }
 
     @Test
@@ -159,20 +159,20 @@ public class BackstackTest {
         final TestKey bye = new TestKey("bye");
         Backstack backstack = new Backstack(hi, bye);
 
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                if(!stateChange.getPreviousState().isEmpty()) {
-                    assertThat(stateChange.topPreviousState()).isEqualTo(bye);
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                if(!keyChange.getPreviousKeys().isEmpty()) {
+                    assertThat(keyChange.topPreviousKey()).isEqualTo(bye);
                 }
                 callback = completionCallback;
             }
         });
 
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
 
         backstack.goBack();
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
     }
 
     @Test
@@ -184,10 +184,10 @@ public class BackstackTest {
 
         assertThat(backstack.getHistory()).isEmpty();
 
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -195,11 +195,11 @@ public class BackstackTest {
     }
 
     @Test
-    public void pendingStateChangeCannotGoBackwards() {
-        PendingStateChange pendingStateChange = new PendingStateChange(null, StateChange.REPLACE, false);
-        pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
+    public void pendingKeyChangeCannotGoBackwards() {
+        PendingKeyChange pendingKeyChange = new PendingKeyChange(null, KeyChange.REPLACE, false);
+        pendingKeyChange.setStatus(PendingKeyChange.Status.COMPLETED);
         try {
-            pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
+            pendingKeyChange.setStatus(PendingKeyChange.Status.IN_PROGRESS);
             Assert.fail();
         } catch(IllegalStateException e) {
             // Good!
@@ -207,10 +207,10 @@ public class BackstackTest {
     }
 
     @Test
-    public void pendingStateChangeStatusShouldNotBeNull() {
-        PendingStateChange pendingStateChange = new PendingStateChange(null, StateChange.REPLACE, false);
+    public void pendingKeyChangeStatusShouldNotBeNull() {
+        PendingKeyChange pendingKeyChange = new PendingKeyChange(null, KeyChange.REPLACE, false);
         try {
-            pendingStateChange.setStatus(null);
+            pendingKeyChange.setStatus(null);
             Assert.fail();
         } catch(NullPointerException e) {
             // Good!
@@ -222,17 +222,17 @@ public class BackstackTest {
         TestKey initial = new TestKey("hello");
         Backstack backstack = new Backstack(initial);
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        backstack.executePendingStateChange();
+        backstack.setKeyChanger(keyChanger);
+        backstack.executePendingKeyChange();
 
-        assertThat(backstack.isStateChangePending()).isFalse();
-        callback.stateChangeComplete();
+        assertThat(backstack.isKeyChangePending()).isFalse();
+        callback.keyChangeComplete();
         // no exception thrown
     }
 
@@ -266,20 +266,20 @@ public class BackstackTest {
         Backstack backstack = new Backstack(initial);
 
         Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
         backstack.addCompletionListener(completionListener);
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
 
-        assertThat(backstack.isStateChangePending()).isFalse();
-        Mockito.verify(completionListener, Mockito.only()).stateChangeCompleted(stateChange);
+        assertThat(backstack.isKeyChangePending()).isFalse();
+        Mockito.verify(completionListener, Mockito.only()).keyChangeCompleted(keyChange);
     }
 
     @Test
@@ -288,35 +288,35 @@ public class BackstackTest {
         Backstack backstack = new Backstack(initial);
 
         Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
         backstack.addCompletionListener(completionListener);
         backstack.removeCompletionListener(completionListener);
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
 
-        assertThat(backstack.isStateChangePending()).isFalse();
-        Mockito.verify(completionListener, Mockito.never()).stateChangeCompleted(stateChange);
+        assertThat(backstack.isKeyChangePending()).isFalse();
+        Mockito.verify(completionListener, Mockito.never()).keyChangeCompleted(keyChange);
     }
 
     @Test
-    public void resetShouldThrowIfStateChangeIsEnqueued() {
+    public void resetShouldThrowIfKeyChangeIsEnqueued() {
         TestKey initial = new TestKey("hello");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger); // initialize state change
+        backstack.setKeyChanger(keyChanger); // initialize key change
         try {
             backstack.reset();
             Assert.fail();
@@ -326,25 +326,25 @@ public class BackstackTest {
     }
 
     @Test
-    public void resetShouldClearStackIfStateChangeIsComplete() {
+    public void resetShouldClearStackIfKeyChangeIsComplete() {
         TestKey initial = new TestKey("hello");
         TestKey other = new TestKey("other");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goTo(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         backstack.reset();
         assertThat(backstack.getHistory()).isEmpty();
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
 
@@ -353,7 +353,7 @@ public class BackstackTest {
         TestKey initial = new TestKey("hello");
         Backstack backstack = new Backstack(initial);
         try {
-            backstack.replaceTop(null, StateChange.REPLACE);
+            backstack.replaceTop(null, KeyChange.REPLACE);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK!
@@ -366,21 +366,21 @@ public class BackstackTest {
         TestKey other = new TestKey("other");
         TestKey another = new TestKey("another");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goTo(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other);
-        backstack.replaceTop(another, StateChange.FORWARD);
-        assertThat(stateChange.getDirection()).isEqualTo(StateChange.FORWARD);
-        callback.stateChangeComplete();
+        backstack.replaceTop(another, KeyChange.FORWARD);
+        assertThat(keyChange.getDirection()).isEqualTo(KeyChange.FORWARD);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, another);
     }
 
@@ -391,25 +391,25 @@ public class BackstackTest {
         TestKey another = new TestKey("another");
         TestKey yetAnother = new TestKey("yetAnother");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goTo(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other);
 
-        backstack.replaceTop(another, StateChange.BACKWARD);
-        backstack.replaceTop(yetAnother, StateChange.REPLACE);
-        assertThat(stateChange.getDirection()).isEqualTo(StateChange.BACKWARD);
-        callback.stateChangeComplete();
-        assertThat(stateChange.getDirection()).isEqualTo(StateChange.REPLACE);
-        callback.stateChangeComplete();
+        backstack.replaceTop(another, KeyChange.BACKWARD);
+        backstack.replaceTop(yetAnother, KeyChange.REPLACE);
+        assertThat(keyChange.getDirection()).isEqualTo(KeyChange.BACKWARD);
+        callback.keyChangeComplete();
+        assertThat(keyChange.getDirection()).isEqualTo(KeyChange.REPLACE);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, yetAnother);
     }
 
@@ -430,17 +430,17 @@ public class BackstackTest {
         TestKey initial = new TestKey("hello");
         TestKey other = new TestKey("other");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goUp(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(other);
     }
 
@@ -451,20 +451,20 @@ public class BackstackTest {
         TestKey another = new TestKey("another");
 
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goTo(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
 
         backstack.goUp(another);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, another);
     }
 
@@ -473,19 +473,20 @@ public class BackstackTest {
         TestKey initial = new TestKey("hello");
         TestKey other = new TestKey("other");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goTo(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         backstack.goUp(initial);
-        callback.stateChangeComplete();;
+        callback.keyChangeComplete();
+        ;
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
 
@@ -518,20 +519,20 @@ public class BackstackTest {
         TestKey initial = new TestKey("hello");
         TestKey other = new TestKey("other");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goTo(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.single(initial));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
 
@@ -541,19 +542,19 @@ public class BackstackTest {
         TestKey initial2 = new TestKey("hello2");
         TestKey initial3 = new TestKey("hello3");
         Backstack backstack = new Backstack(initial1, initial2, initial3);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
 
         backstack.goUpChain(History.of(initial1));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
     }
 
@@ -563,20 +564,20 @@ public class BackstackTest {
         TestKey other = new TestKey("other");
         TestKey another = new TestKey("another");
         Backstack backstack = new Backstack(initial);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goTo(other);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.single(another));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, another);
     }
 
@@ -586,18 +587,18 @@ public class BackstackTest {
         TestKey initial2 = new TestKey("hello2");
         TestKey initial3 = new TestKey("hello3");
         Backstack backstack = new Backstack(initial3);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial1, initial2));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
     }
 
@@ -608,18 +609,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial1, initial2));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
     }
 
@@ -630,18 +631,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial4));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial4);
     }
 
@@ -653,18 +654,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial2, initial3));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
     }
 
@@ -675,18 +676,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial1, initial2));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
     }
 
@@ -697,18 +698,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial2, initial3));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
     }
 
@@ -719,18 +720,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial2, initial1));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial2, initial1); //initial1 reordered to end
     }
 
@@ -742,18 +743,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial3, initial2, initial1));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial3, initial2, initial1); //initial1 reordered to end
     }
 
@@ -768,18 +769,18 @@ public class BackstackTest {
         TestKey other2 = new TestKey("other2");
 
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(other1, other2));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3, other1, other2);
     }
 
@@ -795,18 +796,18 @@ public class BackstackTest {
         TestKey other3 = new TestKey("other3");
 
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(other3, initial2, initial4, other1, other2));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, other3, initial2, initial4, other1, other2);
     }
 
@@ -817,18 +818,18 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         backstack.goUpChain(History.of(initial2, initial3));
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
     }
 
@@ -851,15 +852,15 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         TestKey initial4 = new TestKey("hello4");
         Backstack backstack = new Backstack(initial1, initial2, initial3, initial4);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
 
         assertThat(backstack.fromTop(0)).isSameAs(backstack.top());
         assertThat(backstack.fromTop(0)).isSameAs(initial4);
@@ -913,28 +914,28 @@ public class BackstackTest {
             // OK!
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                if(stateChange.getPreviousState().isEmpty()) {
-                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topNewState());
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                if(keyChange.getPreviousKeys().isEmpty()) {
+                    assertThat(keyChange.backstack().top()).isSameAs(keyChange.topNewKey());
                 } else {
-                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topPreviousState());
+                    assertThat(keyChange.backstack().top()).isSameAs(keyChange.topPreviousKey());
                 }
-                completionCallback.stateChangeComplete();
+                completionCallback.keyChangeComplete();
             }
         };
 
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
         assertThat(backstack.top()).isSameAs(initial3);
 
-        backstack.setHistory(History.of(initial1, initial2), StateChange.REPLACE);
+        backstack.setHistory(History.of(initial1, initial2), KeyChange.REPLACE);
 
         assertThat(backstack.top()).isSameAs(initial2);
 
-        backstack.removeStateChanger();
-        backstack.setStateChanger(stateChanger);
+        backstack.removeKeyChanger();
+        backstack.setKeyChanger(keyChanger);
     }
 
     @Test
@@ -951,28 +952,28 @@ public class BackstackTest {
             // OK!
         }
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                if(stateChange.getPreviousState().isEmpty()) {
-                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getNewState().get(0));
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                if(keyChange.getPreviousKeys().isEmpty()) {
+                    assertThat(keyChange.backstack().root()).isSameAs(keyChange.getNewKeys().get(0));
                 } else {
-                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getPreviousState().get(0));
+                    assertThat(keyChange.backstack().root()).isSameAs(keyChange.getPreviousKeys().get(0));
                 }
-                completionCallback.stateChangeComplete();
+                completionCallback.keyChangeComplete();
             }
         };
 
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
         assertThat(backstack.root()).isSameAs(initial1);
 
-        backstack.setHistory(History.of(initial2, initial3), StateChange.REPLACE);
+        backstack.setHistory(History.of(initial2, initial3), KeyChange.REPLACE);
 
         assertThat(backstack.root()).isSameAs(initial2);
 
-        backstack.removeStateChanger();
-        backstack.setStateChanger(stateChanger);
+        backstack.removeKeyChanger();
+        backstack.setKeyChanger(keyChanger);
     }
 
     @Test
@@ -982,34 +983,34 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         Backstack backstack = new Backstack(initial1);
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete(); // initial state change
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete(); // initial key change
 
         backstack.moveToTop(initial2);
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
-        callback.stateChangeComplete();
+        assertThat(keyChange.getDirection()).isSameAs(KeyChange.FORWARD);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2);
 
         backstack.moveToTop(initial3);
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
-        callback.stateChangeComplete();
+        assertThat(keyChange.getDirection()).isSameAs(KeyChange.FORWARD);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
 
         backstack.moveToTop(initial2, true);
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.REPLACE);
-        callback.stateChangeComplete();
+        assertThat(keyChange.getDirection()).isSameAs(KeyChange.REPLACE);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1, initial3, initial2);
 
         backstack.moveToTop(initial1, false);
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
-        callback.stateChangeComplete();
+        assertThat(keyChange.getDirection()).isSameAs(KeyChange.FORWARD);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial3, initial2, initial1);
     }
 
@@ -1020,31 +1021,31 @@ public class BackstackTest {
         TestKey initial3 = new TestKey("hello3");
         Backstack backstack = new Backstack(initial1);
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setHistory(History.of(initial1, initial2, initial3), StateChange.REPLACE);
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete(); // initial state change
+        backstack.setHistory(History.of(initial1, initial2, initial3), KeyChange.REPLACE);
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete(); // initial key change
         assertThat(backstack.getHistory()).containsExactly(initial1, initial2, initial3);
 
         backstack.jumpToRoot();
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.BACKWARD);
-        callback.stateChangeComplete();
+        assertThat(keyChange.getDirection()).isSameAs(KeyChange.BACKWARD);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
 
-        backstack.jumpToRoot(StateChange.REPLACE);
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.REPLACE);
-        callback.stateChangeComplete();
+        backstack.jumpToRoot(KeyChange.REPLACE);
+        assertThat(keyChange.getDirection()).isSameAs(KeyChange.REPLACE);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
 
-        backstack.jumpToRoot(StateChange.FORWARD);
-        assertThat(stateChange.getDirection()).isSameAs(StateChange.FORWARD);
-        callback.stateChangeComplete();
+        backstack.jumpToRoot(KeyChange.FORWARD);
+        assertThat(keyChange.getDirection()).isSameAs(KeyChange.FORWARD);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial1);
     }
 
@@ -1056,17 +1057,17 @@ public class BackstackTest {
         TestKey boop = new TestKey("boop");
 
         Backstack backstack = new Backstack(initial, other, another, boop);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goUp(initial, false);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
 
@@ -1078,31 +1079,31 @@ public class BackstackTest {
         TestKey boop = new TestKey("boop");
 
         Backstack backstack = new Backstack(initial, other, another, boop);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other, another, boop);
 
         backstack.goUp(initial, true);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other, another);
 
         backstack.goUp(initial, true);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other);
 
         backstack.goUp(initial, true);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
 
         backstack.goUp(initial, true);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial);
     }
 
@@ -1114,58 +1115,58 @@ public class BackstackTest {
         TestKey boop = new TestKey("boop");
 
         Backstack backstack = new Backstack(initial, other, another, boop);
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
-                stateChange = _stateChange;
+            public void handleKeyChange(@NonNull KeyChange _keyChange, @NonNull Callback completionCallback) {
+                keyChange = _keyChange;
                 callback = completionCallback;
             }
         };
-        backstack.setStateChanger(stateChanger);
-        callback.stateChangeComplete();
+        backstack.setKeyChanger(keyChanger);
+        callback.keyChangeComplete();
         backstack.goUpChain(History.of(initial, other), true);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other, another);
 
         backstack.goUpChain(History.of(initial, other), true);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other);
 
         backstack.goUpChain(History.of(initial, other), true);
-        callback.stateChangeComplete();
+        callback.keyChangeComplete();
         assertThat(backstack.getHistory()).containsExactly(initial, other);
     }
 
     @Test
-    public void getHistoryInsideStateChangeWorks() {
+    public void getHistoryInsideKeyChangeWorks() {
         TestKey initial = new TestKey("initial");
 
         TestKey other1 = new TestKey("other1");
         TestKey other2 = new TestKey("other2");
         Backstack backstack = new Backstack(initial);
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                List<?> history = stateChange.backstack().getHistory();
-                if(stateChange.getPreviousState().isEmpty()) {
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                List<?> history = keyChange.backstack().getHistory();
+                if(keyChange.getPreviousKeys().isEmpty()) {
                     if(!history.isEmpty()) {
-                        assertThat(history).containsExactlyElementsOf(stateChange.getNewState());
+                        assertThat(history).containsExactlyElementsOf(keyChange.getNewKeys());
                     }
                 } else {
-                    assertThat(history).containsExactlyElementsOf(stateChange.getPreviousState());
+                    assertThat(history).containsExactlyElementsOf(keyChange.getPreviousKeys());
                 }
-                completionCallback.stateChangeComplete();
+                completionCallback.keyChangeComplete();
             }
         };
 
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
 
-        backstack.setHistory(History.of(other1, other2), StateChange.REPLACE);
+        backstack.setHistory(History.of(other1, other2), KeyChange.REPLACE);
 
-        backstack.removeStateChanger();
+        backstack.removeKeyChanger();
 
-        backstack.setStateChanger(stateChanger);
+        backstack.setKeyChanger(keyChanger);
     }
 
     @Test
@@ -1174,10 +1175,10 @@ public class BackstackTest {
         TestKey testKey = new TestKey("a");
 
         final Backstack backstack = new Backstack(testKey);
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
         final CountDownLatch latch = new CountDownLatch(1);
@@ -1186,7 +1187,7 @@ public class BackstackTest {
             @Override
             public void run() {
                 try {
-                    backstack.setHistory(History.of(new TestKey("b")), StateChange.REPLACE);
+                    backstack.setHistory(History.of(new TestKey("b")), KeyChange.REPLACE);
                 } catch(Exception e) {
                     ref.set(e);
                 } finally {
@@ -1202,22 +1203,22 @@ public class BackstackTest {
     }
 
     @Test
-    public void stateChangeShouldKnowIfTopNewAndPreviousAreEqual() {
+    public void keyChangeShouldKnowIfTopNewAndPreviousAreEqual() {
         TestKey testKey = new TestKey("a");
         TestKey testKey2 = new TestKey("b");
 
         final Backstack backstack = new Backstack(testKey);
-        backstack.setStateChanger(new StateChanger() {
+        backstack.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                assertThat(stateChange.topNewState().equals(stateChange.topPreviousState())).isEqualTo(stateChange.isTopNewStateEqualToPrevious());
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                assertThat(keyChange.topNewKey().equals(keyChange.topPreviousKey())).isEqualTo(keyChange.isTopNewKeyEqualToPrevious());
 
-                completionCallback.stateChangeComplete();
+                completionCallback.keyChangeComplete();
             }
         });
 
         backstack.goTo(testKey2);
         backstack.goBack();
-        backstack.setHistory(History.of(testKey2), StateChange.REPLACE);
+        backstack.setHistory(History.of(testKey2), KeyChange.REPLACE);
     }
 }

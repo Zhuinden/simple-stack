@@ -10,7 +10,7 @@ import java.util.Map;
 public class DefaultStateClearStrategy
         implements BackstackManager.StateClearStrategy {
     @Override
-    public void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange) {
-        keyStateMap.keySet().retainAll(stateChange.getNewState());
+    public void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull KeyChange keyChange) {
+        keyStateMap.keySet().retainAll(keyChange.getNewKeys());
     }
 }

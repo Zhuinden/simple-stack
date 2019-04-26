@@ -127,10 +127,10 @@ public class ScopeLookupModeTest {
         backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
 
         assertThat(backstackManager.canFindFromScope("boop", "service")).isFalse();
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -468,10 +468,10 @@ public class ScopeLookupModeTest {
         assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
         assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
 
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -573,10 +573,10 @@ public class ScopeLookupModeTest {
         assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
         assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
 
-        backstackManager.setStateChanger(new StateChanger() {
+        backstackManager.setKeyChanger(new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         });
 
@@ -716,13 +716,13 @@ public class ScopeLookupModeTest {
          */
         backstackManager.setup(History.of(beep, boop, braap));
 
-        StateChanger stateChanger = new StateChanger() {
+        KeyChanger keyChanger = new KeyChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                completionCallback.stateChangeComplete();
+            public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+                completionCallback.keyChangeComplete();
             }
         };
-        backstackManager.setStateChanger(stateChanger);
+        backstackManager.setKeyChanger(keyChanger);
 
         assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.ALL)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
         assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);

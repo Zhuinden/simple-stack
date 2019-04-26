@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackexamplemvvm.application;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,8 +19,8 @@ import android.view.View;
 
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.KeyChange;
+import com.zhuinden.simplestack.KeyChanger;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.injection.Injector;
 import com.zhuinden.simplestackexamplemvvm.features.statistics.StatisticsKey;
@@ -38,7 +39,7 @@ import static android.support.v4.widget.DrawerLayout.LOCK_MODE_UNLOCKED;
 
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements KeyChanger {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -52,7 +53,7 @@ public class MainActivity
     NavigationView navigationView;
 
     BackstackDelegate backstackDelegate;
-    private FragmentStateChanger fragmentStateChanger;
+    private FragmentKeyChanger fragmentKeyChanger;
     private ActionBarDrawerToggle drawerToggle;
 
     private final NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) item -> {
@@ -85,8 +86,8 @@ public class MainActivity
         ButterKnife.bind(this);
         setupDrawer();
 
-        fragmentStateChanger = new FragmentStateChanger(this, getSupportFragmentManager(), R.id.contentFrame);
-        backstackDelegate.setStateChanger(this);
+        fragmentKeyChanger = new FragmentKeyChanger(this, getSupportFragmentManager(), R.id.contentFrame);
+        backstackDelegate.setKeyChanger(this);
     }
 
     @Override
@@ -136,6 +137,7 @@ public class MainActivity
         }
     }
 
+    @SuppressLint("RestrictedApi") // TODO
     public void setupViewsForKey(BaseKey key) {
         if(key.shouldShowUp()) {
             drawerLayout.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
@@ -159,13 +161,13 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(!stateChange.isTopNewStateEqualToPrevious()) {
-            fragmentStateChanger.handleStateChange(stateChange);
-            setupViewsForKey(stateChange.topNewState());
-            String title = stateChange.<BaseKey>topNewState().title(getResources());
+    public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+        if(!keyChange.isTopNewKeyEqualToPrevious()) {
+            fragmentKeyChanger.handleKeyChange(keyChange);
+            setupViewsForKey(keyChange.topNewKey());
+            String title = keyChange.<BaseKey>topNewKey().title(getResources());
             setTitle(title == null ? getString(R.string.app_name) : title);
         }
-        completionCallback.stateChangeComplete();
+        completionCallback.keyChangeComplete();
     }
 }

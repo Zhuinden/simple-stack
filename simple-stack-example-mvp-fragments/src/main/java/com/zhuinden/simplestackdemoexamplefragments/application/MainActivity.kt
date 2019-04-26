@@ -7,19 +7,19 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.zhuinden.simplestack.BackstackDelegate
 import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.KeyChange
+import com.zhuinden.simplestack.KeyChanger
 import com.zhuinden.simplestackdemoexamplefragments.R
-import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentStateChanger
+import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKeyChanger
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
 import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.ServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), StateChanger {
+class MainActivity : AppCompatActivity(), KeyChanger {
     lateinit var backstackDelegate: BackstackDelegate
-    lateinit var fragmentStateChanger: FragmentStateChanger
+    lateinit var fragmentKeyChanger: FragmentKeyChanger
 
     private val databaseManager: DatabaseManager = Injector.get().databaseManager()
     private val backstackHolder: BackstackHolder = Injector.get().backstackHolder()
@@ -49,10 +49,10 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
         setContentView(R.layout.activity_main)
 
-        this.fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+        this.fragmentKeyChanger = FragmentKeyChanger(supportFragmentManager, R.id.root)
         mainView.onCreate()
 
-        backstackDelegate.setStateChanger(this)
+        backstackDelegate.setKeyChanger(this)
         /*
          * IMPORTANT!
          *
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
          * - Activity.onPostCreate
          *
          * Therefore if ScopedServices is used with Fragments, the scopes must be built in onCreate,
-         * meaning the StateChanger must be set in onCreate, and onPostCreate runs too late,
+         * meaning the KeyChanger must be set in onCreate, and onPostCreate runs too late,
          * otherwise the scopes won't exist in onViewCreated after process death.
          */
     }
@@ -98,16 +98,16 @@ class MainActivity : AppCompatActivity(), StateChanger {
         else -> super.getSystemService(name)
     }
 
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
+    override fun handleKeyChange(keyChange: KeyChange, completionCallback: KeyChanger.Callback) {
+        if (keyChange.isTopNewKeyEqualToPrevious) {
             // no-op
-            completionCallback.stateChangeComplete()
+            completionCallback.keyChangeComplete()
             return
         }
 
-        fragmentStateChanger.handleStateChange(stateChange)
-        mainView.setupViewsForKey(stateChange.topNewState())
-        completionCallback.stateChangeComplete()
+        fragmentKeyChanger.handleKeyChange(keyChange)
+        mainView.setupViewsForKey(keyChange.topNewKey())
+        completionCallback.keyChangeComplete()
     }
 
     companion object {

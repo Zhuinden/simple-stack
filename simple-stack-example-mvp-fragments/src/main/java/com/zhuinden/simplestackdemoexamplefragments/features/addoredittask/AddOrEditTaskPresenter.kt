@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemoexamplefragments.features.addoredittask
 
 import android.annotation.SuppressLint
 import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.KeyChange
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplefragments.domain.Task
@@ -115,7 +115,7 @@ class AddOrEditTaskPresenter @Inject constructor(
                 backstack.goBack()
             }
             is AddOrEditTaskKey.EditTaskKey -> {
-                backstack.jumpToRoot(StateChange.BACKWARD)
+                backstack.jumpToRoot(KeyChange.BACKWARD)
             }
         }
     }

@@ -20,9 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * An interface that represents the view change when a state change occurs.
+ * An interface that represents the view change when a key change occurs.
  *
- * Specified in {@link StateKey}, if {@link DefaultStateChanger} is used with default {@link DefaultStateChanger.GetViewChangeHandlerStrategy}.
+ * Specified in {@link DefaultViewKey}, if {@link DefaultViewKeyChanger} is used with default {@link DefaultViewKeyChanger.GetViewChangeHandlerStrategy}.
  */
 public interface ViewChangeHandler {
     /**
@@ -39,7 +39,7 @@ public interface ViewChangeHandler {
      * @param container          the container for the views
      * @param previousView       the previous view
      * @param newView            the new view
-     * @param direction          the direction (from the StateChange)
+     * @param direction          the direction (from the KeyChange)
      * @param completionCallback the callback that must be called when the view change is complete.
      */
     void performViewChange(@NonNull final ViewGroup container, @NonNull final View previousView, @NonNull final View newView, final int direction, @NonNull final CompletionCallback completionCallback);

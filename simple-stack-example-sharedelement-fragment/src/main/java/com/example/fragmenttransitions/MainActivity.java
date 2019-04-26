@@ -9,8 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackDelegate;
 import com.zhuinden.simplestack.History;
-import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.KeyChange;
+import com.zhuinden.simplestack.KeyChanger;
 
 /**
  * Main activity that holds our fragments
@@ -19,11 +19,11 @@ import com.zhuinden.simplestack.StateChanger;
  */
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements KeyChanger {
     static final String TAG = "MainActivity";
 
     BackstackDelegate backstackDelegate;
-    FragmentStateChanger fragmentStateChanger;
+    FragmentKeyChanger fragmentKeyChanger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +32,8 @@ public class MainActivity
         backstackDelegate.registerForLifecycleCallbacks(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.container);
-        backstackDelegate.setStateChanger(this);
+        fragmentKeyChanger = new FragmentKeyChanger(getSupportFragmentManager(), R.id.container);
+        backstackDelegate.setKeyChanger(this);
     }
 
     @Override
@@ -49,11 +49,11 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(!stateChange.isTopNewStateEqualToPrevious()) {
-            fragmentStateChanger.handleStateChange(stateChange);
+    public void handleKeyChange(@NonNull KeyChange keyChange, @NonNull Callback completionCallback) {
+        if(!keyChange.isTopNewKeyEqualToPrevious()) {
+            fragmentKeyChanger.handleKeyChange(keyChange);
         }
-        completionCallback.stateChangeComplete();
+        completionCallback.keyChangeComplete();
     }
 
     public Backstack getBackstack() {

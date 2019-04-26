@@ -31,13 +31,13 @@ import com.zhuinden.simplestack.DefaultKeyFilter;
 import com.zhuinden.simplestack.DefaultKeyParceler;
 import com.zhuinden.simplestack.DefaultStateClearStrategy;
 import com.zhuinden.simplestack.GlobalServices;
+import com.zhuinden.simplestack.KeyChanger;
 import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.SavedState;
 import com.zhuinden.simplestack.ScopeKey;
 import com.zhuinden.simplestack.ScopeLookupMode;
 import com.zhuinden.simplestack.ScopedServices;
-import com.zhuinden.simplestack.StateChanger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class Navigator {
      */
     @TargetApi(11)
     public static class Installer {
-        StateChanger stateChanger;
+        KeyChanger keyChanger;
         KeyFilter keyFilter = new DefaultKeyFilter();
         KeyParceler keyParceler = new DefaultKeyParceler();
         BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
@@ -66,22 +66,22 @@ public class Navigator {
         GlobalServices globalServices = null;
         boolean isInitializeDeferred = false;
         boolean shouldPersistContainerChild = true;
-        List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
+        List<Backstack.CompletionListener> keyChangeCompletionListeners = new LinkedList<>();
 
         /**
-         * Sets the state changer used by the navigator's backstack.
+         * Sets the key changer used by the navigator's backstack.
          *
-         * If not set, then {@link DefaultStateChanger} is used, which by default behavior requires keys to be {@link StateKey}.
+         * If not set, then {@link DefaultViewKeyChanger} is used, which by default behavior requires keys to be {@link DefaultViewKey}.
          *
-         * @param stateChanger if set, cannot be null.
+         * @param keyChanger if set, cannot be null.
          * @return the installer
          */
         @NonNull
-        public Installer setStateChanger(@NonNull StateChanger stateChanger) {
-            if(stateChanger == null) {
-                throw new IllegalArgumentException("If set, StateChanger cannot be null!");
+        public Installer setKeyChanger(@NonNull KeyChanger keyChanger) {
+            if(keyChanger == null) {
+                throw new IllegalArgumentException("If set, KeyChanger cannot be null!");
             }
-            this.stateChanger = stateChanger;
+            this.keyChanger = keyChanger;
             return this;
         }
 
@@ -116,7 +116,7 @@ public class Navigator {
         }
 
         /**
-         * Sets the state clear strategy used to clear the stored state in BackstackManager after there are no queued state changes left.
+         * Sets the state clear strategy used to clear the stored state in BackstackManager after there are no queued key changes left.
          *
          * @param stateClearStrategy if set, it cannot be null
          * @return the installer
@@ -161,7 +161,7 @@ public class Navigator {
         }
 
         /**
-         * Sets if after initialization, the state changer should only be set when {@link Navigator#executeDeferredInitialization(Context)} is called.
+         * Sets if after initialization, the key changer should only be set when {@link Navigator#executeDeferredInitialization(Context)} is called.
          * Typically needed to setup the backstack for dependency injection module.
          *
          * @param isInitializeDeferred if call to executing deferred initialization is needed
@@ -189,15 +189,15 @@ public class Navigator {
          * Adds a {@link Backstack.CompletionListener}, which will be added to the {@link BackstackManager} when it is initialized.
          * As it is added only on initialization, these are added to the Backstack only once.
          *
-         * @param stateChangeCompletionListener the state change completion listener
+         * @param keyChangeCompletionListener the key change completion listener
          * @return the installer
          */
         @NonNull
-        public Installer addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
-            if(stateChangeCompletionListener == null) {
-                throw new IllegalArgumentException("If added, state change completion listener cannot be null!");
+        public Installer addKeyChangeCompletionListener(@NonNull Backstack.CompletionListener keyChangeCompletionListener) {
+            if(keyChangeCompletionListener == null) {
+                throw new IllegalArgumentException("If added, key change completion listener cannot be null!");
             }
-            this.stateChangeCompletionListeners.add(stateChangeCompletionListener);
+            this.keyChangeCompletionListeners.add(keyChangeCompletionListener);
             return this;
         }
 
@@ -211,8 +211,8 @@ public class Navigator {
          */
         @NonNull
         public Backstack install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
-            if(stateChanger == null) {
-                stateChanger = DefaultStateChanger.create(activity, container);
+            if(keyChanger == null) {
+                keyChanger = DefaultViewKeyChanger.create(activity, container);
             }
             return Navigator.install(this, activity, container, initialKeys);
         }
@@ -231,7 +231,7 @@ public class Navigator {
     /**
      * Installs the {@link Navigator} with default parameters.
      *
-     * This means that {@link DefaultStateChanger} and DefaultStateClearStrategy are used.
+     * This means that {@link DefaultViewKeyChanger} and DefaultStateClearStrategy are used.
      *
      * @param activity    the activity which will host the backstack
      * @param container   the container in which custom viewgroups are hosted (to save its child's state in onSaveInstanceState())
@@ -247,7 +247,7 @@ public class Navigator {
             throw new IllegalArgumentException("Activity cannot be null!");
         }
         if(container == null) {
-            throw new IllegalArgumentException("State changer cannot be null!");
+            throw new IllegalArgumentException("key changer cannot be null!");
         }
         if(initialKeys == null || initialKeys.isEmpty()) {
             throw new IllegalArgumentException("Initial keys cannot be null!");
@@ -258,13 +258,13 @@ public class Navigator {
             activity.getFragmentManager().beginTransaction().add(backstackHost, "NAVIGATOR_BACKSTACK_HOST").commit();
             activity.getFragmentManager().executePendingTransactions();
         }
-        backstackHost.stateChanger = installer.stateChanger;
+        backstackHost.keyChanger = installer.keyChanger;
         backstackHost.keyFilter = installer.keyFilter;
         backstackHost.keyParceler = installer.keyParceler;
         backstackHost.stateClearStrategy = installer.stateClearStrategy;
         backstackHost.scopedServices = installer.scopedServices;
         backstackHost.globalServices = installer.globalServices;
-        backstackHost.stateChangeCompletionListeners = installer.stateChangeCompletionListeners;
+        backstackHost.keyChangeCompletionListeners = installer.keyChangeCompletionListeners;
         backstackHost.shouldPersistContainerChild = installer.shouldPersistContainerChild;
         backstackHost.container = container;
         backstackHost.initialKeys = initialKeys;
@@ -272,7 +272,7 @@ public class Navigator {
     }
 
     /**
-     * If {@link Installer#setDeferredInitialization(boolean)} was set to true, then this will initialize the backstack using the state changer.
+     * If {@link Installer#setDeferredInitialization(boolean)} was set to true, then this will initialize the backstack using the key changer.
      *
      * @param context the context to which an activity belongs that hosts the backstack
      */
@@ -297,7 +297,7 @@ public class Navigator {
      * Delegates back press call to the backstack of the navigator.
      *
      * @param context the Context that belongs to an Activity which hosts the backstack.
-     * @return true if a state change was handled or is in progress, false otherwise
+     * @return true if a key change was handled or is in progress, false otherwise
      */
     public static boolean onBackPressed(Context context) {
         return getBackstack(context).goBack();

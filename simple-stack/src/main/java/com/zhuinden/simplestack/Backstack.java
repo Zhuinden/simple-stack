@@ -31,10 +31,10 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * The {@link Backstack} holds the current state, in the form of a list of Objects.
- * It queues up {@link StateChange}s while a {@link StateChanger} is not available.
- * When a {@link StateChanger} is available, it attempts to execute the queued {@link StateChange}s.
- * A {@link StateChanger} can be either set to {@link Backstack#INITIALIZE}, or to {@link Backstack#REATTACH}.
- * {@link Backstack#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link Backstack#REATTACH} does not.
+ * It queues up {@link KeyChange}s while a {@link KeyChanger} is not available.
+ * When a {@link KeyChanger} is available, it attempts to execute the queued {@link KeyChange}s.
+ * A {@link KeyChanger} can be either set to {@link Backstack#INITIALIZE}, or to {@link Backstack#REATTACH}.
+ * {@link Backstack#INITIALIZE} begins an initializing {@link KeyChange} to set up initial state, {@link Backstack#REATTACH} does not.
  */
 public class Backstack {
     public static <K> K getKey(@NonNull Context context) {
@@ -44,7 +44,7 @@ public class Backstack {
     //
     @Retention(SOURCE)
     @IntDef({INITIALIZE, REATTACH})
-    private @interface StateChangerRegisterMode {
+    private @interface KeyChangerRegisterMode {
     }
 
     public static final int INITIALIZE = 0;
@@ -57,9 +57,9 @@ public class Backstack {
     private List<Object> initialParameters;
     private List<Object> stack = originalStack;
 
-    private LinkedList<PendingStateChange> queuedStateChanges = new LinkedList<>();
+    private LinkedList<PendingKeyChange> queuedKeyChanges = new LinkedList<>();
 
-    private StateChanger stateChanger;
+    private KeyChanger keyChanger;
 
     private final long threadId = Thread.currentThread().getId();
 
@@ -100,63 +100,63 @@ public class Backstack {
     }
 
     /**
-     * Indicates whether a {@link StateChanger} is set.
+     * Indicates whether a {@link KeyChanger} is set.
      *
-     * @return true if a {@link StateChanger} is set, false otherwise.
+     * @return true if a {@link KeyChanger} is set, false otherwise.
      */
     @MainThread
-    public boolean hasStateChanger() {
+    public boolean hasKeyChanger() {
         assertCorrectThread();
 
-        return stateChanger != null;
+        return keyChanger != null;
     }
 
     /**
-     * Sets a {@link StateChanger} with {@link Backstack#INITIALIZE} register mode.
+     * Sets a {@link KeyChanger} with {@link Backstack#INITIALIZE} register mode.
      *
-     * @param stateChanger the new {@link StateChanger}, which cannot be null.
+     * @param keyChanger the new {@link KeyChanger}, which cannot be null.
      */
     @MainThread
-    public void setStateChanger(@NonNull StateChanger stateChanger) {
-        setStateChanger(stateChanger, INITIALIZE);
+    public void setKeyChanger(@NonNull KeyChanger keyChanger) {
+        setKeyChanger(keyChanger, INITIALIZE);
     }
 
     /**
-     * Sets a {@link StateChanger}.
+     * Sets a {@link KeyChanger}.
      *
-     * @param stateChanger the new {@link StateChanger}, which cannot be null.
-     * @param registerMode indicates whether the {@link StateChanger} is to be initialized, or is just reattached.
+     * @param keyChanger the new {@link KeyChanger}, which cannot be null.
+     * @param registerMode indicates whether the {@link KeyChanger} is to be initialized, or is just reattached.
      */
     @MainThread
-    public void setStateChanger(@NonNull StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
-        if(stateChanger == null) {
-            throw new NullPointerException("New state changer cannot be null");
+    public void setKeyChanger(@NonNull KeyChanger keyChanger, @KeyChangerRegisterMode int registerMode) {
+        if(keyChanger == null) {
+            throw new NullPointerException("New key changer cannot be null");
         }
 
         assertCorrectThread();
 
-        this.stateChanger = stateChanger;
-        if(registerMode == INITIALIZE && (queuedStateChanges.size() <= 1 || stack.isEmpty())) {
-            if(!beginStateChangeIfPossible()) {
+        this.keyChanger = keyChanger;
+        if(registerMode == INITIALIZE && (queuedKeyChanges.size() <= 1 || stack.isEmpty())) {
+            if(!beginKeyChangeIfPossible()) {
                 ArrayList<Object> newHistory = new ArrayList<>(selectActiveHistory());
                 if(stack.isEmpty()) {
                     stack = initialParameters;
                 }
-                enqueueStateChange(newHistory, StateChange.REPLACE, true);
+                enqueueKeyChange(newHistory, KeyChange.REPLACE, true);
             }
             return;
         }
-        beginStateChangeIfPossible();
+        beginKeyChangeIfPossible();
     }
 
     /**
-     * Removes the {@link StateChanger}.
+     * Removes the {@link KeyChanger}.
      */
     @MainThread
-    public void removeStateChanger() {
+    public void removeKeyChanger() {
         assertCorrectThread();
 
-        this.stateChanger = null;
+        this.keyChanger = null;
     }
 
     /**
@@ -178,10 +178,10 @@ public class Backstack {
         int direction;
         if(historyBuilder.contains(newKey)) {
             historyBuilder.removeUntil(newKey);
-            direction = StateChange.BACKWARD;
+            direction = KeyChange.BACKWARD;
         } else {
             historyBuilder.add(newKey);
-            direction = StateChange.FORWARD;
+            direction = KeyChange.FORWARD;
         }
         setHistory(historyBuilder.build(), direction);
     }
@@ -191,10 +191,10 @@ public class Backstack {
      * This means removing the current last element, and then adding the new element.
      *
      * @param newTop the new top key
-     * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     * @param direction The direction of the {@link KeyChange}: {@link KeyChange#BACKWARD}, {@link KeyChange#FORWARD} or {@link KeyChange#REPLACE}.
      */
     @MainThread
-    public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
+    public void replaceTop(@NonNull Object newTop, @KeyChange.KeyChangeDirection int direction) {
         checkNewKey(newTop);
 
         assertCorrectThread();
@@ -212,7 +212,7 @@ public class Backstack {
      * This means that if the provided element is found anywhere in the history, then the history goes to it.
      * If not found, then the current top is replaced with the provided element.
      *
-     * Going up occurs in {@link StateChange#BACKWARD} direction.
+     * Going up occurs in {@link KeyChange#BACKWARD} direction.
      *
      * @param newKey the new key to go up to
      */
@@ -226,7 +226,7 @@ public class Backstack {
      * This means that if the provided element is found anywhere in the history, then the history goes to it (unless specified otherwise).
      * If not found, then the current top is replaced with the provided element.
      *
-     * Going up occurs in {@link StateChange#BACKWARD} direction.
+     * Going up occurs in {@link KeyChange#BACKWARD} direction.
      *
      * @param newKey the new key to go up to
      * @param fallbackToBack specifies that if the key is found in the backstack, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
@@ -241,17 +241,17 @@ public class Backstack {
         int size = activeHistory.size();
 
         if(size <= 1) { // single-element history cannot contain the previous element. Short circuit to replaceTop.
-            replaceTop(newKey, StateChange.BACKWARD);
+            replaceTop(newKey, KeyChange.BACKWARD);
             return;
         }
         if(activeHistory.contains(newKey)) {
             if(fallbackToBack) {
-                setHistory(History.builderFrom(activeHistory).removeLast().build(), StateChange.BACKWARD);
+                setHistory(History.builderFrom(activeHistory).removeLast().build(), KeyChange.BACKWARD);
             } else {
                 goTo(newKey);
             }
         } else {
-            replaceTop(newKey, StateChange.BACKWARD);
+            replaceTop(newKey, KeyChange.BACKWARD);
         }
     }
 
@@ -261,7 +261,7 @@ public class Backstack {
      * If it doesn't exist, then it is just added as the last element.
      *
      * @param newKey the new key
-     * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
+     * @param asReplace specifies if the direction is {@link KeyChange#REPLACE} or {@link KeyChange#FORWARD}.
      */
     @MainThread
     public void moveToTop(@NonNull Object newKey, boolean asReplace) {
@@ -270,7 +270,7 @@ public class Backstack {
         assertCorrectThread();
 
         List<?> activeHistory = selectActiveHistory();
-        int direction = asReplace ? StateChange.REPLACE : StateChange.FORWARD;
+        int direction = asReplace ? KeyChange.REPLACE : KeyChange.FORWARD;
 
         History.Builder historyBuilder = History.builderFrom(activeHistory);
         if(historyBuilder.contains(newKey)) {
@@ -285,7 +285,7 @@ public class Backstack {
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
      *
-     * The used direction is {@link StateChange#FORWARD}.
+     * The used direction is {@link KeyChange#FORWARD}.
      *
      * @param newKey the new key
      */
@@ -297,20 +297,20 @@ public class Backstack {
     /**
      * Jumps to the root of the backstack.
      *
-     * This operation counts as a {@link StateChange#BACKWARD} navigation.
+     * This operation counts as a {@link KeyChange#BACKWARD} navigation.
      */
     @MainThread
     public void jumpToRoot() {
-        jumpToRoot(StateChange.BACKWARD);
+        jumpToRoot(KeyChange.BACKWARD);
     }
 
     /**
      * Jumps to the root of the backstack.
      *
-     * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     * @param direction The direction of the {@link KeyChange}: {@link KeyChange#BACKWARD}, {@link KeyChange#FORWARD} or {@link KeyChange#REPLACE}.
      */
     @MainThread
-    public void jumpToRoot(@StateChange.StateChangeDirection int direction) {
+    public void jumpToRoot(@KeyChange.KeyChangeDirection int direction) {
         assertCorrectThread();
 
         List<?> activeHistory = selectActiveHistory();
@@ -324,7 +324,7 @@ public class Backstack {
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
      * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
      *
-     * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
+     * Going up the chain occurs in {@link KeyChange#BACKWARD} direction.
      *
      * @param parentChain the chain of parents, from oldest to newest.
      */
@@ -339,7 +339,7 @@ public class Backstack {
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
      * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
      *
-     * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
+     * Going up the chain occurs in {@link KeyChange#BACKWARD} direction.
      *
      * @param parentChain the chain of parents, from oldest to newest.
      * @param fallbackToBack determines that if the chain is fully found in the backstack, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
@@ -365,7 +365,7 @@ public class Backstack {
             // if the parent chain is found as is, then decide based on fallback what should happen
             if(fallbackToBack) {
                 // last item is already removed, and we're defaulting to back.
-                setHistory(historyBuilder.build(), StateChange.BACKWARD);
+                setHistory(historyBuilder.build(), KeyChange.BACKWARD);
             } else {
                 // we clear all on top of it and go back to the chain
                 goTo(parentChain.get(parentChainSize-1));
@@ -396,7 +396,7 @@ public class Backstack {
                         }
                         newHistory.add(nextKey);
                     }
-                    setHistory(newHistory.build(), StateChange.BACKWARD);
+                    setHistory(newHistory.build(), KeyChange.BACKWARD);
                     return;
                 }
             }
@@ -404,7 +404,7 @@ public class Backstack {
             // no elements in the current history were found in the parent chain
             // default behavior is to add the newly received list in place of the original key
             History.Builder newHistory = historyBuilder.addAll(parentChain);
-            setHistory(newHistory.build(), StateChange.BACKWARD);
+            setHistory(newHistory.build(), KeyChange.BACKWARD);
         }
     }
 
@@ -413,13 +413,13 @@ public class Backstack {
      * If the key is found, then it goes backward to the existing key.
      * If the key is not found, then it goes forward to the newly added key.
      *
-     * @return true if a state change is pending or is handled with a state change, false if there is only one state left.
+     * @return true if a key change is pending or is handled with a key change, false if there is only one state left.
      */
     @MainThread
     public boolean goBack() {
         assertCorrectThread();
 
-        if(isStateChangePending()) {
+        if(isKeyChangePending()) {
             return true;
         }
         if(stack.size() <= 1) {
@@ -429,7 +429,7 @@ public class Backstack {
         List<?> activeHistory = selectActiveHistory();
         History.Builder historyBuilder = History.builderFrom(activeHistory);
         historyBuilder.removeLast();
-        setHistory(historyBuilder.build(), StateChange.BACKWARD);
+        setHistory(historyBuilder.build(), KeyChange.BACKWARD);
         return true;
     }
 
@@ -439,16 +439,16 @@ public class Backstack {
     }
 
     /**
-     * Immediately clears the backstack, it is NOT enqueued as a state change.
+     * Immediately clears the backstack, it is NOT enqueued as a key change.
      *
-     * If there are pending state changes, then it throws an exception.
+     * If there are pending key changes, then it throws an exception.
      *
      * You generally don't need to use this method.
      */
     @MainThread
     public void forceClear() {
         assertCorrectThread();
-        assertNoStateChange();
+        assertNoKeyChange();
         resetBackstack();
     }
 
@@ -468,15 +468,15 @@ public class Backstack {
      * Sets the provided state list as the new active history.
      *
      * @param newHistory the new active history.
-     * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     * @param direction  The direction of the {@link KeyChange}: {@link KeyChange#BACKWARD}, {@link KeyChange#FORWARD} or {@link KeyChange#REPLACE}.
      */
     @MainThread
-    public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
+    public void setHistory(@NonNull List<?> newHistory, @KeyChange.KeyChangeDirection int direction) {
         checkNewHistory(newHistory);
 
         assertCorrectThread();
 
-        enqueueStateChange(newHistory, direction, false); // must use enqueue!
+        enqueueKeyChange(newHistory, direction, false); // must use enqueue!
     }
 
     /**
@@ -577,48 +577,48 @@ public class Backstack {
     }
 
     /**
-     * Returns whether there is at least one queued {@link StateChange}.
+     * Returns whether there is at least one queued {@link KeyChange}.
      *
-     * @return true if there is at least one enqueued {@link StateChange}.
+     * @return true if there is at least one enqueued {@link KeyChange}.
      */
-    public boolean isStateChangePending() {
+    public boolean isKeyChangePending() {
         assertCorrectThread();
 
-        return !queuedStateChanges.isEmpty();
+        return !queuedKeyChanges.isEmpty();
     }
 
-    private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization) {
-        PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
-        queuedStateChanges.add(pendingStateChange);
-        beginStateChangeIfPossible();
+    private void enqueueKeyChange(List<?> newHistory, int direction, boolean initialization) {
+        PendingKeyChange pendingKeyChange = new PendingKeyChange(newHistory, direction, initialization);
+        queuedKeyChanges.add(pendingKeyChange);
+        beginKeyChangeIfPossible();
     }
 
     private List<?> selectActiveHistory() {
-        if(stack.isEmpty() && queuedStateChanges.size() <= 0) {
+        if(stack.isEmpty() && queuedKeyChanges.size() <= 0) {
             return initialParameters;
-        } else if(queuedStateChanges.size() <= 0) {
+        } else if(queuedKeyChanges.size() <= 0) {
             return stack;
         } else {
-            return queuedStateChanges.getLast().newHistory;
+            return queuedKeyChanges.getLast().newHistory;
         }
     }
 
-    private boolean beginStateChangeIfPossible() {
-        if(hasStateChanger() && isStateChangePending()) {
-            PendingStateChange pendingStateChange = queuedStateChanges.getFirst();
-            if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
-                pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
-                changeState(pendingStateChange);
+    private boolean beginKeyChangeIfPossible() {
+        if(hasKeyChanger() && isKeyChangePending()) {
+            PendingKeyChange pendingKeyChange = queuedKeyChanges.getFirst();
+            if(pendingKeyChange.getStatus() == PendingKeyChange.Status.ENQUEUED) {
+                pendingKeyChange.setStatus(PendingKeyChange.Status.IN_PROGRESS);
+                changeState(pendingKeyChange);
                 return true;
             }
         }
         return false;
     }
 
-    private void changeState(final PendingStateChange pendingStateChange) {
-        boolean initialization = pendingStateChange.initialization;
-        List<?> newHistory = pendingStateChange.newHistory;
-        @StateChange.StateChangeDirection int direction = pendingStateChange.direction;
+    private void changeState(final PendingKeyChange pendingKeyChange) {
+        boolean initialization = pendingKeyChange.initialization;
+        List<?> newHistory = pendingKeyChange.newHistory;
+        @KeyChange.KeyChangeDirection int direction = pendingKeyChange.direction;
 
         List<Object> previousState;
         if(initialization) {
@@ -626,54 +626,54 @@ public class Backstack {
         } else {
             previousState = new ArrayList<>(stack);
         }
-        final StateChange stateChange = new StateChange(this,
+        final KeyChange keyChange = new KeyChange(this,
                 Collections.unmodifiableList(previousState),
                 Collections.unmodifiableList(newHistory),
                 direction);
-        StateChanger.Callback completionCallback = new StateChanger.Callback() {
+        KeyChanger.Callback completionCallback = new KeyChanger.Callback() {
             @Override
-            public void stateChangeComplete() {
+            public void keyChangeComplete() {
                 assertCorrectThread();
 
-                if(!pendingStateChange.didForceExecute) {
-                    if(pendingStateChange.getStatus() == PendingStateChange.Status.COMPLETED) {
-                        throw new IllegalStateException("State change completion cannot be called multiple times!");
+                if(!pendingKeyChange.didForceExecute) {
+                    if(pendingKeyChange.getStatus() == PendingKeyChange.Status.COMPLETED) {
+                        throw new IllegalStateException("key change completion cannot be called multiple times!");
                     }
-                    completeStateChange(stateChange);
+                    completeKeyChange(keyChange);
                 }
             }
         };
-        pendingStateChange.completionCallback = completionCallback;
-        stateChanger.handleStateChange(stateChange, completionCallback);
+        pendingKeyChange.completionCallback = completionCallback;
+        keyChanger.handleKeyChange(keyChange, completionCallback);
     }
 
-    private void completeStateChange(StateChange stateChange) {
+    private void completeKeyChange(KeyChange keyChange) {
         if(initialParameters == stack) {
             stack = originalStack;
         }
         stack.clear();
-        stack.addAll(stateChange.newState);
+        stack.addAll(keyChange.newKeys);
 
-        PendingStateChange pendingStateChange = queuedStateChanges.removeFirst();
-        pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
-        notifyCompletionListeners(stateChange);
-        beginStateChangeIfPossible();
+        PendingKeyChange pendingKeyChange = queuedKeyChanges.removeFirst();
+        pendingKeyChange.setStatus(PendingKeyChange.Status.COMPLETED);
+        notifyCompletionListeners(keyChange);
+        beginKeyChangeIfPossible();
     }
 
     // completion listeners
 
     /**
-     * CompletionListener allows you to listen to when a StateChange has been completed.
+     * CompletionListener allows you to listen to when a KeyChange has been completed.
      * They are registered to the backstack with {@link Backstack#addCompletionListener(CompletionListener)}.
      * They are unregistered from the backstack with {@link Backstack#removeCompletionListener(CompletionListener)} methods.
      */
     public interface CompletionListener {
         /**
-         * Callback method that is called when a {@link StateChange} is complete.
+         * Callback method that is called when a {@link KeyChange} is complete.
          *
-         * @param stateChange the state change that has been completed.
+         * @param keyChange the key change that has been completed.
          */
-        void stateChangeCompleted(@NonNull StateChange stateChange);
+        void keyChangeCompleted(@NonNull KeyChange keyChange);
     }
 
     private LinkedList<CompletionListener> completionListeners = new LinkedList<>();
@@ -715,27 +715,27 @@ public class Backstack {
         completionListeners.clear();
     }
 
-    private void notifyCompletionListeners(StateChange stateChange) {
+    private void notifyCompletionListeners(KeyChange keyChange) {
         for(CompletionListener completionListener : completionListeners) {
-            completionListener.stateChangeCompleted(stateChange);
+            completionListener.keyChangeCompleted(keyChange);
         }
     }
 
     // force execute
 
     /**
-     * If there is a state change in progress, then calling this method will force it to be completed immediately.
-     * Any future calls to {@link StateChanger.Callback#stateChangeComplete()} for that given state change are ignored.
+     * If there is a key change in progress, then calling this method will force it to be completed immediately.
+     * Any future calls to {@link KeyChanger.Callback#keyChangeComplete()} for that given key change are ignored.
      */
     @MainThread
-    public void executePendingStateChange() {
+    public void executePendingKeyChange() {
         assertCorrectThread();
 
-        if(isStateChangePending()) {
-            PendingStateChange pendingStateChange = queuedStateChanges.getFirst();
-            if(pendingStateChange.getStatus() == PendingStateChange.Status.IN_PROGRESS) {
-                pendingStateChange.completionCallback.stateChangeComplete();
-                pendingStateChange.didForceExecute = true;
+        if(isKeyChangePending()) {
+            PendingKeyChange pendingKeyChange = queuedKeyChanges.getFirst();
+            if(pendingKeyChange.getStatus() == PendingKeyChange.Status.IN_PROGRESS) {
+                pendingKeyChange.completionCallback.keyChangeComplete();
+                pendingKeyChange.didForceExecute = true;
             }
         }
     }
@@ -753,10 +753,10 @@ public class Backstack {
         }
     }
 
-    private void assertNoStateChange() {
-        if(isStateChangePending()) {
+    private void assertNoKeyChange() {
+        if(isKeyChangePending()) {
             throw new IllegalStateException(
-                    "This operation is not allowed while there are enqueued state changes.");
+                    "This operation is not allowed while there are enqueued key changes.");
         }
     }
 

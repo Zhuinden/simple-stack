@@ -23,10 +23,10 @@ import android.view.ViewGroup;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.GlobalServices;
+import com.zhuinden.simplestack.KeyChanger;
 import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
 import com.zhuinden.simplestack.ScopedServices;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.Collections;
@@ -43,13 +43,13 @@ public final class BackstackHost
         setRetainInstance(true);
     }
 
-    StateChanger stateChanger;
+    KeyChanger keyChanger;
     KeyFilter keyFilter;
     KeyParceler keyParceler;
     BackstackManager.StateClearStrategy stateClearStrategy;
     ScopedServices scopedServices;
     GlobalServices globalServices;
-    List<Backstack.CompletionListener> stateChangeCompletionListeners;
+    List<Backstack.CompletionListener> keyChangeCompletionListeners;
 
     boolean shouldPersistContainerChild;
 
@@ -79,15 +79,15 @@ public final class BackstackHost
                 backstackManager.setGlobalServices(globalServices);
             }
             backstackManager.setup(initialKeys);
-            for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
-                backstackManager.addStateChangeCompletionListener(completionListener);
+            for(Backstack.CompletionListener completionListener : keyChangeCompletionListeners) {
+                backstackManager.addKeyChangeCompletionListener(completionListener);
             }
             if(savedInstanceState != null) {
                 backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable("NAVIGATOR_STATE_BUNDLE"));
             }
         }
         if(!isInitializeDeferred) {
-            backstackManager.setStateChanger(stateChanger);
+            backstackManager.setKeyChanger(keyChanger);
         }
         return backstackManager.getBackstack();
     }
@@ -104,20 +104,20 @@ public final class BackstackHost
     @Override
     public void onResume() {
         super.onResume();
-        backstackManager.reattachStateChanger();
+        backstackManager.reattachKeyChanger();
     }
 
     @Override
     public void onPause() {
-        backstackManager.detachStateChanger();
+        backstackManager.detachKeyChanger();
         super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        backstackManager.getBackstack().executePendingStateChange();
+        backstackManager.getBackstack().executePendingKeyChange();
 
-        stateChanger = null;
+        keyChanger = null;
         container = null;
         super.onDestroyView();
     }

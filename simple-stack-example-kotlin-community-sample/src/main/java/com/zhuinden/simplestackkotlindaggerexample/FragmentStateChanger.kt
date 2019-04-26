@@ -2,24 +2,24 @@ package com.zhuinden.simplestackkotlindaggerexample
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.KeyChange
 
-class FragmentStateChanger(
+class FragmentKeyChanger(
     private val fragmentManager: FragmentManager,
     private val containerId: Int
 ) {
-    fun handleStateChange(stateChange: StateChange) {
+    fun handleKeyChange(keyChange: KeyChange) {
         val fragmentTransaction = fragmentManager.beginTransaction().apply {
-            when (stateChange.direction) {
-                StateChange.FORWARD -> {
+            when (keyChange.direction) {
+                KeyChange.FORWARD -> {
                     setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_right, R.anim.slide_out_to_left)
                 }
-                StateChange.BACKWARD -> {
+                KeyChange.BACKWARD -> {
                     setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right, R.anim.slide_in_from_left, R.anim.slide_out_to_right)
                 }
             }
-            val previousState = stateChange.getPreviousState<BaseKey>()
-            val newState = stateChange.getNewState<BaseKey>()
+            val previousState = keyChange.getPreviousKeys<BaseKey>()
+            val newState = keyChange.getNewKeys<BaseKey>()
             for (oldKey in previousState) {
                 val fragment = fragmentManager.findFragmentByTag(oldKey.fragmentTag)
                 if (fragment != null) {
@@ -32,7 +32,7 @@ class FragmentStateChanger(
             }
             for (newKey in newState) {
                 var fragment: Fragment? = fragmentManager.findFragmentByTag(newKey.fragmentTag)
-                if (newKey == stateChange.topNewState<Any>()) {
+                if (newKey == keyChange.topNewKey<Any>()) {
                     if (fragment != null) {
                         if (fragment.isRemoving) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
                             replace(containerId, newKey.newFragment(), newKey.fragmentTag)

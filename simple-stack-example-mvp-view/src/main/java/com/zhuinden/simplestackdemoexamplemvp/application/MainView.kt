@@ -12,8 +12,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.OnClickListener
 import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.KeyChange
+import com.zhuinden.simplestack.KeyChanger
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
 import com.zhuinden.simplestackdemoexamplemvp.features.statistics.StatisticsKey
@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.activity_main.view.*
  * Created by Owner on 2017. 01. 26..
  */
 
-class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateChanger {
+class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, KeyChanger {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle)
@@ -148,14 +148,14 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
     }
 
 
-    override fun handleStateChange(stateChange: StateChange, callback: StateChanger.Callback) {
+    override fun handleKeyChange(keyChange: KeyChange, callback: KeyChanger.Callback) {
         if (root != null && root.getChildAt(0) != null) {
             val child = root.getChildAt(0)
-            if (child is StateChanger) {
-                child.handleStateChange(stateChange, callback)
+            if (child is KeyChanger) {
+                child.handleKeyChange(keyChange, callback)
                 return
             }
         }
-        callback.stateChangeComplete()
+        callback.keyChangeComplete()
     }
 }
