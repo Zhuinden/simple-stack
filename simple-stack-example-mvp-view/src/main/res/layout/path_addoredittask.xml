@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zhuinden.simplestackdemoexamplemvp.features.addoredittask.AddOrEditTaskView xmlns:android="http://schemas.android.com/apk/res/android"
                                                                                            android:layout_width="match_parent"
                                                                                            android:layout_height="match_parent">
 
@@ -42,5 +42,5 @@
             android:gravity="top"
             android:hint="@string/description_hint" />
     </LinearLayout>
-</com.zhuinden.simplestackdemoexamplemvp.presentation.paths.addoredittask.AddOrEditTaskView>
+</com.zhuinden.simplestackdemoexamplemvp.features.addoredittask.AddOrEditTaskView>
 

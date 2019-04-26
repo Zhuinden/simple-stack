@@ -2,14 +2,12 @@ package com.zhuinden.simplestackdemoexamplefragments.application.injection
 
 import android.content.Context
 import android.content.res.Resources
-import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
-import com.zhuinden.simplestackdemoexamplefragments.presentation.mapper.TaskMapper
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.addoredittask.AddOrEditTaskPresenter
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics.StatisticsPresenter
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.taskdetail.TaskDetailPresenter
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksPresenter
+import com.zhuinden.simplestackdemoexamplefragments.features.addoredittask.AddOrEditTaskPresenter
+import com.zhuinden.simplestackdemoexamplefragments.features.statistics.StatisticsPresenter
+import com.zhuinden.simplestackdemoexamplefragments.features.taskdetail.TaskDetailPresenter
+import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksPresenter
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
 import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue
 import com.zhuinden.simplestackdemoexamplefragments.util.SchedulerHolder
@@ -22,10 +20,8 @@ import javax.inject.Singleton
  */
 
 @Singleton
-@Component(modules = [SchedulerModule::class, NavigationModule::class, AndroidModule::class])
+@Component(modules = [SchedulerModule::class, AndroidModule::class])
 interface SingletonComponent {
-    fun taskMapper(): TaskMapper
-
     fun databaseManager(): DatabaseManager
 
     @Named("LOOPER_SCHEDULER")
@@ -37,8 +33,6 @@ interface SingletonComponent {
     fun taskRepository(): TaskRepository
 
     fun backstackHolder(): BackstackHolder
-
-    fun backstack(): Backstack
 
     fun messageQueue(): MessageQueue
 

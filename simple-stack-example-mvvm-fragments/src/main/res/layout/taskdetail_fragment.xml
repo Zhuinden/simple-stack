@@ -21,7 +21,7 @@
 
         <variable
             name="viewmodel"
-            type="com.zhuinden.simplestackexamplemvvm.presentation.paths.taskdetail.TaskDetailViewModel"/>
+            type="com.zhuinden.simplestackexamplemvvm.features.taskdetail.TaskDetailViewModel" />
     </data>
 
     <FrameLayout

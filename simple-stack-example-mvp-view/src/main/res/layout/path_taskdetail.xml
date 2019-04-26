@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zhuinden.simplestackdemoexamplemvp.features.taskdetail.TaskDetailView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -44,4 +44,4 @@
         android:layout_toRightOf="@+id/checkboxTaskDetailComplete"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-</com.zhuinden.simplestackdemoexamplemvp.presentation.paths.taskdetail.TaskDetailView>
+</com.zhuinden.simplestackdemoexamplemvp.features.taskdetail.TaskDetailView>

@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemoexamplemvp.util
 
-import com.zhuinden.simplestackdemoexamplemvp.application.Key
+import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -13,13 +13,13 @@ import javax.inject.Singleton
 
 @Singleton
 class MessageQueue @Inject constructor() {
-    private var messages: MutableMap<Key, Queue<Any>> = ConcurrentHashMap()
+    private var messages: MutableMap<ViewKey, Queue<Any>> = ConcurrentHashMap()
 
     interface Receiver {
         fun receiveMessage(message: Any)
     }
 
-    fun pushMessageTo(recipient: Key, message: Any) {
+    fun pushMessageTo(recipient: ViewKey, message: Any) {
         var messageQueue: Queue<Any>? = messages[recipient]
         if (messageQueue == null) {
             messageQueue = ConcurrentLinkedQueue()
@@ -28,7 +28,7 @@ class MessageQueue @Inject constructor() {
         messageQueue.add(message)
     }
 
-    fun requestMessages(receiverKey: Key, receiver: Receiver) {
+    fun requestMessages(receiverKey: ViewKey, receiver: Receiver) {
         val messageQueue = messages[receiverKey]
         if (messageQueue != null) {
             val messages = messageQueue.iterator()

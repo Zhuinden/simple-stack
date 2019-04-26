@@ -2,8 +2,9 @@ package com.zhuinden.simplestackdemoexamplefragments.data.repository
 
 import com.zhuinden.simplestackdemoexamplefragments.data.entity.DbTask
 import com.zhuinden.simplestackdemoexamplefragments.data.entity.DbTaskFields
-import com.zhuinden.simplestackdemoexamplefragments.presentation.mapper.TaskMapper
-import com.zhuinden.simplestackdemoexamplefragments.presentation.objects.Task
+import com.zhuinden.simplestackdemoexamplefragments.domain.Task
+import com.zhuinden.simplestackdemoexamplefragments.domain.fromRealm
+import com.zhuinden.simplestackdemoexamplefragments.domain.toRealm
 import com.zhuinden.simplestackdemoexamplefragments.util.SchedulerHolder
 import com.zhuinden.simplestackdemoexamplefragments.util.optional.Optional
 import io.reactivex.Observable
@@ -26,7 +27,6 @@ import javax.inject.Singleton
  */
 @Singleton
 class TaskRepository @Inject constructor(
-    private val taskMapper: TaskMapper,
     @param:Named("LOOPER_SCHEDULER") private val looperScheduler: SchedulerHolder,
     @param:Named("WRITE_SCHEDULER") private val writeScheduler: SchedulerHolder
 ) {
@@ -54,7 +54,7 @@ class TaskRepository @Inject constructor(
         }
 
     private fun mapFrom(dbTasks: RealmResults<DbTask>): List<Task> =
-        dbTasks.map { task -> taskMapper.fromRealm(task) }
+        dbTasks.map { task -> task.fromRealm() }
 
     private fun doWrite(transaction: (Realm) -> Unit) {
         Single.create(SingleOnSubscribe<Void> { _ ->
@@ -88,12 +88,12 @@ class TaskRepository @Inject constructor(
     }
 
     fun insertTask(task: Task) {
-        doWrite { realm -> realm.insertOrUpdate(taskMapper.toRealm(task)) }
+        doWrite { realm -> realm.insertOrUpdate(task.toRealm()) }
     }
 
     fun insertTasks(tasks: List<Task>) {
         doWrite { realm ->
-            realm.insertOrUpdate(tasks.map { task -> taskMapper.toRealm(task) })
+            realm.insertOrUpdate(tasks.map { task -> task.toRealm() })
         }
     }
 
@@ -113,7 +113,7 @@ class TaskRepository @Inject constructor(
                     .equalTo(DbTaskFields.ID, taskId)
                     .findAll()
                 return@Callable when {
-                    tasks.size > 0 -> Optional.of(taskMapper.fromRealm(tasks[0]!!))
+                    tasks.size > 0 -> Optional.of(tasks[0]!!.fromRealm())
                     else -> Optional.absent<Task>()
                 }
             }

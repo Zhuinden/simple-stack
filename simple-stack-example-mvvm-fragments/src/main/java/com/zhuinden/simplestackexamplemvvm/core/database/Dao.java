@@ -3,8 +3,6 @@ package com.zhuinden.simplestackexamplemvvm.core.database;
 import java.util.List;
 
 /**
- * If I want to finish the merge of the old Dao system, then I'll have to remove the queries from DatabaseManager first.
- *
  * Created by Owner on 2017. 09. 03..
  */
 public interface Dao<T> {

@@ -22,8 +22,8 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.injection.Injector;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.statistics.StatisticsKey;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksKey;
+import com.zhuinden.simplestackexamplemvvm.features.statistics.StatisticsKey;
+import com.zhuinden.simplestackexamplemvvm.features.tasks.TasksKey;
 import com.zhuinden.simplestackexamplemvvm.util.ServiceProvider;
 
 import butterknife.BindView;

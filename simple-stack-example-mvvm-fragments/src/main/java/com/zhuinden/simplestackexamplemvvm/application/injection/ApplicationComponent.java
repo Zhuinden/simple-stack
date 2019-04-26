@@ -7,11 +7,11 @@ import android.content.res.Resources;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestackexamplemvvm.application.BackstackHolder;
 import com.zhuinden.simplestackexamplemvvm.core.scheduler.Scheduler;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.addedittask.AddEditTaskViewModel;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.statistics.StatisticsViewModel;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.taskdetail.TaskDetailViewModel;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TaskItemViewModel;
-import com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TasksViewModel;
+import com.zhuinden.simplestackexamplemvvm.features.addedittask.AddEditTaskViewModel;
+import com.zhuinden.simplestackexamplemvvm.features.statistics.StatisticsViewModel;
+import com.zhuinden.simplestackexamplemvvm.features.taskdetail.TaskDetailViewModel;
+import com.zhuinden.simplestackexamplemvvm.features.tasks.TaskItemViewModel;
+import com.zhuinden.simplestackexamplemvvm.features.tasks.TasksViewModel;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

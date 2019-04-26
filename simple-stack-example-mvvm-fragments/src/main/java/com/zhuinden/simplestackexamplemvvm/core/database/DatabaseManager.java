@@ -93,12 +93,15 @@ public final class DatabaseManager
 
     private final List<Table> tables;
 
+    private final BackgroundScheduler backgroundScheduler;
+
     private SQLiteDatabase database;
 
     @Inject
-    public DatabaseManager(Context appContext, List<Table> tables) {
+    public DatabaseManager(Context appContext, List<Table> tables, BackgroundScheduler backgroundScheduler) {
         super(appContext, DATABASE_NAME, null, DATABASE_VERSION);
         this.tables = tables;
+        this.backgroundScheduler = backgroundScheduler;
         this.database = getWritableDatabase();
     }
 
@@ -215,7 +218,7 @@ public final class DatabaseManager
     // Experimental. This allows for reactivity.
     private List<WeakReference<LiveResults<?>>> liveDatas = Collections.synchronizedList(new LinkedList<>());
 
-    public <T> LiveResults<T> findAllWithChanges(BackgroundScheduler backgroundScheduler, Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
+    public <T> LiveResults<T> findAllWithChanges(Table table, Mapper<T> mapper, QueryDefinition queryDefinition) {
         return new LiveResults<>(backgroundScheduler, this, table, mapper, queryDefinition);
     }
 

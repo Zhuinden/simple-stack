@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zhuinden.simplestackdemoexamplemvp.features.paths.second.SecondView xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -40,4 +40,4 @@
         android:paddingRight="24dp"
         android:layout_margin="48dp"
         android:text="Go to TODOs"/>
-</com.zhuinden.simplestackdemoexamplemvp.presentation.paths.second.SecondView>
+</com.zhuinden.simplestackdemoexamplemvp.features.paths.second.SecondView>

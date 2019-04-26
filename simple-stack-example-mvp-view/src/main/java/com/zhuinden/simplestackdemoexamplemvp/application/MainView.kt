@@ -15,8 +15,9 @@ import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.statistics.StatisticsKey
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
+import com.zhuinden.simplestackdemoexamplemvp.features.statistics.StatisticsKey
+import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplemvp.util.showIf
 import kotlinx.android.synthetic.main.activity_main.view.*
 
@@ -57,7 +58,7 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
         }
     }
 
-    fun setupViewsForKey(key: Key, newView: View) {
+    fun setupViewsForKey(key: ViewKey, newView: View) {
         val actionBar = MainActivity[context].supportActionBar!!
         if (key.shouldShowUp()) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
@@ -100,7 +101,7 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
 
     fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (root != null && root.getChildAt(0) != null) {
-            val key = Backstack.getKey<Key>(root.getChildAt(0).context)
+            val key = Backstack.getKey<ViewKey>(root.getChildAt(0).context)
             MainActivity[context].menuInflater.inflate(key.menu(), menu)
             return true
         }

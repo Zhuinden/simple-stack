@@ -10,10 +10,10 @@ import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestackdemoexamplefragments.R
+import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentStateChanger
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
-import com.zhuinden.simplestackdemoexamplefragments.util.FragmentStateChanger
 import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.ServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 

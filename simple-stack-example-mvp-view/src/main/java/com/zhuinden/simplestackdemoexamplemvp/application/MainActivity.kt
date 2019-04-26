@@ -5,16 +5,15 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
-import com.zhuinden.simplestack.navigator.changehandlers.FadeViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.presentation.paths.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewStateChanger
+import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -33,12 +32,15 @@ class MainActivity : AppCompatActivity(), StateChanger {
     override fun onCreateOptionsMenu(menu: Menu): Boolean =
         mainView.onCreateOptionsMenu(menu)
 
+    private lateinit var viewStateChanger: ViewStateChanger
+
     override fun onCreate(savedInstanceState: Bundle?) {
         databaseManager.init(this)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        viewStateChanger = ViewStateChanger(this, root)
         val backstack = Navigator.configure()
             .setScopedServices(ServiceProvider())
             .setDeferredInitialization(true)
@@ -85,32 +87,10 @@ class MainActivity : AppCompatActivity(), StateChanger {
             completionCallback.stateChangeComplete()
             return
         }
-        val newKey = stateChange.topNewState<Key>()
-        val previousKey = stateChange.topPreviousState<Key?>()
 
-        val newView = LayoutInflater.from(stateChange.createContext(this, newKey))
-            .inflate(newKey.layout(), root, false)
-
-        val previousView = root.getChildAt(0)
-        Navigator.persistViewToState(previousView)
-        Navigator.restoreViewFromState(newView)
-
-        if (previousKey == null || previousView == null) {
-            root.addView(newView)
-            mainView.setupViewsForKey(newKey, newView)
-            completionCallback.stateChangeComplete()
-            return
-        }
-
-        val viewChangeHandler = when (stateChange.direction) {
-            StateChange.FORWARD -> newKey.viewChangeHandler()
-            StateChange.BACKWARD -> previousKey.viewChangeHandler()
-            else -> FadeViewChangeHandler()
-        }
-
-        viewChangeHandler.performViewChange(root, previousView, newView, stateChange.direction) {
+        viewStateChanger.handleStateChange(stateChange) {
             mainView.handleStateChange(stateChange) {
-                mainView.setupViewsForKey(newKey, newView)
+                mainView.setupViewsForKey(stateChange.topNewState(), root.getChildAt(0))
                 completionCallback.stateChangeComplete()
             }
         }

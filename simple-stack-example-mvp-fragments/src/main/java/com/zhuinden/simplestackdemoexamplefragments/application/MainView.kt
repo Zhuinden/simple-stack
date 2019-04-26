@@ -10,8 +10,9 @@ import android.util.AttributeSet
 import android.view.View
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestackdemoexamplefragments.R
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.statistics.StatisticsKey
-import com.zhuinden.simplestackdemoexamplefragments.presentation.paths.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
+import com.zhuinden.simplestackdemoexamplefragments.features.statistics.StatisticsKey
+import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.showIf
 import kotlinx.android.synthetic.main.activity_main.view.*
 
@@ -26,7 +27,7 @@ class MainView : DrawerLayout {
 
     init {
         if (!isInEditMode) {
-            backstack = Injector.get().backstack()
+            backstack = Injector.get().backstackHolder().backstack
         }
     }
 
@@ -56,7 +57,7 @@ class MainView : DrawerLayout {
         }
     }
 
-    fun setupViewsForKey(key: Key) {
+    fun setupViewsForKey(key: FragmentKey) {
         val actionBar = MainActivity[context].supportActionBar!!
         if (key.shouldShowUp()) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)

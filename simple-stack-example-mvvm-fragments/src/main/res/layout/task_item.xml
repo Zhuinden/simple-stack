@@ -19,7 +19,7 @@
 
         <variable
             name="viewmodel"
-            type="com.zhuinden.simplestackexamplemvvm.presentation.paths.tasks.TaskItemViewModel"/>
+            type="com.zhuinden.simplestackexamplemvvm.features.tasks.TaskItemViewModel" />
     </data>
 
     <LinearLayout
