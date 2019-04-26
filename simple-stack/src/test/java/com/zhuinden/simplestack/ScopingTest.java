@@ -888,19 +888,19 @@ public class ScopingTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -941,22 +941,22 @@ public class ScopingTest {
 
         backstackManager.setup(History.of(beep, boop));
 
-        assertThat(activatedScope).isEmpty();
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(activatedServices).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
         backstackManager.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service2);
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(activatedServices).containsExactly(service2);
+        assertThat(deactivatedServices).isEmpty();
 
         backstackManager.getBackstack().goBack();
 
-        assertThat(activatedScope).containsExactly(service2, service1);
-        assertThat(deactivatedScope).containsExactly(service2);
+        assertThat(activatedServices).containsExactly(service2, service1);
+        assertThat(deactivatedServices).containsExactly(service2);
 
         backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
 
-        assertThat(activatedScope).containsExactly(service2, service1);
-        assertThat(deactivatedScope).containsExactly(service2, service1);
+        assertThat(activatedServices).containsExactly(service2, service1);
+        assertThat(deactivatedServices).containsExactly(service2, service1);
     }
 
     @Test
@@ -964,19 +964,19 @@ public class ScopingTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1025,14 +1025,14 @@ public class ScopingTest {
 
         backstackManager.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
+        assertThat(activatedServices).isEmpty();
         backstackManager.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1, service2, service3);
+        assertThat(activatedServices).containsExactly(service1, service2, service3);
 
         backstackManager.getBackstack().goTo(boop);
-        assertThat(activatedScope).containsExactly(service1, service2, service3, service4, service5, service6);
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1);
+        assertThat(activatedServices).containsExactly(service1, service2, service3, service4, service5, service6);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1);
     }
 
     @Test
@@ -1040,17 +1040,17 @@ public class ScopingTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
 
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1099,17 +1099,17 @@ public class ScopingTest {
 
         backstackManager.setup(History.of(beep));
 
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
         backstackManager.setStateChanger(stateChanger);
 
         backstackManager.getBackstack().goTo(boop);
 
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1);
 
         TestKey bye = new TestKey("bye");
         backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
 
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1, service6, service5, service4);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1, service6, service5, service4);
     }
 
     @Test
@@ -1117,19 +1117,19 @@ public class ScopingTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1152,16 +1152,16 @@ public class ScopingTest {
 
         backstackManager.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(activatedServices).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
         backstackManager.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1);
+        assertThat(activatedServices).containsExactly(service1);
 
         backstackManager.getBackstack().removeStateChanger();
         backstackManager.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1);
+        assertThat(activatedServices).containsExactly(service1);
     }
 
     @Test
@@ -1169,19 +1169,19 @@ public class ScopingTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1205,25 +1205,25 @@ public class ScopingTest {
         TestKey bye = new TestKey("bye");
         backstackManager.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(activatedServices).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
         backstackManager.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1);
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(activatedServices).containsExactly(service1);
+        assertThat(deactivatedServices).isEmpty();
 
         backstackManager.getBackstack().removeStateChanger();
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
 
         backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
 
         backstackManager.setStateChanger(stateChanger);
-        assertThat(deactivatedScope).containsExactly(service1);
+        assertThat(deactivatedServices).containsExactly(service1);
 
         backstackManager.getBackstack().removeStateChanger();
         backstackManager.setStateChanger(stateChanger);
-        assertThat(deactivatedScope).containsExactly(service1);
+        assertThat(deactivatedServices).containsExactly(service1);
     }
 
     @Test
@@ -1231,8 +1231,8 @@ public class ScopingTest {
         BackstackManager backstackManager = new BackstackManager();
         backstackManager.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         final AtomicReference<StateChanger.Callback> callback = new AtomicReference<>();
         StateChanger pendingStateChanger = new StateChanger() {
@@ -1245,13 +1245,13 @@ public class ScopingTest {
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1300,11 +1300,11 @@ public class ScopingTest {
 
         backstackManager.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
+        assertThat(activatedServices).isEmpty();
         backstackManager.setStateChanger(pendingStateChanger);
         callback.get().stateChangeComplete();
 
-        assertThat(activatedScope).containsExactly(service1, service2, service3);
+        assertThat(activatedServices).containsExactly(service1, service2, service3);
 
         backstackManager.getBackstack().setHistory(History.of(boop), StateChange.BACKWARD);
         backstackManager.getBackstack().removeStateChanger();
@@ -1313,8 +1313,8 @@ public class ScopingTest {
         backstackManager.setStateChanger(pendingStateChanger);
         callback.get().stateChangeComplete();
 
-        assertThat(activatedScope).containsExactly(service1, service2, service3, service4, service5, service6);
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1);
+        assertThat(activatedServices).containsExactly(service1, service2, service3, service4, service5, service6);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1);
     }
 
     @Test
@@ -1324,16 +1324,16 @@ public class ScopingTest {
 
         class MyService
                 implements ScopedServices.Activated {
-            boolean didScopeActivate = false;
+            boolean didServiceActivate = false;
             boolean didScopeDeactivate = false;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                didScopeActivate = true;
+            public void onServiceActive() {
+                didServiceActivate = true;
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 didScopeDeactivate = true;
             }
         }
@@ -1369,7 +1369,7 @@ public class ScopingTest {
         backstackDelegate.onPostResume();
         backstackDelegate.onPause();
 
-        assertThat(service.didScopeActivate).isTrue();
+        assertThat(service.didServiceActivate).isTrue();
         assertThat(service.didScopeDeactivate).isFalse();
 
         assertThat(backstackDelegate.hasScope("beep")).isTrue();
@@ -1377,7 +1377,7 @@ public class ScopingTest {
         backstackDelegate.onDestroy();
         assertThat(backstackDelegate.hasScope("beep")).isFalse();
         assertThat(backstackDelegate.hasService(testKeyWithScope, SERVICE_TAG)).isFalse();
-        assertThat(service.didScopeActivate).isTrue();
+        assertThat(service.didServiceActivate).isTrue();
         assertThat(service.didScopeDeactivate).isTrue();
     }
 
@@ -1429,7 +1429,7 @@ public class ScopingTest {
     }
 
     @Test
-    public void scopedAndActivatedAreCalledInRightOrder() {
+    public void registeredAndActivatedAreCalledInRightOrder() {
         final List<Pair<Object, ServiceEvent>> events = new ArrayList<>();
 
         BackstackManager backstackManager = new BackstackManager();
@@ -1444,19 +1444,18 @@ public class ScopingTest {
             }
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
                 events.add(Pair.of((Object) this, ServiceEvent.ACTIVE));
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 events.add(Pair.of((Object) this, ServiceEvent.INACTIVE));
             }
 
             @Override
             public void onServiceRegistered() {
                 events.add(Pair.of((Object) this, ServiceEvent.CREATE));
-
             }
 
             @Override
@@ -1699,12 +1698,12 @@ public class ScopingTest {
                 implements ScopedServices.Activated, ScopedServices.Registered {
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 inactivated.add(this);
             }
 

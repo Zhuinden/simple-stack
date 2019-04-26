@@ -380,12 +380,12 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
                 events.add(Pair.of((Object) this, ServiceEvent.ACTIVE));
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 events.add(Pair.of((Object) this, ServiceEvent.INACTIVE));
             }
 
@@ -605,12 +605,12 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
                 events.add(Pair.of((Object) this, ServiceEvent.ACTIVE));
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 events.add(Pair.of((Object) this, ServiceEvent.INACTIVE));
             }
 

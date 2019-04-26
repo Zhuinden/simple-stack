@@ -416,18 +416,18 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegister;
             private boolean didServiceUnregister;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
@@ -499,8 +499,8 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackDelegate.hasScope("parentScope3")).isTrue();
         assertThat(backstackDelegate.hasService("parentScope2", "service")).isTrue();
         assertThat(service.didServiceRegister).isTrue();
-        assertThat(service.didScopeActivate).isTrue();
-        assertThat(service.didScopeInactivate).isFalse();
+        assertThat(service.didServiceActivate).isTrue();
+        assertThat(service.didServiceInactivate).isFalse();
         assertThat(service.didServiceUnregister).isFalse();
         backstackDelegate.onDestroy();
         assertThat(backstackDelegate.hasScope("hello")).isFalse();
@@ -510,8 +510,8 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackDelegate.hasScope("parentScope3")).isFalse();
         assertThat(backstackDelegate.hasService("parentScope2", "service")).isFalse();
         assertThat(service.didServiceRegister).isTrue();
-        assertThat(service.didScopeActivate).isTrue();
-        assertThat(service.didScopeInactivate).isTrue();
+        assertThat(service.didServiceActivate).isTrue();
+        assertThat(service.didServiceInactivate).isTrue();
         assertThat(service.didServiceUnregister).isTrue();
 
         assertThat(registered).containsExactly(service);
@@ -532,18 +532,18 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegistered;
             private boolean didServiceUnregistered;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
@@ -633,18 +633,18 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegistered;
             private boolean didServiceUnregistered;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
@@ -738,18 +738,18 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegister;
             private boolean didServiceUnregister;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
@@ -867,18 +867,18 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegister;
             private boolean didExitScope;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
@@ -1142,18 +1142,18 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegister;
             private boolean didServiceUnregister;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
@@ -1511,18 +1511,18 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegister;
             private boolean didServiceUnregister;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
@@ -1714,8 +1714,8 @@ public class ScopingExplicitParentsTest {
                 implements ScopedServices.Registered, ScopedServices.Activated {
             private boolean didServiceRegister;
             private boolean didServiceUnregister;
-            private boolean didScopeActivate;
-            private boolean didScopeInactivate;
+            private boolean didServiceActivate;
+            private boolean didServiceInactivate;
 
             private final String name;
 
@@ -1729,14 +1729,14 @@ public class ScopingExplicitParentsTest {
             }
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                this.didScopeActivate = true;
+            public void onServiceActive() {
+                this.didServiceActivate = true;
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                this.didScopeInactivate = true;
+            public void onServiceInactive() {
+                this.didServiceInactivate = true;
                 inactivated.add(this);
             }
 
