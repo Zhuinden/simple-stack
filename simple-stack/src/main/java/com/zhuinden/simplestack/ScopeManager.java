@@ -252,6 +252,9 @@ class ScopeManager {
     private void destroyServicesAndRemoveState(String scopeTag, Map<String, Object> serviceMap) {
         List<Object> services = new ArrayList<>(serviceMap.values());
         Collections.reverse(services);
+
+        IdentityHashMap<Object, Integer> unregisterInvocationTracker = new IdentityHashMap<>(); // call unregister only once!
+
         for(Object service : services) {
             if(!isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 untrackServiceInScope(scopeEnteredServices, service, scopeTag);
@@ -261,7 +264,8 @@ class ScopeManager {
             }
 
             if(isServiceNotRegistered(service)) {
-                if(service instanceof ScopedServices.Registered) {
+                if(service instanceof ScopedServices.Registered && !unregisterInvocationTracker.containsKey(service)) {
+                    unregisterInvocationTracker.put(service, 1);
                     ((ScopedServices.Registered) service).onServiceUnregistered();
                 }
             }

@@ -1701,9 +1701,11 @@ public class ScopingTest {
         final List<Object> inactivated = new ArrayList<>();
         final List<Object> entered = new ArrayList<>();
         final List<Object> exited = new ArrayList<>();
+        final List<Object> registered = new ArrayList<>();
+        final List<Object> unregistered = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Scoped {
+                implements ScopedServices.Activated, ScopedServices.Scoped, ScopedServices.Registered {
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -1723,6 +1725,16 @@ public class ScopingTest {
             @Override
             public void onExitScope(@NonNull String scope) {
                 exited.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                registered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                unregistered.add(this);
             }
         }
 
@@ -1754,15 +1766,20 @@ public class ScopingTest {
         assertThat(inactivated).isEmpty();
         assertThat(entered).isEmpty();
         assertThat(exited).isEmpty();
+        assertThat(registered).isEmpty();
+        assertThat(unregistered).isEmpty();
         backstackManager.setStateChanger(stateChanger);
 
         assertThat(activated).isNotEmpty();
         assertThat(inactivated).isEmpty();
         assertThat(entered).isNotEmpty();
         assertThat(exited).isEmpty();
+        assertThat(registered).isNotEmpty();
+        assertThat(unregistered).isEmpty();
 
         assertThat(activated).containsOnlyOnce(service);
         assertThat(entered).containsOnlyOnce(service);
+        assertThat(registered).containsOnlyOnce(service);
 
         backstackManager.getBackstack().setHistory(History.of(clear), StateChange.REPLACE);
 
@@ -1770,9 +1787,12 @@ public class ScopingTest {
         assertThat(inactivated).isNotEmpty();
         assertThat(entered).isNotEmpty();
         assertThat(exited).isNotEmpty();
+        assertThat(registered).isNotEmpty();
+        assertThat(unregistered).isNotEmpty();
 
         assertThat(inactivated).containsOnlyOnce(service);
         assertThat(exited).containsOnlyOnce(service);
+        assertThat(unregistered).containsOnlyOnce(service);
     }
 
     @Test
