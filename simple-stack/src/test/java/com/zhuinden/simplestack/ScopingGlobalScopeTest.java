@@ -372,7 +372,7 @@ public class ScopingGlobalScopeTest {
         backstackManager.setScopedServices(new ServiceProvider());
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Scoped {
+                implements ScopedServices.Activated, ScopedServices.Registered {
             private int id = 0;
 
             MyService(int id) {
@@ -390,20 +390,20 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void onEnterScope(@NonNull String scope) {
-                events.add(Pair.of((Object) this, ServiceEvent.CREATE));
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                events.add(Pair.of((Object) this, ServiceEvent.DESTROY));
-            }
-
-            @Override
             public String toString() {
                 return "MyService{" +
                         "id=" + id +
                         '}';
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                events.add(Pair.of((Object) this, ServiceEvent.CREATE));
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                events.add(Pair.of((Object) this, ServiceEvent.DESTROY));
             }
         }
 
@@ -597,7 +597,7 @@ public class ScopingGlobalScopeTest {
         backstackManager.setScopedServices(new ServiceProvider());
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Scoped {
+                implements ScopedServices.Activated, ScopedServices.Registered {
             private int id = 0;
 
             MyService(int id) {
@@ -615,20 +615,20 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void onEnterScope(@NonNull String scope) {
-                events.add(Pair.of((Object) this, ServiceEvent.CREATE));
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                events.add(Pair.of((Object) this, ServiceEvent.DESTROY));
-            }
-
-            @Override
             public String toString() {
                 return "MyService{" +
                         "id=" + id +
                         '}';
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                events.add(Pair.of((Object) this, ServiceEvent.CREATE));
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                events.add(Pair.of((Object) this, ServiceEvent.DESTROY));
             }
         }
 

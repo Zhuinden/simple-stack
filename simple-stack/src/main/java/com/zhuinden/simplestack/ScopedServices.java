@@ -13,32 +13,11 @@ import java.util.Map;
  *
  * Additionally, services that implement {@link Bundleable} have their state persisted/restored across process death automatically.
  *
- * Services that implement {@link Scoped} will receive callbacks for when their scope is created, and their scope is destroyed.
- *
  * Services that implements {@link Activated} will receive callbacks for when their scope becomes the active (top-most) scope, or become inactive.
  *
  * NOTE: Think of it as configuration: it is kept across configuration change, so it should not reference the Activity directly.
  */
 public interface ScopedServices {
-    /**
-     * When a service implements {@link Scoped}, then it will receive a callback when the service is registered/unregistered from the scope.
-     */
-    public static interface Scoped {
-        /**
-         * Called when the object is added to the scope.
-         *
-         * @param scope the tag of the scope
-         */
-        void onEnterScope(@NonNull String scope);
-
-        /**
-         * Called when the scope is destroyed, and therefore the object is no longer in the scope.
-         *
-         * @param scope the tag of the scope
-         */
-        void onExitScope(@NonNull String scope);
-    }
-
     /**
      * When a service implements {@link Activated}, then it will receive a callback when the scope the service belongs to becomes the active (top-most) scope.
      */

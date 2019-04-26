@@ -142,9 +142,6 @@ class ScopeManager {
 
             if(isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 trackServiceInScope(scopeEnteredServices, service, scopeTag);
-                if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
-                }
             }
         }
     }
@@ -255,9 +252,6 @@ class ScopeManager {
         for(Object service : services) {
             if(!isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 untrackServiceInScope(scopeEnteredServices, service, scopeTag);
-                if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onExitScope(scopeTag);
-                }
             }
 
             if(isServiceNotRegistered(service)) {

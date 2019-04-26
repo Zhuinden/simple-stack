@@ -407,29 +407,17 @@ public class ScopingExplicitParentsTest {
         Activity activity = Mockito.mock(Activity.class);
         Mockito.when(activity.isFinishing()).thenReturn(true);
 
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> registered = new ArrayList<>();
+        final List<Object> unregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
-            private boolean didExitScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegister;
+            private boolean didServiceUnregister;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -441,6 +429,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegister = true;
+                registered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didServiceUnregister = true;
+                unregistered.add(this);
             }
         }
         final Service service = new Service();
@@ -498,10 +498,10 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackDelegate.hasScope("parentScope2")).isTrue();
         assertThat(backstackDelegate.hasScope("parentScope3")).isTrue();
         assertThat(backstackDelegate.hasService("parentScope2", "service")).isTrue();
-        assertThat(service.didEnterScope).isTrue();
+        assertThat(service.didServiceRegister).isTrue();
         assertThat(service.didScopeActivate).isTrue();
         assertThat(service.didScopeInactivate).isFalse();
-        assertThat(service.didExitScope).isFalse();
+        assertThat(service.didServiceUnregister).isFalse();
         backstackDelegate.onDestroy();
         assertThat(backstackDelegate.hasScope("hello")).isFalse();
         assertThat(backstackDelegate.hasScope("world")).isFalse();
@@ -509,43 +509,31 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackDelegate.hasScope("parentScope2")).isFalse();
         assertThat(backstackDelegate.hasScope("parentScope3")).isFalse();
         assertThat(backstackDelegate.hasService("parentScope2", "service")).isFalse();
-        assertThat(service.didEnterScope).isTrue();
+        assertThat(service.didServiceRegister).isTrue();
         assertThat(service.didScopeActivate).isTrue();
         assertThat(service.didScopeInactivate).isTrue();
-        assertThat(service.didExitScope).isTrue();
+        assertThat(service.didServiceUnregister).isTrue();
 
-        assertThat(enteredScope).containsExactly(service);
+        assertThat(registered).containsExactly(service);
         assertThat(activated).containsExactly(service);
         assertThat(inactivated).containsExactly(service);
-        assertThat(exitedScope).containsExactly(service);
+        assertThat(unregistered).containsExactly(service);
     }
 
     @Test
     public void explicitParentsAreDestroyedIfNoScopeKeyKeepsThemAlive() {
 
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> serviceRegistered = new ArrayList<>();
+        final List<Object> serviceUnregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
-            private boolean didExitScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegistered;
+            private boolean didServiceUnregistered;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -557,6 +545,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegistered = true;
+                serviceRegistered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didServiceUnregistered = true;
+                serviceUnregistered.add(this);
             }
         }
         final Service service = new Service();
@@ -624,29 +624,17 @@ public class ScopingExplicitParentsTest {
 
     @Test
     public void explicitParentServicesAreInitializedBeforeActualScopeKeyServices() {
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> serviceRegistered = new ArrayList<>();
+        final List<Object> serviceUnregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
-            private boolean didExitScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegistered;
+            private boolean didServiceUnregistered;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -658,6 +646,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegistered = true;
+                serviceRegistered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didServiceUnregistered = true;
+                serviceUnregistered.add(this);
             }
         }
         final Service service1 = new Service();
@@ -716,42 +716,30 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackManager.getService("hello", "service")).isSameAs(service2);
         assertThat(backstackManager.getService("parentScope", "service")).isSameAs(service1);
 
-        assertThat(enteredScope).containsExactly(service1, service2);
+        assertThat(serviceRegistered).containsExactly(service1, service2);
         assertThat(activated).containsExactly(service1, service2);
 
         backstackManager.getBackstack().setHistory(
                 History.of(new ChildKey("bye", History.of("boop"))),
                 StateChange.BACKWARD);
 
-        assertThat(exitedScope).containsExactly(service2, service1);
+        assertThat(serviceUnregistered).containsExactly(service2, service1);
         assertThat(inactivated).containsExactly(service2, service1);
     }
 
     @Test
     public void servicesInExplicitParentsAreDestroyedOnlyAfterAllChildServicesAreDestroyed() {
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> registered = new ArrayList<>();
+        final List<Object> unregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
-            private boolean didExitScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegister;
+            private boolean didServiceUnregister;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -763,6 +751,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegister = true;
+                registered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didServiceUnregister = true;
+                unregistered.add(this);
             }
         }
         final Service service1 = new Service();
@@ -850,37 +850,25 @@ public class ScopingExplicitParentsTest {
         assertThat(backstackManager.hasService("world", "service4")).isFalse();
         assertThat(backstackManager.hasService("hello", "service3")).isFalse();
 
-        assertThat(enteredScope).containsExactly(service1, service2, service3, service4);
+        assertThat(registered).containsExactly(service1, service2, service3, service4);
         assertThat(activated).containsExactly(service2, service4);
         assertThat(inactivated).containsExactly(service4, service2);
-        assertThat(exitedScope).containsExactly(service4, service3, service2, service1);
+        assertThat(unregistered).containsExactly(service4, service3, service2, service1);
     }
 
     @Test
     public void explicitParentServicesReceiveCallbacksBeforeChildInAscendingOrder() {
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> registered = new ArrayList<>();
+        final List<Object> unregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegister;
             private boolean didExitScope;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -892,6 +880,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegister = true;
+                registered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didExitScope = true;
+                unregistered.add(this);
             }
         }
         final Service serviceP0 = new Service();
@@ -1013,7 +1013,7 @@ public class ScopingExplicitParentsTest {
 
         /// verified set up
 
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(registered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1025,12 +1025,12 @@ public class ScopingExplicitParentsTest {
                 serviceC5);
         assertThat(activated).containsExactly(serviceP0, serviceP4, serviceC5);
         assertThat(inactivated).isEmpty();
-        assertThat(exitedScope).isEmpty();
+        assertThat(unregistered).isEmpty();
 
         backstackManager.getBackstack().goBack(); // [C1, C2, C3, C4]
 
         assertThat(activated).containsExactly(serviceP0, serviceP4, serviceC5, serviceC4);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(registered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1041,7 +1041,7 @@ public class ScopingExplicitParentsTest {
                 serviceC4,
                 serviceC5);
         assertThat(inactivated).containsExactly(serviceC5);
-        assertThat(exitedScope).containsExactly(serviceC5);
+        assertThat(unregistered).containsExactly(serviceC5);
 
         backstackManager.getBackstack().goBack(); // [C1, C2, C3]
 
@@ -1052,7 +1052,7 @@ public class ScopingExplicitParentsTest {
                 serviceP1,
                 serviceP3,
                 serviceC3);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(registered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1063,7 +1063,7 @@ public class ScopingExplicitParentsTest {
                 serviceC4,
                 serviceC5);
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4);
-        assertThat(exitedScope).containsExactly(serviceC5, serviceC4, serviceP4);
+        assertThat(unregistered).containsExactly(serviceC5, serviceC4, serviceP4);
 
         backstackManager.getBackstack().jumpToRoot(); // [C1]
 
@@ -1076,7 +1076,7 @@ public class ScopingExplicitParentsTest {
                 serviceC3,
                 serviceP2,
                 serviceC1);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(registered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1087,7 +1087,7 @@ public class ScopingExplicitParentsTest {
                 serviceC4,
                 serviceC5);
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3);
-        assertThat(exitedScope).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
+        assertThat(unregistered).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
 
         backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
 
@@ -1100,7 +1100,7 @@ public class ScopingExplicitParentsTest {
                 serviceC3,
                 serviceP2,
                 serviceC1);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(registered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1119,7 +1119,7 @@ public class ScopingExplicitParentsTest {
                 serviceP2,
                 serviceP1,
                 serviceP0);
-        assertThat(exitedScope).containsExactly(serviceC5,
+        assertThat(unregistered).containsExactly(serviceC5,
                 serviceC4,
                 serviceP4,
                 serviceC3,
@@ -1133,29 +1133,17 @@ public class ScopingExplicitParentsTest {
 
     @Test
     public void explicitParentServicesReceiveCallbacksBeforeChildInAscendingOrderOtherSetup() {
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> serviceRegistered = new ArrayList<>();
+        final List<Object> serviceUnregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
-            private boolean didExitScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegister;
+            private boolean didServiceUnregister;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -1167,6 +1155,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegister = true;
+                serviceRegistered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didServiceUnregister = true;
+                serviceUnregistered.add(this);
             }
         }
         final Service serviceP0 = new Service();
@@ -1288,7 +1288,7 @@ public class ScopingExplicitParentsTest {
 
         /// verified set up
 
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(serviceRegistered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1300,12 +1300,12 @@ public class ScopingExplicitParentsTest {
                 serviceC5);
         assertThat(activated).containsExactly(serviceP4, serviceC5);
         assertThat(inactivated).isEmpty();
-        assertThat(exitedScope).isEmpty();
+        assertThat(serviceUnregistered).isEmpty();
 
         backstackManager.getBackstack().goBack(); // [C1, C2, C3, C4]
 
         assertThat(activated).containsExactly(serviceP4, serviceC5, serviceC4);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(serviceRegistered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1316,7 +1316,7 @@ public class ScopingExplicitParentsTest {
                 serviceC4,
                 serviceC5);
         assertThat(inactivated).containsExactly(serviceC5);
-        assertThat(exitedScope).containsExactly(serviceC5);
+        assertThat(serviceUnregistered).containsExactly(serviceC5);
 
         backstackManager.getBackstack().goBack(); // [C1, C2, C3]
 
@@ -1327,7 +1327,7 @@ public class ScopingExplicitParentsTest {
                 serviceP1,
                 serviceP3,
                 serviceC3);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(serviceRegistered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1338,7 +1338,7 @@ public class ScopingExplicitParentsTest {
                 serviceC4,
                 serviceC5);
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4);
-        assertThat(exitedScope).containsExactly(serviceC5, serviceC4, serviceP4);
+        assertThat(serviceUnregistered).containsExactly(serviceC5, serviceC4, serviceP4);
 
         backstackManager.getBackstack().jumpToRoot(); // [C1]
 
@@ -1351,7 +1351,7 @@ public class ScopingExplicitParentsTest {
                 serviceC3,
                 serviceP2,
                 serviceC1);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(serviceRegistered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1362,7 +1362,7 @@ public class ScopingExplicitParentsTest {
                 serviceC4,
                 serviceC5);
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3);
-        assertThat(exitedScope).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
+        assertThat(serviceUnregistered).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
 
         backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
 
@@ -1375,7 +1375,7 @@ public class ScopingExplicitParentsTest {
                 serviceC3,
                 serviceP2,
                 serviceC1);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(serviceRegistered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1394,7 +1394,7 @@ public class ScopingExplicitParentsTest {
                 serviceP2,
                 serviceP1,
                 serviceP0);
-        assertThat(exitedScope).containsExactly(serviceC5,
+        assertThat(serviceUnregistered).containsExactly(serviceC5,
                 serviceC4,
                 serviceP4,
                 serviceC3,
@@ -1419,7 +1419,7 @@ public class ScopingExplicitParentsTest {
                 serviceC1,
                 serviceP4,
                 serviceC5);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(serviceRegistered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1440,7 +1440,7 @@ public class ScopingExplicitParentsTest {
                 serviceP2,
                 serviceP1,
                 serviceP0);
-        assertThat(exitedScope).containsExactly(serviceC5,
+        assertThat(serviceUnregistered).containsExactly(serviceC5,
                 serviceC4,
                 serviceP4,
                 serviceC3,
@@ -1466,7 +1466,7 @@ public class ScopingExplicitParentsTest {
                 serviceC1,
                 serviceP4,
                 serviceC5);
-        assertThat(enteredScope).containsExactly(serviceP0,
+        assertThat(serviceRegistered).containsExactly(serviceP0,
                 serviceP1,
                 serviceP2,
                 serviceC1,
@@ -1487,7 +1487,7 @@ public class ScopingExplicitParentsTest {
                 serviceP2,
                 serviceP1,
                 serviceP0);
-        assertThat(exitedScope).containsExactly(serviceC5,
+        assertThat(serviceUnregistered).containsExactly(serviceC5,
                 serviceC4,
                 serviceP4,
                 serviceC3,
@@ -1501,30 +1501,18 @@ public class ScopingExplicitParentsTest {
 
     @Test
     public void explicitParentsAreCreatedEvenIfThereAreNoScopeKeys() {
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> serviceRegistered = new ArrayList<>();
+        final List<Object> serviceUnregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
 
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
-            private boolean didExitScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegister;
+            private boolean didServiceUnregister;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
 
             @Override
             public void onScopeActive(@NonNull String scope) {
@@ -1536,6 +1524,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegister = true;
+                serviceRegistered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didServiceUnregister = true;
+                serviceUnregistered.add(this);
             }
         }
 
@@ -1705,15 +1705,15 @@ public class ScopingExplicitParentsTest {
 
     @Test
     public void explicitParentServicesReceiveExitAndActivationOnFinalizeInReversedOrder() {
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> serviceRegistered = new ArrayList<>();
+        final List<Object> serviceUnregistered = new ArrayList<>();
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
         class Service
-                implements ScopedServices.Scoped, ScopedServices.Activated {
-            private boolean didEnterScope;
-            private boolean didExitScope;
+                implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean didServiceRegister;
+            private boolean didServiceUnregister;
             private boolean didScopeActivate;
             private boolean didScopeInactivate;
 
@@ -1729,18 +1729,6 @@ public class ScopingExplicitParentsTest {
             }
 
             @Override
-            public void onEnterScope(@NonNull String scope) {
-                this.didEnterScope = true;
-                enteredScope.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                this.didExitScope = true;
-                exitedScope.add(this);
-            }
-
-            @Override
             public void onScopeActive(@NonNull String scope) {
                 this.didScopeActivate = true;
                 activated.add(this);
@@ -1750,6 +1738,18 @@ public class ScopingExplicitParentsTest {
             public void onScopeInactive(@NonNull String scope) {
                 this.didScopeInactivate = true;
                 inactivated.add(this);
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                this.didServiceRegister = true;
+                serviceRegistered.add(this);
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                this.didServiceUnregister = true;
+                serviceUnregistered.add(this);
             }
         }
         final Service serviceP0 = new Service("serviceP0");
@@ -1831,14 +1831,14 @@ public class ScopingExplicitParentsTest {
 
         /// verified set up
 
-        assertThat(enteredScope).containsExactly(serviceP0, serviceP1, serviceP2, serviceC1);
+        assertThat(serviceRegistered).containsExactly(serviceP0, serviceP1, serviceP2, serviceC1);
         assertThat(activated).containsExactly(serviceP0, serviceP1, serviceP2, serviceC1);
         assertThat(inactivated).isEmpty();
-        assertThat(exitedScope).isEmpty();
+        assertThat(serviceUnregistered).isEmpty();
 
         backstackManager.finalizeScopes();
 
         assertThat(inactivated).containsExactly(serviceC1, serviceP2, serviceP1, serviceP0);
-        assertThat(exitedScope).containsExactly(serviceC1, serviceP2, serviceP1, serviceP0);
+        assertThat(serviceUnregistered).containsExactly(serviceC1, serviceP2, serviceP1, serviceP0);
     }
 }
