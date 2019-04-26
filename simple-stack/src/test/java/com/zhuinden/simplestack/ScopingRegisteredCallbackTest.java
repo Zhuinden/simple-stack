@@ -137,12 +137,6 @@ public class ScopingRegisteredCallbackTest {
         }
     }
 
-    private static class CreateEvent extends ServiceEventWithScope {
-        public CreateEvent(String scope) {
-            super("CREATE", scope);
-        }
-    }
-
     private static class ActiveEvent extends ServiceEventWithScope {
         public ActiveEvent(String scope) {
             super("ACTIVE", scope);
@@ -152,12 +146,6 @@ public class ScopingRegisteredCallbackTest {
     private static class InactiveEvent extends ServiceEventWithScope {
         public InactiveEvent(String scope) {
             super("INACTIVE", scope);
-        }
-    }
-
-    private static class DestroyEvent extends ServiceEventWithScope {
-        public DestroyEvent(String scope) {
-            super("DESTROY", scope);
         }
     }
 
@@ -216,7 +204,7 @@ public class ScopingRegisteredCallbackTest {
         backstackManager.setScopedServices(new ServiceProvider());
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Scoped, ScopedServices.Registered {
+                implements ScopedServices.Activated, ScopedServices.Registered {
             private final String id;
 
             MyService(String id) {
@@ -231,16 +219,6 @@ public class ScopingRegisteredCallbackTest {
             @Override
             public void onScopeInactive(@NonNull String scope) {
                 events.add(Pair.of((Object) this, new InactiveEvent(scope)));
-            }
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                events.add(Pair.of((Object) this, new CreateEvent(scope)));
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                events.add(Pair.of((Object) this, new DestroyEvent(scope)));
             }
 
             @Override
@@ -435,67 +413,26 @@ public class ScopingRegisteredCallbackTest {
 
         assertThat(events).containsExactly(
                 Pair.of(service0, new RegisterEvent()),
-                Pair.of(service0, new CreateEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(serviceShared0123P1P2P3, new RegisterEvent()),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(service1, new RegisterEvent()),
-                Pair.of(service1, new CreateEvent("scope1")),
                 Pair.of(serviceShared12, new RegisterEvent()),
-                Pair.of(serviceShared12, new CreateEvent("scope1")),
                 Pair.of(serviceShared13, new RegisterEvent()),
-                Pair.of(serviceShared13, new CreateEvent("scope1")),
                 Pair.of(serviceShared123, new RegisterEvent()),
-                Pair.of(serviceShared123, new CreateEvent("scope1")),
                 Pair.of(serviceShared1P1, new RegisterEvent()),
-                Pair.of(serviceShared1P1, new CreateEvent("scope1")),
                 Pair.of(serviceShared1P2, new RegisterEvent()),
-                Pair.of(serviceShared1P2, new CreateEvent("scope1")),
                 Pair.of(serviceShared1P3, new RegisterEvent()),
-                Pair.of(serviceShared1P3, new CreateEvent("scope1")),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent("scope1")),
                 Pair.of(serviceP1, new RegisterEvent()),
-                Pair.of(serviceP1, new CreateEvent("parent1")),
-                Pair.of(serviceShared1P1, new CreateEvent("parent1")),
                 Pair.of(serviceShared2P1, new RegisterEvent()),
-                Pair.of(serviceShared2P1, new CreateEvent("parent1")),
                 Pair.of(serviceShared3P1, new RegisterEvent()),
-                Pair.of(serviceShared3P1, new CreateEvent("parent1")),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent("parent1")),
                 Pair.of(serviceP2, new RegisterEvent()),
-                Pair.of(serviceP2, new CreateEvent("parent2")),
-                Pair.of(serviceShared1P2, new CreateEvent("parent2")),
                 Pair.of(serviceShared2P2, new RegisterEvent()),
-                Pair.of(serviceShared2P2, new CreateEvent("parent2")),
                 Pair.of(serviceShared3P2, new RegisterEvent()),
-                Pair.of(serviceShared3P2, new CreateEvent("parent2")),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent("parent2")),
                 Pair.of(service2, new RegisterEvent()),
-                Pair.of(service2, new CreateEvent("scope2")),
-                Pair.of(serviceShared12, new CreateEvent("scope2")),
                 Pair.of(serviceShared23, new RegisterEvent()),
-                Pair.of(serviceShared23, new CreateEvent("scope2")),
-                Pair.of(serviceShared123, new CreateEvent("scope2")),
-                Pair.of(serviceShared2P1, new CreateEvent("scope2")),
-                Pair.of(serviceShared2P2, new CreateEvent("scope2")),
                 Pair.of(serviceShared2P3, new RegisterEvent()),
-                Pair.of(serviceShared2P3, new CreateEvent("scope2")),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent("scope2")),
                 Pair.of(serviceP3, new RegisterEvent()),
-                Pair.of(serviceP3, new CreateEvent("parent3")),
-                Pair.of(serviceShared1P3, new CreateEvent("parent3")),
-                Pair.of(serviceShared2P3, new CreateEvent("parent3")),
                 Pair.of(serviceShared3P3, new RegisterEvent()),
-                Pair.of(serviceShared3P3, new CreateEvent("parent3")),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent("parent3")),
                 Pair.of(service3, new RegisterEvent()),
-                Pair.of(service3, new CreateEvent("scope3")),
-                Pair.of(serviceShared13, new CreateEvent("scope3")),
-                Pair.of(serviceShared23, new CreateEvent("scope3")),
-                Pair.of(serviceShared123, new CreateEvent("scope3")),
-                Pair.of(serviceShared3P1, new CreateEvent("scope3")),
-                Pair.of(serviceShared3P2, new CreateEvent("scope3")),
-                Pair.of(serviceShared3P3, new CreateEvent("scope3")),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent("scope3")),
                 Pair.of(service0, new ActiveEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(serviceShared0123P1P2P3, new ActiveEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(serviceP1, new ActiveEvent("parent1")),
@@ -542,21 +479,8 @@ public class ScopingRegisteredCallbackTest {
                 Pair.of(serviceShared2P3, new InactiveEvent("parent3")),
                 Pair.of(serviceShared1P3, new InactiveEvent("parent3")),
                 Pair.of(serviceP3, new InactiveEvent("parent3")),
-                Pair.of(serviceShared0123P1P2P3, new DestroyEvent("scope3")),
-                Pair.of(serviceShared3P3, new DestroyEvent("scope3")),
-                Pair.of(serviceShared3P2, new DestroyEvent("scope3")),
-                Pair.of(serviceShared3P1, new DestroyEvent("scope3")),
-                Pair.of(serviceShared123, new DestroyEvent("scope3")),
-                Pair.of(serviceShared23, new DestroyEvent("scope3")),
-                Pair.of(serviceShared13, new DestroyEvent("scope3")),
-                Pair.of(service3, new DestroyEvent("scope3")),
                 Pair.of(service3, new UnregisterEvent()),
-                Pair.of(serviceShared0123P1P2P3, new DestroyEvent("parent3")),
-                Pair.of(serviceShared3P3, new DestroyEvent("parent3")),
                 Pair.of(serviceShared3P3, new UnregisterEvent()),
-                Pair.of(serviceShared2P3, new DestroyEvent("parent3")),
-                Pair.of(serviceShared1P3, new DestroyEvent("parent3")),
-                Pair.of(serviceP3, new DestroyEvent("parent3")),
                 Pair.of(serviceP3, new UnregisterEvent()),
                 Pair.of(service1, new ActiveEvent("scope1")),
                 Pair.of(serviceShared12, new ActiveEvent("scope1")),
@@ -584,32 +508,14 @@ public class ScopingRegisteredCallbackTest {
                 Pair.of(serviceShared2P1, new InactiveEvent("parent1")),
                 Pair.of(serviceShared1P1, new InactiveEvent("parent1")),
                 Pair.of(serviceP1, new InactiveEvent("parent1")),
-                Pair.of(serviceShared0123P1P2P3, new DestroyEvent("scope2")),
-                Pair.of(serviceShared2P3, new DestroyEvent("scope2")),
                 Pair.of(serviceShared2P3, new UnregisterEvent()),
-                Pair.of(serviceShared2P2, new DestroyEvent("scope2")),
-                Pair.of(serviceShared2P1, new DestroyEvent("scope2")),
-                Pair.of(serviceShared123, new DestroyEvent("scope2")),
-                Pair.of(serviceShared23, new DestroyEvent("scope2")),
                 Pair.of(serviceShared23, new UnregisterEvent()),
-                Pair.of(serviceShared12, new DestroyEvent("scope2")),
-                Pair.of(service2, new DestroyEvent("scope2")),
                 Pair.of(service2, new UnregisterEvent()),
-                Pair.of(serviceShared0123P1P2P3, new DestroyEvent("parent2")),
-                Pair.of(serviceShared3P2, new DestroyEvent("parent2")),
                 Pair.of(serviceShared3P2, new UnregisterEvent()),
-                Pair.of(serviceShared2P2, new DestroyEvent("parent2")),
                 Pair.of(serviceShared2P2, new UnregisterEvent()),
-                Pair.of(serviceShared1P2, new DestroyEvent("parent2")),
-                Pair.of(serviceP2, new DestroyEvent("parent2")),
                 Pair.of(serviceP2, new UnregisterEvent()),
-                Pair.of(serviceShared0123P1P2P3, new DestroyEvent("parent1")),
-                Pair.of(serviceShared3P1, new DestroyEvent("parent1")),
                 Pair.of(serviceShared3P1, new UnregisterEvent()),
-                Pair.of(serviceShared2P1, new DestroyEvent("parent1")),
                 Pair.of(serviceShared2P1, new UnregisterEvent()),
-                Pair.of(serviceShared1P1, new DestroyEvent("parent1")),
-                Pair.of(serviceP1, new DestroyEvent("parent1")),
                 Pair.of(serviceP1, new UnregisterEvent()),
                 Pair.of(serviceShared0123P1P2P3, new InactiveEvent("scope1")),
                 Pair.of(serviceShared1P3, new InactiveEvent("scope1")),
@@ -621,45 +527,25 @@ public class ScopingRegisteredCallbackTest {
                 Pair.of(service1, new InactiveEvent("scope1")),
                 Pair.of(serviceShared0123P1P2P3, new InactiveEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(service0, new InactiveEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
-                Pair.of(serviceShared0123P1P2P3, new DestroyEvent("scope1")),
-                Pair.of(serviceShared1P3, new DestroyEvent("scope1")),
                 Pair.of(serviceShared1P3, new UnregisterEvent()),
-                Pair.of(serviceShared1P2, new DestroyEvent("scope1")),
                 Pair.of(serviceShared1P2, new UnregisterEvent()),
-                Pair.of(serviceShared1P1, new DestroyEvent("scope1")),
                 Pair.of(serviceShared1P1, new UnregisterEvent()),
-                Pair.of(serviceShared123, new DestroyEvent("scope1")),
                 Pair.of(serviceShared123, new UnregisterEvent()),
-                Pair.of(serviceShared13, new DestroyEvent("scope1")),
                 Pair.of(serviceShared13, new UnregisterEvent()),
-                Pair.of(serviceShared12, new DestroyEvent("scope1")),
                 Pair.of(serviceShared12, new UnregisterEvent()),
-                Pair.of(service1, new DestroyEvent("scope1")),
                 Pair.of(service1, new UnregisterEvent()),
-                Pair.of(serviceShared0123P1P2P3, new DestroyEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(serviceShared0123P1P2P3, new UnregisterEvent()),
-                Pair.of(service0, new DestroyEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(service0, new UnregisterEvent()),
                 /// POST FINALIZATION
                 Pair.of(service0, new RegisterEvent()),
-                Pair.of(service0, new CreateEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(serviceShared0123P1P2P3, new RegisterEvent()),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(service1, new RegisterEvent()),
-                Pair.of(service1, new CreateEvent("scope1")),
                 Pair.of(serviceShared12, new RegisterEvent()),
-                Pair.of(serviceShared12, new CreateEvent("scope1")),
                 Pair.of(serviceShared13, new RegisterEvent()),
-                Pair.of(serviceShared13, new CreateEvent("scope1")),
                 Pair.of(serviceShared123, new RegisterEvent()),
-                Pair.of(serviceShared123, new CreateEvent("scope1")),
                 Pair.of(serviceShared1P1, new RegisterEvent()),
-                Pair.of(serviceShared1P1, new CreateEvent("scope1")),
                 Pair.of(serviceShared1P2, new RegisterEvent()),
-                Pair.of(serviceShared1P2, new CreateEvent("scope1")),
                 Pair.of(serviceShared1P3, new RegisterEvent()),
-                Pair.of(serviceShared1P3, new CreateEvent("scope1")),
-                Pair.of(serviceShared0123P1P2P3, new CreateEvent("scope1")),
                 Pair.of(service0, new ActiveEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(serviceShared0123P1P2P3, new ActiveEvent(ScopeManager.GLOBAL_SCOPE_TAG)),
                 Pair.of(service1, new ActiveEvent("scope1")),

@@ -142,9 +142,6 @@ class ScopeManager {
 
             if(isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 trackServiceInScope(scopeEnteredServices, service, scopeTag);
-                if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
-                }
             }
         }
     }
@@ -249,19 +246,22 @@ class ScopeManager {
         }
     }
 
+    private final IdentityHashMap<Object, Integer> unregisterInvocationTracker = new IdentityHashMap<>(); // call unregister only once!
+
     private void destroyServicesAndRemoveState(String scopeTag, Map<String, Object> serviceMap) {
         List<Object> services = new ArrayList<>(serviceMap.values());
         Collections.reverse(services);
+
+        unregisterInvocationTracker.clear();
+
         for(Object service : services) {
             if(!isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 untrackServiceInScope(scopeEnteredServices, service, scopeTag);
-                if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onExitScope(scopeTag);
-                }
             }
 
             if(isServiceNotRegistered(service)) {
-                if(service instanceof ScopedServices.Registered) {
+                if(service instanceof ScopedServices.Registered && !unregisterInvocationTracker.containsKey(service)) {
+                    unregisterInvocationTracker.put(service, 1);
                     ((ScopedServices.Registered) service).onServiceUnregistered();
                 }
             }
