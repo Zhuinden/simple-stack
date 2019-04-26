@@ -1,9 +1,13 @@
 # Change log
 
--Simple Stack ?.??.? (????-??-??)
+-Simple Stack 1.14.1 (2019-04-26)
 --------------------------------
 
-- UPDATE: Safer version of the FragmentStateChanger that handles re-entrancy of `back` and going to the same target as where we were (handle `fragment.isRemoving`).
+- FIX: `onServiceUnregistered()` was called multiple times if the service was being unregistered from a scope where it was registered multiple times.
+
+- SAMPLE UPDATE: Safer version of the FragmentStateChanger that handles re-entrancy of `back` and going to the same target as where we were (handle `fragment.isRemoving`).
+
+- SAMPLE UPDATE: MVP/MVVM samples have a better packaging structure.
 
 
 -Simple Stack 1.14.0 (2019-03-16)
@@ -20,6 +24,7 @@ Now, a service will only receive `fromBundle` callback before its `onServiceRegi
 - FIX: during `backstackManager.finalizeScopes()`, `onExitScope` and `onScopeInactive` were dispatched in an incorrect order across nested explicit parents.
 
 - CHANGE: `persistViewToState()`/`restoreViewFromState()` now use a separate bundle from the one that's publicly visible on SavedState.
+
 
 -Simple Stack 1.13.4 (2019-03-10)
 --------------------------------
