@@ -25,10 +25,10 @@ public class FragmentStateChanger {
     }
 
     public void handleStateChange(StateChange stateChange) {
-        List<BaseKey> previousState = stateChange.getPreviousState();
-        List<BaseKey> newState = stateChange.getNewState();
-        BaseKey topPreviousKey = stateChange.topPreviousState();
-        BaseKey topNewKey = stateChange.topNewState();
+        List<BaseKey> previousState = stateChange.getPreviousKeys();
+        List<BaseKey> newState = stateChange.getNewKeys();
+        BaseKey topPreviousKey = stateChange.topPreviousKey();
+        BaseKey topNewKey = stateChange.topNewKey();
         Fragment topPreviousFragment = null;
         if(topPreviousKey != null) {
             topPreviousFragment = fragmentManager.findFragmentByTag(topPreviousKey.getFragmentTag());
@@ -85,7 +85,7 @@ public class FragmentStateChanger {
         }
         for(BaseKey newKey : newState) {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
-            if(newKey.equals(stateChange.topNewState())) {
+            if(newKey.equals(stateChange.topNewKey())) {
                 if(fragment != null) {
                     if(fragment.isRemoving()) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
                         fragmentTransaction.replace(containerId, newKey.newFragment(), newKey.getFragmentTag());

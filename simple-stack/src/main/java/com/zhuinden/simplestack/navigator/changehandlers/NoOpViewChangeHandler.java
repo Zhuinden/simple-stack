@@ -27,9 +27,9 @@ import com.zhuinden.simplestack.navigator.ViewChangeHandler;
 public final class NoOpViewChangeHandler
         implements ViewChangeHandler {
     @Override
-    public void performViewChange(@NonNull ViewGroup container, @NonNull View previousView, @NonNull View newView, int direction, @NonNull CompletionCallback completionCallback) {
+    public void performViewChange(@NonNull ViewGroup container, @NonNull View previousView, @NonNull View newView, int direction, @NonNull ViewChangeCallback viewChangeCallback) {
         container.removeView(previousView);
         container.addView(newView);
-        completionCallback.onCompleted();
+        viewChangeCallback.onCompleted();
     }
 }

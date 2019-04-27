@@ -73,7 +73,7 @@ public class BackstackManager
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
-            scopeManager.buildScopes(stateChange.getNewState());
+            scopeManager.buildScopes(stateChange.getNewKeys());
             stateChanger.handleStateChange(stateChange, new Callback() {
                 @Override
                 public void stateChangeComplete() {
@@ -81,7 +81,7 @@ public class BackstackManager
                     if(!backstack.isStateChangePending()) {
                         stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
 
-                        History<Object> newState = stateChange.getNewState();
+                        History<Object> newState = stateChange.getNewKeys();
 
                         // activation/deactivation
                         Object newTopKeyWithAssociatedScope = null;

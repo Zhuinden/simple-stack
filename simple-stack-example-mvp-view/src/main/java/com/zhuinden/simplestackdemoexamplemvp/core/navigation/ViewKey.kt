@@ -4,13 +4,13 @@ import android.os.Parcelable
 import android.support.annotation.DrawableRes
 import android.view.View
 
-import com.zhuinden.simplestack.navigator.StateKey
+import com.zhuinden.simplestack.navigator.DefaultViewKey
 
 /**
  * Created by Owner on 2017. 01. 12..
  */
 
-interface ViewKey : StateKey, Parcelable {
+interface ViewKey : DefaultViewKey, Parcelable {
     val isFabVisible: Boolean
 
     override fun layout(): Int

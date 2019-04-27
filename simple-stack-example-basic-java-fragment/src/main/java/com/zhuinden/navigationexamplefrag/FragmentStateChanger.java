@@ -29,8 +29,8 @@ public class FragmentStateChanger {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
 
-        List<BaseKey> previousState = stateChange.getPreviousState();
-        List<BaseKey> newState = stateChange.getNewState();
+        List<BaseKey> previousState = stateChange.getPreviousKeys();
+        List<BaseKey> newState = stateChange.getNewKeys();
         for(BaseKey oldKey : previousState) {
             Fragment fragment = fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
@@ -43,7 +43,7 @@ public class FragmentStateChanger {
         }
         for(BaseKey newKey : newState) {
             Fragment fragment = fragmentManager.findFragmentByTag(newKey.getFragmentTag());
-            if(newKey.equals(stateChange.topNewState())) {
+            if(newKey.equals(stateChange.topNewKey())) {
                 if(fragment != null) {
                     if(fragment.isRemoving()) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
                         fragmentTransaction.replace(containerId, newKey.newFragment(), newKey.getFragmentTag());

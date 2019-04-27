@@ -553,7 +553,7 @@ public class ScopingGlobalScopeTest {
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
+                scopeManager.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
         };
@@ -573,7 +573,7 @@ public class ScopingGlobalScopeTest {
         StateChanger stateChanger2 = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager2.buildScopes(stateChange.getNewState());
+                scopeManager2.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
         };

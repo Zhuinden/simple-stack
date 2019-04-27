@@ -37,8 +37,8 @@ public class FragmentStateChanger {
                     R.anim.slide_out_to_right);
         }
 
-        List<BaseKey<?>> previousState = stateChange.getPreviousState();
-        List<BaseKey<?>> newState = stateChange.getNewState();
+        List<BaseKey<?>> previousState = stateChange.getPreviousKeys();
+        List<BaseKey<?>> newState = stateChange.getNewKeys();
         for(BaseKey oldKey : previousState) {
             BaseFragment fragment = (BaseFragment) fragmentManager.findFragmentByTag(oldKey.getFragmentTag());
             if(fragment != null) {
@@ -51,7 +51,7 @@ public class FragmentStateChanger {
         }
         for(BaseKey newKey : newState) {
             BaseFragment fragment = (BaseFragment) fragmentManager.findFragmentByTag(newKey.getFragmentTag());
-            if(newKey.equals(stateChange.topNewState())) {
+            if(newKey.equals(stateChange.topNewKey())) {
                 if(fragment != null) {
                     if(fragment.isRemoving()) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
                         fragment = newKey.newFragment();
