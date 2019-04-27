@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 
-import com.zhuinden.simplestack.ScopedServices;
+import com.zhuinden.simplestack.ServiceBinder;
 import com.zhuinden.simplestackexamplemvvm.util.ServiceProvider;
 
 /**
@@ -24,7 +24,7 @@ public abstract class BaseKey<T>
     }
 
     @Override
-    public void bindServices(@NonNull ScopedServices.ServiceBinder serviceBinder) {
+    public void bindServices(@NonNull ServiceBinder serviceBinder) {
         serviceBinder.add(getViewModelTag(), newViewModel());
     }
 

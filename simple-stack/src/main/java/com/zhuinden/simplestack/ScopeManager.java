@@ -114,7 +114,7 @@ class ScopeManager {
             Map<String, Object> scope = new LinkedHashMap<>();
             scopes.put(scopeTag, scope);
 
-            scopedServices.bindServices(new ScopedServices.ServiceBinder(this, key, scopeTag, scope));
+            scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
 
             restoreAndNotifyServices(scopeTag, scope);
         }

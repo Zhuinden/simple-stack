@@ -1,7 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.features.taskdetail
 
 import android.view.View
-import com.zhuinden.simplestack.ScopedServices
+import com.zhuinden.simplestack.ServiceBinder
 
 import com.zhuinden.simplestack.navigator.ViewChangeHandler
 import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
@@ -15,7 +15,7 @@ import kotlinx.android.parcel.Parcelize
 data class TaskDetailKey(val taskId: String) : ViewKey, ServiceProvider.HasServices {
     override fun getScopeTag(): String = "TaskDetail[$taskId]"
 
-    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+    override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.add(TaskDetailView.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
     }
 

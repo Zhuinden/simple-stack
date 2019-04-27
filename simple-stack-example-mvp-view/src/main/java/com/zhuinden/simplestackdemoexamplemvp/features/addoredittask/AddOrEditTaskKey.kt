@@ -1,7 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.features.addoredittask
 
 import android.view.View
-import com.zhuinden.simplestack.ScopedServices
+import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestack.navigator.ViewChangeHandler
 import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
@@ -13,7 +13,7 @@ import kotlinx.android.parcel.Parcelize
 sealed class AddOrEditTaskKey(val parent: ViewKey, val taskId: String = "") : ViewKey, ServiceProvider.HasServices {
     override fun getScopeTag() = "AddOrEditTask"
 
-    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+    override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.add(AddOrEditTaskView.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
     }
 

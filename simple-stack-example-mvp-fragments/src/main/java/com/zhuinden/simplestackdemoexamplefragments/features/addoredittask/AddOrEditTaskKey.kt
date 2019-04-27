@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemoexamplefragments.features.addoredittask
 
 import android.support.v4.app.Fragment
 import android.view.View
-import com.zhuinden.simplestack.ScopedServices
+import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
@@ -14,7 +14,7 @@ import kotlinx.android.parcel.Parcelize
  * Created by Zhuinden on 2018. 08. 20.
  */
 sealed class AddOrEditTaskKey(val parent: FragmentKey, val taskId: String = "") : BaseKey(), HasServices {
-    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+    override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.add(AddOrEditTaskFragment.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
     }
 
