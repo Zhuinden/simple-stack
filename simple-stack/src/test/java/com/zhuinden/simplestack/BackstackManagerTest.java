@@ -211,7 +211,7 @@ public class BackstackManagerTest {
         Backstack.CompletionListener stateChangeCompletionListener = new Backstack.CompletionListener() {
             @Override
             public void stateChangeCompleted(@NonNull StateChange stateChange) {
-                integers.add(stateChange.<TestKey>topNewState());
+                integers.add(stateChange.<TestKey>topNewKey());
             }
         };
         backstackManager.addStateChangeCompletionListener(stateChangeCompletionListener);

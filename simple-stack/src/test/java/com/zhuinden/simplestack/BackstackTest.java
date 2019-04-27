@@ -145,7 +145,7 @@ public class BackstackTest {
         backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                assertThat(stateChange.topPreviousState()).isNull();
+                assertThat(stateChange.topPreviousKey()).isNull();
                 callback = completionCallback;
             }
         });
@@ -162,8 +162,8 @@ public class BackstackTest {
         backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                if(!stateChange.getPreviousState().isEmpty()) {
-                    assertThat(stateChange.topPreviousState()).isEqualTo(bye);
+                if(!stateChange.getPreviousKeys().isEmpty()) {
+                    assertThat(stateChange.topPreviousKey()).isEqualTo(bye);
                 }
                 callback = completionCallback;
             }
@@ -916,10 +916,10 @@ public class BackstackTest {
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                if(stateChange.getPreviousState().isEmpty()) {
-                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topNewState());
+                if(stateChange.getPreviousKeys().isEmpty()) {
+                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topNewKey());
                 } else {
-                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topPreviousState());
+                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topPreviousKey());
                 }
                 completionCallback.stateChangeComplete();
             }
@@ -954,10 +954,10 @@ public class BackstackTest {
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                if(stateChange.getPreviousState().isEmpty()) {
-                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getNewState().get(0));
+                if(stateChange.getPreviousKeys().isEmpty()) {
+                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getNewKeys().get(0));
                 } else {
-                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getPreviousState().get(0));
+                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getPreviousKeys().get(0));
                 }
                 completionCallback.stateChangeComplete();
             }
@@ -1148,12 +1148,12 @@ public class BackstackTest {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 List<?> history = stateChange.backstack().getHistory();
-                if(stateChange.getPreviousState().isEmpty()) {
+                if(stateChange.getPreviousKeys().isEmpty()) {
                     if(!history.isEmpty()) {
-                        assertThat(history).containsExactlyElementsOf(stateChange.getNewState());
+                        assertThat(history).containsExactlyElementsOf(stateChange.getNewKeys());
                     }
                 } else {
-                    assertThat(history).containsExactlyElementsOf(stateChange.getPreviousState());
+                    assertThat(history).containsExactlyElementsOf(stateChange.getPreviousKeys());
                 }
                 completionCallback.stateChangeComplete();
             }
@@ -1210,7 +1210,7 @@ public class BackstackTest {
         backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                assertThat(stateChange.topNewState().equals(stateChange.topPreviousState())).isEqualTo(stateChange.isTopNewStateEqualToPrevious());
+                assertThat(stateChange.topNewKey().equals(stateChange.topPreviousKey())).isEqualTo(stateChange.isTopNewKeyEqualToPrevious());
 
                 completionCallback.stateChangeComplete();
             }

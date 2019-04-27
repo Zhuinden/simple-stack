@@ -652,7 +652,7 @@ public class Backstack {
             stack = originalStack;
         }
         stack.clear();
-        stack.addAll(stateChange.newState);
+        stack.addAll(stateChange.newKeys);
 
         PendingStateChange pendingStateChange = queuedStateChanges.removeFirst();
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);

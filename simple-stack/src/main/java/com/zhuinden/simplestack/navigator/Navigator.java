@@ -71,7 +71,7 @@ public class Navigator {
         /**
          * Sets the state changer used by the navigator's backstack.
          *
-         * If not set, then {@link DefaultStateChanger} is used, which by default behavior requires keys to be {@link StateKey}.
+         * If not set, then {@link DefaultStateChanger} is used, which by default behavior requires keys to be {@link DefaultViewKey}.
          *
          * @param stateChanger if set, cannot be null.
          * @return the installer

@@ -49,8 +49,8 @@ public class ReentranceTest {
         StateChanger dispatcher = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange navigation, @NonNull StateChanger.Callback callback) {
-                lastStack = navigation.getNewState();
-                Parcelable next = navigation.topNewState();
+                lastStack = navigation.getNewKeys();
+                Parcelable next = navigation.topNewKey();
                 if(next instanceof Detail) {
                     flow.goTo(new Loading());
                 } else if(next instanceof Loading) {
@@ -72,8 +72,8 @@ public class ReentranceTest {
 
             @Override
             public void handleStateChange(@NonNull StateChange navigation, @NonNull StateChanger.Callback onComplete) {
-                lastStack = navigation.getNewState();
-                Object next = navigation.topNewState();
+                lastStack = navigation.getNewKeys();
+                Object next = navigation.topNewKey();
                 if(loading) {
                     if(next instanceof Detail) {
                         flow.goTo(new Loading());
@@ -104,8 +104,8 @@ public class ReentranceTest {
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
-                Object next = traversal.topNewState();
+                lastStack = traversal.getNewKeys();
+                Object next = traversal.topNewKey();
                 if(next instanceof Detail) {
                     ReentranceTest.this.flow.setHistory(History.newBuilder() //
                                     .add(new Detail()) //
@@ -128,9 +128,9 @@ public class ReentranceTest {
         StateChanger dispatcher = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
+                lastStack = traversal.getNewKeys();
                 lastCallback = callback;
-                Object next = traversal.topNewState();
+                Object next = traversal.topNewKey();
                 if(next instanceof Detail) {
                     flow.goTo(new Loading());
                 } else if(next instanceof Loading) {
@@ -158,7 +158,7 @@ public class ReentranceTest {
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
+                lastStack = traversal.getNewKeys();
                 lastCallback = callback;
             }
         });
@@ -179,7 +179,7 @@ public class ReentranceTest {
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
+                lastStack = traversal.getNewKeys();
                 callback.stateChangeComplete();
             }
         });
@@ -197,7 +197,7 @@ public class ReentranceTest {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
                 dispatchCount.incrementAndGet();
-                lastStack = traversal.getNewState();
+                lastStack = traversal.getNewKeys();
                 callback.stateChangeComplete();
             }
         });
@@ -264,7 +264,7 @@ public class ReentranceTest {
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
-                lastStack = traversal.getNewState();
+                lastStack = traversal.getNewKeys();
                 callback.stateChangeComplete();
             }
         });
@@ -289,7 +289,7 @@ public class ReentranceTest {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
                 secondDispatcherCount.incrementAndGet();
-                lastStack = traversal.getNewState();
+                lastStack = traversal.getNewKeys();
                 callback.stateChangeComplete();
             }
         });

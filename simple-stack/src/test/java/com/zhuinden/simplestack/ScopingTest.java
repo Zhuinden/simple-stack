@@ -303,7 +303,7 @@ public class ScopingTest {
         backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
+                scopeManager.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
         });
@@ -325,7 +325,7 @@ public class ScopingTest {
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
+                scopeManager.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
         };
@@ -343,7 +343,7 @@ public class ScopingTest {
         StateChanger stateChanger2 = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager2.buildScopes(stateChange.getNewState());
+                scopeManager2.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
         };

@@ -283,7 +283,7 @@ public class BackstackDelegateTest {
         backstackDelegate.onCreate(null, null, History.single(testKey));
         backstackDelegate.setStateChanger(stateChanger);
 
-        assertThat(called.get(0).topNewState()).isSameAs(testKey);
+        assertThat(called.get(0).topNewKey()).isSameAs(testKey);
     }
 
     @Test

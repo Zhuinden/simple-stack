@@ -58,7 +58,7 @@ public class FlowTest {
             implements StateChanger {
         @Override
         public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback callback) {
-            lastStack = stateChange.getNewState();
+            lastStack = stateChange.getNewKeys();
             lastDirection = stateChange.getDirection();
             callback.stateChangeComplete();
         }

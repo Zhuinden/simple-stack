@@ -18,8 +18,8 @@ class FragmentStateChanger(
                     setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_to_right, R.anim.slide_in_from_left, R.anim.slide_out_to_right)
                 }
             }
-            val previousState = stateChange.getPreviousState<BaseKey>()
-            val newState = stateChange.getNewState<BaseKey>()
+            val previousState = stateChange.getPreviousKeys<BaseKey>()
+            val newState = stateChange.getNewKeys<BaseKey>()
             for (oldKey in previousState) {
                 val fragment = fragmentManager.findFragmentByTag(oldKey.fragmentTag)
                 if (fragment != null) {
@@ -32,7 +32,7 @@ class FragmentStateChanger(
             }
             for (newKey in newState) {
                 var fragment: Fragment? = fragmentManager.findFragmentByTag(newKey.fragmentTag)
-                if (newKey == stateChange.topNewState<Any>()) {
+                if (newKey == stateChange.topNewKey<Any>()) {
                     if (fragment != null) {
                         if (fragment.isRemoving) { // Fragments are quirky, they die asynchronously. Ignore if they're still there.
                             replace(containerId, newKey.newFragment(), newKey.fragmentTag)

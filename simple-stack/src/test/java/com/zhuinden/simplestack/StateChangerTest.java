@@ -44,8 +44,8 @@ public class StateChangerTest {
         @Override
         public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
             this.stateChange = stateChange;
-            originalState = stateChange.getPreviousState();
-            newState = stateChange.getNewState();
+            originalState = stateChange.getPreviousKeys();
+            newState = stateChange.getNewKeys();
             completionCallback.stateChangeComplete();
         }
     }
@@ -284,8 +284,8 @@ public class StateChangerTest {
     @Test
     public void stateChangeCreatesContextThatExposesKey() {
         Context context = Mockito.mock(Context.class);
-        Context newContext = testStateChanger.stateChange.createContext(context, testStateChanger.stateChange.topNewState());
-        assertThat(Backstack.getKey(newContext)).isSameAs(testStateChanger.stateChange.topNewState());
+        Context newContext = testStateChanger.stateChange.createContext(context, testStateChanger.stateChange.topNewKey());
+        assertThat(Backstack.getKey(newContext)).isSameAs(testStateChanger.stateChange.topNewKey());
     }
 
     @Test

@@ -29,7 +29,7 @@ import com.zhuinden.simplestack.navigator.changehandlers.FadeViewChangeHandler;
 /**
  * A default state changer that handles view changes, and allows an optional external state changer (which is executed before the view change).
  *
- * For the default behavior to work, all keys must implement {@link StateKey}, which specifies a layout, and a {@link ViewChangeHandler}.
+ * For the default behavior to work, all keys must implement {@link DefaultViewKey}, which specifies a layout, and a {@link ViewChangeHandler}.
  *
  * But if {@link LayoutInflationStrategy} and {@link GetViewChangeHandlerStrategy} are re-defined, then this is no longer necessary.
  */
@@ -63,7 +63,7 @@ public final class DefaultStateChanger
             implements LayoutInflationStrategy {
         @Override
         public void inflateLayout(@NonNull StateChange stateChange, @NonNull Object key, @NonNull Context context, @NonNull ViewGroup container, @NonNull Callback callback) {
-            final View newView = LayoutInflater.from(context).inflate(((StateKey) key).layout(), container, false);
+            final View newView = LayoutInflater.from(context).inflate(((DefaultViewKey) key).layout(), container, false);
             callback.layoutInflationComplete(newView);
         }
     }
@@ -106,9 +106,9 @@ public final class DefaultStateChanger
         public ViewChangeHandler getViewChangeHandler(@NonNull StateChange stateChange, @NonNull ViewGroup container, @NonNull Object previousKey, @NonNull Object newKey, @NonNull View previousView, @NonNull View newView, int direction) {
             ViewChangeHandler viewChangeHandler;
             if(direction == StateChange.FORWARD) {
-                viewChangeHandler = ((StateKey) newKey).viewChangeHandler();
+                viewChangeHandler = ((DefaultViewKey) newKey).viewChangeHandler();
             } else if(direction == StateChange.BACKWARD) {
-                viewChangeHandler = ((StateKey) previousKey).viewChangeHandler();
+                viewChangeHandler = ((DefaultViewKey) previousKey).viewChangeHandler();
             } else {
                 viewChangeHandler = FADE_VIEW_CHANGE_HANDLER;
             }
@@ -517,12 +517,12 @@ public final class DefaultStateChanger
         externalStateChanger.handleStateChange(stateChange, new Callback() {
             @Override
             public void stateChangeComplete() {
-                if(stateChange.isTopNewStateEqualToPrevious()) {
+                if(stateChange.isTopNewKeyEqualToPrevious()) {
                     completionCallback.stateChangeComplete();
                     return;
                 }
-                performViewChange(stateChange.topPreviousState(),
-                        stateChange.topNewState(),
+                performViewChange(stateChange.topPreviousKey(),
+                        stateChange.topNewKey(),
                         stateChange,
                         completionCallback);
             }
@@ -592,7 +592,7 @@ public final class DefaultStateChanger
                                                     previousView,
                                                     newView,
                                                     direction,
-                                                    new ViewChangeHandler.CompletionCallback() {
+                                                    new ViewChangeHandler.ViewChangeCallback() {
                                                         @Override
                                                         public void onCompleted() {
                                                             finishStateChange(stateChange,

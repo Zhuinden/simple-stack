@@ -23,14 +23,14 @@ public class ControllerStateChanger {
 
     public void handleStateChange(StateChange stateChange) {
         if(!router.hasRootController()) {
-            BaseKey key = stateChange.topNewState();
+            BaseKey key = stateChange.topNewKey();
             router.setRoot(RouterTransaction.with(key.newController()));
             return;
         }
 
         List<RouterTransaction> routerTransactions = new LinkedList<>();
         Iterator<RouterTransaction> currentTransactions = router.getBackstack().iterator();
-        Iterator<BaseKey> newKeys = stateChange.<BaseKey>getNewState().iterator();
+        Iterator<BaseKey> newKeys = stateChange.<BaseKey>getNewKeys().iterator();
         while(currentTransactions.hasNext() && newKeys.hasNext()) {
             RouterTransaction currentTransaction = currentTransactions.next();
             BaseKey previousKey = ((BaseController) currentTransaction.controller()).getKey();
