@@ -47,12 +47,12 @@ public class ScopingRegisteredCallbackTest {
 
     private interface HasServices
             extends ScopeKey {
-        void bindServices(ScopedServices.ServiceBinder serviceBinder);
+        void bindServices(ServiceBinder serviceBinder);
     }
 
     private interface HasParentServices
             extends ScopeKey.Child {
-        void bindServices(ScopedServices.ServiceBinder serviceBinder);
+        void bindServices(ServiceBinder serviceBinder);
     }
 
     private static class ServiceProvider
@@ -272,7 +272,7 @@ public class ScopingRegisteredCallbackTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("scope1") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("service1", service1);
@@ -297,7 +297,7 @@ public class ScopingRegisteredCallbackTest {
             }
 
             @Override
-            public final void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public final void bindServices(ServiceBinder serviceBinder) {
                 if(name.equals(serviceBinder.getScopeTag())) {
                     bindOwnServices(serviceBinder);
                 } else {
@@ -305,9 +305,9 @@ public class ScopingRegisteredCallbackTest {
                 }
             }
 
-            abstract void bindParentServices(ScopedServices.ServiceBinder serviceBinder);
+            abstract void bindParentServices(ServiceBinder serviceBinder);
 
-            abstract void bindOwnServices(ScopedServices.ServiceBinder serviceBinder);
+            abstract void bindOwnServices(ServiceBinder serviceBinder);
         }
 
         TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
@@ -318,7 +318,7 @@ public class ScopingRegisteredCallbackTest {
             }
 
             @Override
-            void bindParentServices(ScopedServices.ServiceBinder serviceBinder) {
+            void bindParentServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.add("serviceP1", serviceP1);
                     serviceBinder.add("serviceShared1P1", serviceShared1P1);
@@ -336,7 +336,7 @@ public class ScopingRegisteredCallbackTest {
             }
 
             @Override
-            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+            void bindOwnServices(ServiceBinder serviceBinder) {
                 serviceBinder.add("service2", service2);
 
                 serviceBinder.add("serviceShared12", serviceShared12);
@@ -357,7 +357,7 @@ public class ScopingRegisteredCallbackTest {
             }
 
             @Override
-            void bindParentServices(ScopedServices.ServiceBinder serviceBinder) {
+            void bindParentServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.add("serviceP1", serviceP1);
                     serviceBinder.add("serviceShared1P1", serviceShared1P1);
@@ -375,7 +375,7 @@ public class ScopingRegisteredCallbackTest {
             }
 
             @Override
-            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+            void bindOwnServices(ServiceBinder serviceBinder) {
                 serviceBinder.add("service3", service3);
 
                 serviceBinder.add("serviceShared13", serviceShared13);

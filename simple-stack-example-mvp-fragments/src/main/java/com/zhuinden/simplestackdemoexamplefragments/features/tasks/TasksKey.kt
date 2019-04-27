@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemoexamplefragments.features.tasks
 
 import android.support.v4.app.Fragment
 import android.view.View
-import com.zhuinden.simplestack.ScopedServices
+import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
@@ -15,7 +15,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class TasksKey(val placeholder: String = "") : BaseKey(), HasServices {
-    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
+    override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.add(TasksFragment.CONTROLLER_TAG, Injector.get().tasksPresenter())
     }
 

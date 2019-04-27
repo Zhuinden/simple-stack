@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestack.ScopeKey;
 import com.zhuinden.simplestack.ScopedServices;
+import com.zhuinden.simplestack.ServiceBinder;
 
 public class ServiceProvider
         implements ScopedServices {

@@ -51,12 +51,12 @@ public class ScopingGlobalScopeTest {
 
     private interface HasServices
             extends ScopeKey {
-        void bindServices(ScopedServices.ServiceBinder serviceBinder);
+        void bindServices(ServiceBinder serviceBinder);
     }
 
     private interface HasParentServices
             extends ScopeKey.Child {
-        void bindServices(ScopedServices.ServiceBinder serviceBinder);
+        void bindServices(ServiceBinder serviceBinder);
     }
 
 
@@ -126,7 +126,7 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.add("parentService1", parentService1);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
@@ -159,7 +159,7 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 if("parent2".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.add("parentService2", parentService2);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
@@ -236,7 +236,7 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.add("parentService1", parentService1);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
@@ -269,7 +269,7 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 if("parent2".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.add("parentService2", parentService2);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
@@ -427,7 +427,7 @@ public class ScopingGlobalScopeTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -438,7 +438,7 @@ public class ScopingGlobalScopeTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE4", service4);
@@ -449,7 +449,7 @@ public class ScopingGlobalScopeTest {
 
         TestKeyWithScope braap = new TestKeyWithScope("braap") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE7", service7);
@@ -654,7 +654,7 @@ public class ScopingGlobalScopeTest {
             }
 
             @Override
-            public final void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public final void bindServices(ServiceBinder serviceBinder) {
                 if("explicitParentScope".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.add("explicitParentService", explicitParentService);
                 }
@@ -663,12 +663,12 @@ public class ScopingGlobalScopeTest {
                 }
             }
 
-            abstract void bindOwnServices(ScopedServices.ServiceBinder serviceBinder);
+            abstract void bindOwnServices(ServiceBinder serviceBinder);
         }
 
         TestKeyWithScope beep = new TestKeyWithExplicitParent("beep") {
             @Override
-            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+            void bindOwnServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("implicitParentService", implicitParentService);
@@ -677,7 +677,7 @@ public class ScopingGlobalScopeTest {
 
         TestKeyWithScope boop = new TestKeyWithExplicitParent("boop") {
             @Override
-            void bindOwnServices(ScopedServices.ServiceBinder serviceBinder) {
+            void bindOwnServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("currentScopeService", currentScopeService);

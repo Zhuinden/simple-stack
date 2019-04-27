@@ -87,7 +87,7 @@ public class ScopingTest {
 
     private interface HasServices
             extends ScopeKey {
-        void bindServices(ScopedServices.ServiceBinder serviceBinder);
+        void bindServices(ServiceBinder serviceBinder);
     }
 
     private static class ServiceProvider
@@ -119,7 +119,7 @@ public class ScopingTest {
         }
 
         @Override
-        public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+        public void bindServices(ServiceBinder serviceBinder) {
             serviceBinder.add(SERVICE_TAG, services.get(SERVICE_TAG));
         }
 
@@ -212,7 +212,7 @@ public class ScopingTest {
         final Object service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(nullTag, service);
             }
@@ -241,7 +241,7 @@ public class ScopingTest {
         final Object nullService = null;
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(serviceTag, null);
             }
@@ -287,7 +287,7 @@ public class ScopingTest {
         final Service service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service);
             }
@@ -378,7 +378,7 @@ public class ScopingTest {
         final Service service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service);
             }
@@ -414,7 +414,7 @@ public class ScopingTest {
         final Service service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service);
             }
@@ -458,7 +458,7 @@ public class ScopingTest {
         final Service service = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service);
             }
@@ -472,7 +472,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
             }
 
             @NonNull
@@ -511,7 +511,7 @@ public class ScopingTest {
         final Service service2 = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service1);
             }
@@ -525,7 +525,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service2);
             }
@@ -576,7 +576,7 @@ public class ScopingTest {
         final Service service = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service);
             }
@@ -590,7 +590,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
             }
 
             @NonNull
@@ -623,7 +623,7 @@ public class ScopingTest {
         final Service service2 = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service1);
             }
@@ -637,7 +637,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service2);
             }
@@ -675,7 +675,7 @@ public class ScopingTest {
         final Service service2 = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 assertThat(serviceBinder.has("SERVICE1")).isFalse();
@@ -696,7 +696,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 assertThat(serviceBinder.has("SERVICE1")).isFalse();
@@ -748,7 +748,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -763,7 +763,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE2", service2);
@@ -819,7 +819,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -864,7 +864,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -909,7 +909,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -924,7 +924,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE2", service2);
@@ -990,7 +990,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -1008,7 +1008,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE4", service4);
@@ -1064,7 +1064,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -1082,7 +1082,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE4", service4);
@@ -1137,7 +1137,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -1189,7 +1189,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -1265,7 +1265,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -1283,7 +1283,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE4", service4);
@@ -1341,7 +1341,7 @@ public class ScopingTest {
         final MyService service = new MyService();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(SERVICE_TAG, service);
             }
@@ -1485,7 +1485,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE1", service1);
@@ -1502,7 +1502,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE4", service4);
@@ -1519,7 +1519,7 @@ public class ScopingTest {
 
         TestKeyWithScope braap = new TestKeyWithScope("braap") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
                 serviceBinder.add("SERVICE7", service7);
@@ -1610,7 +1610,7 @@ public class ScopingTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.has("service0")).isFalse();
                 assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service0")).isFalse();
                 serviceBinder.add("service0", service0);
@@ -1644,7 +1644,7 @@ public class ScopingTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.lookup("service0")).isSameAs(service0);
                 assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service")).isTrue();
                 assertThat(serviceBinder.lookup("service")).isSameAs(service1);
@@ -1725,7 +1725,7 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
                 serviceBinder.add(serviceTag1, service);
                 serviceBinder.add(serviceTag2, service);
