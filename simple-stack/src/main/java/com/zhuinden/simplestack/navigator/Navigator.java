@@ -65,7 +65,7 @@ public class Navigator {
         ScopedServices scopedServices = null;
         GlobalServices globalServices = null;
         boolean isInitializeDeferred = false;
-        boolean shouldPersistContainerChild = true;
+        boolean shouldPersistContainerChild = false;
         List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
         /**
@@ -212,6 +212,7 @@ public class Navigator {
         @NonNull
         public Backstack install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
             if(stateChanger == null) {
+                shouldPersistContainerChild = true;
                 stateChanger = DefaultStateChanger.create(activity, container);
             }
             return Navigator.install(this, activity, container, initialKeys);
