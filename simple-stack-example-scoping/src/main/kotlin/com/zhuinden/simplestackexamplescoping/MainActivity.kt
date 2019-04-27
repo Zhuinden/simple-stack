@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity(), StateChanger {
         Navigator.configure()
             .setStateChanger(this)
             .setScopedServices(ScopeConfiguration())
-            .setShouldPersistContainerChild(false)
             .install(this, root, History.of(WordListKey()))
     }
 
