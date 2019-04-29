@@ -15,7 +15,9 @@
  */
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Parcelable;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
@@ -33,12 +35,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The backstack manager manages a {@link Backstack} internally, and wraps it with the ability of persisting view state and the backstack history itself.
+ * The backstack manages the navigation history internally, and wraps it with the ability of persisting view state.
  *
- * The backstack is created by {@link BackstackManager#setup(List)}, and initialized by {@link BackstackManager#setStateChanger(StateChanger)}.
+ * Based on the configuration of {@link ScopedServices}, it also holds and saves/restores the state of services bound to scopes.
+ *
+ * The backstack is initialized with {@link Backstack#setup(List)}, and {@link Backstack#setStateChanger(StateChanger)}.
  */
-public class BackstackManager
+public class Backstack
         implements Bundleable {
+    /**
+     * Retrieves the key from the provided Context. This relies on that within the base context chain, there is at least one {@link KeyContextWrapper}.
+     *
+     * The {@link KeyContextWrapper} is generally created via {@link StateChange#createContext(Context, Object)}.
+     *
+     * @param context the context
+     * @param <K>     the type of the key
+     * @return the key
+     */
+    @NonNull
+    public static <K> K getKey(@NonNull Context context) {
+        return KeyContextWrapper.getKey(context);
+    }
+
     /**
      * Specifies the strategy to be used in order to delete {@link SavedState}s that are no longer needed after a {@link StateChange}, when there is no pending {@link StateChange} left.
      */
@@ -78,7 +96,7 @@ public class BackstackManager
                 @Override
                 public void stateChangeComplete() {
                     completionCallback.stateChangeComplete();
-                    if(!backstack.isStateChangePending()) {
+                    if(!isStateChangePending()) {
                         stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
 
                         History<Object> newState = stateChange.getNewKeys();
@@ -158,12 +176,12 @@ public class BackstackManager
     /**
      * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
      *
-     * If used, this method must be called before {@link BackstackManager#setup(List)} .
+     * If used, this method must be called before {@link Backstack#setup(List)} .
      *
      * @param keyFilter The custom {@link KeyFilter}.
      */
     public void setKeyFilter(@NonNull KeyFilter keyFilter) {
-        if(backstack != null) {
+        if(core != null) {
             throw new IllegalStateException("Custom key filter should be set before calling `setup()`");
         }
         if(keyFilter == null) {
@@ -175,12 +193,12 @@ public class BackstackManager
     /**
      * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
      *
-     * If used, this method must be called before {@link BackstackManager#setup(List)} .
+     * If used, this method must be called before {@link Backstack#setup(List)} .
      *
      * @param keyParceler The custom {@link KeyParceler}.
      */
     public void setKeyParceler(@NonNull KeyParceler keyParceler) {
-        if(backstack != null) {
+        if(core != null) {
             throw new IllegalStateException("Custom key parceler should be set before calling `setup()`");
         }
         if(keyParceler == null) {
@@ -193,12 +211,12 @@ public class BackstackManager
      * Specifies a custom {@link StateClearStrategy}, allowing a custom strategy for clearing the retained state of keys.
      * The {@link DefaultStateClearStrategy} clears the {@link SavedState} for keys that are not found in the new state.
      *
-     * If used, this method must be called before {@link BackstackManager#setup(List)} .
+     * If used, this method must be called before {@link Backstack#setup(List)} .
      *
      * @param stateClearStrategy The custom {@link StateClearStrategy}.
      */
     public void setStateClearStrategy(@NonNull StateClearStrategy stateClearStrategy) {
-        if(backstack != null) {
+        if(core != null) {
             throw new IllegalStateException("Custom state clear strategy should be set before calling `setup()`");
         }
         if(stateClearStrategy == null) {
@@ -213,7 +231,7 @@ public class BackstackManager
      * @param scopedServices the {@link ScopedServices}.
      */
     public void setScopedServices(@NonNull ScopedServices scopedServices) {
-        if(backstack != null) {
+        if(core != null) {
             throw new IllegalStateException("Scope provider should be set before calling `setup()`");
         }
         if(scopedServices == null) {
@@ -228,7 +246,7 @@ public class BackstackManager
      * @param globalServices the {@link GlobalServices}.
      */
     public void setGlobalServices(@NonNull GlobalServices globalServices) {
-        if(backstack != null) {
+        if(core != null) {
             throw new IllegalStateException("Global scope should be set before calling `setup()`");
         }
         if(globalServices == null) {
@@ -237,13 +255,13 @@ public class BackstackManager
         this.scopeManager.setGlobalServices(globalServices);
     }
 
-    Backstack backstack;
+    NavigationCore core;
 
     Map<Object, SavedState> keyStateMap = new HashMap<>();
     ScopeManager scopeManager = new ScopeManager();
 
     /* init */ {
-        scopeManager.setBackstackManager(this);
+        scopeManager.setBackstack(this);
     }
 
     StateChanger stateChanger;
@@ -254,56 +272,56 @@ public class BackstackManager
      * @param initialKeys the initial keys of the backstack
      */
     public void setup(@NonNull List<?> initialKeys) {
-        backstack = new Backstack(initialKeys);
+        core = new NavigationCore(initialKeys);
+        core.setBackstack(this);
     }
 
     /**
-     * Gets the managed {@link Backstack}. It can only be called after {@link BackstackManager#setup(List)}.
+     * Returns whether {@link Backstack#setup(List)} has been called.
      *
-     * @return the backstack
+     * @return if setup has been called
      */
-    public Backstack getBackstack() {
-        checkBackstack("You must call `setup()` before calling `getBackstack()`");
-        return backstack;
+    public boolean isInitialized() {
+        return core != null;
     }
 
     private void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
-            backstack.setStateChanger(managedStateChanger);
+            core.setStateChanger(managedStateChanger);
         }
     }
 
     /**
-     * Sets the {@link StateChanger} for the given {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     * Sets the {@link StateChanger} for the given {@link Backstack}. This can only be called after {@link Backstack#setup(List)}.
      *
      * @param stateChanger the state changer
      */
     public void setStateChanger(@Nullable StateChanger stateChanger) {
         checkBackstack("You must call `setup()` before calling `setStateChanger().");
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
+        if(core.hasStateChanger()) {
+            core.removeStateChanger();
         }
         this.stateChanger = stateChanger;
         initializeBackstack(stateChanger);
     }
 
     /**
-     * Detaches the {@link StateChanger} from the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     * Detaches the {@link StateChanger} from the {@link Backstack}. This can only be called after {@link Backstack#setup(List)}.
      */
     public void detachStateChanger() {
         checkBackstack("You must call `setup()` before calling `detachStateChanger().`");
-        if(backstack.hasStateChanger()) {
-            backstack.removeStateChanger();
+        if(core.hasStateChanger()) {
+            core.removeStateChanger();
         }
     }
 
     /**
-     * Reattaches the {@link StateChanger} to the {@link Backstack}. This can only be called after {@link BackstackManager#setup(List)}.
+     * Reattaches the {@link StateChanger} to the {@link Backstack}. This can only be called after {@link Backstack#setup(List)}.
      */
     public void reattachStateChanger() {
         checkBackstack("You must call `setup()` before calling `reattachStateChanger().`");
-        if(!backstack.hasStateChanger()) {
-            backstack.setStateChanger(managedStateChanger, Backstack.REATTACH);
+        if(!core.hasStateChanger()) {
+            core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
         }
     }
 
@@ -340,7 +358,7 @@ public class BackstackManager
 
         scopeManager.deactivateGlobalScope();
 
-        History<Object> history = backstack.getHistory();
+        History<Object> history = getHistory();
         Set<String> scopeSet = new LinkedHashSet<>();
         for(int i = 0, size = history.size(); i < size; i++) {
             Object key = history.fromTop(i);
@@ -602,7 +620,7 @@ public class BackstackManager
         if(stateChangeCompletionListener == null) {
             throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
         }
-        this.backstack.addCompletionListener(stateChangeCompletionListener);
+        this.core.addCompletionListener(stateChangeCompletionListener);
     }
 
     /**
@@ -615,7 +633,7 @@ public class BackstackManager
         if(stateChangeCompletionListener == null) {
             throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
         }
-        this.backstack.removeCompletionListener(stateChangeCompletionListener);
+        this.core.removeCompletionListener(stateChangeCompletionListener);
     }
 
     /**
@@ -623,18 +641,19 @@ public class BackstackManager
      */
     public void removeAllStateChangeCompletionListeners() {
         checkBackstack("A backstack must be set up before state change completion listeners are removed from it.");
-        this.backstack.removeCompletionListeners();
+        this.core.removeCompletionListeners();
     }
 
     /**
-     * Restores the BackstackManager from a StateBundle.
-     * This can only be called after {@link BackstackManager#setup(List)}.
+     * Restores the Backstack from a StateBundle.
+     * This can only be called after {@link Backstack#setup(List)}.
      *
-     * @param stateBundle the state bundle obtained via {@link BackstackManager#toBundle()}
+     * @param stateBundle the state bundle obtained via {@link Backstack#toBundle()}
      */
     @Override
     public void fromBundle(@Nullable StateBundle stateBundle) {
         checkBackstack("A backstack must be set up before it is restored!");
+
         if(stateBundle != null) {
             List<Object> keys = new ArrayList<>();
             List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(getHistoryTag());
@@ -648,7 +667,7 @@ public class BackstackManager
                 keys = Collections.emptyList(); // lenient against null
             }
             if(!keys.isEmpty()) {
-                backstack.setInitialParameters(keys);
+                core.setInitialParameters(keys);
             }
             List<ParcelledState> savedStates = stateBundle.getParcelableArrayList(getStatesTag());
             if(savedStates != null) {
@@ -671,7 +690,7 @@ public class BackstackManager
     }
 
     private void checkBackstack(String message) {
-        if(backstack == null) {
+        if(core == null) {
             throw new IllegalStateException(message);
         }
     }
@@ -686,7 +705,7 @@ public class BackstackManager
     public StateBundle toBundle() {
         StateBundle stateBundle = new StateBundle();
         ArrayList<Parcelable> history = new ArrayList<>();
-        for(Object key : backstack.getHistory()) {
+        for(Object key : getHistory()) {
             history.add(keyParceler.toParcelable(key));
         }
         stateBundle.putParcelableArrayList(getHistoryTag(), history);
@@ -704,5 +723,314 @@ public class BackstackManager
 
         stateBundle.putParcelable(getScopesTag(), scopeManager.saveStates());
         return stateBundle;
+    }
+
+    /**
+     * CompletionListener allows you to listen to when a {@link StateChange} has been completed.
+     * They are registered to the {@link Backstack} with {@link NavigationCore#addCompletionListener(CompletionListener)}.
+     * They are unregistered from the {@link Backstack} with {@link NavigationCore#removeCompletionListener(CompletionListener)} methods.
+     */
+    public interface CompletionListener {
+        /**
+         * Callback method that is called when a {@link StateChange} is complete.
+         *
+         * @param stateChange the state change that has been completed.
+         */
+        void stateChangeCompleted(@NonNull StateChange stateChange);
+    }
+
+    // Navigation Core wrappers
+
+    /**
+     * Indicates whether a {@link StateChanger} is set.
+     *
+     * @return true if a {@link StateChanger} is set, false otherwise.
+     */
+    @MainThread
+    public boolean hasStateChanger() {
+        return core.hasStateChanger();
+    }
+
+    /**
+     * Removes the {@link StateChanger}.
+     */
+    @MainThread
+    public void removeStateChanger() {
+        core.removeStateChanger();
+    }
+
+    /**
+     * Goes to the new key.
+     * If the key is found, then it goes backward to the existing key.
+     * If the key is not found, then it goes forward to the newly added key.
+     *
+     * @param newKey the target state.
+     */
+    @MainThread
+    public void goTo(@NonNull Object newKey) {
+        core.goTo(newKey);
+    }
+
+    /**
+     * Replaces the current top with the provided key.
+     * This means removing the current last element, and then adding the new element.
+     *
+     * @param newTop the new top key
+     * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     */
+    @MainThread
+    public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
+        core.replaceTop(newTop, direction);
+    }
+
+    /**
+     * Goes "up" to the provided element.
+     * This means that if the provided element is found anywhere in the history, then the history goes to it.
+     * If not found, then the current top is replaced with the provided element.
+     *
+     * Going up occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param newKey the new key to go up to
+     */
+    @MainThread
+    public void goUp(@NonNull Object newKey) {
+        core.goUp(newKey);
+    }
+
+    /**
+     * Goes "up" to the provided element.
+     * This means that if the provided element is found anywhere in the history, then the history goes to it (unless specified otherwise).
+     * If not found, then the current top is replaced with the provided element.
+     *
+     * Going up occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param newKey the new key to go up to
+     * @param fallbackToBack specifies that if the key is found in the NavigationCore, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
+     */
+    @MainThread
+    public void goUp(@NonNull Object newKey, boolean fallbackToBack) {
+        core.goUp(newKey, fallbackToBack);
+    }
+
+    /**
+     * Moves the provided new key to the top of the NavigationCore.
+     * If the key already exists, then it is first removed, and added as the last element.
+     * If it doesn't exist, then it is just added as the last element.
+     *
+     * The used direction is {@link StateChange#FORWARD}.
+     *
+     * @param newKey the new key
+     */
+    @MainThread
+    public void moveToTop(@NonNull Object newKey) {
+        core.moveToTop(newKey);
+    }
+
+    /**
+     * Moves the provided new key to the top of the NavigationCore.
+     * If the key already exists, then it is first removed, and added as the last element.
+     * If it doesn't exist, then it is just added as the last element.
+     *
+     * @param newKey the new key
+     * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
+     */
+    @MainThread
+    public void moveToTop(@NonNull Object newKey, boolean asReplace) {
+        core.moveToTop(newKey, asReplace);
+    }
+
+    /**
+     * Jumps to the root of the NavigationCore.
+     *
+     * This operation counts as a {@link StateChange#BACKWARD} navigation.
+     */
+    @MainThread
+    public void jumpToRoot() {
+        core.jumpToRoot();
+    }
+
+    /**
+     * Jumps to the root of the NavigationCore.
+     *
+     * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     */
+    @MainThread
+    public void jumpToRoot(@StateChange.StateChangeDirection int direction) {
+        core.jumpToRoot(direction);
+    }
+
+    /**
+     * Goes "up" once to the provided chain of parents.
+     * If the chain of parents is found as previous elements, then it works as back navigation to that chain,, removing all other elements on top of it.
+     * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
+     * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
+     *
+     * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param parentChain the chain of parents, from oldest to newest.
+     */
+    @MainThread
+    public void goUpChain(@NonNull List<?> parentChain) {
+        core.goUpChain(parentChain);
+    }
+
+    /**
+     * Goes "up" once to the provided chain of parents.
+     * If the chain of parents is found as previous elements, then it works as back navigation to that chain, removing all other elements on top of it (unless specified otherwise).
+     * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
+     * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
+     *
+     * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
+     *
+     * @param parentChain the chain of parents, from oldest to newest.
+     * @param fallbackToBack determines that if the chain is fully found in the NavigationCore, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
+     */
+    @MainThread
+    public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
+        core.goUpChain(parentChain, fallbackToBack);
+    }
+
+    /**
+     * Goes back in the history.
+     * If the key is found, then it goes backward to the existing key.
+     * If the key is not found, then it goes forward to the newly added key.
+     *
+     * @return true if a state change is pending or is handled with a state change, false if there is only one state left.
+     */
+    @MainThread
+    public boolean goBack() {
+        return core.goBack();
+    }
+
+    /**
+     * Immediately clears the NavigationCore, it is NOT enqueued as a state change.
+     *
+     * If there are pending state changes, then it throws an exception.
+     *
+     * You generally don't need to use this method.
+     */
+    @MainThread
+    public void forceClear() {
+        core.forceClear();
+    }
+
+    /**
+     * Sets the provided state list as the new active history.
+     *
+     * @param newHistory the new active history.
+     * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
+     */
+    @MainThread
+    public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
+        core.setHistory(newHistory, direction);
+    }
+
+    /**
+     * Returns the root (first) element of this history, or null if the history is empty.
+     *
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
+     *
+     * @param <K> the type of the key
+     * @return the root (first) key
+     */
+    @NonNull
+    public <K> K root() {
+        return core.root();
+    }
+
+    /**
+     * Returns the last element in the list, or null if the history is empty.
+     *
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
+     *
+     * @param <K> the type of the key
+     * @return the top key
+     */
+    @NonNull
+    public <K> K top() {
+        return core.top();
+    }
+
+    /**
+     * Returns the element indexed from the top.
+     *
+     * Offset value `0` behaves the same as {@link NavigationCore#top()}, while `1` returns the one before it.
+     * Negative indices are wrapped around, for example `-1` is the first element of the stack, `-2` the second, and so on.
+     *
+     * Accepted values are in range of [-size, size).
+     *
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
+     * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
+     *
+     * @param offset the offset from the top
+     * @param <K> the type of the key
+     * @return the key from the top with offset
+     */
+    @NonNull
+    public <K> K fromTop(int offset) {
+        return core.fromTop(offset);
+    }
+
+    /**
+     * Returns an unmodifiable copy of the current history.
+     *
+     * @return the unmodifiable copy of history.
+     */
+    @NonNull
+    public <K> History<K> getHistory() {
+        return core.getHistory();
+    }
+
+    /**
+     * Returns an unmodifiable list that contains the keys this NavigationCore is initialized with.
+     *
+     * @return the list of keys used at first initialization
+     */
+    @NonNull
+    public <K> History<K> getInitialKeys() {
+        return core.getInitialKeys();
+    }
+
+    /**
+     * Returns whether there is at least one queued {@link StateChange}.
+     *
+     * @return true if there is at least one enqueued {@link StateChange}.
+     */
+    public boolean isStateChangePending() {
+        return core.isStateChangePending();
+    }
+
+    /**
+     * Registers the {@link Backstack.CompletionListener}.
+     *
+     * @param completionListener The non-null completion listener to be registered.
+     */
+    public void addCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+        core.addCompletionListener(completionListener);
+    }
+
+    /**
+     * Unregisters the {@link Backstack.CompletionListener}.
+     *
+     * @param completionListener The non-null completion listener to be unregistered.
+     */
+    public void removeCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+        core.removeCompletionListener(completionListener);
+    }
+
+    /**
+     * Unregisters all {@link Backstack.CompletionListener}s.
+     */
+    public void removeCompletionListeners() {
+        core.removeCompletionListeners();
+    }
+
+    /**
+     * If there is a state change in progress, then calling this method will force it to be completed immediately.
+     * Any future calls to {@link StateChanger.Callback#stateChangeComplete()} for that given state change are ignored.
+     */
+    @MainThread
+    public void executePendingStateChange() {
+        core.executePendingStateChange();
     }
 }
