@@ -52,7 +52,7 @@ public class ServiceBinder {
      * @param serviceTag the tag of the service
      * @param service    the service
      */
-    public void add(@NonNull String serviceTag, @NonNull Object service) {
+    public void addService(@NonNull String serviceTag, @NonNull Object service) {
         //noinspection ConstantConditions
         if(serviceTag == null) {
             throw new IllegalArgumentException("Service tag cannot be null!");
@@ -70,7 +70,7 @@ public class ServiceBinder {
      * @param serviceTag the service tag
      * @return if the service is in the scope
      */
-    public boolean has(@NonNull String serviceTag) {
+    public boolean hasService(@NonNull String serviceTag) {
         if(serviceTag == null) {
             throw new IllegalArgumentException("Service tag cannot be null!");
         }
@@ -86,11 +86,11 @@ public class ServiceBinder {
      * @throws IllegalArgumentException if the service is not in the scope
      */
     @NonNull
-    public <T> T get(@NonNull String serviceTag) {
+    public <T> T getService(@NonNull String serviceTag) {
         if(serviceTag == null) {
             throw new IllegalArgumentException("Service tag cannot be null!");
         }
-        if(!has(serviceTag)) {
+        if(!hasService(serviceTag)) {
             throw new IllegalArgumentException("The service with tag [" + serviceTag + "] was not found!");
         }
         //noinspection unchecked
@@ -103,7 +103,7 @@ public class ServiceBinder {
      * @param serviceTag the service tag
      * @return if the service exists in active scopes
      */
-    public boolean canFind(@NonNull String serviceTag) {
+    public boolean canFindService(@NonNull String serviceTag) {
         return scopeManager.canFindService(serviceTag);
     }
 
@@ -116,7 +116,7 @@ public class ServiceBinder {
      * @throws IllegalArgumentException if the service is not found in any active scopes
      */
     @NonNull
-    public <T> T lookup(@NonNull String serviceTag) {
+    public <T> T lookupService(@NonNull String serviceTag) {
         return scopeManager.lookupService(serviceTag);
     }
 
@@ -127,7 +127,7 @@ public class ServiceBinder {
      * @param serviceTag the service tag
      * @return whether the service can be looked up from the provided scope
      */
-    public boolean canFindFrom(String scopeTag, String serviceTag) {
+    public boolean canFindFromScope(String scopeTag, String serviceTag) {
         return scopeManager.canFindFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
     }
 
@@ -140,7 +140,7 @@ public class ServiceBinder {
      * @throws IllegalArgumentException if the service is not found in the scope or any of its parents
      */
     @NonNull
-    public <T> T lookupFrom(String scopeTag, String serviceTag) {
+    public <T> T lookupFromScope(String scopeTag, String serviceTag) {
         return scopeManager.lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
     }
 

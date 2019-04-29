@@ -16,7 +16,7 @@ data class TaskDetailKey(val taskId: String) : ViewKey, ServiceProvider.HasServi
     override fun getScopeTag(): String = "TaskDetail[$taskId]"
 
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.add(TaskDetailView.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
+        serviceBinder.addService(TaskDetailView.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
     }
 
     override fun layout(): Int = R.layout.path_taskdetail

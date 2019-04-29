@@ -15,7 +15,7 @@ data class TasksKey(val placeholder: String) : ViewKey, ServiceProvider.HasServi
     override fun getScopeTag(): String = "Tasks"
 
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.add(TasksView.CONTROLLER_TAG, Injector.get().tasksPresenter())
+        serviceBinder.addService(TasksView.CONTROLLER_TAG, Injector.get().tasksPresenter())
     }
 
     constructor() : this("")

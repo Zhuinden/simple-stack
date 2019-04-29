@@ -14,7 +14,7 @@ sealed class AddOrEditTaskKey(val parent: ViewKey, val taskId: String = "") : Vi
     override fun getScopeTag() = "AddOrEditTask"
 
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.add(AddOrEditTaskView.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
+        serviceBinder.addService(AddOrEditTaskView.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
     }
 
     @Parcelize

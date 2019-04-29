@@ -72,9 +72,9 @@ public class ScopeLookupModeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService1", parentService1);
+                    serviceBinder.addService("parentService1", parentService1);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service1", service1);
+                    serviceBinder.addService("service1", service1);
                 }
             }
 
@@ -105,9 +105,9 @@ public class ScopeLookupModeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent2".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService2", parentService2);
+                    serviceBinder.addService("parentService2", parentService2);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service2", service2);
+                    serviceBinder.addService("service2", service2);
                 }
             }
 
@@ -409,9 +409,9 @@ public class ScopeLookupModeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService1", parentService1);
+                    serviceBinder.addService("parentService1", parentService1);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service1", service1);
+                    serviceBinder.addService("service1", service1);
                 }
             }
 
@@ -442,9 +442,9 @@ public class ScopeLookupModeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent2".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService2", parentService2);
+                    serviceBinder.addService("parentService2", parentService2);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service2", service2);
+                    serviceBinder.addService("service2", service2);
                 }
             }
 
@@ -514,9 +514,9 @@ public class ScopeLookupModeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService1", parentService1);
+                    serviceBinder.addService("parentService1", parentService1);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service1", service1);
+                    serviceBinder.addService("service1", service1);
                 }
             }
 
@@ -547,9 +547,9 @@ public class ScopeLookupModeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent2".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService2", parentService2);
+                    serviceBinder.addService("parentService2", parentService2);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service2", service2);
+                    serviceBinder.addService("service2", service2);
                 }
             }
 

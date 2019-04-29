@@ -235,16 +235,16 @@ public class ScopingExplicitParentsTest {
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 String tag = serviceBinder.getScopeTag();
                 if("hello".equals(tag)) {
-                    serviceBinder.add("SERVICE", service1);
+                    serviceBinder.addService("SERVICE", service1);
                 }
                 if("parentScope1".equals(tag)) {
-                    serviceBinder.add("SERVICE", service2);
+                    serviceBinder.addService("SERVICE", service2);
                 }
                 if("parentScope2".equals(tag)) {
-                    serviceBinder.add("SERVICE", service3);
+                    serviceBinder.addService("SERVICE", service3);
                 }
                 if("parentScope3".equals(tag)) {
-                    serviceBinder.add("SERVICE", service4);
+                    serviceBinder.addService("SERVICE", service4);
                 }
             }
         });
@@ -312,10 +312,10 @@ public class ScopingExplicitParentsTest {
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 String tag = serviceBinder.getScopeTag();
                 if("hello".equals(tag)) {
-                    serviceBinder.add("SERVICE", service1);
+                    serviceBinder.addService("SERVICE", service1);
                 }
                 if("parentScope1".equals(tag)) {
-                    serviceBinder.add("SERVICE", service2);
+                    serviceBinder.addService("SERVICE", service2);
                 }
             }
         });
@@ -377,7 +377,7 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if("parentScope1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service", service1);
+                    serviceBinder.addService("service", service1);
                 }
             }
         });
@@ -479,7 +479,7 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if("parentScope2".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service", service);
+                    serviceBinder.addService("service", service);
                 }
             }
         });
@@ -595,7 +595,7 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if("parentScope".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service", service);
+                    serviceBinder.addService("service", service);
                 }
             }
         });
@@ -697,10 +697,10 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("parentScope")) {
-                    serviceBinder.add("service", service1);
+                    serviceBinder.addService("service", service1);
                 }
                 if(serviceBinder.getScopeTag().equals("hello")) {
-                    serviceBinder.add("service", service2);
+                    serviceBinder.addService("service", service2);
                 }
             }
         });
@@ -806,17 +806,17 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("parentScope1")) {
-                    serviceBinder.add("service1", service1);
+                    serviceBinder.addService("service1", service1);
                 }
                 if(serviceBinder.getScopeTag().equals("parentScope2")) {
-                    serviceBinder.add("service2", service2);
+                    serviceBinder.addService("service2", service2);
                 }
 
                 if(serviceBinder.getScopeTag().equals("hello")) {
-                    serviceBinder.add("service3", service3);
+                    serviceBinder.addService("service3", service3);
                 }
                 if(serviceBinder.getScopeTag().equals("world")) {
-                    serviceBinder.add("service4", service4);
+                    serviceBinder.addService("service4", service4);
                 }
             }
         });
@@ -940,34 +940,34 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
-                    serviceBinder.add("service", serviceP0);
+                    serviceBinder.addService("service", serviceP0);
                 }
                 if(serviceBinder.getScopeTag().equals("P1")) {
-                    serviceBinder.add("service", serviceP1);
+                    serviceBinder.addService("service", serviceP1);
                 }
                 if(serviceBinder.getScopeTag().equals("P2")) {
-                    serviceBinder.add("service", serviceP2);
+                    serviceBinder.addService("service", serviceP2);
                 }
                 if(serviceBinder.getScopeTag().equals("P3")) {
-                    serviceBinder.add("service", serviceP3);
+                    serviceBinder.addService("service", serviceP3);
                 }
                 if(serviceBinder.getScopeTag().equals("P4")) {
-                    serviceBinder.add("service", serviceP4);
+                    serviceBinder.addService("service", serviceP4);
                 }
                 if(serviceBinder.getScopeTag().equals("C1")) {
-                    serviceBinder.add("service", serviceC1);
+                    serviceBinder.addService("service", serviceC1);
                 }
                 if(serviceBinder.getScopeTag().equals("C2")) {
-                    serviceBinder.add("service", serviceC2);
+                    serviceBinder.addService("service", serviceC2);
                 }
                 if(serviceBinder.getScopeTag().equals("C3")) {
-                    serviceBinder.add("service", serviceC3);
+                    serviceBinder.addService("service", serviceC3);
                 }
                 if(serviceBinder.getScopeTag().equals("C4")) {
-                    serviceBinder.add("service", serviceC4);
+                    serviceBinder.addService("service", serviceC4);
                 }
                 if(serviceBinder.getScopeTag().equals("C5")) {
-                    serviceBinder.add("service", serviceC5);
+                    serviceBinder.addService("service", serviceC5);
                 }
             }
         });
@@ -1215,34 +1215,34 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
-                    serviceBinder.add("service", serviceP0);
+                    serviceBinder.addService("service", serviceP0);
                 }
                 if(serviceBinder.getScopeTag().equals("P1")) {
-                    serviceBinder.add("service", serviceP1);
+                    serviceBinder.addService("service", serviceP1);
                 }
                 if(serviceBinder.getScopeTag().equals("P2")) {
-                    serviceBinder.add("service", serviceP2);
+                    serviceBinder.addService("service", serviceP2);
                 }
                 if(serviceBinder.getScopeTag().equals("P3")) {
-                    serviceBinder.add("service", serviceP3);
+                    serviceBinder.addService("service", serviceP3);
                 }
                 if(serviceBinder.getScopeTag().equals("P4")) {
-                    serviceBinder.add("service", serviceP4);
+                    serviceBinder.addService("service", serviceP4);
                 }
                 if(serviceBinder.getScopeTag().equals("C1")) {
-                    serviceBinder.add("service", serviceC1);
+                    serviceBinder.addService("service", serviceC1);
                 }
                 if(serviceBinder.getScopeTag().equals("C2")) {
-                    serviceBinder.add("service", serviceC2);
+                    serviceBinder.addService("service", serviceC2);
                 }
                 if(serviceBinder.getScopeTag().equals("C3")) {
-                    serviceBinder.add("service", serviceC3);
+                    serviceBinder.addService("service", serviceC3);
                 }
                 if(serviceBinder.getScopeTag().equals("C4")) {
-                    serviceBinder.add("service", serviceC4);
+                    serviceBinder.addService("service", serviceC4);
                 }
                 if(serviceBinder.getScopeTag().equals("C5")) {
-                    serviceBinder.add("service", serviceC5);
+                    serviceBinder.addService("service", serviceC5);
                 }
             }
         });
@@ -1571,10 +1571,10 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("boop")) {
-                    serviceBinder.add("service", service1);
+                    serviceBinder.addService("service", service1);
                 }
                 if(serviceBinder.getScopeTag().equals("beep")) {
-                    serviceBinder.add("service", service2);
+                    serviceBinder.addService("service", service2);
                 }
             }
         });
@@ -1642,12 +1642,12 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("boop")) {
-                    serviceBinder.add("service1", service1);
-                    serviceBinder.add("common", common1);
+                    serviceBinder.addService("service1", service1);
+                    serviceBinder.addService("common", common1);
                 }
                 if(serviceBinder.getScopeTag().equals("beep")) {
-                    serviceBinder.add("service2", service2);
-                    serviceBinder.add("common", common2);
+                    serviceBinder.addService("service2", service2);
+                    serviceBinder.addService("common", common2);
                 }
             }
         });
@@ -1792,16 +1792,16 @@ public class ScopingExplicitParentsTest {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
-                    serviceBinder.add("service", serviceP0);
+                    serviceBinder.addService("service", serviceP0);
                 }
                 if(serviceBinder.getScopeTag().equals("P1")) {
-                    serviceBinder.add("service", serviceP1);
+                    serviceBinder.addService("service", serviceP1);
                 }
                 if(serviceBinder.getScopeTag().equals("P2")) {
-                    serviceBinder.add("service", serviceP2);
+                    serviceBinder.addService("service", serviceP2);
                 }
                 if(serviceBinder.getScopeTag().equals("C1")) {
-                    serviceBinder.add("service", serviceC1);
+                    serviceBinder.addService("service", serviceC1);
                 }
             }
         });

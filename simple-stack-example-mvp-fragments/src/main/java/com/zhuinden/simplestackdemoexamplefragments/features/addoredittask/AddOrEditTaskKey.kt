@@ -15,7 +15,7 @@ import kotlinx.android.parcel.Parcelize
  */
 sealed class AddOrEditTaskKey(val parent: FragmentKey, val taskId: String = "") : BaseKey(), HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.add(AddOrEditTaskFragment.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
+        serviceBinder.addService(AddOrEditTaskFragment.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
     }
 
     constructor(parent: FragmentKey) : this(parent, "")
