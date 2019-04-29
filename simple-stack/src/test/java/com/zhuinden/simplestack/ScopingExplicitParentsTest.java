@@ -52,12 +52,12 @@ public class ScopingExplicitParentsTest {
                 return null;
             }
         }
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new DefaultScopedServices());
-        backstackManager.setup(History.of(new ChildKey("hello")));
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new DefaultScopedServices());
+        backstack.setup(History.of(new ChildKey("hello")));
         boolean success = false;
         try {
-            backstackManager.setStateChanger(new StateChanger() {
+            backstack.setStateChanger(new StateChanger() {
                 @Override
                 public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                     completionCallback.stateChangeComplete();
@@ -86,11 +86,11 @@ public class ScopingExplicitParentsTest {
                 return History.of("parentScope");
             }
         }
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(History.of(new ChildKey("hello")));
+        Backstack backstack = new Backstack();
+        backstack.setup(History.of(new ChildKey("hello")));
         boolean success = false;
         try {
-            backstackManager.setStateChanger(new StateChanger() {
+            backstack.setStateChanger(new StateChanger() {
                 @Override
                 public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                     completionCallback.stateChangeComplete();
@@ -119,17 +119,17 @@ public class ScopingExplicitParentsTest {
                 return History.of("parentScope");
             }
         }
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new DefaultScopedServices());
-        backstackManager.setup(History.of(new ChildKey("hello")));
-        backstackManager.setStateChanger(new StateChanger() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new DefaultScopedServices());
+        backstack.setup(History.of(new ChildKey("hello")));
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.hasScope("parentScope")).isTrue();
+        assertThat(backstack.hasScope("parentScope")).isTrue();
     }
 
     @Test
@@ -174,29 +174,29 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new DefaultScopedServices());
-        backstackManager.setup(History.of(new ChildKey1("hello"), new ChildKey2("world")));
-        backstackManager.setStateChanger(new StateChanger() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new DefaultScopedServices());
+        backstack.setup(History.of(new ChildKey1("hello"), new ChildKey2("world")));
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.hasScope("parentScope1")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope2")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope3")).isTrue();
-        assertThat(backstackManager.hasScope("hello")).isTrue();
-        assertThat(backstackManager.hasScope("world")).isTrue();
+        assertThat(backstack.hasScope("parentScope1")).isTrue();
+        assertThat(backstack.hasScope("parentScope2")).isTrue();
+        assertThat(backstack.hasScope("parentScope3")).isTrue();
+        assertThat(backstack.hasScope("hello")).isTrue();
+        assertThat(backstack.hasScope("world")).isTrue();
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(backstackManager.hasScope("parentScope1")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope2")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope3")).isFalse();
-        assertThat(backstackManager.hasScope("hello")).isTrue();
-        assertThat(backstackManager.hasScope("world")).isFalse();
+        assertThat(backstack.hasScope("parentScope1")).isTrue();
+        assertThat(backstack.hasScope("parentScope2")).isTrue();
+        assertThat(backstack.hasScope("parentScope3")).isFalse();
+        assertThat(backstack.hasScope("hello")).isTrue();
+        assertThat(backstack.hasScope("world")).isFalse();
     }
 
     @Test
@@ -229,8 +229,8 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 String tag = serviceBinder.getScopeTag();
@@ -249,33 +249,33 @@ public class ScopingExplicitParentsTest {
             }
         });
 
-        backstackManager.setup(History.of(
+        backstack.setup(History.of(
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope2", "parentScope3"))
         ));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.hasScope("hello")).isTrue();
-        assertThat(backstackManager.hasScope("world")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope1")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope2")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope3")).isTrue();
+        assertThat(backstack.hasScope("hello")).isTrue();
+        assertThat(backstack.hasScope("world")).isTrue();
+        assertThat(backstack.hasScope("parentScope1")).isTrue();
+        assertThat(backstack.hasScope("parentScope2")).isTrue();
+        assertThat(backstack.hasScope("parentScope3")).isTrue();
 
-        assertThat(backstackManager.getService("hello", "SERVICE")).isSameAs(service1);
-        assertThat(backstackManager.getService("parentScope1", "SERVICE")).isSameAs(service2);
-        assertThat(backstackManager.getService("parentScope2", "SERVICE")).isSameAs(service3);
-        assertThat(backstackManager.getService("parentScope3", "SERVICE")).isSameAs(service4);
+        assertThat(backstack.getService("hello", "SERVICE")).isSameAs(service1);
+        assertThat(backstack.getService("parentScope1", "SERVICE")).isSameAs(service2);
+        assertThat(backstack.getService("parentScope2", "SERVICE")).isSameAs(service3);
+        assertThat(backstack.getService("parentScope3", "SERVICE")).isSameAs(service4);
 
-        assertThat(backstackManager.lookupService("SERVICE")).isSameAs(service4);
+        assertThat(backstack.lookupService("SERVICE")).isSameAs(service4);
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(backstackManager.lookupService("SERVICE")).isSameAs(service1);
+        assertThat(backstack.lookupService("SERVICE")).isSameAs(service1);
     }
 
     @Test
@@ -306,8 +306,8 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 String tag = serviceBinder.getScopeTag();
@@ -320,29 +320,29 @@ public class ScopingExplicitParentsTest {
             }
         });
 
-        backstackManager.setup(History.of(
+        backstack.setup(History.of(
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope1"))
         ));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.hasScope("hello")).isTrue();
-        assertThat(backstackManager.hasScope("world")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope1")).isTrue();
+        assertThat(backstack.hasScope("hello")).isTrue();
+        assertThat(backstack.hasScope("world")).isTrue();
+        assertThat(backstack.hasScope("parentScope1")).isTrue();
 
-        assertThat(backstackManager.getService("hello", "SERVICE")).isSameAs(service1);
-        assertThat(backstackManager.getService("parentScope1", "SERVICE")).isSameAs(service2);
+        assertThat(backstack.getService("hello", "SERVICE")).isSameAs(service1);
+        assertThat(backstack.getService("parentScope1", "SERVICE")).isSameAs(service2);
 
-        assertThat(backstackManager.lookupService("SERVICE")).isSameAs(service2);
+        assertThat(backstack.lookupService("SERVICE")).isSameAs(service2);
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(backstackManager.lookupService("SERVICE")).isSameAs(service1);
+        assertThat(backstack.lookupService("SERVICE")).isSameAs(service1);
     }
 
     @Test
@@ -372,8 +372,8 @@ public class ScopingExplicitParentsTest {
             }
         }
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if("parentScope1".equals(serviceBinder.getScopeTag())) {
@@ -382,24 +382,24 @@ public class ScopingExplicitParentsTest {
             }
         });
 
-        backstackManager.setup(History.of(
+        backstack.setup(History.of(
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope2", "parentScope3"))
         ));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.hasScope("parentScope1")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope2")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope3")).isTrue();
-        assertThat(backstackManager.hasScope("hello")).isTrue();
-        assertThat(backstackManager.hasScope("world")).isTrue();
+        assertThat(backstack.hasScope("parentScope1")).isTrue();
+        assertThat(backstack.hasScope("parentScope2")).isTrue();
+        assertThat(backstack.hasScope("parentScope3")).isTrue();
+        assertThat(backstack.hasScope("hello")).isTrue();
+        assertThat(backstack.hasScope("world")).isTrue();
 
-        assertThat(backstackManager.lookupService("service")).isSameAs(service1);
+        assertThat(backstack.lookupService("service")).isSameAs(service1);
     }
 
     @Test
@@ -590,8 +590,8 @@ public class ScopingExplicitParentsTest {
                 completionCallback.stateChangeComplete();
             }
         };
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if("parentScope".equals(serviceBinder.getScopeTag())) {
@@ -599,27 +599,27 @@ public class ScopingExplicitParentsTest {
                 }
             }
         });
-        backstackManager.setup(History.of(
+        backstack.setup(History.of(
                 new ChildKey("hello", History.of("parentScope1")),
                 new ChildKey("world", History.of("parentScope")),
                 new ChildKey("bye", History.of("parentScope"))
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.hasScope("parentScope")).isTrue();
-        assertThat(backstackManager.lookupService("service")).isSameAs(service);
-        assertThat(backstackManager.getService("parentScope", "service")).isSameAs(service);
+        assertThat(backstack.hasScope("parentScope")).isTrue();
+        assertThat(backstack.lookupService("service")).isSameAs(service);
+        assertThat(backstack.getService("parentScope", "service")).isSameAs(service);
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(backstackManager.hasScope("parentScope")).isTrue();
-        assertThat(backstackManager.lookupService("service")).isSameAs(service);
-        assertThat(backstackManager.getService("parentScope", "service")).isSameAs(service);
+        assertThat(backstack.hasScope("parentScope")).isTrue();
+        assertThat(backstack.lookupService("service")).isSameAs(service);
+        assertThat(backstack.getService("parentScope", "service")).isSameAs(service);
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(backstackManager.hasScope("parentScope")).isFalse();
-        assertThat(backstackManager.canFindService("service")).isFalse();
+        assertThat(backstack.hasScope("parentScope")).isFalse();
+        assertThat(backstack.canFindService("service")).isFalse();
     }
 
     @Test
@@ -692,8 +692,8 @@ public class ScopingExplicitParentsTest {
                 completionCallback.stateChangeComplete();
             }
         };
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("parentScope")) {
@@ -704,22 +704,22 @@ public class ScopingExplicitParentsTest {
                 }
             }
         });
-        backstackManager.setup(History.of(
+        backstack.setup(History.of(
                 new ChildKey("hello", History.of("parentScope"))
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.hasScope("hello")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope")).isTrue();
-        assertThat(backstackManager.hasService("hello", "service")).isTrue();
-        assertThat(backstackManager.hasService("parentScope", "service")).isTrue();
-        assertThat(backstackManager.getService("hello", "service")).isSameAs(service2);
-        assertThat(backstackManager.getService("parentScope", "service")).isSameAs(service1);
+        assertThat(backstack.hasScope("hello")).isTrue();
+        assertThat(backstack.hasScope("parentScope")).isTrue();
+        assertThat(backstack.hasService("hello", "service")).isTrue();
+        assertThat(backstack.hasService("parentScope", "service")).isTrue();
+        assertThat(backstack.getService("hello", "service")).isSameAs(service2);
+        assertThat(backstack.getService("parentScope", "service")).isSameAs(service1);
 
         assertThat(serviceRegistered).containsExactly(service1, service2);
         assertThat(activated).containsExactly(service1, service2);
 
-        backstackManager.getBackstack().setHistory(
+        backstack.setHistory(
                 History.of(new ChildKey("bye", History.of("boop"))),
                 StateChange.BACKWARD);
 
@@ -801,8 +801,8 @@ public class ScopingExplicitParentsTest {
             }
         };
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("parentScope1")) {
@@ -820,35 +820,35 @@ public class ScopingExplicitParentsTest {
                 }
             }
         });
-        backstackManager.setup(
+        backstack.setup(
                 History.of(
                         new ChildKey("hello", History.of("parentScope1", "parentScope2")),
                         new ChildKey("world", History.of("parentScope2"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.hasScope("parentScope1")).isTrue();
-        assertThat(backstackManager.hasScope("parentScope2")).isTrue();
-        assertThat(backstackManager.hasScope("hello")).isTrue();
-        assertThat(backstackManager.hasScope("world")).isTrue();
-        assertThat(backstackManager.hasService("parentScope2", "service2")).isTrue();
-        assertThat(backstackManager.hasService("parentScope1", "service1")).isTrue();
-        assertThat(backstackManager.hasService("world", "service4")).isTrue();
-        assertThat(backstackManager.hasService("hello", "service3")).isTrue();
+        assertThat(backstack.hasScope("parentScope1")).isTrue();
+        assertThat(backstack.hasScope("parentScope2")).isTrue();
+        assertThat(backstack.hasScope("hello")).isTrue();
+        assertThat(backstack.hasScope("world")).isTrue();
+        assertThat(backstack.hasService("parentScope2", "service2")).isTrue();
+        assertThat(backstack.hasService("parentScope1", "service1")).isTrue();
+        assertThat(backstack.hasService("world", "service4")).isTrue();
+        assertThat(backstack.hasService("hello", "service3")).isTrue();
 
-        backstackManager.getBackstack().setHistory(
+        backstack.setHistory(
                 History.of(new ChildKey("bye", History.of("boop"))),
                 StateChange.BACKWARD);
 
-        assertThat(backstackManager.hasScope("parentScope1")).isFalse();
-        assertThat(backstackManager.hasScope("parentScope2")).isFalse();
-        assertThat(backstackManager.hasScope("hello")).isFalse();
-        assertThat(backstackManager.hasScope("world")).isFalse();
-        assertThat(backstackManager.hasService("parentScope2", "service2")).isFalse();
-        assertThat(backstackManager.hasService("parentScope1", "service1")).isFalse();
-        assertThat(backstackManager.hasService("world", "service4")).isFalse();
-        assertThat(backstackManager.hasService("hello", "service3")).isFalse();
+        assertThat(backstack.hasScope("parentScope1")).isFalse();
+        assertThat(backstack.hasScope("parentScope2")).isFalse();
+        assertThat(backstack.hasScope("hello")).isFalse();
+        assertThat(backstack.hasScope("world")).isFalse();
+        assertThat(backstack.hasService("parentScope2", "service2")).isFalse();
+        assertThat(backstack.hasService("parentScope1", "service1")).isFalse();
+        assertThat(backstack.hasService("world", "service4")).isFalse();
+        assertThat(backstack.hasService("hello", "service3")).isFalse();
 
         assertThat(registered).containsExactly(service1, service2, service3, service4);
         assertThat(activated).containsExactly(service2, service4);
@@ -935,8 +935,8 @@ public class ScopingExplicitParentsTest {
             }
         };
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
@@ -978,7 +978,7 @@ public class ScopingExplicitParentsTest {
          *     PARENT2       PARENT3         PARENT4
          *   CHILD1 CHILD2    CHILD3     CHILD4   CHILD5
          */
-        backstackManager.setup(
+        backstack.setup(
                 History.of(
                         new ChildKey("C1", History.of("P0", "P1", "P2")),
                         new ChildKey("C2", History.of("P0", "P1", "P2")),
@@ -987,29 +987,29 @@ public class ScopingExplicitParentsTest {
                         new ChildKey("C5", History.of("P0", "P4"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.hasScope("C1")).isTrue();
-        assertThat(backstackManager.hasScope("C2")).isTrue();
-        assertThat(backstackManager.hasScope("C3")).isTrue();
-        assertThat(backstackManager.hasScope("C4")).isTrue();
-        assertThat(backstackManager.hasScope("C5")).isTrue();
-        assertThat(backstackManager.hasScope("P0")).isTrue();
-        assertThat(backstackManager.hasScope("P1")).isTrue();
-        assertThat(backstackManager.hasScope("P2")).isTrue();
-        assertThat(backstackManager.hasScope("P3")).isTrue();
-        assertThat(backstackManager.hasScope("P4")).isTrue();
+        assertThat(backstack.hasScope("C1")).isTrue();
+        assertThat(backstack.hasScope("C2")).isTrue();
+        assertThat(backstack.hasScope("C3")).isTrue();
+        assertThat(backstack.hasScope("C4")).isTrue();
+        assertThat(backstack.hasScope("C5")).isTrue();
+        assertThat(backstack.hasScope("P0")).isTrue();
+        assertThat(backstack.hasScope("P1")).isTrue();
+        assertThat(backstack.hasScope("P2")).isTrue();
+        assertThat(backstack.hasScope("P3")).isTrue();
+        assertThat(backstack.hasScope("P4")).isTrue();
 
-        assertThat(backstackManager.getService("C1", "service")).isSameAs(serviceC1);
-        assertThat(backstackManager.getService("C2", "service")).isSameAs(serviceC2);
-        assertThat(backstackManager.getService("C3", "service")).isSameAs(serviceC3);
-        assertThat(backstackManager.getService("C4", "service")).isSameAs(serviceC4);
-        assertThat(backstackManager.getService("C5", "service")).isSameAs(serviceC5);
-        assertThat(backstackManager.getService("P0", "service")).isSameAs(serviceP0);
-        assertThat(backstackManager.getService("P1", "service")).isSameAs(serviceP1);
-        assertThat(backstackManager.getService("P2", "service")).isSameAs(serviceP2);
-        assertThat(backstackManager.getService("P3", "service")).isSameAs(serviceP3);
-        assertThat(backstackManager.getService("P4", "service")).isSameAs(serviceP4);
+        assertThat(backstack.getService("C1", "service")).isSameAs(serviceC1);
+        assertThat(backstack.getService("C2", "service")).isSameAs(serviceC2);
+        assertThat(backstack.getService("C3", "service")).isSameAs(serviceC3);
+        assertThat(backstack.getService("C4", "service")).isSameAs(serviceC4);
+        assertThat(backstack.getService("C5", "service")).isSameAs(serviceC5);
+        assertThat(backstack.getService("P0", "service")).isSameAs(serviceP0);
+        assertThat(backstack.getService("P1", "service")).isSameAs(serviceP1);
+        assertThat(backstack.getService("P2", "service")).isSameAs(serviceP2);
+        assertThat(backstack.getService("P3", "service")).isSameAs(serviceP3);
+        assertThat(backstack.getService("P4", "service")).isSameAs(serviceP4);
 
         /// verified set up
 
@@ -1027,7 +1027,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).isEmpty();
         assertThat(unregistered).isEmpty();
 
-        backstackManager.getBackstack().goBack(); // [C1, C2, C3, C4]
+        backstack.goBack(); // [C1, C2, C3, C4]
 
         assertThat(activated).containsExactly(serviceP0, serviceP4, serviceC5, serviceC4);
         assertThat(registered).containsExactly(serviceP0,
@@ -1043,7 +1043,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5);
         assertThat(unregistered).containsExactly(serviceC5);
 
-        backstackManager.getBackstack().goBack(); // [C1, C2, C3]
+        backstack.goBack(); // [C1, C2, C3]
 
         assertThat(activated).containsExactly(serviceP0,
                 serviceP4,
@@ -1065,7 +1065,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4);
         assertThat(unregistered).containsExactly(serviceC5, serviceC4, serviceP4);
 
-        backstackManager.getBackstack().jumpToRoot(); // [C1]
+        backstack.jumpToRoot(); // [C1]
 
         assertThat(activated).containsExactly(serviceP0,
                 serviceP4,
@@ -1089,7 +1089,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3);
         assertThat(unregistered).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
 
-        backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
+        backstack.setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
 
         assertThat(activated).containsExactly(serviceP0,
                 serviceP4,
@@ -1210,8 +1210,8 @@ public class ScopingExplicitParentsTest {
             }
         };
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
@@ -1253,7 +1253,7 @@ public class ScopingExplicitParentsTest {
          *     PARENT2       PARENT3
          *   CHILD1 CHILD2    CHILD3
          */
-        backstackManager.setup(
+        backstack.setup(
                 History.of(
                         new ChildKey("C1", History.of("P0", "P1", "P2")),
                         new ChildKey("C2", History.of("P0", "P1", "P2")),
@@ -1262,29 +1262,29 @@ public class ScopingExplicitParentsTest {
                         new ChildKey("C5", History.of("P4"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.hasScope("C1")).isTrue();
-        assertThat(backstackManager.hasScope("C2")).isTrue();
-        assertThat(backstackManager.hasScope("C3")).isTrue();
-        assertThat(backstackManager.hasScope("C4")).isTrue();
-        assertThat(backstackManager.hasScope("C5")).isTrue();
-        assertThat(backstackManager.hasScope("P0")).isTrue();
-        assertThat(backstackManager.hasScope("P1")).isTrue();
-        assertThat(backstackManager.hasScope("P2")).isTrue();
-        assertThat(backstackManager.hasScope("P3")).isTrue();
-        assertThat(backstackManager.hasScope("P4")).isTrue();
+        assertThat(backstack.hasScope("C1")).isTrue();
+        assertThat(backstack.hasScope("C2")).isTrue();
+        assertThat(backstack.hasScope("C3")).isTrue();
+        assertThat(backstack.hasScope("C4")).isTrue();
+        assertThat(backstack.hasScope("C5")).isTrue();
+        assertThat(backstack.hasScope("P0")).isTrue();
+        assertThat(backstack.hasScope("P1")).isTrue();
+        assertThat(backstack.hasScope("P2")).isTrue();
+        assertThat(backstack.hasScope("P3")).isTrue();
+        assertThat(backstack.hasScope("P4")).isTrue();
 
-        assertThat(backstackManager.getService("C1", "service")).isSameAs(serviceC1);
-        assertThat(backstackManager.getService("C2", "service")).isSameAs(serviceC2);
-        assertThat(backstackManager.getService("C3", "service")).isSameAs(serviceC3);
-        assertThat(backstackManager.getService("C4", "service")).isSameAs(serviceC4);
-        assertThat(backstackManager.getService("C5", "service")).isSameAs(serviceC5);
-        assertThat(backstackManager.getService("P0", "service")).isSameAs(serviceP0);
-        assertThat(backstackManager.getService("P1", "service")).isSameAs(serviceP1);
-        assertThat(backstackManager.getService("P2", "service")).isSameAs(serviceP2);
-        assertThat(backstackManager.getService("P3", "service")).isSameAs(serviceP3);
-        assertThat(backstackManager.getService("P4", "service")).isSameAs(serviceP4);
+        assertThat(backstack.getService("C1", "service")).isSameAs(serviceC1);
+        assertThat(backstack.getService("C2", "service")).isSameAs(serviceC2);
+        assertThat(backstack.getService("C3", "service")).isSameAs(serviceC3);
+        assertThat(backstack.getService("C4", "service")).isSameAs(serviceC4);
+        assertThat(backstack.getService("C5", "service")).isSameAs(serviceC5);
+        assertThat(backstack.getService("P0", "service")).isSameAs(serviceP0);
+        assertThat(backstack.getService("P1", "service")).isSameAs(serviceP1);
+        assertThat(backstack.getService("P2", "service")).isSameAs(serviceP2);
+        assertThat(backstack.getService("P3", "service")).isSameAs(serviceP3);
+        assertThat(backstack.getService("P4", "service")).isSameAs(serviceP4);
 
         /// verified set up
 
@@ -1302,7 +1302,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).isEmpty();
         assertThat(serviceUnregistered).isEmpty();
 
-        backstackManager.getBackstack().goBack(); // [C1, C2, C3, C4]
+        backstack.goBack(); // [C1, C2, C3, C4]
 
         assertThat(activated).containsExactly(serviceP4, serviceC5, serviceC4);
         assertThat(serviceRegistered).containsExactly(serviceP0,
@@ -1318,7 +1318,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5);
         assertThat(serviceUnregistered).containsExactly(serviceC5);
 
-        backstackManager.getBackstack().goBack(); // [C1, C2, C3]
+        backstack.goBack(); // [C1, C2, C3]
 
         assertThat(activated).containsExactly(serviceP4,
                 serviceC5,
@@ -1340,7 +1340,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4);
         assertThat(serviceUnregistered).containsExactly(serviceC5, serviceC4, serviceP4);
 
-        backstackManager.getBackstack().jumpToRoot(); // [C1]
+        backstack.jumpToRoot(); // [C1]
 
         assertThat(activated).containsExactly(serviceP4,
                 serviceC5,
@@ -1364,7 +1364,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3);
         assertThat(serviceUnregistered).containsExactly(serviceC5, serviceC4, serviceP4, serviceC3, serviceP3, serviceC2);
 
-        backstackManager.getBackstack().setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
+        backstack.setHistory(History.of(new TestKey("bye")), StateChange.REPLACE); // ["bye"]
 
         assertThat(activated).containsExactly(serviceP4,
                 serviceC5,
@@ -1405,7 +1405,7 @@ public class ScopingExplicitParentsTest {
                 serviceP1,
                 serviceP0);
 
-        backstackManager.getBackstack().setHistory(History.of(new ChildKey("C5", History.of("P4"))),
+        backstack.setHistory(History.of(new ChildKey("C5", History.of("P4"))),
                 StateChange.REPLACE);
 
         assertThat(activated).containsExactly(serviceP4,
@@ -1451,8 +1451,8 @@ public class ScopingExplicitParentsTest {
                 serviceP1,
                 serviceP0);
 
-        backstackManager.detachStateChanger();
-        backstackManager.setStateChanger(stateChanger);
+        backstack.detachStateChanger();
+        backstack.setStateChanger(stateChanger);
 
         // no change should happen here
         assertThat(activated).containsExactly(serviceP4,
@@ -1566,8 +1566,8 @@ public class ScopingExplicitParentsTest {
         final Service service1 = new Service();
         final Service service2 = new Service();
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("boop")) {
@@ -1579,25 +1579,25 @@ public class ScopingExplicitParentsTest {
             }
         });
 
-        backstackManager.setup(History.of(
+        backstack.setup(History.of(
                 new ChildKey("hello", History.of("boop")),
                 new ChildKey("world", History.of("beep"))
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.hasScope("boop")).isTrue();
-        assertThat(backstackManager.hasScope("beep")).isTrue();
-        assertThat(backstackManager.getService("boop", "service")).isSameAs(service1);
-        assertThat(backstackManager.getService("beep", "service")).isSameAs(service2);
+        assertThat(backstack.hasScope("boop")).isTrue();
+        assertThat(backstack.hasScope("beep")).isTrue();
+        assertThat(backstack.getService("boop", "service")).isSameAs(service1);
+        assertThat(backstack.getService("beep", "service")).isSameAs(service2);
 
-        assertThat(backstackManager.lookupService("service")).isSameAs(service2);
+        assertThat(backstack.lookupService("service")).isSameAs(service2);
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(backstackManager.hasScope("boop")).isTrue();
-        assertThat(backstackManager.hasScope("beep")).isFalse();
-        assertThat(backstackManager.getService("boop", "service")).isSameAs(service1);
-        assertThat(backstackManager.lookupService("service")).isSameAs(service1);
+        assertThat(backstack.hasScope("boop")).isTrue();
+        assertThat(backstack.hasScope("beep")).isFalse();
+        assertThat(backstack.getService("boop", "service")).isSameAs(service1);
+        assertThat(backstack.lookupService("service")).isSameAs(service1);
     }
 
     @Test
@@ -1637,8 +1637,8 @@ public class ScopingExplicitParentsTest {
         final Object common1 = new Object();
         final Object common2 = new Object();
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("boop")) {
@@ -1652,55 +1652,55 @@ public class ScopingExplicitParentsTest {
             }
         });
 
-        backstackManager.setup(History.of(
+        backstack.setup(History.of(
                 new ChildKey("hello", History.of("beep")),
                 new ChildKey("world", History.of("beep", "boop")),
                 new ChildKey("kappa", Collections.<String>emptyList())
         ));
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.lookupService("service1")).isSameAs(service1);
+        assertThat(backstack.lookupService("service1")).isSameAs(service1);
 
-        assertThat(backstackManager.canFindFromScope("hello", "service1")).isFalse();
-        assertThat(backstackManager.canFindFromScope("world", "service1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("hello", "service2")).isTrue();
+        assertThat(backstack.canFindFromScope("hello", "service1")).isFalse();
+        assertThat(backstack.canFindFromScope("world", "service1")).isTrue();
+        assertThat(backstack.canFindFromScope("hello", "service2")).isTrue();
         try {
-            assertThat(backstackManager.lookupFromScope("hello", "service1"));
+            assertThat(backstack.lookupFromScope("hello", "service1"));
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK!
         }
-        assertThat(backstackManager.lookupFromScope("hello", "service2")).isSameAs(service2);
-        assertThat(backstackManager.lookupFromScope("world", "service1")).isSameAs(service1);
-        assertThat(backstackManager.lookupFromScope("world", "service2")).isSameAs(service2);
+        assertThat(backstack.lookupFromScope("hello", "service2")).isSameAs(service2);
+        assertThat(backstack.lookupFromScope("world", "service1")).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("world", "service2")).isSameAs(service2);
 
-        assertThat(backstackManager.canFindFromScope("world", "common")).isTrue();
-        assertThat(backstackManager.canFindFromScope("hello", "common")).isTrue();
-        assertThat(backstackManager.lookupFromScope("hello", "common")).isSameAs(common2);
-        assertThat(backstackManager.lookupFromScope("world", "common")).isSameAs(common1);
+        assertThat(backstack.canFindFromScope("world", "common")).isTrue();
+        assertThat(backstack.canFindFromScope("hello", "common")).isTrue();
+        assertThat(backstack.lookupFromScope("hello", "common")).isSameAs(common2);
+        assertThat(backstack.lookupFromScope("world", "common")).isSameAs(common1);
 
-        assertThat(backstackManager.canFindFromScope("boop", "service2")).isTrue();
-        assertThat(backstackManager.lookupFromScope("boop", "service2")).isSameAs(service2);
-        assertThat(backstackManager.canFindFromScope("boop", "service1")).isTrue();
-        assertThat(backstackManager.lookupFromScope("boop", "service1")).isSameAs(service1);
+        assertThat(backstack.canFindFromScope("boop", "service2")).isTrue();
+        assertThat(backstack.lookupFromScope("boop", "service2")).isSameAs(service2);
+        assertThat(backstack.canFindFromScope("boop", "service1")).isTrue();
+        assertThat(backstack.lookupFromScope("boop", "service1")).isSameAs(service1);
 
-        assertThat(backstackManager.canFindFromScope("beep", "service1")).isFalse();
-        assertThat(backstackManager.canFindFromScope("beep", "service2")).isTrue();
-        assertThat(backstackManager.lookupFromScope("beep", "service2")).isSameAs(service2);
+        assertThat(backstack.canFindFromScope("beep", "service1")).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "service2")).isTrue();
+        assertThat(backstack.lookupFromScope("beep", "service2")).isSameAs(service2);
 
-        assertThat(backstackManager.lookupFromScope("boop", "common")).isSameAs(common1);
-        assertThat(backstackManager.lookupFromScope("beep", "common")).isSameAs(common2);
+        assertThat(backstack.lookupFromScope("boop", "common")).isSameAs(common1);
+        assertThat(backstack.lookupFromScope("beep", "common")).isSameAs(common2);
 
-        backstackManager.getBackstack().jumpToRoot();
+        backstack.jumpToRoot();
 
-        assertThat(backstackManager.canFindFromScope("boop", "common")).isFalse();
-        assertThat(backstackManager.canFindFromScope("beep", "common")).isTrue();
-        assertThat(backstackManager.lookupFromScope("beep", "common")).isSameAs(common2);
+        assertThat(backstack.canFindFromScope("boop", "common")).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "common")).isTrue();
+        assertThat(backstack.lookupFromScope("beep", "common")).isSameAs(common2);
 
-        backstackManager.finalizeScopes();
+        backstack.finalizeScopes();
 
-        assertThat(backstackManager.canFindFromScope("boop", "common")).isFalse();
-        assertThat(backstackManager.canFindFromScope("beep", "common")).isFalse();
+        assertThat(backstack.canFindFromScope("boop", "common")).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "common")).isFalse();
     }
 
     @Test
@@ -1787,8 +1787,8 @@ public class ScopingExplicitParentsTest {
             }
         };
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ScopedServices() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ScopedServices() {
             @Override
             public void bindServices(@NonNull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
@@ -1812,22 +1812,22 @@ public class ScopingExplicitParentsTest {
          *     PARENT2
          *   CHILD1
          */
-        backstackManager.setup(
+        backstack.setup(
                 History.of(
                         new ChildKey("C1", History.of("P0", "P1", "P2"))
                 )
         );
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.hasScope("C1")).isTrue();
-        assertThat(backstackManager.hasScope("P0")).isTrue();
-        assertThat(backstackManager.hasScope("P1")).isTrue();
-        assertThat(backstackManager.hasScope("P2")).isTrue();
+        assertThat(backstack.hasScope("C1")).isTrue();
+        assertThat(backstack.hasScope("P0")).isTrue();
+        assertThat(backstack.hasScope("P1")).isTrue();
+        assertThat(backstack.hasScope("P2")).isTrue();
 
-        assertThat(backstackManager.getService("C1", "service")).isSameAs(serviceC1);
-        assertThat(backstackManager.getService("P0", "service")).isSameAs(serviceP0);
-        assertThat(backstackManager.getService("P1", "service")).isSameAs(serviceP1);
-        assertThat(backstackManager.getService("P2", "service")).isSameAs(serviceP2);
+        assertThat(backstack.getService("C1", "service")).isSameAs(serviceC1);
+        assertThat(backstack.getService("P0", "service")).isSameAs(serviceP0);
+        assertThat(backstack.getService("P1", "service")).isSameAs(serviceP1);
+        assertThat(backstack.getService("P2", "service")).isSameAs(serviceP2);
 
         /// verified set up
 
@@ -1836,7 +1836,7 @@ public class ScopingExplicitParentsTest {
         assertThat(inactivated).isEmpty();
         assertThat(serviceUnregistered).isEmpty();
 
-        backstackManager.finalizeScopes();
+        backstack.finalizeScopes();
 
         assertThat(inactivated).containsExactly(serviceC1, serviceP2, serviceP1, serviceP0);
         assertThat(serviceUnregistered).containsExactly(serviceC1, serviceP2, serviceP1, serviceP0);

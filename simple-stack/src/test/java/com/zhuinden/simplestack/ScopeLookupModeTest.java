@@ -49,8 +49,8 @@ public class ScopeLookupModeTest {
 
     @Test
     public void lookupModesWork() {
-        final BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        final Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
         final Object parentService1 = new Object();
         final Object parentService2 = new Object();
@@ -124,10 +124,10 @@ public class ScopeLookupModeTest {
             }
         }
 
-        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
+        backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
 
-        assertThat(backstackManager.canFindFromScope("boop", "service")).isFalse();
-        backstackManager.setStateChanger(new StateChanger() {
+        assertThat(backstack.canFindFromScope("boop", "service")).isFalse();
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
@@ -135,240 +135,240 @@ public class ScopeLookupModeTest {
         });
 
         // default (ALL)
-        assertThat(backstackManager.canFindFromScope("beep", "service1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("beep", "service2")).isFalse();
-        assertThat(backstackManager.canFindFromScope("beep", "parentService1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("beep", "parentService2")).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "service1")).isTrue();
+        assertThat(backstack.canFindFromScope("beep", "service2")).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "parentService1")).isTrue();
+        assertThat(backstack.canFindFromScope("beep", "parentService2")).isFalse();
 
-        assertThat(backstackManager.canFindFromScope("parent1", "service1")).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent1", "service2")).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent1", "parentService1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("parent1", "parentService2")).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "service1")).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "service2")).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "parentService1")).isTrue();
+        assertThat(backstack.canFindFromScope("parent1", "parentService2")).isFalse();
 
-        assertThat(backstackManager.canFindFromScope("boop", "service1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "service2")).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "parentService1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "parentService2")).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "service1")).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "service2")).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "parentService1")).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "parentService2")).isTrue();
 
-        assertThat(backstackManager.canFindFromScope("parent2", "service1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("parent2", "service2")).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent2", "parentService1")).isTrue();
-        assertThat(backstackManager.canFindFromScope("parent2", "parentService2")).isTrue();
+        assertThat(backstack.canFindFromScope("parent2", "service1")).isTrue();
+        assertThat(backstack.canFindFromScope("parent2", "service2")).isFalse();
+        assertThat(backstack.canFindFromScope("parent2", "parentService1")).isTrue();
+        assertThat(backstack.canFindFromScope("parent2", "parentService2")).isTrue();
 
         // ALL specified
-        assertThat(backstackManager.canFindFromScope("beep", "service1", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("beep", "service2", ScopeLookupMode.ALL)).isFalse();
-        assertThat(backstackManager.canFindFromScope("beep", "parentService1", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("beep", "parentService2", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "service1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("beep", "service2", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "parentService1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("beep", "parentService2", ScopeLookupMode.ALL)).isFalse();
 
-        assertThat(backstackManager.canFindFromScope("parent1", "service1", ScopeLookupMode.ALL)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent1", "service2", ScopeLookupMode.ALL)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent1", "parentService1", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("parent1", "parentService2", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "service1", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "service2", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "parentService1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("parent1", "parentService2", ScopeLookupMode.ALL)).isFalse();
 
-        assertThat(backstackManager.canFindFromScope("boop", "service1", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "service2", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "parentService1", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "parentService2", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "service1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "service2", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "parentService1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "parentService2", ScopeLookupMode.ALL)).isTrue();
 
-        assertThat(backstackManager.canFindFromScope("parent2", "service1", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("parent2", "service2", ScopeLookupMode.ALL)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent2", "parentService1", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstackManager.canFindFromScope("parent2", "parentService2", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("parent2", "service1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("parent2", "service2", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("parent2", "parentService1", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("parent2", "parentService2", ScopeLookupMode.ALL)).isTrue();
 
         // EXPLICIT specified
-        assertThat(backstackManager.canFindFromScope("beep", "service1", ScopeLookupMode.EXPLICIT)).isTrue();
-        assertThat(backstackManager.canFindFromScope("beep", "service2", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("beep", "parentService1", ScopeLookupMode.EXPLICIT)).isTrue();
-        assertThat(backstackManager.canFindFromScope("beep", "parentService2", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "service1", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("beep", "service2", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("beep", "parentService1", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("beep", "parentService2", ScopeLookupMode.EXPLICIT)).isFalse();
 
-        assertThat(backstackManager.canFindFromScope("parent1", "service1", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent1", "service2", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent1", "parentService1", ScopeLookupMode.EXPLICIT)).isTrue();
-        assertThat(backstackManager.canFindFromScope("parent1", "parentService2", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "service1", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "service2", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("parent1", "parentService1", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("parent1", "parentService2", ScopeLookupMode.EXPLICIT)).isFalse();
 
-        assertThat(backstackManager.canFindFromScope("boop", "service1", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("boop", "service2", ScopeLookupMode.EXPLICIT)).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "parentService1", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("boop", "parentService2", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "service1", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("boop", "service2", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "parentService1", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("boop", "parentService2", ScopeLookupMode.EXPLICIT)).isTrue();
 
-        assertThat(backstackManager.canFindFromScope("parent2", "service1", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent2", "service2", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent2", "parentService1", ScopeLookupMode.EXPLICIT)).isFalse();
-        assertThat(backstackManager.canFindFromScope("parent2", "parentService2", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("parent2", "service1", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("parent2", "service2", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("parent2", "parentService1", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("parent2", "parentService2", ScopeLookupMode.EXPLICIT)).isTrue();
 
         // default (ALL)
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("beep", "service2");
+                backstack.lookupFromScope("beep", "service2");
             }
         });
-        assertThat(backstackManager.lookupFromScope("beep", "service1")).isSameAs(service1);
-        assertThat(backstackManager.lookupFromScope("beep", "parentService1")).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("beep", "service1")).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("beep", "parentService1")).isSameAs(parentService1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("beep", "parentService2");
+                backstack.lookupFromScope("beep", "parentService2");
             }
         });
 
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "service1");
+                backstack.lookupFromScope("parent1", "service1");
             }
         });
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "service2");
+                backstack.lookupFromScope("parent1", "service2");
             }
         });
-        assertThat(backstackManager.lookupFromScope("parent1", "parentService1")).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("parent1", "parentService1")).isSameAs(parentService1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "parentService2");
+                backstack.lookupFromScope("parent1", "parentService2");
             }
         });
 
-        assertThat(backstackManager.lookupFromScope("boop", "service1")).isSameAs(service1);
-        assertThat(backstackManager.lookupFromScope("boop", "service2")).isSameAs(service2);
-        assertThat(backstackManager.lookupFromScope("boop", "parentService1")).isSameAs(parentService1);
-        assertThat(backstackManager.lookupFromScope("boop", "parentService2")).isSameAs(parentService2);
+        assertThat(backstack.lookupFromScope("boop", "service1")).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("boop", "service2")).isSameAs(service2);
+        assertThat(backstack.lookupFromScope("boop", "parentService1")).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("boop", "parentService2")).isSameAs(parentService2);
 
-        assertThat(backstackManager.lookupFromScope("parent2", "service1")).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("parent2", "service1")).isSameAs(service1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent2", "service2");
+                backstack.lookupFromScope("parent2", "service2");
             }
         });
-        assertThat(backstackManager.lookupFromScope("parent2", "parentService1")).isSameAs(parentService1);
-        assertThat(backstackManager.lookupFromScope("parent2", "parentService2")).isSameAs(parentService2);
+        assertThat(backstack.lookupFromScope("parent2", "parentService1")).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("parent2", "parentService2")).isSameAs(parentService2);
 
         // ALL specified
-        assertThat(backstackManager.lookupFromScope("beep", "service1", ScopeLookupMode.ALL)).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("beep", "service1", ScopeLookupMode.ALL)).isSameAs(service1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("beep", "service2", ScopeLookupMode.ALL);
+                backstack.lookupFromScope("beep", "service2", ScopeLookupMode.ALL);
             }
         });
-        assertThat(backstackManager.lookupFromScope("beep", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("beep", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("beep", "parentService2", ScopeLookupMode.ALL);
-            }
-        });
-
-        assertThrows(new Action() {
-            @Override
-            public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "service1", ScopeLookupMode.ALL);
-            }
-        });
-        assertThrows(new Action() {
-            @Override
-            public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "service2", ScopeLookupMode.ALL);
-            }
-        });
-        assertThat(backstackManager.lookupFromScope("parent1", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
-        assertThrows(new Action() {
-            @Override
-            public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "parentService2", ScopeLookupMode.ALL);
+                backstack.lookupFromScope("beep", "parentService2", ScopeLookupMode.ALL);
             }
         });
 
-        assertThat(backstackManager.lookupFromScope("boop", "service1", ScopeLookupMode.ALL)).isSameAs(service1);
-        assertThat(backstackManager.lookupFromScope("boop", "service2", ScopeLookupMode.ALL)).isSameAs(service2);
-        assertThat(backstackManager.lookupFromScope("boop", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
-        assertThat(backstackManager.lookupFromScope("boop", "parentService2", ScopeLookupMode.ALL)).isSameAs(parentService2);
-
-        assertThat(backstackManager.lookupFromScope("parent2", "service1", ScopeLookupMode.ALL)).isSameAs(service1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent2", "service2", ScopeLookupMode.ALL);
+                backstack.lookupFromScope("parent1", "service1", ScopeLookupMode.ALL);
             }
         });
-        assertThat(backstackManager.lookupFromScope("parent2", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
-        assertThat(backstackManager.lookupFromScope("parent2", "parentService2", ScopeLookupMode.ALL)).isSameAs(parentService2);
+        assertThrows(new Action() {
+            @Override
+            public void doSomething() {
+                backstack.lookupFromScope("parent1", "service2", ScopeLookupMode.ALL);
+            }
+        });
+        assertThat(backstack.lookupFromScope("parent1", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
+        assertThrows(new Action() {
+            @Override
+            public void doSomething() {
+                backstack.lookupFromScope("parent1", "parentService2", ScopeLookupMode.ALL);
+            }
+        });
+
+        assertThat(backstack.lookupFromScope("boop", "service1", ScopeLookupMode.ALL)).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("boop", "service2", ScopeLookupMode.ALL)).isSameAs(service2);
+        assertThat(backstack.lookupFromScope("boop", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("boop", "parentService2", ScopeLookupMode.ALL)).isSameAs(parentService2);
+
+        assertThat(backstack.lookupFromScope("parent2", "service1", ScopeLookupMode.ALL)).isSameAs(service1);
+        assertThrows(new Action() {
+            @Override
+            public void doSomething() {
+                backstack.lookupFromScope("parent2", "service2", ScopeLookupMode.ALL);
+            }
+        });
+        assertThat(backstack.lookupFromScope("parent2", "parentService1", ScopeLookupMode.ALL)).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("parent2", "parentService2", ScopeLookupMode.ALL)).isSameAs(parentService2);
 
         // EXPLICIT specified
-        assertThat(backstackManager.lookupFromScope("beep", "service1", ScopeLookupMode.EXPLICIT)).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("beep", "service1", ScopeLookupMode.EXPLICIT)).isSameAs(service1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("beep", "service2", ScopeLookupMode.EXPLICIT);
+                backstack.lookupFromScope("beep", "service2", ScopeLookupMode.EXPLICIT);
             }
         });
-        assertThat(backstackManager.lookupFromScope("beep", "parentService1", ScopeLookupMode.EXPLICIT)).isSameAs(parentService1);
+        assertThat(backstack.lookupFromScope("beep", "parentService1", ScopeLookupMode.EXPLICIT)).isSameAs(parentService1);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("beep", "parentService2", ScopeLookupMode.EXPLICIT);
-            }
-        });
-
-        assertThrows(new Action() {
-            @Override
-            public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "service1", ScopeLookupMode.EXPLICIT);
-            }
-        });
-        assertThrows(new Action() {
-            @Override
-            public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "service2", ScopeLookupMode.EXPLICIT);
-            }
-        });
-        assertThat(backstackManager.lookupFromScope("parent1", "parentService1", ScopeLookupMode.EXPLICIT)).isSameAs(parentService1);
-        assertThrows(new Action() {
-            @Override
-            public void doSomething() {
-                backstackManager.lookupFromScope("parent1", "parentService2", ScopeLookupMode.EXPLICIT);
+                backstack.lookupFromScope("beep", "parentService2", ScopeLookupMode.EXPLICIT);
             }
         });
 
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("boop", "service1", ScopeLookupMode.EXPLICIT);
+                backstack.lookupFromScope("parent1", "service1", ScopeLookupMode.EXPLICIT);
             }
         });
-        assertThat(backstackManager.lookupFromScope("boop", "service2", ScopeLookupMode.EXPLICIT)).isSameAs(service2);
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("boop", "parentService1", ScopeLookupMode.EXPLICIT);
+                backstack.lookupFromScope("parent1", "service2", ScopeLookupMode.EXPLICIT);
             }
         });
-        assertThat(backstackManager.lookupFromScope("boop", "parentService2", ScopeLookupMode.EXPLICIT)).isSameAs(parentService2);
+        assertThat(backstack.lookupFromScope("parent1", "parentService1", ScopeLookupMode.EXPLICIT)).isSameAs(parentService1);
+        assertThrows(new Action() {
+            @Override
+            public void doSomething() {
+                backstack.lookupFromScope("parent1", "parentService2", ScopeLookupMode.EXPLICIT);
+            }
+        });
 
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent2", "service1", ScopeLookupMode.EXPLICIT);
+                backstack.lookupFromScope("boop", "service1", ScopeLookupMode.EXPLICIT);
+            }
+        });
+        assertThat(backstack.lookupFromScope("boop", "service2", ScopeLookupMode.EXPLICIT)).isSameAs(service2);
+        assertThrows(new Action() {
+            @Override
+            public void doSomething() {
+                backstack.lookupFromScope("boop", "parentService1", ScopeLookupMode.EXPLICIT);
+            }
+        });
+        assertThat(backstack.lookupFromScope("boop", "parentService2", ScopeLookupMode.EXPLICIT)).isSameAs(parentService2);
+
+        assertThrows(new Action() {
+            @Override
+            public void doSomething() {
+                backstack.lookupFromScope("parent2", "service1", ScopeLookupMode.EXPLICIT);
             }
         });
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent2", "service2", ScopeLookupMode.EXPLICIT);
+                backstack.lookupFromScope("parent2", "service2", ScopeLookupMode.EXPLICIT);
             }
         });
         assertThrows(new Action() {
             @Override
             public void doSomething() {
-                backstackManager.lookupFromScope("parent2", "parentService1", ScopeLookupMode.EXPLICIT);
+                backstack.lookupFromScope("parent2", "parentService1", ScopeLookupMode.EXPLICIT);
             }
         });
-        assertThat(backstackManager.lookupFromScope("parent2", "parentService2", ScopeLookupMode.EXPLICIT)).isSameAs(parentService2);
+        assertThat(backstack.lookupFromScope("parent2", "parentService2", ScopeLookupMode.EXPLICIT)).isSameAs(parentService2);
     }
 
     private interface Action {
@@ -386,8 +386,8 @@ public class ScopeLookupModeTest {
 
     @Test
     public void findScopesForKeyWorks() {
-        final BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        final Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
         final Object parentService1 = new Object();
         final Object parentService2 = new Object();
@@ -461,34 +461,34 @@ public class ScopeLookupModeTest {
             }
         }
 
-        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
+        backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
 
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
 
-        backstackManager.setStateChanger(new StateChanger() {
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2");
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1");
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1");
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2");
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1");
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1");
     }
 
     @Test
     public void findScopesForKeyIncludesGlobalScopeIfAvailable() {
-        final BackstackManager backstackManager = new BackstackManager();
+        final Backstack backstack = new Backstack();
 
-        backstackManager.setScopedServices(new ServiceProvider());
+        backstack.setScopedServices(new ServiceProvider());
 
         Object globalService = new Object();
-        backstackManager.setGlobalServices(
+        backstack.setGlobalServices(
                 GlobalServices.builder()
                         .addService("globalService", globalService)
                         .build()
@@ -566,24 +566,24 @@ public class ScopeLookupModeTest {
             }
         }
 
-        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
+        backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
 
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
 
-        backstackManager.setStateChanger(new StateChanger() {
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
     }
 
     @Test
@@ -624,8 +624,8 @@ public class ScopeLookupModeTest {
         }
 
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
         class MyService {
             private final String id;
@@ -644,7 +644,7 @@ public class ScopeLookupModeTest {
 
         final Object service0 = new MyService("service0");
 
-        backstackManager.setGlobalServices(GlobalServices.builder()
+        backstack.setGlobalServices(GlobalServices.builder()
                 .addService("service0", service0)
                 .build());
 
@@ -714,7 +714,7 @@ public class ScopeLookupModeTest {
          *                        PARENT2        PARENT3
          *   BEEP               BOOP                 BRAAP
          */
-        backstackManager.setup(History.of(beep, boop, braap));
+        backstack.setup(History.of(beep, boop, braap));
 
         StateChanger stateChanger = new StateChanger() {
             @Override
@@ -722,22 +722,22 @@ public class ScopeLookupModeTest {
                 completionCallback.stateChangeComplete();
             }
         };
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.ALL)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.ALL)).containsExactly("scope2", "parent2", "parent1", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).containsExactly("scope2", "parent2", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.ALL)).containsExactly("scope3", "parent3", "parent1", "scope2", "parent2", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).containsExactly("scope3", "parent3", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.ALL)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.ALL)).containsExactly("scope2", "parent2", "parent1", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).containsExactly("scope2", "parent2", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.ALL)).containsExactly("scope3", "parent3", "parent1", "scope2", "parent2", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).containsExactly("scope3", "parent3", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
 
-        backstackManager.finalizeScopes();
+        backstack.finalizeScopes();
 
-        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.ALL)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.ALL)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.ALL)).isEmpty();
-        assertThat(backstackManager.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).isEmpty();
     }
 }
