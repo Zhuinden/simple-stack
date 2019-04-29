@@ -145,22 +145,12 @@ public class ServiceBinder {
     }
 
     /**
-     * Returns the {@link Backstack} that belongs to the {@link BackstackManager} that manages the scopes.
+     * Returns the {@link Backstack} that manages the scopes.
      *
      * @return the backstack
      */
     @NonNull
     public Backstack getBackstack() {
         return scopeManager.getBackstack();
-    }
-
-    /**
-     * Returns the {@link BackstackManager} that manages the scopes.
-     *
-     * @return the backstack manager
-     */
-    @NonNull
-    public BackstackManager getManager() {
-        return scopeManager.getManager();
     }
 }

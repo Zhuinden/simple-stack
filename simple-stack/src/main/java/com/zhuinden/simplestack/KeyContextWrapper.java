@@ -19,7 +19,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 
 /**
@@ -61,11 +60,14 @@ public class KeyContextWrapper
      * @param context the key context wrapper in which the key can be found.
      * @return the key.
      */
-    @Nullable
+    @NonNull
     @SuppressLint("WrongConstant")
     public static <T> T getKey(Context context) {
         // noinspection ResourceType
         Object key = context.getSystemService(TAG);
+        if(key == null) {
+            throw new IllegalStateException("The context is supposed to contain a key, but it does not!");
+        }
         // noinspection unchecked
         return (T) key;
     }

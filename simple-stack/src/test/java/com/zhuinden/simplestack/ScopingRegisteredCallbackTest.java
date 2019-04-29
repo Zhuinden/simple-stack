@@ -200,8 +200,8 @@ public class ScopingRegisteredCallbackTest {
     public void registeredWorks() {
         final List<Pair<Object, ? extends ServiceEvent>> events = new ArrayList<>();
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
         class MyService
                 implements ScopedServices.Activated, ScopedServices.Registered {
@@ -243,7 +243,7 @@ public class ScopingRegisteredCallbackTest {
 
         final Object serviceShared0123P1P2P3 = new MyService("serviceShared0123P1P2P3");
 
-        backstackManager.setGlobalServices(GlobalServices.builder()
+        backstack.setGlobalServices(GlobalServices.builder()
                 .addService("service0", service0)
                 .addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3)
                 .build());
@@ -393,7 +393,7 @@ public class ScopingRegisteredCallbackTest {
          *                        PARENT2        PARENT3
          *   BEEP               BOOP                 BRAAP
          */
-        backstackManager.setup(History.of(beep, boop, braap));
+        backstack.setup(History.of(beep, boop, braap));
 
         StateChanger stateChanger = new StateChanger() {
             @Override
@@ -401,15 +401,15 @@ public class ScopingRegisteredCallbackTest {
                 completionCallback.stateChangeComplete();
             }
         };
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        backstackManager.finalizeScopes();
+        backstack.finalizeScopes();
 
-        backstackManager.getBackstack().goTo(beep);
+        backstack.goTo(beep);
 
         assertThat(events).containsExactly(
                 Pair.of(service0, new RegisterEvent()),

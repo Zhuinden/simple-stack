@@ -37,6 +37,8 @@ class ScopeManager {
     private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
     private final IdentityHashMap<Object, Set<String>> scopeActivatedServices = new IdentityHashMap<>();
 
+    private final IdentityHashMap<Object, Integer> untrackEventInvocationTracker = new IdentityHashMap<>(); // call unregister/inactivated only once!
+
     private boolean isGlobalScopePendingActivation = true;
 
     void activateGlobalScope() {
@@ -63,18 +65,14 @@ class ScopeManager {
     ScopeManager() {
     }
 
-    private BackstackManager backstackManager;
+    private Backstack backstack;
 
-    void setBackstackManager(BackstackManager backstackManager) {
-        this.backstackManager = backstackManager;
-    }
-
-    BackstackManager getManager() {
-        return backstackManager;
+    void setBackstack(Backstack backstack) {
+        this.backstack = backstack;
     }
 
     Backstack getBackstack() {
-        return backstackManager.getBackstack();
+        return backstack;
     }
 
     private final Map<String, Map<String, Object>> scopes = new LinkedHashMap<>();
@@ -186,7 +184,7 @@ class ScopeManager {
     void finalizeScopes() {
         this.isFinalized = true;
 
-        // this logic is actually mostly inside BackstackManager for some reason
+        // this logic is actually mostly inside Backstack for some reason
         destroyScope(GLOBAL_SCOPE_TAG);
 
         this.latestState = null; // don't use `emptyList()` so that Globals can be re-initialized.
@@ -249,8 +247,6 @@ class ScopeManager {
             destroyServicesAndRemoveState(scopeTag, serviceMap);
         }
     }
-
-    private final IdentityHashMap<Object, Integer> untrackEventInvocationTracker = new IdentityHashMap<>(); // call unregister only once!
 
     private void destroyServicesAndRemoveState(String scopeTag, Map<String, Object> serviceMap) {
         List<Object> services = new ArrayList<>(serviceMap.values());

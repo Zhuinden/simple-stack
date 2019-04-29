@@ -2,6 +2,7 @@ package com.zhuinden.simplestack;
 
 /*
  * Copyright 2014 Square Inc.
+ *
  * Copyright 2017 Gabor Varadi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +17,6 @@ package com.zhuinden.simplestack;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
@@ -34,7 +33,6 @@ import static org.assertj.core.api.Fail.fail;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ReentranceTest {
-
     Backstack flow;
     List<Object> lastStack;
     StateChanger.Callback lastCallback;
@@ -59,7 +57,8 @@ public class ReentranceTest {
                 callback.stateChangeComplete();
             }
         };
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.setStateChanger(dispatcher);
         flow.goTo(new Detail());
         verifyHistory(lastStack, new Error(), new Loading(), new Detail(), new Catalog());
@@ -81,17 +80,18 @@ public class ReentranceTest {
                         flow.goTo(new Error());
                     } else if(next instanceof Error) {
                         loading = false;
-                        flow.setHistory(History.builderFrom(flow).removeLast().build(), StateChange.BACKWARD);
+                        flow.setHistory(History.builderFrom(flow.getHistory()).removeLast().build(), StateChange.BACKWARD);
                     }
                 } else {
                     if(next instanceof Loading) {
-                        flow.setHistory(History.builderFrom(flow).removeLast().build(), StateChange.BACKWARD);
+                        flow.setHistory(History.builderFrom(flow.getHistory()).removeLast().build(), StateChange.BACKWARD);
                     }
                 }
                 onComplete.stateChangeComplete();
             }
         };
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.setStateChanger(dispatcher);
         verifyHistory(lastStack, new Catalog());
         flow.goTo(new Detail());
@@ -100,7 +100,8 @@ public class ReentranceTest {
 
     @Test
     public void reentrantForwardThenGo() {
-        Backstack flow = new Backstack(History.single(new Catalog()));
+        Backstack flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
@@ -138,7 +139,8 @@ public class ReentranceTest {
                 }
             }
         };
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.setStateChanger(dispatcher);
         lastCallback.stateChangeComplete();
 
@@ -154,7 +156,8 @@ public class ReentranceTest {
 
     @Test
     public void onCompleteThrowsIfCalledTwice() {
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
@@ -174,7 +177,8 @@ public class ReentranceTest {
 
     @Test
     public void bootstrapTraversal() {
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
 
         flow.setStateChanger(new StateChanger() {
             @Override
@@ -190,7 +194,8 @@ public class ReentranceTest {
     @Test
     public void pendingTraversalReplacesBootstrap() {
         final AtomicInteger dispatchCount = new AtomicInteger(0);
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.goTo(new Detail());
 
         flow.setStateChanger(new StateChanger() {
@@ -208,7 +213,8 @@ public class ReentranceTest {
 
     @Test
     public void allPendingTraversalsFire() {
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.goTo(new Loading());
         flow.goTo(new Detail());
         flow.goTo(new Error());
@@ -229,7 +235,8 @@ public class ReentranceTest {
 
     @Test
     public void clearingDispatcherMidTraversalPauses() {
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
 
         flow.setStateChanger(new StateChanger() {
             @Override
@@ -254,7 +261,8 @@ public class ReentranceTest {
 
     @Test
     public void handleStateChangerSetInMidFlightWaitsForBootstrap() {
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
@@ -277,7 +285,8 @@ public class ReentranceTest {
     @Test
     public void handleStateChangeerSetInMidFlightWithBigQueueNeedsNoBootstrap() {
         final AtomicInteger secondDispatcherCount = new AtomicInteger(0);
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
         flow.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange traversal, @NonNull StateChanger.Callback callback) {
@@ -303,7 +312,8 @@ public class ReentranceTest {
     @Test
     public void traversalsQueuedAfterDispatcherRemovedBootstrapTheNextOne() {
         final AtomicInteger secondDispatcherCount = new AtomicInteger(0);
-        flow = new Backstack(History.single(new Catalog()));
+        flow = new Backstack();
+        flow.setup(History.single(new Catalog()));
 
         flow.setStateChanger(new StateChanger() {
             @Override

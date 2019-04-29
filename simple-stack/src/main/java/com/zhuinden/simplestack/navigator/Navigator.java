@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.DefaultKeyFilter;
 import com.zhuinden.simplestack.DefaultKeyParceler;
 import com.zhuinden.simplestack.DefaultStateClearStrategy;
@@ -61,7 +60,7 @@ public class Navigator {
         StateChanger stateChanger;
         KeyFilter keyFilter = new DefaultKeyFilter();
         KeyParceler keyParceler = new DefaultKeyParceler();
-        BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
+        Backstack.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
         ScopedServices scopedServices = null;
         GlobalServices globalServices = null;
         boolean isInitializeDeferred = false;
@@ -116,13 +115,13 @@ public class Navigator {
         }
 
         /**
-         * Sets the state clear strategy used to clear the stored state in BackstackManager after there are no queued state changes left.
+         * Sets the state clear strategy used to clear the stored state in Backstack after there are no queued state changes left.
          *
          * @param stateClearStrategy if set, it cannot be null
          * @return the installer
          */
         @NonNull
-        public Installer setStateClearStrategy(@NonNull BackstackManager.StateClearStrategy stateClearStrategy) {
+        public Installer setStateClearStrategy(@NonNull Backstack.StateClearStrategy stateClearStrategy) {
             if(stateClearStrategy == null) {
                 throw new IllegalArgumentException("If set, StateClearStrategy cannot be null!");
             }
@@ -186,7 +185,7 @@ public class Navigator {
         }
 
         /**
-         * Adds a {@link Backstack.CompletionListener}, which will be added to the {@link BackstackManager} when it is initialized.
+         * Adds a {@link Backstack.CompletionListener}, which will be added to the {@link Backstack} when it is initialized.
          * As it is added only on initialization, these are added to the Backstack only once.
          *
          * @param stateChangeCompletionListener the state change completion listener
@@ -284,17 +283,6 @@ public class Navigator {
     }
 
     /**
-     * Gets the backstack that belongs to the Activity which hosts the backstack.
-     *
-     * @param context the context
-     * @return the backstack
-     */
-    public static Backstack getBackstack(Context context) {
-        BackstackHost backstackHost = getBackstackHost(context);
-        return backstackHost.getBackstack();
-    }
-
-    /**
      * Delegates back press call to the backstack of the navigator.
      *
      * @param context the Context that belongs to an Activity which hosts the backstack.
@@ -313,7 +301,7 @@ public class Navigator {
      * @return whether the scope exists
      */
     public static boolean hasScope(@NonNull Context context, @NonNull String scopeTag) {
-        return getManager(context).hasScope(scopeTag);
+        return getBackstack(context).hasScope(scopeTag);
     }
 
     /**
@@ -324,7 +312,7 @@ public class Navigator {
      * @return whether the service is bound in the given scope
      */
     public static boolean hasService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
-        return getManager(context).hasService(scopeKey, serviceTag);
+        return getBackstack(context).hasService(scopeKey, serviceTag);
     }
 
     /**
@@ -335,7 +323,7 @@ public class Navigator {
      * @return whether the service is bound in the given scope
      */
     public static boolean hasService(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager(context).hasService(scopeTag, serviceTag);
+        return getBackstack(context).hasService(scopeTag, serviceTag);
     }
 
     /**
@@ -348,7 +336,7 @@ public class Navigator {
      */
     @NonNull
     public static <T> T getService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
-        return getManager(context).getService(scopeKey, serviceTag);
+        return getBackstack(context).getService(scopeKey, serviceTag);
     }
 
     /**
@@ -361,7 +349,7 @@ public class Navigator {
      */
     @NonNull
     public static <T> T getService(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager(context).getService(scopeTag, serviceTag);
+        return getBackstack(context).getService(scopeTag, serviceTag);
     }
 
     /**
@@ -373,7 +361,7 @@ public class Navigator {
      * @throws IllegalStateException if the service doesn't exist in any scope
      */
     public static boolean canFindService(@NonNull Context context, @NonNull String serviceTag) {
-        return getManager(context).canFindService(serviceTag);
+        return getBackstack(context).canFindService(serviceTag);
     }
 
     /**
@@ -387,7 +375,7 @@ public class Navigator {
      */
     @NonNull
     public static <T> T lookupService(@NonNull Context context, @NonNull String serviceTag) {
-        return getManager(context).lookupService(serviceTag);
+        return getBackstack(context).lookupService(serviceTag);
     }
 
     /**
@@ -401,7 +389,7 @@ public class Navigator {
      */
     @NonNull
     public static List<String> findScopesForKey(@NonNull Context context, @NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
-        return getManager(context).findScopesForKey(key, lookupMode);
+        return getBackstack(context).findScopesForKey(key, lookupMode);
     }
 
     /**
@@ -413,7 +401,7 @@ public class Navigator {
      * @return whether the service exists in any of the accessed scopes
      */
     public static boolean canFindFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager(context).canFindFromScope(scopeTag, serviceTag);
+        return getBackstack(context).canFindFromScope(scopeTag, serviceTag);
     }
 
     /**
@@ -427,7 +415,7 @@ public class Navigator {
      * @return whether the service exists in any scopes from the current scope or its parents
      */
     public static boolean canFindFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
-        return getManager(context).canFindFromScope(scopeTag, serviceTag, lookupMode);
+        return getBackstack(context).canFindFromScope(scopeTag, serviceTag, lookupMode);
     }
 
     /**
@@ -442,7 +430,7 @@ public class Navigator {
      */
     @NonNull
     public static <T> T lookupFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager(context).lookupFromScope(scopeTag, serviceTag);
+        return getBackstack(context).lookupFromScope(scopeTag, serviceTag);
     }
 
 
@@ -458,20 +446,19 @@ public class Navigator {
      */
     @NonNull
     public static <T> T lookupFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
-        return getManager(context).lookupFromScope(scopeTag, serviceTag, lookupMode);
+        return getBackstack(context).lookupFromScope(scopeTag, serviceTag, lookupMode);
     }
 
-
     /**
-     * A method to return the backstack manager, managed by the {@link BackstackHost}.
-     * Typically not needed.
+     * Gets the backstack that belongs to the Activity which hosts the backstack.
      *
-     * @return the managed backstack manager that belongs to the {@link BackstackHost} inside the activity.
+     * @param context the context
+     * @return the backstack
      */
     @NonNull
-    public static BackstackManager getManager(Context context) {
+    public static Backstack getBackstack(Context context) {
         BackstackHost backstackHost = getBackstackHost(context);
-        return backstackHost.getBackstackManager();
+        return backstackHost.getBackstack();
     }
 
     /**
@@ -483,7 +470,7 @@ public class Navigator {
         if(view != null) {
             Context context = view.getContext();
             BackstackHost backstackHost = getBackstackHost(context);
-            backstackHost.getBackstackManager().persistViewToState(view);
+            backstackHost.getBackstack().persistViewToState(view);
         }
     }
 
@@ -498,7 +485,7 @@ public class Navigator {
         }
         Context context = view.getContext();
         BackstackHost backstackHost = getBackstackHost(context);
-        backstackHost.getBackstackManager().restoreViewFromState(view);
+        backstackHost.getBackstack().restoreViewFromState(view);
     }
 
     /**
@@ -517,7 +504,7 @@ public class Navigator {
             throw new NullPointerException("key cannot be null");
         }
         BackstackHost backstackHost = getBackstackHost(context);
-        return backstackHost.getBackstackManager().getSavedState(key);
+        return backstackHost.getBackstack().getSavedState(key);
     }
 
     /**

@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.Backstack;
-import com.zhuinden.simplestack.BackstackManager;
 import com.zhuinden.simplestack.GlobalServices;
 import com.zhuinden.simplestack.KeyFilter;
 import com.zhuinden.simplestack.KeyParceler;
@@ -46,14 +45,14 @@ public final class BackstackHost
     StateChanger stateChanger;
     KeyFilter keyFilter;
     KeyParceler keyParceler;
-    BackstackManager.StateClearStrategy stateClearStrategy;
+    Backstack.StateClearStrategy stateClearStrategy;
     ScopedServices scopedServices;
     GlobalServices globalServices;
     List<Backstack.CompletionListener> stateChangeCompletionListeners;
 
     boolean shouldPersistContainerChild;
 
-    BackstackManager backstackManager;
+    Backstack backstack;
 
     List<?> initialKeys = Collections.emptyList(); // should not stay empty list
     ViewGroup container;
@@ -67,29 +66,29 @@ public final class BackstackHost
     }
 
     Backstack initialize(boolean isInitializeDeferred) {
-        if(backstackManager == null) {
-            backstackManager = new BackstackManager();
-            backstackManager.setKeyFilter(keyFilter);
-            backstackManager.setKeyParceler(keyParceler);
-            backstackManager.setStateClearStrategy(stateClearStrategy);
+        if(backstack == null) {
+            backstack = new Backstack();
+            backstack.setKeyFilter(keyFilter);
+            backstack.setKeyParceler(keyParceler);
+            backstack.setStateClearStrategy(stateClearStrategy);
             if(scopedServices != null) {
-                backstackManager.setScopedServices(scopedServices);
+                backstack.setScopedServices(scopedServices);
             }
             if(globalServices != null) {
-                backstackManager.setGlobalServices(globalServices);
+                backstack.setGlobalServices(globalServices);
             }
-            backstackManager.setup(initialKeys);
+            backstack.setup(initialKeys);
             for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
-                backstackManager.addStateChangeCompletionListener(completionListener);
+                backstack.addStateChangeCompletionListener(completionListener);
             }
             if(savedInstanceState != null) {
-                backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable("NAVIGATOR_STATE_BUNDLE"));
+                backstack.fromBundle(savedInstanceState.<StateBundle>getParcelable("NAVIGATOR_STATE_BUNDLE"));
             }
         }
         if(!isInitializeDeferred) {
-            backstackManager.setStateChanger(stateChanger);
+            backstack.setStateChanger(stateChanger);
         }
-        return backstackManager.getBackstack();
+        return backstack;
     }
 
     @Override
@@ -98,24 +97,24 @@ public final class BackstackHost
         if(shouldPersistContainerChild) {
             Navigator.persistViewToState(container.getChildAt(0));
         }
-        outState.putParcelable("NAVIGATOR_STATE_BUNDLE", backstackManager.toBundle());
+        outState.putParcelable("NAVIGATOR_STATE_BUNDLE", backstack.toBundle());
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        backstackManager.reattachStateChanger();
+        backstack.reattachStateChanger();
     }
 
     @Override
     public void onPause() {
-        backstackManager.detachStateChanger();
+        backstack.detachStateChanger();
         super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        backstackManager.getBackstack().executePendingStateChange();
+        backstack.executePendingStateChange();
 
         stateChanger = null;
         container = null;
@@ -125,14 +124,10 @@ public final class BackstackHost
     @Override
     public void onDestroy() {
         super.onDestroy();
-        backstackManager.finalizeScopes();
+        backstack.finalizeScopes();
     }
 
     public Backstack getBackstack() {
-        return backstackManager.getBackstack();
-    }
-
-    public BackstackManager getBackstackManager() {
-        return backstackManager;
+        return backstack;
     }
 }

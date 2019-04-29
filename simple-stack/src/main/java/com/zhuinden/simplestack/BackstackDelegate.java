@@ -35,7 +35,7 @@ import java.util.List;
  * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
 public class BackstackDelegate {
-    private BackstackManager backstackManager;
+    private Backstack backstack;
 
     private static final String UNINITIALIZED = "";
     private String persistenceTag = UNINITIALIZED;
@@ -50,7 +50,7 @@ public class BackstackDelegate {
      * @param keyFilter The custom {@link KeyFilter}.
      */
     public void setKeyFilter(@NonNull KeyFilter keyFilter) {
-        if(backstackManager != null && backstackManager.getBackstack() != null) {
+        if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If set, key filter must be set before calling `onCreate()`");
         }
         if(keyFilter == null) {
@@ -67,7 +67,7 @@ public class BackstackDelegate {
      * @param keyParceler The custom {@link KeyParceler}.
      */
     public void setKeyParceler(@NonNull KeyParceler keyParceler) {
-        if(backstackManager != null && backstackManager.getBackstack() != null) {
+        if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If set, key parceler must set before calling `onCreate()`");
         }
         if(keyParceler == null) {
@@ -77,15 +77,15 @@ public class BackstackDelegate {
     }
 
     /**
-     * Specifies a custom {@link BackstackManager.StateClearStrategy}, allowing a custom way of retaining saved state.
+     * Specifies a custom {@link Backstack.StateClearStrategy}, allowing a custom way of retaining saved state.
      * The {@link DefaultStateClearStrategy} clears saved state for keys not found in the new state.
      *
      * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
-     * @param stateClearStrategy The custom {@link BackstackManager.StateClearStrategy}.
+     * @param stateClearStrategy The custom {@link Backstack.StateClearStrategy}.
      */
-    public void setStateClearStrategy(@NonNull BackstackManager.StateClearStrategy stateClearStrategy) {
-        if(backstackManager != null && backstackManager.getBackstack() != null) {
+    public void setStateClearStrategy(@NonNull Backstack.StateClearStrategy stateClearStrategy) {
+        if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If set, state clear strategy must be set before calling `onCreate()`");
         }
         if(stateClearStrategy == null) {
@@ -108,7 +108,7 @@ public class BackstackDelegate {
         if(scopedServices == null) {
             throw new IllegalArgumentException("Specified scoped services should not be null!");
         }
-        if(!activityWasDestroyed && (backstackManager != null && backstackManager.getBackstack() != null)) {
+        if(!activityWasDestroyed && (backstack != null && backstack.isInitialized())) {
             throw new IllegalStateException("If set, scoped services must set before calling `onCreate()`");
         }
         activityWasDestroyed = false;
@@ -129,7 +129,7 @@ public class BackstackDelegate {
         if(globalServices == null) {
             throw new IllegalArgumentException("Specified global services should not be null!");
         }
-        if(!activityWasDestroyed && (backstackManager != null && backstackManager.getBackstack() != null)) {
+        if(!activityWasDestroyed && (backstack != null && backstack.isInitialized())) {
             throw new IllegalStateException("If set, global services must set before calling `onCreate()`");
         }
         activityWasDestroyed = false;
@@ -147,7 +147,7 @@ public class BackstackDelegate {
      * @param stateChangeCompletionListener the state change completion listener
      */
     public void addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
-        if(backstackManager != null && backstackManager.getBackstack() != null) {
+        if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If adding, completion listener must be added before calling `onCreate()`");
         }
         if(stateChangeCompletionListener == null) {
@@ -166,7 +166,7 @@ public class BackstackDelegate {
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private ScopedServices scopedServices = null;
     private GlobalServices globalServices = null;
-    private BackstackManager.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
+    private Backstack.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
     private List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
     /**
@@ -179,7 +179,7 @@ public class BackstackDelegate {
      */
     @SuppressWarnings("StringEquality")
     public void setPersistenceTag(@NonNull String persistenceTag) {
-        if(backstackManager != null && backstackManager.getBackstack() != null) {
+        if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("Persistence tag should be set before calling `onCreate()`");
         }
         if(persistenceTag == null) {
@@ -234,7 +234,7 @@ public class BackstackDelegate {
         if(activity == null) {
             throw new NullPointerException("Activity is null");
         }
-        @SuppressWarnings("unused") BackstackManager backstackManager = getManager();
+        @SuppressWarnings("unused") Backstack backstack = getBackstack();
         final Application application = activity.getApplication();
         application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
@@ -304,28 +304,28 @@ public class BackstackDelegate {
         }
         NonConfigurationInstance nonConfig = (NonConfigurationInstance) nonConfigurationInstance;
         if(nonConfig != null) {
-            backstackManager = nonConfig.getBackstackManager();
+            backstack = nonConfig.getBackstack();
         }
-        if(backstackManager == null) {
-            backstackManager = new BackstackManager();
-            backstackManager.setKeyFilter(keyFilter);
-            backstackManager.setKeyParceler(keyParceler);
-            backstackManager.setStateClearStrategy(stateClearStrategy);
+        if(backstack == null) {
+            backstack = new Backstack();
+            backstack.setKeyFilter(keyFilter);
+            backstack.setKeyParceler(keyParceler);
+            backstack.setStateClearStrategy(stateClearStrategy);
             if(scopedServices != null) {
-                backstackManager.setScopedServices(scopedServices);
+                backstack.setScopedServices(scopedServices);
             }
             if(globalServices != null) {
-                backstackManager.setGlobalServices(globalServices);
+                backstack.setGlobalServices(globalServices);
             }
-            backstackManager.setup(initialKeys);
+            backstack.setup(initialKeys);
             for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {
-                backstackManager.addStateChangeCompletionListener(completionListener);
+                backstack.addStateChangeCompletionListener(completionListener);
             }
             if(savedInstanceState != null) {
-                backstackManager.fromBundle(savedInstanceState.<StateBundle>getParcelable(getHistoryTag()));
+                backstack.fromBundle(savedInstanceState.<StateBundle>getParcelable(getHistoryTag()));
             }
         }
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
     }
 
     /**
@@ -336,8 +336,8 @@ public class BackstackDelegate {
      */
     public void setStateChanger(@Nullable StateChanger stateChanger) {
         this.stateChanger = stateChanger;
-        if(backstackManager != null) { // allowed before `onCreate()`
-            backstackManager.setStateChanger(stateChanger);
+        if(backstack != null) { // allowed before `onCreate()`
+            backstack.setStateChanger(stateChanger);
         }
     }
 
@@ -345,10 +345,10 @@ public class BackstackDelegate {
      * The onRetainCustomNonConfigurationInstance() delegate for the Activity.
      * This is required to make sure that the Backstack survives configuration change.
      *
-     * @return a {@link NonConfigurationInstance} that contains the internal {@link BackstackManager}.
+     * @return a {@link NonConfigurationInstance} that contains the internal {@link Backstack}.
      */
     public NonConfigurationInstance onRetainCustomNonConfigurationInstance() {
-        return new NonConfigurationInstance(backstackManager);
+        return new NonConfigurationInstance(backstack);
     }
 
     /**
@@ -369,8 +369,8 @@ public class BackstackDelegate {
      * @param outState the Bundle into which the backstack history and view states are saved.
      */
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        BackstackManager backstackManager = getManager(); // assertion!
-        outState.putParcelable(getHistoryTag(), backstackManager.toBundle());
+        Backstack backstack = getBackstack(); // assertion!
+        outState.putParcelable(getHistoryTag(), backstack.toBundle());
     }
 
     /**
@@ -381,7 +381,7 @@ public class BackstackDelegate {
         if(stateChanger == null) {
             throw new IllegalStateException("State changer is still not set in `onPostResume`!");
         }
-        getManager().reattachStateChanger();
+        getBackstack().reattachStateChanger();
     }
 
     /**
@@ -389,7 +389,7 @@ public class BackstackDelegate {
      * It removes the {@link StateChanger} if it is set.
      */
     public void onPause() {
-        getManager().detachStateChanger();
+        getBackstack().detachStateChanger();
     }
 
     /**
@@ -407,22 +407,9 @@ public class BackstackDelegate {
 
         //noinspection ConstantConditions
         if(activity == null || (activity != null && activity.isFinishing())) {
-            getManager().finalizeScopes();
+            getBackstack().finalizeScopes();
         }
         activity = null;
-    }
-
-    // ----- get backstack
-
-    /**
-     * Returns the {@link Backstack} that belongs to this delegate.
-     * This method can only be invoked after {@link BackstackDelegate#onCreate(Bundle, Object, List)} has been called.
-     *
-     * @return the {@link Backstack} managed by this delegate.
-     */
-    @NonNull
-    public Backstack getBackstack() {
-        return getManager().getBackstack();
     }
 
     // ----- viewstate persistence
@@ -433,7 +420,7 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void persistViewToState(@Nullable View view) {
-        getManager().persistViewToState(view);
+        getBackstack().persistViewToState(view);
     }
 
     /**
@@ -442,7 +429,7 @@ public class BackstackDelegate {
      * @param view the view that belongs to a certain key
      */
     public void restoreViewFromState(@NonNull View view) {
-        getManager().restoreViewFromState(view);
+        getBackstack().restoreViewFromState(view);
     }
 
     /**
@@ -454,7 +441,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public SavedState getSavedState(@NonNull Object key) {
-        return getManager().getSavedState(key);
+        return getBackstack().getSavedState(key);
     }
 
     /**
@@ -465,7 +452,7 @@ public class BackstackDelegate {
      * @return whether the scope exists
      */
     public boolean hasScope(@NonNull String scopeTag) {
-        return getManager().hasScope(scopeTag);
+        return getBackstack().hasScope(scopeTag);
     }
 
     /**
@@ -476,7 +463,7 @@ public class BackstackDelegate {
      * @return whether the service is bound in the given scope
      */
     public boolean hasService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
-        return getManager().hasService(scopeKey, serviceTag);
+        return getBackstack().hasService(scopeKey, serviceTag);
     }
 
     /**
@@ -487,7 +474,7 @@ public class BackstackDelegate {
      * @return whether the service is bound in the given scope
      */
     public boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager().hasService(scopeTag, serviceTag);
+        return getBackstack().hasService(scopeTag, serviceTag);
     }
 
     /**
@@ -500,7 +487,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public <T> T getService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
-        return getManager().getService(scopeKey, serviceTag);
+        return getBackstack().getService(scopeKey, serviceTag);
     }
 
     /**
@@ -513,7 +500,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager().getService(scopeTag, serviceTag);
+        return getBackstack().getService(scopeTag, serviceTag);
     }
 
     /**
@@ -524,7 +511,7 @@ public class BackstackDelegate {
      * @return whether the service exists in any active scopes
      */
     public boolean canFindService(@NonNull String serviceTag) {
-        return getManager().canFindService(serviceTag);
+        return getBackstack().canFindService(serviceTag);
     }
 
     /**
@@ -538,7 +525,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public <T> T lookupService(@NonNull String serviceTag) {
-        return getManager().lookupService(serviceTag);
+        return getBackstack().lookupService(serviceTag);
     }
 
     /**
@@ -552,7 +539,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public List<String> findScopesForKey(@NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
-        return getManager().findScopesForKey(key, lookupMode);
+        return getBackstack().findScopesForKey(key, lookupMode);
     }
 
     /**
@@ -564,7 +551,7 @@ public class BackstackDelegate {
      * @return whether the service exists in any of the accessed scopes
      */
     public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager().canFindFromScope(scopeTag, serviceTag);
+        return getBackstack().canFindFromScope(scopeTag, serviceTag);
     }
 
     /**
@@ -578,7 +565,7 @@ public class BackstackDelegate {
      * @return whether the service exists in any scopes from the current scope or its parents
      */
     public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
-        return getManager().canFindFromScope(scopeTag, serviceTag, lookupMode);
+        return getBackstack().canFindFromScope(scopeTag, serviceTag, lookupMode);
     }
 
     /**
@@ -593,7 +580,7 @@ public class BackstackDelegate {
      */
     @NonNull
     public <T> T lookupFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
-        return getManager().lookupFromScope(scopeTag, serviceTag);
+        return getBackstack().lookupFromScope(scopeTag, serviceTag);
     }
 
     /**
@@ -608,34 +595,35 @@ public class BackstackDelegate {
      */
     @NonNull
     public <T> T lookupFromScope(@NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
-        return getManager().lookupFromScope(scopeTag, serviceTag, lookupMode);
+        return getBackstack().lookupFromScope(scopeTag, serviceTag, lookupMode);
     }
 
     /**
-     * Returns the {@link BackstackManager}. If called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}, it throws an exception.
+     * Returns the {@link Backstack} that belongs to this delegate.
+     * This method can only be invoked after {@link BackstackDelegate#onCreate(Bundle, Object, List)} has been called.
      *
-     * @return the backstack manager
+     * @return the {@link Backstack} managed by this delegate.
      */
     @NonNull
-    public BackstackManager getManager() {
-        if(backstackManager == null) {
+    public Backstack getBackstack() {
+        if(backstack == null) {
             throw new IllegalStateException("This method can only be called after calling `onCreate()`");
         }
-        return backstackManager;
+        return backstack;
     }
 
     /**
-     * The class which stores the {@link BackstackManager} for surviving configuration change.
+     * The class which stores the {@link Backstack} for surviving configuration change.
      */
     public static class NonConfigurationInstance {
-        private BackstackManager backstackManager;
+        private Backstack backstack;
 
-        NonConfigurationInstance(BackstackManager backstackManager) {
-            this.backstackManager = backstackManager;
+        NonConfigurationInstance(Backstack backstack) {
+            this.backstack = backstack;
         }
 
-        BackstackManager getBackstackManager() {
-            return backstackManager;
+        Backstack getBackstack() {
+            return backstack;
         }
     }
 }
