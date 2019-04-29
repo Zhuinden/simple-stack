@@ -275,15 +275,15 @@ public class ScopingRegisteredCallbackTest {
             public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("service1", service1);
+                serviceBinder.addService("service1", service1);
 
-                serviceBinder.add("serviceShared12", serviceShared12);
-                serviceBinder.add("serviceShared13", serviceShared13);
-                serviceBinder.add("serviceShared123", serviceShared123);
-                serviceBinder.add("serviceShared1P1", serviceShared1P1);
-                serviceBinder.add("serviceShared1P2", serviceShared1P2);
-                serviceBinder.add("serviceShared1P3", serviceShared1P3);
-                serviceBinder.add("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
+                serviceBinder.addService("serviceShared12", serviceShared12);
+                serviceBinder.addService("serviceShared13", serviceShared13);
+                serviceBinder.addService("serviceShared123", serviceShared123);
+                serviceBinder.addService("serviceShared1P1", serviceShared1P1);
+                serviceBinder.addService("serviceShared1P2", serviceShared1P2);
+                serviceBinder.addService("serviceShared1P3", serviceShared1P3);
+                serviceBinder.addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
             }
         };
 
@@ -320,32 +320,32 @@ public class ScopingRegisteredCallbackTest {
             @Override
             void bindParentServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("serviceP1", serviceP1);
-                    serviceBinder.add("serviceShared1P1", serviceShared1P1);
-                    serviceBinder.add("serviceShared2P1", serviceShared2P1);
-                    serviceBinder.add("serviceShared3P1", serviceShared3P1);
-                    serviceBinder.add("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
+                    serviceBinder.addService("serviceP1", serviceP1);
+                    serviceBinder.addService("serviceShared1P1", serviceShared1P1);
+                    serviceBinder.addService("serviceShared2P1", serviceShared2P1);
+                    serviceBinder.addService("serviceShared3P1", serviceShared3P1);
+                    serviceBinder.addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
                 }
                 if("parent2".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("serviceP2", serviceP2);
-                    serviceBinder.add("serviceShared1P2", serviceShared1P2);
-                    serviceBinder.add("serviceShared2P2", serviceShared2P2);
-                    serviceBinder.add("serviceShared3P2", serviceShared3P2);
-                    serviceBinder.add("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
+                    serviceBinder.addService("serviceP2", serviceP2);
+                    serviceBinder.addService("serviceShared1P2", serviceShared1P2);
+                    serviceBinder.addService("serviceShared2P2", serviceShared2P2);
+                    serviceBinder.addService("serviceShared3P2", serviceShared3P2);
+                    serviceBinder.addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
                 }
             }
 
             @Override
             void bindOwnServices(ServiceBinder serviceBinder) {
-                serviceBinder.add("service2", service2);
+                serviceBinder.addService("service2", service2);
 
-                serviceBinder.add("serviceShared12", serviceShared12);
-                serviceBinder.add("serviceShared23", serviceShared23);
-                serviceBinder.add("serviceShared123", serviceShared123);
-                serviceBinder.add("serviceShared2P1", serviceShared2P1);
-                serviceBinder.add("serviceShared2P2", serviceShared2P2);
-                serviceBinder.add("serviceShared2P3", serviceShared2P3);
-                serviceBinder.add("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
+                serviceBinder.addService("serviceShared12", serviceShared12);
+                serviceBinder.addService("serviceShared23", serviceShared23);
+                serviceBinder.addService("serviceShared123", serviceShared123);
+                serviceBinder.addService("serviceShared2P1", serviceShared2P1);
+                serviceBinder.addService("serviceShared2P2", serviceShared2P2);
+                serviceBinder.addService("serviceShared2P3", serviceShared2P3);
+                serviceBinder.addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
             }
         };
 
@@ -359,32 +359,32 @@ public class ScopingRegisteredCallbackTest {
             @Override
             void bindParentServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("serviceP1", serviceP1);
-                    serviceBinder.add("serviceShared1P1", serviceShared1P1);
-                    serviceBinder.add("serviceShared2P1", serviceShared2P1);
-                    serviceBinder.add("serviceShared3P1", serviceShared3P1);
-                    serviceBinder.add("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
+                    serviceBinder.addService("serviceP1", serviceP1);
+                    serviceBinder.addService("serviceShared1P1", serviceShared1P1);
+                    serviceBinder.addService("serviceShared2P1", serviceShared2P1);
+                    serviceBinder.addService("serviceShared3P1", serviceShared3P1);
+                    serviceBinder.addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
                 }
                 if("parent3".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("serviceP3", serviceP3);
-                    serviceBinder.add("serviceShared1P3", serviceShared1P3);
-                    serviceBinder.add("serviceShared2P3", serviceShared2P3);
-                    serviceBinder.add("serviceShared3P3", serviceShared3P3);
-                    serviceBinder.add("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
+                    serviceBinder.addService("serviceP3", serviceP3);
+                    serviceBinder.addService("serviceShared1P3", serviceShared1P3);
+                    serviceBinder.addService("serviceShared2P3", serviceShared2P3);
+                    serviceBinder.addService("serviceShared3P3", serviceShared3P3);
+                    serviceBinder.addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
                 }
             }
 
             @Override
             void bindOwnServices(ServiceBinder serviceBinder) {
-                serviceBinder.add("service3", service3);
+                serviceBinder.addService("service3", service3);
 
-                serviceBinder.add("serviceShared13", serviceShared13);
-                serviceBinder.add("serviceShared23", serviceShared23);
-                serviceBinder.add("serviceShared123", serviceShared123);
-                serviceBinder.add("serviceShared3P1", serviceShared3P1);
-                serviceBinder.add("serviceShared3P2", serviceShared3P2);
-                serviceBinder.add("serviceShared3P3", serviceShared3P3);
-                serviceBinder.add("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
+                serviceBinder.addService("serviceShared13", serviceShared13);
+                serviceBinder.addService("serviceShared23", serviceShared23);
+                serviceBinder.addService("serviceShared123", serviceShared123);
+                serviceBinder.addService("serviceShared3P1", serviceShared3P1);
+                serviceBinder.addService("serviceShared3P2", serviceShared3P2);
+                serviceBinder.addService("serviceShared3P3", serviceShared3P3);
+                serviceBinder.addService("serviceShared0123P1P2P3", serviceShared0123P1P2P3);
             }
         };
 

@@ -7,7 +7,7 @@ class ScopeConfiguration : ScopedServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         when (serviceBinder.scopeTag) {
             WordScope.SCOPE_TAG -> {
-                serviceBinder.addService(WordController())
+                serviceBinder.add(WordController())
             }
         }
     }

@@ -15,7 +15,7 @@ data class StatisticsKey(val placeholder: String) : ViewKey, ServiceProvider.Has
     override fun getScopeTag(): String = " Statistics"
 
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.add(StatisticsView.CONTROLLER_TAG, Injector.get().statisticsPresenter())
+        serviceBinder.addService(StatisticsView.CONTROLLER_TAG, Injector.get().statisticsPresenter())
     }
 
     constructor() : this("")

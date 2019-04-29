@@ -25,7 +25,7 @@ public abstract class BaseKey<T>
 
     @Override
     public void bindServices(@NonNull ServiceBinder serviceBinder) {
-        serviceBinder.add(getViewModelTag(), newViewModel());
+        serviceBinder.addService(getViewModelTag(), newViewModel());
     }
 
     protected abstract boolean isFabVisible();

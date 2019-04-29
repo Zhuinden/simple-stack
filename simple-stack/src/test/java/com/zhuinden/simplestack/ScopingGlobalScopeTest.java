@@ -128,9 +128,9 @@ public class ScopingGlobalScopeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService1", parentService1);
+                    serviceBinder.addService("parentService1", parentService1);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service1", service1);
+                    serviceBinder.addService("service1", service1);
                 }
             }
 
@@ -161,9 +161,9 @@ public class ScopingGlobalScopeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent2".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService2", parentService2);
+                    serviceBinder.addService("parentService2", parentService2);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service2", service2);
+                    serviceBinder.addService("service2", service2);
                 }
             }
 
@@ -238,9 +238,9 @@ public class ScopingGlobalScopeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService1", parentService1);
+                    serviceBinder.addService("parentService1", parentService1);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service1", service1);
+                    serviceBinder.addService("service1", service1);
                 }
             }
 
@@ -271,9 +271,9 @@ public class ScopingGlobalScopeTest {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if("parent2".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("parentService2", parentService2);
+                    serviceBinder.addService("parentService2", parentService2);
                 } else if(name.equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("service2", service2);
+                    serviceBinder.addService("service2", service2);
                 }
             }
 
@@ -430,9 +430,9 @@ public class ScopingGlobalScopeTest {
             public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                serviceBinder.add("SERVICE2", service2);
-                serviceBinder.add("SERVICE3", service3);
+                serviceBinder.addService("SERVICE1", service1);
+                serviceBinder.addService("SERVICE2", service2);
+                serviceBinder.addService("SERVICE3", service3);
             }
         };
 
@@ -441,9 +441,9 @@ public class ScopingGlobalScopeTest {
             public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE4", service4);
-                serviceBinder.add("SERVICE5", service5);
-                serviceBinder.add("SERVICE6", service6);
+                serviceBinder.addService("SERVICE4", service4);
+                serviceBinder.addService("SERVICE5", service5);
+                serviceBinder.addService("SERVICE6", service6);
             }
         };
 
@@ -452,9 +452,9 @@ public class ScopingGlobalScopeTest {
             public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE7", service7);
-                serviceBinder.add("SERVICE8", service8);
-                serviceBinder.add("SERVICE9", service9);
+                serviceBinder.addService("SERVICE7", service7);
+                serviceBinder.addService("SERVICE8", service8);
+                serviceBinder.addService("SERVICE9", service9);
             }
         };
 
@@ -656,7 +656,7 @@ public class ScopingGlobalScopeTest {
             @Override
             public final void bindServices(ServiceBinder serviceBinder) {
                 if("explicitParentScope".equals(serviceBinder.getScopeTag())) {
-                    serviceBinder.add("explicitParentService", explicitParentService);
+                    serviceBinder.addService("explicitParentService", explicitParentService);
                 }
                 if(name.equals(serviceBinder.getScopeTag())) {
                     bindOwnServices(serviceBinder);
@@ -671,7 +671,7 @@ public class ScopingGlobalScopeTest {
             void bindOwnServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("implicitParentService", implicitParentService);
+                serviceBinder.addService("implicitParentService", implicitParentService);
             }
         };
 
@@ -680,7 +680,7 @@ public class ScopingGlobalScopeTest {
             void bindOwnServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("currentScopeService", currentScopeService);
+                serviceBinder.addService("currentScopeService", currentScopeService);
             }
         };
 

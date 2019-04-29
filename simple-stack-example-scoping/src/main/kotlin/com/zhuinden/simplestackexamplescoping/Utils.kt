@@ -40,8 +40,8 @@ inline fun <reified T> Fragment.canFind(serviceTag: String = T::class.java.name)
 
 inline fun <reified T> Fragment.lookup(serviceTag: String = T::class.java.name) = Navigator.lookupService<T>(requireContext(), serviceTag)
 
-inline fun <reified T> ServiceBinder.addService(service: T, serviceTag: String = T::class.java.name) {
-    add(serviceTag, service as Any)
+inline fun <reified T> ServiceBinder.add(service: T, serviceTag: String = T::class.java.name) {
+    addService(serviceTag, service as Any)
 }
 
 fun Context.showToast(text: String, duration: Int = Toast.LENGTH_LONG) {

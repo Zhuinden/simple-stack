@@ -16,7 +16,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class TaskDetailKey(val taskId: String) : BaseKey(), HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.add(TaskDetailFragment.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
+        serviceBinder.addService(TaskDetailFragment.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
     }
 
     override fun getScopeTag(): String = "TaskDetail[$taskId]"
