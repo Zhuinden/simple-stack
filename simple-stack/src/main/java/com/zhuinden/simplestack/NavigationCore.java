@@ -15,7 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.content.Context;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -30,25 +29,24 @@ import java.util.List;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * The {@link Backstack} holds the current state, in the form of a list of Objects.
+ * The {@link NavigationCore} holds the current state, in the form of a list of Objects.
  * It queues up {@link StateChange}s while a {@link StateChanger} is not available.
  * When a {@link StateChanger} is available, it attempts to execute the queued {@link StateChange}s.
- * A {@link StateChanger} can be either set to {@link Backstack#INITIALIZE}, or to {@link Backstack#REATTACH}.
- * {@link Backstack#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link Backstack#REATTACH} does not.
+ * A {@link StateChanger} can be either set to {@link NavigationCore#INITIALIZE}, or to {@link NavigationCore#REATTACH}.
+ * {@link NavigationCore#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link NavigationCore#REATTACH} does not.
+ *
+ * Please note that {@link StateChange#backstack()} can only return a {@link Backstack} if navigation occurs through {@link Backstack},
+ * because it must be set via {@link NavigationCore#setBackstack(Backstack)}.
  */
-public class Backstack {
-    public static <K> K getKey(@NonNull Context context) {
-        return KeyContextWrapper.getKey(context);
-    }
-
+class NavigationCore {
     //
     @Retention(SOURCE)
     @IntDef({INITIALIZE, REATTACH})
     private @interface StateChangerRegisterMode {
     }
 
-    public static final int INITIALIZE = 0;
-    public static final int REATTACH = 1;
+    static final int INITIALIZE = 0;
+    static final int REATTACH = 1;
     //
 
     private final List<Object> originalStack = new ArrayList<>();
@@ -61,14 +59,20 @@ public class Backstack {
 
     private StateChanger stateChanger;
 
+    private Backstack backstack;
+
+    void setBackstack(Backstack backstack) {
+        this.backstack = backstack;
+    }
+
     private final long threadId = Thread.currentThread().getId();
 
     /**
-     * Creates the Backstack with the provided initial keys.
+     * Creates the NavigationCore with the provided initial keys.
      *
      * @param initialKeys
      */
-    public Backstack(@NonNull Object... initialKeys) {
+    public NavigationCore(@NonNull Object... initialKeys) {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
@@ -77,11 +81,11 @@ public class Backstack {
     }
 
     /**
-     * Creates the Backstack with the provided initial keys.
+     * Creates the NavigationCore with the provided initial keys.
      *
      * @param initialKeys
      */
-    public Backstack(@NonNull List<?> initialKeys) {
+    public NavigationCore(@NonNull List<?> initialKeys) {
         if(initialKeys == null) {
             throw new NullPointerException("Initial key list should not be null");
         }
@@ -112,7 +116,7 @@ public class Backstack {
     }
 
     /**
-     * Sets a {@link StateChanger} with {@link Backstack#INITIALIZE} register mode.
+     * Sets a {@link StateChanger} with {@link NavigationCore#INITIALIZE} register mode.
      *
      * @param stateChanger the new {@link StateChanger}, which cannot be null.
      */
@@ -229,7 +233,7 @@ public class Backstack {
      * Going up occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param newKey the new key to go up to
-     * @param fallbackToBack specifies that if the key is found in the backstack, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
+     * @param fallbackToBack specifies that if the key is found in the NavigationCore, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
      */
     @MainThread
     public void goUp(@NonNull Object newKey, boolean fallbackToBack) {
@@ -256,7 +260,7 @@ public class Backstack {
     }
 
     /**
-     * Moves the provided new key to the top of the backstack.
+     * Moves the provided new key to the top of the NavigationCore.
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
      *
@@ -281,7 +285,7 @@ public class Backstack {
     }
 
     /**
-     * Moves the provided new key to the top of the backstack.
+     * Moves the provided new key to the top of the NavigationCore.
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
      *
@@ -295,7 +299,7 @@ public class Backstack {
     }
 
     /**
-     * Jumps to the root of the backstack.
+     * Jumps to the root of the NavigationCore.
      *
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
@@ -305,7 +309,7 @@ public class Backstack {
     }
 
     /**
-     * Jumps to the root of the backstack.
+     * Jumps to the root of the NavigationCore.
      *
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
@@ -342,7 +346,7 @@ public class Backstack {
      * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param parentChain the chain of parents, from oldest to newest.
-     * @param fallbackToBack determines that if the chain is fully found in the backstack, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
+     * @param fallbackToBack determines that if the chain is fully found in the NavigationCore, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
      */
     @MainThread
     public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
@@ -439,7 +443,7 @@ public class Backstack {
     }
 
     /**
-     * Immediately clears the backstack, it is NOT enqueued as a state change.
+     * Immediately clears the NavigationCore, it is NOT enqueued as a state change.
      *
      * If there are pending state changes, then it throws an exception.
      *
@@ -450,18 +454,6 @@ public class Backstack {
         assertCorrectThread();
         assertNoStateChange();
         resetBackstack();
-    }
-
-    /**
-     * Same as {@link Backstack#forceClear()}.
-     *
-     * You generally don't need to use this method.
-     *
-     * @deprecated The name `reset()` doesn't signal enough that it should not be used. If you need it, use {@link Backstack#forceClear()} instead, but you probably don't need it.
-     */
-    @Deprecated
-    public void reset() {
-        forceClear();
     }
 
     /**
@@ -482,7 +474,7 @@ public class Backstack {
     /**
      * Returns the root (first) element of this history, or null if the history is empty.
      *
-     * @throws IllegalStateException if the backstack history doesn't contain any elements yet.
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
      *
      * @param <K> the type of the key
      * @return the root (first) key
@@ -490,7 +482,7 @@ public class Backstack {
     @NonNull
     public <K> K root() {
         if(stack.isEmpty()) {
-            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized NavigationCore.");
         }
         // noinspection unchecked
         return (K) stack.get(0);
@@ -499,7 +491,7 @@ public class Backstack {
     /**
      * Returns the last element in the list, or null if the history is empty.
      *
-     * @throws IllegalStateException if the backstack history doesn't contain any elements yet.
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
      *
      * @param <K> the type of the key
      * @return the top key
@@ -507,7 +499,7 @@ public class Backstack {
     @NonNull
     public <K> K top() {
         if(stack.isEmpty()) {
-            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized NavigationCore.");
         }
         // noinspection unchecked
         return (K) stack.get(stack.size() - 1);
@@ -516,12 +508,12 @@ public class Backstack {
     /**
      * Returns the element indexed from the top.
      *
-     * Offset value `0` behaves the same as {@link Backstack#top()}, while `1` returns the one before it.
+     * Offset value `0` behaves the same as {@link NavigationCore#top()}, while `1` returns the one before it.
      * Negative indices are wrapped around, for example `-1` is the first element of the stack, `-2` the second, and so on.
      *
      * Accepted values are in range of [-size, size).
      *
-     * @throws IllegalStateException if the backstack history doesn't contain any elements yet.
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
      * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
      *
      * @param offset the offset from the top
@@ -532,7 +524,7 @@ public class Backstack {
     public <K> K fromTop(int offset) {
         int size = stack.size();
         if(size <= 0) {
-            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized NavigationCore.");
         }
         if(offset < -size || offset >= size) {
             throw new IllegalArgumentException("The provided offset value [" + offset + "] was out of range: [" + -size + "; " + size + ")");
@@ -562,7 +554,7 @@ public class Backstack {
     }
 
     /**
-     * Returns an unmodifiable list that contains the keys this backstack is initialized with.
+     * Returns an unmodifiable list that contains the keys this NavigationCore is initialized with.
      *
      * @return the list of keys used at first initialization
      */
@@ -626,7 +618,7 @@ public class Backstack {
         } else {
             previousState = new ArrayList<>(stack);
         }
-        final StateChange stateChange = new StateChange(this,
+        final StateChange stateChange = new StateChange(backstack,
                 Collections.unmodifiableList(previousState),
                 Collections.unmodifiableList(newHistory),
                 direction);
@@ -662,28 +654,14 @@ public class Backstack {
 
     // completion listeners
 
-    /**
-     * CompletionListener allows you to listen to when a StateChange has been completed.
-     * They are registered to the backstack with {@link Backstack#addCompletionListener(CompletionListener)}.
-     * They are unregistered from the backstack with {@link Backstack#removeCompletionListener(CompletionListener)} methods.
-     */
-    public interface CompletionListener {
-        /**
-         * Callback method that is called when a {@link StateChange} is complete.
-         *
-         * @param stateChange the state change that has been completed.
-         */
-        void stateChangeCompleted(@NonNull StateChange stateChange);
-    }
-
-    private LinkedList<CompletionListener> completionListeners = new LinkedList<>();
+    private LinkedList<Backstack.CompletionListener> completionListeners = new LinkedList<>();
 
     /**
      * Registers the {@link Backstack.CompletionListener}.
      *
      * @param completionListener The non-null completion listener to be registered.
      */
-    public void addCompletionListener(@NonNull CompletionListener completionListener) {
+    public void addCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be added!");
         }
@@ -698,7 +676,7 @@ public class Backstack {
      *
      * @param completionListener The non-null completion listener to be unregistered.
      */
-    public void removeCompletionListener(@NonNull CompletionListener completionListener) {
+    public void removeCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be removed!");
         }
@@ -716,7 +694,7 @@ public class Backstack {
     }
 
     private void notifyCompletionListeners(StateChange stateChange) {
-        for(CompletionListener completionListener : completionListeners) {
+        for(Backstack.CompletionListener completionListener : completionListeners) {
             completionListener.stateChangeCompleted(stateChange);
         }
     }
