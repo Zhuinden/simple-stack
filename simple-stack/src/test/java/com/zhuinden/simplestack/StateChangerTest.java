@@ -279,7 +279,7 @@ public class StateChangerTest {
 
     @Test
     public void stateChangeExposesBackstack() {
-        assertThat(testStateChanger.stateChange.backstack()).isSameAs(backstack);
+        assertThat(testStateChanger.stateChange.getBackstack()).isSameAs(backstack);
     }
 
     @Test

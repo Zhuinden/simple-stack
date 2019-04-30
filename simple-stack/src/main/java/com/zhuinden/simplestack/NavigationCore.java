@@ -35,7 +35,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * A {@link StateChanger} can be either set to {@link NavigationCore#INITIALIZE}, or to {@link NavigationCore#REATTACH}.
  * {@link NavigationCore#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link NavigationCore#REATTACH} does not.
  *
- * Please note that {@link StateChange#backstack()} can only return a {@link Backstack} if navigation occurs through {@link Backstack},
+ * Please note that {@link StateChange#getBackstack()} can only return a {@link Backstack} if navigation occurs through {@link Backstack},
  * because it must be set via {@link NavigationCore#setBackstack(Backstack)}.
  */
 class NavigationCore {

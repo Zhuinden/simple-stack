@@ -3,7 +3,7 @@ package com.zhuinden.simplestack;
 import android.support.annotation.NonNull;
 
 /**
- * Scoped Services allow binding services to a given scope. Scopes are identified by a "scope tag" defined by a {@link ScopeKey}.
+ * {@link ScopedServices} allow binding services to a given scope. Scopes are identified by a "scope tag" defined by a {@link ScopeKey}.
  *
  * For each scope, the services are bound to that scope only when that scope is first created. Otherwise, they survive configuration change, and are shared between keys that belong to the same scope.
  *

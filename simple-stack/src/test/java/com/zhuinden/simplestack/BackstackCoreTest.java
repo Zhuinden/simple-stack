@@ -958,9 +958,9 @@ public class BackstackCoreTest {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 if(stateChange.getPreviousKeys().isEmpty()) {
-                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topNewKey());
+                    assertThat(stateChange.getBackstack().top()).isSameAs(stateChange.topNewKey());
                 } else {
-                    assertThat(stateChange.backstack().top()).isSameAs(stateChange.topPreviousKey());
+                    assertThat(stateChange.getBackstack().top()).isSameAs(stateChange.topPreviousKey());
                 }
                 completionCallback.stateChangeComplete();
             }
@@ -997,9 +997,9 @@ public class BackstackCoreTest {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 if(stateChange.getPreviousKeys().isEmpty()) {
-                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getNewKeys().get(0));
+                    assertThat(stateChange.getBackstack().root()).isSameAs(stateChange.getNewKeys().get(0));
                 } else {
-                    assertThat(stateChange.backstack().root()).isSameAs(stateChange.getPreviousKeys().get(0));
+                    assertThat(stateChange.getBackstack().root()).isSameAs(stateChange.getPreviousKeys().get(0));
                 }
                 completionCallback.stateChangeComplete();
             }
@@ -1196,7 +1196,7 @@ public class BackstackCoreTest {
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                List<?> history = stateChange.backstack().getHistory();
+                List<?> history = stateChange.getBackstack().getHistory();
                 if(stateChange.getPreviousKeys().isEmpty()) {
                     if(!history.isEmpty()) {
                         assertThat(history).containsExactlyElementsOf(stateChange.getNewKeys());

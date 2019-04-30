@@ -57,7 +57,7 @@ public class StateChange {
      * @return the backstack
      */
     @NonNull
-    public Backstack backstack() {
+    public Backstack getBackstack() {
         return backstack;
     }
 
