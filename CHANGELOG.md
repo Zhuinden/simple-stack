@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 2.0.0 (2019-??-??)
+-Simple Stack 2.0.0 (2019-04-30)
 --------------------------------
 
 **MAJOR API BREAKING CHANGES!** To create better consistency and naming, certain core APIs were renamed, moved around, restructured, etc.
