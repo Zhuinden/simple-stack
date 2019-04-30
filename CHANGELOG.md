@@ -1,5 +1,75 @@
 # Change log
 
+-Simple Stack 2.0.0 (2019-??-??)
+--------------------------------
+
+**MAJOR API BREAKING CHANGES!** To create better consistency and naming, certain core APIs were renamed, moved around, restructured, etc.
+
+This means that 1.x and 2.x shouldn't be used in a project at the same time, because they're not compatible.
+
+- BREAKING CHANGE: `BackstackManager` is now `Backstack`.
+
+What was called `Backstack` is now called `NavigationCore` and is an internal class (not part of public API).
+
+(!) This also means that the `new Backstack(List<?>)` constructor is replaced with `new Backstack(); backstack.setup(List<?>)`.
+
+All sane public APIs of NavigationCore were moved over to the new Backstack (think navigation-related ones).
+
+This means that wherever you used to receive a `Backstack`, now you still receive a "Backstack", but it has additional functionality (such as `lookupService`).
+
+As a result, the following methods no longer exist:
+
+  - `BackstackDelegate.getManager()` is removed
+
+  - `Navigator.getManager()` is removed
+
+  - `ServiceBinder.getManager()` is removed
+
+With that, `StateChange.getBackstack()` now returns what was previously the `BackstackManager`, allowing access to scope-related functions.
+
+- BREAKING CHANGE: `ScopedServices.Scoped` is removed, and completely replaced with `ScopedServices.Registered`.
+
+- BREAKING CHANGE: `ScopedServices.Activated` behavior change, now only called once rather than multiple times if the service is in an active explicit parent chain.
+
+  - `onScopeActive()/onScopeInactive()` -> `onServiceActive()`/`onServiceInactive()`.
+
+Previously, you could get multiple callbacks to `onScopeActive` per each activated scope the service was in, now it is tracked per service instead and only called for `0->1` and `1->0`.
+
+- BREAKING CHANGE: `setShouldPersistContainerChild(true)` was the default, now it is default to `false`. It's only `true` by default if the `DefaultStateChanger` is used.
+
+If you use a custom-view-based setup and a custom state changer, please make sure to set `Navigator.configure().setShouldPersistContainerChild(true).install(...)`.
+
+- BREAKING CHANGE: `ScopedServices.ServiceBinder` is now moved to top-level, now accessible as `ServiceBinder`.
+
+- BREAKING CHANGE: `ViewChangeHandler.CompletionCallback` renamed to `ViewChangeHandler.ViewChangeCallback`.
+
+- BREAKING CHANGE: `StateKey` is renamed to `DefaultViewKey`.
+
+- BREAKING CHANGE: `HistoryBuilder` is now `History.Builder`. The deprecated `HistoryBuilder` factory methods were removed.
+
+- BREAKING CHANGE:
+
+  - `StateChange.getPreviousState()` -> `StateChange.getPreviousKeys()`
+  - `StateChange.getNewState()` -> `StateChange.getNewKeys()`
+  - `StateChange.topPreviousState()` -> `StateChange.topPreviousKey()`
+  - `StateChange.topNewState()` -> `StateChange.topNewKey()`
+  - `StateChange.isTopNewStateEqualToPrevious()` -> `StateChange.isTopNewKeyEqualToPrevious()`
+
+- BREAKING CHANGE: `StateChange.backstack()` -> `StateChange.getBackstack()`.
+
+- BREAKING CHANGE: ServiceBinder method renaming for sake of consistency.
+
+  - `ServiceBinder.add()` -> `ServiceBinder.addService()`
+  - `ServiceBinder.has()` -> `ServiceBinder.hasService()`
+  - `ServiceBinder.get()` -> `ServiceBinder.getService()`
+  - `ServiceBinder.canFind()` -> `ServiceBinder.canFindService()`
+  - `ServiceBinder.lookup()` -> `ServiceBinder.lookupService()`
+  - `ServiceBinder.canFindFrom()` -> `ServiceBinder.canFindFromScope()`
+  - `ServiceBinder.lookUpFrom()` -> `ServiceBinder.lookupFromScope()`
+
+- CHANGE/FIX: Added missing `@NonNull` annotation on `KeyContextWrapper.getKey()`. Now throws exception if the key is not found (previously returned null).
+
+
 -Simple Stack 1.14.1 (2019-04-26)
 --------------------------------
 

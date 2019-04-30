@@ -24,6 +24,8 @@ import com.zhuinden.statebundle.StateBundle;
  * Specifies the ability to persist the state of the object to a StateBundle.
  *
  * This is used by the root custom view, and also to persist the state of scoped services.
+ *
+ * The {@link Backstack} is also marked as {@link Bundleable}.
  */
 public interface Bundleable {
     @NonNull
