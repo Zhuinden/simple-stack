@@ -1,6 +1,7 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.core.navigation
 
 import android.support.v4.app.Fragment
+import com.zhuinden.simplestackexamplescoping.utils.requireArguments
 
 /**
  * Created by Zhuinden on 2018.09.17.

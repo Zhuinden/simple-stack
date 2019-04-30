@@ -1,14 +1,13 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.core.scoping
 
 import com.zhuinden.simplestack.ScopedServices
 import com.zhuinden.simplestack.ServiceBinder
 
 class ScopeConfiguration : ScopedServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
-        when (serviceBinder.scopeTag) {
-            WordScope.SCOPE_TAG -> {
-                serviceBinder.add(WordController())
-            }
+        val key = serviceBinder.getKey<Any>()
+        if (key is HasServices) {
+            key.bindServices(serviceBinder)
         }
     }
 }

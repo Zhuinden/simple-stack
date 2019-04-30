@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.utils
 
 import android.content.Context
 import android.support.annotation.LayoutRes

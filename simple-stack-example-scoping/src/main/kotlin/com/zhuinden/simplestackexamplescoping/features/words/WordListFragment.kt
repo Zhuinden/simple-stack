@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.features.words
 
 import android.arch.lifecycle.Observer
 import android.os.Bundle
@@ -6,6 +6,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.zhuinden.simplestackexamplescoping.R
+import com.zhuinden.simplestackexamplescoping.core.navigation.BaseFragment
+import com.zhuinden.simplestackexamplescoping.utils.*
 import kotlinx.android.synthetic.main.word_list_view.*
 
 /**
