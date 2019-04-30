@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemoexamplefragments.features.statistics
 
 import android.support.v4.app.Fragment
 import android.view.View
-import com.zhuinden.simplestack.ScopedServices
+import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
@@ -14,8 +14,8 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class StatisticsKey(val placeholder: String = "") : BaseKey(), HasServices {
-    override fun bindServices(serviceBinder: ScopedServices.ServiceBinder) {
-        serviceBinder.add(StatisticsFragment.CONTROLLER_TAG, Injector.get().statisticsPresenter())
+    override fun bindServices(serviceBinder: ServiceBinder) {
+        serviceBinder.addService(StatisticsFragment.CONTROLLER_TAG, Injector.get().statisticsPresenter())
     }
 
     override fun getScopeTag(): String = "Statistics"

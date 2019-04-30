@@ -58,7 +58,7 @@ public class FlowTest {
             implements StateChanger {
         @Override
         public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback callback) {
-            lastStack = stateChange.getNewState();
+            lastStack = stateChange.getNewKeys();
             lastDirection = stateChange.getDirection();
             callback.stateChangeComplete();
         }
@@ -72,7 +72,8 @@ public class FlowTest {
     @Test
     public void oneTwoThree() {
         History<?> history = History.single(new Uno());
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
 
         flow.goTo(new Dos());
@@ -100,9 +101,10 @@ public class FlowTest {
 
         class Ourrobouros
                 implements StateChanger {
-            Backstack flow = new Backstack(firstHistory);
+            Backstack flow = new Backstack();
 
             {
+                flow.setup(firstHistory);
                 flow.setStateChanger(this);
             }
 
@@ -126,7 +128,8 @@ public class FlowTest {
         History<?> history = History.from(Arrays.asList(able, baker, charlie));
         assertThat(history.size()).isEqualTo(3);
 
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
 
         assertThat(flow.goBack()).isTrue();
@@ -141,9 +144,10 @@ public class FlowTest {
     @Test
     public void setHistoryWorks() {
         History<?> history = History.from(Arrays.asList(able, baker));
-        Backstack flow = new Backstack(history);
-        FlowDispatcher handleStateChangeer = new FlowDispatcher();
-        flow.setStateChanger(handleStateChangeer);
+        Backstack flow = new Backstack();
+        flow.setup(history);
+        FlowDispatcher stateChanger = new FlowDispatcher();
+        flow.setStateChanger(stateChanger);
 
         History<?> newHistory = History.from(Arrays.asList(charlie, delta));
         flow.setHistory(newHistory, StateChange.FORWARD);
@@ -157,7 +161,8 @@ public class FlowTest {
     @Test
     public void setObjectGoesBack() {
         History<?> history = History.from(Arrays.asList(able, baker, charlie, delta));
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
 
         assertThat(history.size()).isEqualTo(4);
@@ -181,7 +186,8 @@ public class FlowTest {
     @Test
     public void setObjectToMissingObjectPushes() {
         History<?> history = History.from(Arrays.asList(able, baker));
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(2);
 
@@ -203,7 +209,8 @@ public class FlowTest {
     @Test
     public void setObjectKeepsOriginal() {
         History<?> history = History.from(Arrays.asList(able, baker));
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(2);
 
@@ -218,7 +225,8 @@ public class FlowTest {
     @Test
     public void replaceHistoryResultsInLengthOneHistory() {
         History<?> history = History.from(Arrays.asList(able, baker, charlie));
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
 
@@ -233,11 +241,12 @@ public class FlowTest {
     @Test
     public void replaceTopDoesNotAlterHistoryLength() {
         History<?> history = History.from(Arrays.asList(able, baker, charlie));
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(3);
 
-        flow.setHistory(History.builderFrom(flow).removeLast().add(delta).build(), StateChange.REPLACE);
+        flow.replaceTop(delta, StateChange.REPLACE);
         assertThat(lastStack.top()).isEqualTo(new TestKey("Delta"));
         assertThat(lastStack.top() == delta).isTrue();
         assertThat(lastStack.top()).isSameAs(delta);
@@ -253,7 +262,8 @@ public class FlowTest {
         TestKey charlie = new TestKey("Charlie");
         TestKey delta = new TestKey("Delta");
         History<?> history = History.from(Arrays.asList(able, baker, charlie, delta));
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
         assertThat(history.size()).isEqualTo(4);
 
@@ -332,7 +342,8 @@ public class FlowTest {
         History<?> history = History.newBuilder()
                 .addAll(Arrays.asList(new Picky("Able"), new Picky("Baker"), new Picky("Charlie"), new Picky("Delta")))
                 .build();
-        Backstack flow = new Backstack(history);
+        Backstack flow = new Backstack();
+        flow.setup(history);
         flow.setStateChanger(new FlowDispatcher());
 
         assertThat(history.size()).isEqualTo(4);
@@ -352,5 +363,4 @@ public class FlowTest {
 
         assertThat(flow.goBack()).isFalse();
     }
-
 }

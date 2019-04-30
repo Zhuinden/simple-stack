@@ -44,8 +44,8 @@ public class StateChangerTest {
         @Override
         public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
             this.stateChange = stateChange;
-            originalState = stateChange.getPreviousState();
-            newState = stateChange.getNewState();
+            originalState = stateChange.getPreviousKeys();
+            newState = stateChange.getNewKeys();
             completionCallback.stateChangeComplete();
         }
     }
@@ -271,21 +271,22 @@ public class StateChangerTest {
 
     @Before
     public void before() {
-        backstack = new Backstack(new A(), new B(), new C(), new D());
+        backstack = new Backstack();
+        backstack.setup(History.of(new A(), new B(), new C(), new D()));
         testStateChanger = new TestStateChanger();
         backstack.setStateChanger(testStateChanger);
     }
 
     @Test
     public void stateChangeExposesBackstack() {
-        assertThat(testStateChanger.stateChange.backstack()).isSameAs(backstack);
+        assertThat(testStateChanger.stateChange.getBackstack()).isSameAs(backstack);
     }
 
     @Test
     public void stateChangeCreatesContextThatExposesKey() {
         Context context = Mockito.mock(Context.class);
-        Context newContext = testStateChanger.stateChange.createContext(context, testStateChanger.stateChange.topNewState());
-        assertThat(Backstack.getKey(newContext)).isSameAs(testStateChanger.stateChange.topNewState());
+        Context newContext = testStateChanger.stateChange.createContext(context, testStateChanger.stateChange.topNewKey());
+        assertThat(Backstack.getKey(newContext)).isSameAs(testStateChanger.stateChange.topNewKey());
     }
 
     @Test
@@ -323,7 +324,8 @@ public class StateChangerTest {
 
     @Test
     public void goBackOneElementReturnsFalse() {
-        backstack = new Backstack(new A());
+        backstack = new Backstack();
+        backstack.setup(History.of(new A()));
         backstack.setStateChanger(testStateChanger);
         boolean didGoBack = backstack.goBack();
         assertThat(didGoBack).isFalse();

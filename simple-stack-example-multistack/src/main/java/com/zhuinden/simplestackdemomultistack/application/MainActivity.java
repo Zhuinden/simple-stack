@@ -177,7 +177,7 @@ public class MainActivity
 
     @Override
     public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(stateChange.isTopNewStateEqualToPrevious()) {
+        if(stateChange.isTopNewKeyEqualToPrevious()) {
             // no-op
             completionCallback.stateChangeComplete();
             return;
@@ -186,10 +186,10 @@ public class MainActivity
         if(root.getChildAt(0) != null) {
             Key previousKey = Backstack.getKey(root.getChildAt(0).getContext());
             StackType previousStack = StackType.valueOf(previousKey.stackIdentifier());
-            StackType newStack = StackType.valueOf(((Key) stateChange.topNewState()).stackIdentifier());
+            StackType newStack = StackType.valueOf(((Key) stateChange.topNewKey()).stackIdentifier());
             direction = previousStack.ordinal() < newStack.ordinal() ? StateChange.FORWARD : previousStack.ordinal() > newStack.ordinal() ? StateChange.BACKWARD : StateChange.REPLACE;
         }
-        exchangeViewForKey(stateChange.topNewState(), direction);
+        exchangeViewForKey(stateChange.topNewKey(), direction);
         completionCallback.stateChangeComplete();
     }
 

@@ -13,8 +13,8 @@ class ViewStateChanger(
     private val root: ViewGroup
 ) : StateChanger {
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        val newKey = stateChange.topNewState<ViewKey>()
-        val previousKey = stateChange.topPreviousState<ViewKey?>()
+        val newKey = stateChange.topNewKey<ViewKey>()
+        val previousKey = stateChange.topPreviousKey<ViewKey?>()
 
         val newView = LayoutInflater.from(stateChange.createContext(activity, newKey))
             .inflate(newKey.layout(), root, false)

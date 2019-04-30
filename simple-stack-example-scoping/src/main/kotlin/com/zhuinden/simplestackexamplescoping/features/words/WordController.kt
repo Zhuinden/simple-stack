@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.features.words
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData

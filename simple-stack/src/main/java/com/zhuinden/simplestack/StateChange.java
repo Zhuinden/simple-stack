@@ -39,16 +39,16 @@ public class StateChange {
     public static final int BACKWARD = -1;
     public static final int FORWARD = 1;
 
-    StateChange(Backstack backstack, List<Object> previousState, List<Object> newState, @StateChangeDirection int direction) {
+    StateChange(Backstack backstack, List<Object> previousKeys, List<Object> newKeys, @StateChangeDirection int direction) {
         this.backstack = backstack;
-        this.previousState = previousState;
-        this.newState = newState;
+        this.previousKeys = previousKeys;
+        this.newKeys = newKeys;
         this.direction = direction;
     }
 
     Backstack backstack;
-    List<Object> previousState;
-    List<Object> newState;
+    List<Object> previousKeys;
+    List<Object> newKeys;
     int direction;
 
     /**
@@ -57,17 +57,17 @@ public class StateChange {
      * @return the backstack
      */
     @NonNull
-    public Backstack backstack() {
+    public Backstack getBackstack() {
         return backstack;
     }
 
     /**
      * Convenience method to help short-circuit if the top new key is the same as the previous one.
      *
-     * @return if the top new state is equal to the top previous state
+     * @return if the top new key is equal to the top previous key
      */
-    public final boolean isTopNewStateEqualToPrevious() {
-        return topNewState().equals(topPreviousState());
+    public final boolean isTopNewKeyEqualToPrevious() {
+        return topNewKey().equals(topPreviousKey());
     }
 
     // create a copy list where each item is casted to <T>
@@ -89,8 +89,8 @@ public class StateChange {
      * @return the previous state.
      */
     @NonNull
-    public <T> History<T> getPreviousState() {
-        return createParametricCopyList(previousState);
+    public <T> History<T> getPreviousKeys() {
+        return createParametricCopyList(previousKeys);
     }
 
     /**
@@ -101,8 +101,8 @@ public class StateChange {
      * @return the new state.
      */
     @NonNull
-    public <T> History<T> getNewState() {
-        return createParametricCopyList(newState);
+    public <T> History<T> getNewKeys() {
+        return createParametricCopyList(newKeys);
     }
 
     /**
@@ -121,10 +121,10 @@ public class StateChange {
      * @return the last element in previous state, or null if empty.
      */
     @Nullable
-    public <T> T topPreviousState() {
-        if(previousState.size() > 0) {
+    public <T> T topPreviousKey() {
+        if(previousKeys.size() > 0) {
             // noinspection unchecked
-            return (T) previousState.get(previousState.size() - 1);
+            return (T) previousKeys.get(previousKeys.size() - 1);
         } else {
             return null;
         }
@@ -136,9 +136,9 @@ public class StateChange {
      * @return the last element in new state.
      */
     @NonNull
-    public <T> T topNewState() {
+    public <T> T topNewKey() {
         // noinspection unchecked
-        return (T) newState.get(newState.size() - 1);
+        return (T) newKeys.get(newKeys.size() - 1);
     }
 
     /**

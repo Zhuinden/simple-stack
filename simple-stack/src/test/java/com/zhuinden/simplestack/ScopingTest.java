@@ -46,11 +46,11 @@ public class ScopingTest {
     }
 
     private static class Service
-            implements Bundleable, ScopedServices.Scoped {
+            implements Bundleable, ScopedServices.Registered {
         int blah = 2;
 
-        boolean didEnterScope = false;
-        boolean didExitScope = false;
+        boolean didServiceRegister = false;
+        boolean didServiceUnregister = false;
 
         @NonNull
         @Override
@@ -68,13 +68,13 @@ public class ScopingTest {
         }
 
         @Override
-        public void onEnterScope(@NonNull String scope) {
-            didEnterScope = true;
+        public void onServiceRegistered() {
+            didServiceRegister = true;
         }
 
         @Override
-        public void onExitScope(@NonNull String scope) {
-            didExitScope = true;
+        public void onServiceUnregistered() {
+            didServiceUnregister = true;
         }
     }
 
@@ -87,7 +87,7 @@ public class ScopingTest {
 
     private interface HasServices
             extends ScopeKey {
-        void bindServices(ScopedServices.ServiceBinder serviceBinder);
+        void bindServices(ServiceBinder serviceBinder);
     }
 
     private static class ServiceProvider
@@ -119,8 +119,8 @@ public class ScopingTest {
         }
 
         @Override
-        public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
-            serviceBinder.add(SERVICE_TAG, services.get(SERVICE_TAG));
+        public void bindServices(ServiceBinder serviceBinder) {
+            serviceBinder.addService(SERVICE_TAG, services.get(SERVICE_TAG));
         }
 
         public static final Creator<TestKeyWithScope> CREATOR = new Creator<TestKeyWithScope>() {
@@ -142,9 +142,9 @@ public class ScopingTest {
 
     @Test
     public void scopedServicesShouldNotBeNull() {
-        BackstackManager backstackManager = new BackstackManager();
+        Backstack backstack = new Backstack();
         try {
-            backstackManager.setScopedServices(null);
+            backstack.setScopedServices(null);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK!
@@ -153,10 +153,10 @@ public class ScopingTest {
 
     @Test
     public void scopedServicesShouldBeSetBeforeSetup() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(History.of(testKey1));
+        Backstack backstack = new Backstack();
+        backstack.setup(History.of(testKey1));
         try {
-            backstackManager.setScopedServices(new ServiceProvider());
+            backstack.setScopedServices(new ServiceProvider());
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK!
@@ -165,11 +165,11 @@ public class ScopingTest {
 
     @Test
     public void scopedServicesThrowIfNoScopedServicesAreDefinedAndServicesAreToBeBound() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setup(History.of(testKey2));
+        Backstack backstack = new Backstack();
+        backstack.setup(History.of(testKey2));
 
         try {
-            backstackManager.setStateChanger(stateChanger);
+            backstack.setStateChanger(stateChanger);
             Assert.fail();
         } catch(IllegalStateException e) {
             assertThat(e.getMessage()).contains("scoped services");
@@ -178,28 +178,28 @@ public class ScopingTest {
 
     @Test
     public void scopeIsCreatedForScopeKeys() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
-        backstackManager.setup(History.single(testKey2));
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.single(testKey2));
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isFalse();
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isTrue();
 
-        Service service = backstackManager.getService(testKey2, SERVICE_TAG);
+        Service service = backstack.getService(testKey2, SERVICE_TAG);
         assertThat(service).isSameAs(services.get(SERVICE_TAG));
     }
 
     @Test
     public void gettingNonExistentServiceThrows() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
-        backstackManager.setup(History.single(testKey2));
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.single(testKey2));
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isFalse();
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isTrue();
 
         try {
-            backstackManager.getService(testKey2, "d'oh");
+            backstack.getService(testKey2, "d'oh");
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK!
@@ -212,9 +212,9 @@ public class ScopingTest {
         final Object service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(nullTag, service);
+                serviceBinder.addService(nullTag, service);
             }
 
             @NonNull
@@ -224,11 +224,11 @@ public class ScopingTest {
             }
         };
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
-        backstackManager.setup(History.of(testKeyWithScope));
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(testKeyWithScope));
         try {
-            backstackManager.setStateChanger(stateChanger);
+            backstack.setStateChanger(stateChanger);
             Assert.fail();
         } catch(Exception e) {
             assertThat(e.getMessage()).isEqualTo("Service tag cannot be null!");
@@ -241,9 +241,9 @@ public class ScopingTest {
         final Object nullService = null;
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(serviceTag, null);
+                serviceBinder.addService(serviceTag, null);
             }
 
             @NonNull
@@ -253,11 +253,11 @@ public class ScopingTest {
             }
         };
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
-        backstackManager.setup(History.of(testKeyWithScope));
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(testKeyWithScope));
         try {
-            backstackManager.setStateChanger(stateChanger);
+            backstack.setStateChanger(stateChanger);
             Assert.fail();
         } catch(Exception e) {
             assertThat(e.getMessage()).isEqualTo("The provided service should not be null!");
@@ -266,30 +266,30 @@ public class ScopingTest {
 
     @Test
     public void scopeIsDestroyedForClearedScopeKeys() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
-        backstackManager.setup(History.single(testKey2));
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.single(testKey2));
 
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isFalse();
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isTrue();
 
-        backstackManager.getBackstack().setHistory(History.of(testKey1), StateChange.REPLACE);
+        backstack.setHistory(History.of(testKey1), StateChange.REPLACE);
 
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isFalse();
     }
 
     @Test
     public void scopeServicesArePersistedToStateBundle() {
-        final ScopeManager scopeManager = new ScopeManager();
+        final Backstack backstack = new Backstack();
 
-        scopeManager.setScopedServices(new ServiceProvider());
+        backstack.setScopedServices(new ServiceProvider());
         final Service service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -299,72 +299,67 @@ public class ScopingTest {
             }
         };
 
-        Backstack backstack = new Backstack(History.of(testKeyWithScope));
+        backstack.setup(History.of(testKeyWithScope));
         backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(scopeManager.hasService(testKeyWithScope.getScopeTag(), SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService(testKeyWithScope.getScopeTag(), SERVICE_TAG)).isTrue();
 
-        StateBundle stateBundle = scopeManager.saveStates();
+        StateBundle stateBundle = backstack.toBundle();
 
         //noinspection ConstantConditions
-        assertThat(stateBundle.getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah"))
-                .isEqualTo(5);
+        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah"))
+                .isEqualTo(5); // backstack.getScopesTag() is internal
     }
 
     @Test
     public void persistedStateOfScopedServicesIsRestored() {
-        final ScopeManager scopeManager = new ScopeManager();
-        scopeManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(testKey2));
 
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewState());
                 completionCallback.stateChangeComplete();
             }
         };
 
-        Backstack backstack = new Backstack(History.of(testKey2));
         backstack.setStateChanger(stateChanger);
 
-        assertThat(scopeManager.hasService(testKey2.getScopeTag(), SERVICE_TAG));
+        assertThat(backstack.hasService(testKey2.getScopeTag(), SERVICE_TAG)).isTrue();
 
-        StateBundle stateBundle = scopeManager.saveStates();
+        StateBundle stateBundle = backstack.toBundle();
 
-        final ScopeManager scopeManager2 = new ScopeManager();
-        scopeManager2.setScopedServices(new ServiceProvider());
+        Backstack backstack2 = new Backstack();
+        backstack2.setScopedServices(new ServiceProvider());
 
         StateChanger stateChanger2 = new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-                scopeManager2.buildScopes(stateChange.getNewState());
                 completionCallback.stateChangeComplete();
             }
         };
 
-        scopeManager2.setRestoredStates(stateBundle);
-
-        Backstack backstack2 = new Backstack(History.of(testKey2));
-
+        backstack2.setup(History.of(testKey2));
+        backstack2.fromBundle(stateBundle);
         backstack2.setStateChanger(stateChanger2);
-        assertThat(scopeManager2.<Service>getService(testKey2.getScopeTag(), SERVICE_TAG).blah).isEqualTo(5);
+        assertThat(backstack2.<Service>getService(testKey2.getScopeTag(), SERVICE_TAG).blah).isEqualTo(5);
     }
 
     @Test
     public void nonExistentServiceShouldReturnFalseAndThrow() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
-        backstackManager.setup(History.of(testKey2));
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(testKey2));
 
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isFalse();
         try {
-            backstackManager.getService(testKey2, SERVICE_TAG);
+            backstack.getService(testKey2, SERVICE_TAG);
             Assert.fail();
         } catch(IllegalArgumentException e) {
             // OK!
@@ -373,14 +368,14 @@ public class ScopingTest {
 
     @Test
     public void scopedServiceCallbackIsCalledCorrectly() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
         final Service service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -390,20 +385,20 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(testKeyWithScope));
+        backstack.setup(History.of(testKeyWithScope));
 
-        assertThat(service.didEnterScope).isFalse();
-        assertThat(service.didExitScope).isFalse();
+        assertThat(service.didServiceRegister).isFalse();
+        assertThat(service.didServiceUnregister).isFalse();
 
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(service.didEnterScope).isTrue();
-        assertThat(service.didExitScope).isFalse();
+        assertThat(service.didServiceRegister).isTrue();
+        assertThat(service.didServiceUnregister).isFalse();
 
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
+        backstack.setHistory(History.single(testKey1), StateChange.REPLACE);
 
-        assertThat(service.didEnterScope).isTrue();
-        assertThat(service.didExitScope).isTrue();
+        assertThat(service.didServiceRegister).isTrue();
+        assertThat(service.didServiceUnregister).isTrue();
     }
 
     @Test
@@ -414,9 +409,9 @@ public class ScopingTest {
         final Service service = new Service();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -442,25 +437,25 @@ public class ScopingTest {
 
         assertThat(backstackDelegate.hasScope("beep")).isTrue();
         assertThat(backstackDelegate.hasService(testKeyWithScope, SERVICE_TAG)).isTrue();
-        assertThat(service.didEnterScope).isTrue();
-        assertThat(service.didExitScope).isFalse();
+        assertThat(service.didServiceRegister).isTrue();
+        assertThat(service.didServiceUnregister).isFalse();
         backstackDelegate.onDestroy();
         assertThat(backstackDelegate.hasScope("beep")).isFalse();
         assertThat(backstackDelegate.hasService(testKeyWithScope, SERVICE_TAG)).isFalse();
-        assertThat(service.didEnterScope).isTrue();
-        assertThat(service.didExitScope).isTrue();
+        assertThat(service.didServiceRegister).isTrue();
+        assertThat(service.didServiceUnregister).isTrue();
     }
 
     @Test
     public void lookupServiceNoOverlapsWorks() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
         final Service service = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -472,7 +467,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
             }
 
             @NonNull
@@ -482,20 +477,20 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
-        backstackManager.getBackstack().goBack();
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstack.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
+        backstack.goBack();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.<Object>lookupService(SERVICE_TAG)).isSameAs(service);
+        backstack.setHistory(History.single(testKey1), StateChange.REPLACE);
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
         try {
-            backstackManager.lookupService(SERVICE_TAG);
+            backstack.lookupService(SERVICE_TAG);
             Assert.fail();
         } catch(IllegalStateException e) {
             assertThat(e.getMessage()).contains("does not exist in any scope");
@@ -505,15 +500,15 @@ public class ScopingTest {
 
     @Test
     public void lookupServiceWithOverlapsWorks() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
         final Service service1 = new Service();
         final Service service2 = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service1);
+                serviceBinder.addService(SERVICE_TAG, service1);
             }
 
             @NonNull
@@ -525,9 +520,9 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service2);
+                serviceBinder.addService(SERVICE_TAG, service2);
             }
 
             @NonNull
@@ -537,31 +532,31 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        assertThat(backstackManager.hasScope("beep")).isFalse();
-        assertThat(backstackManager.hasScope("boop")).isFalse();
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.hasScope("beep")).isTrue();
-        assertThat(backstackManager.hasScope("boop")).isTrue();
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service2);
-        backstackManager.getBackstack().goBack();
-        assertThat(backstackManager.hasScope("beep")).isTrue();
-        assertThat(backstackManager.hasScope("boop")).isFalse();
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.<Object>lookupService(SERVICE_TAG)).isSameAs(service1);
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
-        assertThat(backstackManager.hasScope("beep")).isFalse();
-        assertThat(backstackManager.hasScope("boop")).isFalse();
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasScope("beep")).isFalse();
+        assertThat(backstack.hasScope("boop")).isFalse();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack.hasScope("beep")).isTrue();
+        assertThat(backstack.hasScope("boop")).isTrue();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isTrue();
+        assertThat(backstack.<Object>lookupService(SERVICE_TAG)).isSameAs(service2);
+        backstack.goBack();
+        assertThat(backstack.hasScope("beep")).isTrue();
+        assertThat(backstack.hasScope("boop")).isFalse();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstack.<Object>lookupService(SERVICE_TAG)).isSameAs(service1);
+        backstack.setHistory(History.single(testKey1), StateChange.REPLACE);
+        assertThat(backstack.hasScope("beep")).isFalse();
+        assertThat(backstack.hasScope("boop")).isFalse();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
         try {
-            backstackManager.lookupService(SERVICE_TAG);
+            backstack.lookupService(SERVICE_TAG);
             Assert.fail();
         } catch(IllegalStateException e) {
             assertThat(e.getMessage()).contains("does not exist in any scope");
@@ -571,14 +566,14 @@ public class ScopingTest {
 
     @Test
     public void canFindServiceNoOverlapsWorks() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
         final Service service = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -590,7 +585,7 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
             }
 
             @NonNull
@@ -600,32 +595,32 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
-        backstackManager.getBackstack().goBack();
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.canFindService(SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstack.<Object>canFindService(SERVICE_TAG)).isTrue();
+        backstack.goBack();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.<Object>canFindService(SERVICE_TAG)).isTrue();
+        backstack.setHistory(History.single(testKey1), StateChange.REPLACE);
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstack.canFindService(SERVICE_TAG)).isFalse();
     }
 
     @Test
     public void canFindServiceWithOverlapsWorks() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
         final Service service1 = new Service();
         final Service service2 = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service1);
+                serviceBinder.addService(SERVICE_TAG, service1);
             }
 
             @NonNull
@@ -637,9 +632,9 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service2);
+                serviceBinder.addService(SERVICE_TAG, service2);
             }
 
             @NonNull
@@ -649,42 +644,42 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
-        backstackManager.getBackstack().goBack();
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isTrue();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.<Object>canFindService(SERVICE_TAG)).isTrue();
-        backstackManager.getBackstack().setHistory(History.single(testKey1), StateChange.REPLACE);
-        assertThat(backstackManager.hasService("beep", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.hasService("boop", SERVICE_TAG)).isFalse();
-        assertThat(backstackManager.canFindService(SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isTrue();
+        assertThat(backstack.<Object>canFindService(SERVICE_TAG)).isTrue();
+        backstack.goBack();
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstack.<Object>canFindService(SERVICE_TAG)).isTrue();
+        backstack.setHistory(History.single(testKey1), StateChange.REPLACE);
+        assertThat(backstack.hasService("beep", SERVICE_TAG)).isFalse();
+        assertThat(backstack.hasService("boop", SERVICE_TAG)).isFalse();
+        assertThat(backstack.canFindService(SERVICE_TAG)).isFalse();
     }
 
     @Test
     public void serviceBinderMethodsWork() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
         final Service service1 = new Service();
         final Service service2 = new Service();
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                assertThat(serviceBinder.has("SERVICE1")).isFalse();
-                assertThat(serviceBinder.canFind("SERVICE1")).isFalse();
-                serviceBinder.add("SERVICE1", service1);
-                assertThat(serviceBinder.has("SERVICE1")).isTrue();
-                assertThat(serviceBinder.canFind("SERVICE1")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE1")).isFalse();
+                assertThat(serviceBinder.canFindService("SERVICE1")).isFalse();
+                serviceBinder.addService("SERVICE1", service1);
+                assertThat(serviceBinder.hasService("SERVICE1")).isTrue();
+                assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
 
-                assertThat(serviceBinder.lookup("SERVICE1")).isSameAs(service1);
+                assertThat(serviceBinder.lookupService("SERVICE1")).isSameAs(service1);
             }
 
             @NonNull
@@ -696,19 +691,19 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                assertThat(serviceBinder.has("SERVICE1")).isFalse();
-                assertThat(serviceBinder.canFind("SERVICE1")).isTrue();
-                assertThat(serviceBinder.has("SERVICE2")).isFalse();
-                serviceBinder.add("SERVICE2", service2);
-                assertThat(serviceBinder.has("SERVICE1")).isFalse();
-                assertThat(serviceBinder.canFind("SERVICE1")).isTrue();
-                assertThat(serviceBinder.has("SERVICE2")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE1")).isFalse();
+                assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE2")).isFalse();
+                serviceBinder.addService("SERVICE2", service2);
+                assertThat(serviceBinder.hasService("SERVICE1")).isFalse();
+                assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE2")).isTrue();
 
-                assertThat(serviceBinder.lookup("SERVICE1")).isSameAs(service1);
-                assertThat(serviceBinder.lookup("SERVICE2")).isSameAs(service2);
+                assertThat(serviceBinder.lookupService("SERVICE1")).isSameAs(service1);
+                assertThat(serviceBinder.lookupService("SERVICE2")).isSameAs(service2);
             }
 
             @NonNull
@@ -718,41 +713,40 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
     }
 
     @Test
     public void scopeCreationAndDestructionHappensInForwardAndReverseOrder() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> serviceRegistered = new ArrayList<>();
+        final List<Object> serviceUnregistered = new ArrayList<>();
 
-        class MyService implements ScopedServices.Scoped {
+        class MyService implements ScopedServices.Registered {
             @Override
-            public void onEnterScope(@NonNull String scope) {
-                enteredScope.add(this);
+            public void onServiceRegistered() {
+                serviceRegistered.add(this);
             }
 
             @Override
-            public void onExitScope(@NonNull String scope) {
-                exitedScope.add(this);
+            public void onServiceUnregistered() {
+                serviceUnregistered.add(this);
             }
         }
 
         final MyService service1 = new MyService();
         final MyService service2 = new MyService();
 
-
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
+                serviceBinder.addService("SERVICE1", service1);
             }
 
             @NonNull
@@ -764,10 +758,10 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE2", service2);
+                serviceBinder.addService("SERVICE2", service2);
             }
 
             @NonNull
@@ -779,38 +773,38 @@ public class ScopingTest {
 
         TestKey bye = new TestKey("bye");
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        assertThat(enteredScope).isEmpty();
-        assertThat(exitedScope).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        assertThat(serviceRegistered).isEmpty();
+        assertThat(serviceUnregistered).isEmpty();
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(enteredScope).containsExactly(service1, service2);
-        assertThat(exitedScope).isEmpty();
+        assertThat(serviceRegistered).containsExactly(service1, service2);
+        assertThat(serviceUnregistered).isEmpty();
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstack.setHistory(History.of(bye), StateChange.REPLACE);
 
-        assertThat(enteredScope).containsExactly(service1, service2);
-        assertThat(exitedScope).containsExactly(service2, service1);
+        assertThat(serviceRegistered).containsExactly(service1, service2);
+        assertThat(serviceUnregistered).containsExactly(service2, service1);
     }
 
     @Test
     public void serviceCreationAndDestructionHappensInForwardAndReverseOrder() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> enteredScope = new ArrayList<>();
-        final List<Object> exitedScope = new ArrayList<>();
+        final List<Object> serviceRegistered = new ArrayList<>();
+        final List<Object> serviceUnregistered = new ArrayList<>();
 
-        class MyService implements ScopedServices.Scoped {
+        class MyService implements ScopedServices.Registered {
             @Override
-            public void onEnterScope(@NonNull String scope) {
-                enteredScope.add(this);
+            public void onServiceRegistered() {
+                serviceRegistered.add(this);
             }
 
             @Override
-            public void onExitScope(@NonNull String scope) {
-                exitedScope.add(this);
+            public void onServiceUnregistered() {
+                serviceUnregistered.add(this);
             }
         }
 
@@ -820,11 +814,11 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                serviceBinder.add("SERVICE2", service2);
+                serviceBinder.addService("SERVICE1", service1);
+                serviceBinder.addService("SERVICE2", service2);
             }
 
             @NonNull
@@ -836,47 +830,40 @@ public class ScopingTest {
 
         TestKey bye = new TestKey("bye");
 
-        backstackManager.setup(History.of(beep));
+        backstack.setup(History.of(beep));
 
-        assertThat(enteredScope).isEmpty();
-        assertThat(exitedScope).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        assertThat(serviceRegistered).isEmpty();
+        assertThat(serviceUnregistered).isEmpty();
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(enteredScope).containsExactly(service1, service2);
-        assertThat(exitedScope).isEmpty();
+        assertThat(serviceRegistered).containsExactly(service1, service2);
+        assertThat(serviceUnregistered).isEmpty();
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstack.setHistory(History.of(bye), StateChange.REPLACE);
 
-        assertThat(enteredScope).containsExactly(service1, service2);
-        assertThat(exitedScope).containsExactly(service2, service1);
+        assertThat(serviceRegistered).containsExactly(service1, service2);
+        assertThat(serviceUnregistered).containsExactly(service2, service1);
     }
 
     @Test
     public void scopedServicesCanRetrieveBackstackFromServiceBinder() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        final Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final AtomicReference<Backstack> backstack = new AtomicReference<>();
+        final AtomicReference<Backstack> ref = new AtomicReference<>();
 
-        class MyService implements ScopedServices.Scoped {
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-            }
+        class MyService {
         }
 
         final MyService service1 = new MyService();
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                backstack.set(serviceBinder.getBackstack());
+                serviceBinder.addService("SERVICE1", service1);
+                ref.set(serviceBinder.getBackstack());
             }
 
             @NonNull
@@ -886,29 +873,29 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep));
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(backstackManager.getBackstack()).isSameAs(backstack.get());
+        backstack.setup(History.of(beep));
+        backstack.setStateChanger(stateChanger);
+        assertThat(backstack).isSameAs(ref.get());
     }
 
     @Test
     public void activatedWorks() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -917,10 +904,10 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
+                serviceBinder.addService("SERVICE1", service1);
             }
 
             @NonNull
@@ -932,10 +919,10 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE2", service2);
+                serviceBinder.addService("SERVICE2", service2);
             }
 
             @NonNull
@@ -947,44 +934,44 @@ public class ScopingTest {
 
         TestKey bye = new TestKey("bye");
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        assertThat(activatedScope).isEmpty();
-        assertThat(deactivatedScope).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        assertThat(activatedServices).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service2);
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(activatedServices).containsExactly(service2);
+        assertThat(deactivatedServices).isEmpty();
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(activatedScope).containsExactly(service2, service1);
-        assertThat(deactivatedScope).containsExactly(service2);
+        assertThat(activatedServices).containsExactly(service2, service1);
+        assertThat(deactivatedServices).containsExactly(service2);
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstack.setHistory(History.of(bye), StateChange.REPLACE);
 
-        assertThat(activatedScope).containsExactly(service2, service1);
-        assertThat(deactivatedScope).containsExactly(service2, service1);
+        assertThat(activatedServices).containsExactly(service2, service1);
+        assertThat(deactivatedServices).containsExactly(service2, service1);
     }
 
     @Test
     public void activatedIsCalledInRightOrder() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -998,12 +985,12 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                serviceBinder.add("SERVICE2", service2);
-                serviceBinder.add("SERVICE3", service3);
+                serviceBinder.addService("SERVICE1", service1);
+                serviceBinder.addService("SERVICE2", service2);
+                serviceBinder.addService("SERVICE3", service3);
             }
 
             @NonNull
@@ -1016,12 +1003,12 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE4", service4);
-                serviceBinder.add("SERVICE5", service5);
-                serviceBinder.add("SERVICE6", service6);
+                serviceBinder.addService("SERVICE4", service4);
+                serviceBinder.addService("SERVICE5", service5);
+                serviceBinder.addService("SERVICE6", service6);
             }
 
             @NonNull
@@ -1031,34 +1018,34 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep));
+        backstack.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        assertThat(activatedServices).isEmpty();
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1, service2, service3);
+        assertThat(activatedServices).containsExactly(service1, service2, service3);
 
-        backstackManager.getBackstack().goTo(boop);
-        assertThat(activatedScope).containsExactly(service1, service2, service3, service4, service5, service6);
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1);
+        backstack.goTo(boop);
+        assertThat(activatedServices).containsExactly(service1, service2, service3, service4, service5, service6);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1);
     }
 
     @Test
     public void deactivatedIsCalledInReverseOrder() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1072,12 +1059,12 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                serviceBinder.add("SERVICE2", service2);
-                serviceBinder.add("SERVICE3", service3);
+                serviceBinder.addService("SERVICE1", service1);
+                serviceBinder.addService("SERVICE2", service2);
+                serviceBinder.addService("SERVICE3", service3);
             }
 
             @NonNull
@@ -1090,12 +1077,12 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE4", service4);
-                serviceBinder.add("SERVICE5", service5);
-                serviceBinder.add("SERVICE6", service6);
+                serviceBinder.addService("SERVICE4", service4);
+                serviceBinder.addService("SERVICE5", service5);
+                serviceBinder.addService("SERVICE6", service6);
             }
 
             @NonNull
@@ -1105,39 +1092,39 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep));
+        backstack.setup(History.of(beep));
 
-        assertThat(deactivatedScope).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        assertThat(deactivatedServices).isEmpty();
+        backstack.setStateChanger(stateChanger);
 
-        backstackManager.getBackstack().goTo(boop);
+        backstack.goTo(boop);
 
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1);
 
         TestKey bye = new TestKey("bye");
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstack.setHistory(History.of(bye), StateChange.REPLACE);
 
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1, service6, service5, service4);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1, service6, service5, service4);
     }
 
     @Test
     public void activationIsCalledOnlyOnce() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1145,10 +1132,10 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
+                serviceBinder.addService("SERVICE1", service1);
             }
 
             @NonNull
@@ -1158,38 +1145,38 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep));
+        backstack.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
-        assertThat(deactivatedScope).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        assertThat(activatedServices).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1);
+        assertThat(activatedServices).containsExactly(service1);
 
-        backstackManager.getBackstack().removeStateChanger();
-        backstackManager.setStateChanger(stateChanger);
+        backstack.removeStateChanger();
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1);
+        assertThat(activatedServices).containsExactly(service1);
     }
 
     @Test
     public void deactivationIsCalledOnlyOnce() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1197,10 +1184,10 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
+                serviceBinder.addService("SERVICE1", service1);
             }
 
             @NonNull
@@ -1211,36 +1198,36 @@ public class ScopingTest {
         };
 
         TestKey bye = new TestKey("bye");
-        backstackManager.setup(History.of(beep));
+        backstack.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
-        assertThat(deactivatedScope).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        assertThat(activatedServices).isEmpty();
+        assertThat(deactivatedServices).isEmpty();
+        backstack.setStateChanger(stateChanger);
 
-        assertThat(activatedScope).containsExactly(service1);
-        assertThat(deactivatedScope).isEmpty();
+        assertThat(activatedServices).containsExactly(service1);
+        assertThat(deactivatedServices).isEmpty();
 
-        backstackManager.getBackstack().removeStateChanger();
-        assertThat(deactivatedScope).isEmpty();
+        backstack.removeStateChanger();
+        assertThat(deactivatedServices).isEmpty();
 
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
-        assertThat(deactivatedScope).isEmpty();
+        backstack.setHistory(History.of(bye), StateChange.REPLACE);
+        assertThat(deactivatedServices).isEmpty();
 
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(deactivatedScope).containsExactly(service1);
+        backstack.setStateChanger(stateChanger);
+        assertThat(deactivatedServices).containsExactly(service1);
 
-        backstackManager.getBackstack().removeStateChanger();
-        backstackManager.setStateChanger(stateChanger);
-        assertThat(deactivatedScope).containsExactly(service1);
+        backstack.removeStateChanger();
+        backstack.setStateChanger(stateChanger);
+        assertThat(deactivatedServices).containsExactly(service1);
     }
 
     @Test
     public void activationHappensEvenWithForceExecutedStateChangeAndInitializeStateChange() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
-        final List<Object> activatedScope = new ArrayList<>();
-        final List<Object> deactivatedScope = new ArrayList<>();
+        final List<Object> activatedServices = new ArrayList<>();
+        final List<Object> deactivatedServices = new ArrayList<>();
 
         final AtomicReference<StateChanger.Callback> callback = new AtomicReference<>();
         StateChanger pendingStateChanger = new StateChanger() {
@@ -1253,13 +1240,13 @@ public class ScopingTest {
         class MyService
                 implements ScopedServices.Activated {
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                activatedScope.add(this);
+            public void onServiceActive() {
+                activatedServices.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
-                deactivatedScope.add(this);
+            public void onServiceInactive() {
+                deactivatedServices.add(this);
             }
         }
 
@@ -1273,12 +1260,12 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                serviceBinder.add("SERVICE2", service2);
-                serviceBinder.add("SERVICE3", service3);
+                serviceBinder.addService("SERVICE1", service1);
+                serviceBinder.addService("SERVICE2", service2);
+                serviceBinder.addService("SERVICE3", service3);
             }
 
             @NonNull
@@ -1291,12 +1278,12 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE4", service4);
-                serviceBinder.add("SERVICE5", service5);
-                serviceBinder.add("SERVICE6", service6);
+                serviceBinder.addService("SERVICE4", service4);
+                serviceBinder.addService("SERVICE5", service5);
+                serviceBinder.addService("SERVICE6", service6);
             }
 
             @NonNull
@@ -1306,23 +1293,23 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep));
+        backstack.setup(History.of(beep));
 
-        assertThat(activatedScope).isEmpty();
-        backstackManager.setStateChanger(pendingStateChanger);
+        assertThat(activatedServices).isEmpty();
+        backstack.setStateChanger(pendingStateChanger);
         callback.get().stateChangeComplete();
 
-        assertThat(activatedScope).containsExactly(service1, service2, service3);
+        assertThat(activatedServices).containsExactly(service1, service2, service3);
 
-        backstackManager.getBackstack().setHistory(History.of(boop), StateChange.BACKWARD);
-        backstackManager.getBackstack().removeStateChanger();
-        backstackManager.getBackstack().executePendingStateChange();
+        backstack.setHistory(History.of(boop), StateChange.BACKWARD);
+        backstack.removeStateChanger();
+        backstack.executePendingStateChange();
 
-        backstackManager.setStateChanger(pendingStateChanger);
+        backstack.setStateChanger(pendingStateChanger);
         callback.get().stateChangeComplete();
 
-        assertThat(activatedScope).containsExactly(service1, service2, service3, service4, service5, service6);
-        assertThat(deactivatedScope).containsExactly(service3, service2, service1);
+        assertThat(activatedServices).containsExactly(service1, service2, service3, service4, service5, service6);
+        assertThat(deactivatedServices).containsExactly(service3, service2, service1);
     }
 
     @Test
@@ -1332,16 +1319,16 @@ public class ScopingTest {
 
         class MyService
                 implements ScopedServices.Activated {
-            boolean didScopeActivate = false;
+            boolean didServiceActivate = false;
             boolean didScopeDeactivate = false;
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
-                didScopeActivate = true;
+            public void onServiceActive() {
+                didServiceActivate = true;
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 didScopeDeactivate = true;
             }
         }
@@ -1349,9 +1336,9 @@ public class ScopingTest {
         final MyService service = new MyService();
         TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(SERVICE_TAG, service);
+                serviceBinder.addService(SERVICE_TAG, service);
             }
 
             @NonNull
@@ -1377,7 +1364,7 @@ public class ScopingTest {
         backstackDelegate.onPostResume();
         backstackDelegate.onPause();
 
-        assertThat(service.didScopeActivate).isTrue();
+        assertThat(service.didServiceActivate).isTrue();
         assertThat(service.didScopeDeactivate).isFalse();
 
         assertThat(backstackDelegate.hasScope("beep")).isTrue();
@@ -1385,7 +1372,7 @@ public class ScopingTest {
         backstackDelegate.onDestroy();
         assertThat(backstackDelegate.hasScope("beep")).isFalse();
         assertThat(backstackDelegate.hasService(testKeyWithScope, SERVICE_TAG)).isFalse();
-        assertThat(service.didScopeActivate).isTrue();
+        assertThat(service.didServiceActivate).isTrue();
         assertThat(service.didScopeDeactivate).isTrue();
     }
 
@@ -1437,14 +1424,14 @@ public class ScopingTest {
     }
 
     @Test
-    public void scopedAndActivatedAreCalledInRightOrder() {
+    public void registeredAndActivatedAreCalledInRightOrder() {
         final List<Pair<Object, ServiceEvent>> events = new ArrayList<>();
 
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Scoped {
+                implements ScopedServices.Activated, ScopedServices.Registered {
             private int id = 0;
 
             MyService(int id) {
@@ -1452,22 +1439,22 @@ public class ScopingTest {
             }
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
                 events.add(Pair.of((Object) this, ServiceEvent.ACTIVE));
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 events.add(Pair.of((Object) this, ServiceEvent.INACTIVE));
             }
 
             @Override
-            public void onEnterScope(@NonNull String scope) {
+            public void onServiceRegistered() {
                 events.add(Pair.of((Object) this, ServiceEvent.CREATE));
             }
 
             @Override
-            public void onExitScope(@NonNull String scope) {
+            public void onServiceUnregistered() {
                 events.add(Pair.of((Object) this, ServiceEvent.DESTROY));
             }
 
@@ -1493,12 +1480,12 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE1", service1);
-                serviceBinder.add("SERVICE2", service2);
-                serviceBinder.add("SERVICE3", service3);
+                serviceBinder.addService("SERVICE1", service1);
+                serviceBinder.addService("SERVICE2", service2);
+                serviceBinder.addService("SERVICE3", service3);
             }
 
             @NonNull
@@ -1510,12 +1497,12 @@ public class ScopingTest {
 
         TestKeyWithScope boop = new TestKeyWithScope("boop") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE4", service4);
-                serviceBinder.add("SERVICE5", service5);
-                serviceBinder.add("SERVICE6", service6);
+                serviceBinder.addService("SERVICE4", service4);
+                serviceBinder.addService("SERVICE5", service5);
+                serviceBinder.addService("SERVICE6", service6);
             }
 
             @NonNull
@@ -1527,12 +1514,12 @@ public class ScopingTest {
 
         TestKeyWithScope braap = new TestKeyWithScope("braap") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
 
-                serviceBinder.add("SERVICE7", service7);
-                serviceBinder.add("SERVICE8", service8);
-                serviceBinder.add("SERVICE9", service9);
+                serviceBinder.addService("SERVICE7", service7);
+                serviceBinder.addService("SERVICE8", service8);
+                serviceBinder.addService("SERVICE9", service9);
             }
 
             @NonNull
@@ -1542,19 +1529,19 @@ public class ScopingTest {
             }
         };
 
-        backstackManager.setup(History.of(beep, boop));
+        backstack.setup(History.of(beep, boop));
 
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
-        backstackManager.getBackstack().goTo(braap);
+        backstack.goTo(braap);
 
-        backstackManager.getBackstack().removeStateChanger(); // just to make sure
-        backstackManager.setStateChanger(stateChanger); // just to make sure
+        backstack.removeStateChanger(); // just to make sure
+        backstack.setStateChanger(stateChanger); // just to make sure
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
         TestKey bye = new TestKey("bye");
-        backstackManager.getBackstack().setHistory(History.of(bye), StateChange.REPLACE);
+        backstack.setHistory(History.of(bye), StateChange.REPLACE);
 
         assertThat(events).containsExactly(
                 Pair.of(service1, ServiceEvent.CREATE),
@@ -1598,8 +1585,8 @@ public class ScopingTest {
 
     @Test
     public void lookupServiceFromScopeWorks() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
         final Object service1 = new Object();
         final Object service2 = new Object();
@@ -1618,19 +1605,19 @@ public class ScopingTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
-                assertThat(serviceBinder.has("service0")).isFalse();
-                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service0")).isFalse();
-                serviceBinder.add("service0", service0);
-                assertThat(serviceBinder.has("service0")).isTrue();
-                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service0")).isTrue();
-                assertThat(serviceBinder.get("service0")).isSameAs(service0);
-                assertThat(serviceBinder.lookup("service0")).isSameAs(service0);
-                assertThat(serviceBinder.lookupFrom(serviceBinder.getScopeTag(), "service0")).isSameAs(service0);
-                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service")).isFalse();
-                serviceBinder.add("service", service1);
-                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service")).isTrue();
-                assertThat(serviceBinder.lookupFrom(serviceBinder.getScopeTag(), "service")).isSameAs(service1);
+            public void bindServices(ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.hasService("service0")).isFalse();
+                assertThat(serviceBinder.canFindFromScope(serviceBinder.getScopeTag(), "service0")).isFalse();
+                serviceBinder.addService("service0", service0);
+                assertThat(serviceBinder.hasService("service0")).isTrue();
+                assertThat(serviceBinder.canFindFromScope(serviceBinder.getScopeTag(), "service0")).isTrue();
+                assertThat(serviceBinder.getService("service0")).isSameAs(service0);
+                assertThat(serviceBinder.lookupService("service0")).isSameAs(service0);
+                assertThat(serviceBinder.lookupFromScope(serviceBinder.getScopeTag(), "service0")).isSameAs(service0);
+                assertThat(serviceBinder.canFindFromScope(serviceBinder.getScopeTag(), "service")).isFalse();
+                serviceBinder.addService("service", service1);
+                assertThat(serviceBinder.canFindFromScope(serviceBinder.getScopeTag(), "service")).isTrue();
+                assertThat(serviceBinder.lookupFromScope(serviceBinder.getScopeTag(), "service")).isSameAs(service1);
             }
 
             @NonNull
@@ -1652,16 +1639,16 @@ public class ScopingTest {
             }
 
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
-                assertThat(serviceBinder.lookup("service0")).isSameAs(service0);
-                assertThat(serviceBinder.canFindFrom(serviceBinder.getScopeTag(), "service")).isTrue();
-                assertThat(serviceBinder.lookup("service")).isSameAs(service1);
-                serviceBinder.add("service", service2);
+            public void bindServices(ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.lookupService("service0")).isSameAs(service0);
+                assertThat(serviceBinder.canFindFromScope(serviceBinder.getScopeTag(), "service")).isTrue();
+                assertThat(serviceBinder.lookupService("service")).isSameAs(service1);
+                serviceBinder.addService("service", service2);
                 // the most important assertion here
-                assertThat(serviceBinder.lookup("service")).isSameAs(service2);
-                assertThat(serviceBinder.lookupFrom("beep", "service")).isSameAs(service1);
+                assertThat(serviceBinder.lookupService("service")).isSameAs(service2);
+                assertThat(serviceBinder.lookupFromScope("beep", "service")).isSameAs(service1);
 
-                serviceBinder.add("service3", service3);
+                serviceBinder.addService("service3", service3);
             }
 
             @NonNull
@@ -1671,60 +1658,48 @@ public class ScopingTest {
             }
         }
 
-        backstackManager.setup(History.of(new Key1("beep"), new Key2("boop")));
-        backstackManager.setStateChanger(new StateChanger() {
+        backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
 
-        assertThat(backstackManager.lookupService("service")).isSameAs(service2);
-        assertThat(backstackManager.canFindService("service3")).isTrue();
-        assertThat(backstackManager.canFindFromScope("boop", "service3")).isTrue();
-        assertThat(backstackManager.lookupFromScope("boop", "service3")).isSameAs(service3);
-        assertThat(backstackManager.lookupFromScope("beep", "service")).isSameAs(service1);
-        assertThat(backstackManager.lookupFromScope("boop", "service")).isSameAs(service2);
+        assertThat(backstack.lookupService("service")).isSameAs(service2);
+        assertThat(backstack.canFindService("service3")).isTrue();
+        assertThat(backstack.canFindFromScope("boop", "service3")).isTrue();
+        assertThat(backstack.lookupFromScope("boop", "service3")).isSameAs(service3);
+        assertThat(backstack.lookupFromScope("beep", "service")).isSameAs(service1);
+        assertThat(backstack.lookupFromScope("boop", "service")).isSameAs(service2);
 
-        backstackManager.getBackstack().goBack();
+        backstack.goBack();
 
-        assertThat(backstackManager.canFindFromScope("boop", "service3")).isFalse();
-        assertThat(backstackManager.lookupService("service")).isSameAs(service1);
+        assertThat(backstack.canFindFromScope("boop", "service3")).isFalse();
+        assertThat(backstack.lookupService("service")).isSameAs(service1);
     }
 
     @Test
     public void sameServiceRegisteredInScopeMultipleTimesReceivesCallbackOnlyOnce() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
 
         final List<Object> activated = new ArrayList<>();
         final List<Object> inactivated = new ArrayList<>();
-        final List<Object> entered = new ArrayList<>();
-        final List<Object> exited = new ArrayList<>();
         final List<Object> registered = new ArrayList<>();
         final List<Object> unregistered = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Scoped, ScopedServices.Registered {
+                implements ScopedServices.Activated, ScopedServices.Registered {
 
             @Override
-            public void onScopeActive(@NonNull String scope) {
+            public void onServiceActive() {
                 activated.add(this);
             }
 
             @Override
-            public void onScopeInactive(@NonNull String scope) {
+            public void onServiceInactive() {
                 inactivated.add(this);
-            }
-
-            @Override
-            public void onEnterScope(@NonNull String scope) {
-                entered.add(this);
-            }
-
-            @Override
-            public void onExitScope(@NonNull String scope) {
-                exited.add(this);
             }
 
             @Override
@@ -1745,10 +1720,10 @@ public class ScopingTest {
 
         TestKeyWithScope beep = new TestKeyWithScope("beep") {
             @Override
-            public void bindServices(ScopedServices.ServiceBinder serviceBinder) {
+            public void bindServices(ServiceBinder serviceBinder) {
                 assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
-                serviceBinder.add(serviceTag1, service);
-                serviceBinder.add(serviceTag2, service);
+                serviceBinder.addService(serviceTag1, service);
+                serviceBinder.addService(serviceTag2, service);
             }
 
             @NonNull
@@ -1760,58 +1735,50 @@ public class ScopingTest {
 
         TestKey clear = new TestKey("clear");
 
-        backstackManager.setup(History.of(beep));
+        backstack.setup(History.of(beep));
 
         assertThat(activated).isEmpty();
         assertThat(inactivated).isEmpty();
-        assertThat(entered).isEmpty();
-        assertThat(exited).isEmpty();
         assertThat(registered).isEmpty();
         assertThat(unregistered).isEmpty();
-        backstackManager.setStateChanger(stateChanger);
+        backstack.setStateChanger(stateChanger);
 
         assertThat(activated).isNotEmpty();
         assertThat(inactivated).isEmpty();
-        assertThat(entered).isNotEmpty();
-        assertThat(exited).isEmpty();
         assertThat(registered).isNotEmpty();
         assertThat(unregistered).isEmpty();
 
         assertThat(activated).containsOnlyOnce(service);
-        assertThat(entered).containsOnlyOnce(service);
         assertThat(registered).containsOnlyOnce(service);
 
-        backstackManager.getBackstack().setHistory(History.of(clear), StateChange.REPLACE);
+        backstack.setHistory(History.of(clear), StateChange.REPLACE);
 
         assertThat(activated).isNotEmpty();
         assertThat(inactivated).isNotEmpty();
-        assertThat(entered).isNotEmpty();
-        assertThat(exited).isNotEmpty();
         assertThat(registered).isNotEmpty();
         assertThat(unregistered).isNotEmpty();
 
         assertThat(inactivated).containsOnlyOnce(service);
-        assertThat(exited).containsOnlyOnce(service);
         assertThat(unregistered).containsOnlyOnce(service);
     }
 
     @Test
     public void finalizingScopeTwiceShouldBeNoOp() {
-        BackstackManager backstackManager = new BackstackManager();
-        backstackManager.setScopedServices(new ServiceProvider());
-        backstackManager.setup(History.of(testKey2));
-        backstackManager.setStateChanger(new StateChanger() {
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(testKey2));
+        backstack.setStateChanger(new StateChanger() {
             @Override
             public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
-        assertThat(backstackManager.hasService(testKey2, SERVICE_TAG)).isTrue();
+        assertThat(backstack.hasService(testKey2, SERVICE_TAG)).isTrue();
 
-        backstackManager.finalizeScopes();
+        backstack.finalizeScopes();
 
         try {
-            backstackManager.finalizeScopes();
+            backstack.finalizeScopes();
         } catch(Throwable e) {
             Assert.fail("Should be no-op.");
         }

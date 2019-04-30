@@ -160,10 +160,10 @@ public class MainActivity
 
     @Override
     public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(!stateChange.isTopNewStateEqualToPrevious()) {
+        if(!stateChange.isTopNewKeyEqualToPrevious()) {
             fragmentStateChanger.handleStateChange(stateChange);
-            setupViewsForKey(stateChange.topNewState());
-            String title = stateChange.<BaseKey>topNewState().title(getResources());
+            setupViewsForKey(stateChange.topNewKey());
+            String title = stateChange.<BaseKey>topNewKey().title(getResources());
             setTitle(title == null ? getString(R.string.app_name) : title);
         }
         completionCallback.stateChangeComplete();

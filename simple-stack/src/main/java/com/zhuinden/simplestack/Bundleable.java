@@ -17,14 +17,15 @@ package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
 
 import com.zhuinden.statebundle.StateBundle;
 
 /**
- * Specifies that the custom view that implements this also places its persisted state into a StateBundle.
+ * Specifies the ability to persist the state of the object to a StateBundle.
  *
- * This is used by {@link BackstackDelegate#persistViewToState(View)} and {@link BackstackDelegate#restoreViewFromState(View)}.
+ * This is used by the root custom view, and also to persist the state of scoped services.
+ *
+ * The {@link Backstack} is also marked as {@link Bundleable}.
  */
 public interface Bundleable {
     @NonNull

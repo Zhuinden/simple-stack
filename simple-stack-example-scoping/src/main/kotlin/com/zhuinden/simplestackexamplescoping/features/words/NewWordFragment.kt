@@ -1,9 +1,14 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.features.words
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.zhuinden.simplestackexamplescoping.R
+import com.zhuinden.simplestackexamplescoping.core.navigation.BaseFragment
+import com.zhuinden.simplestackexamplescoping.utils.backstack
+import com.zhuinden.simplestackexamplescoping.utils.lookup
+import com.zhuinden.simplestackexamplescoping.utils.onClick
 import kotlinx.android.synthetic.main.new_word_fragment.*
 
 

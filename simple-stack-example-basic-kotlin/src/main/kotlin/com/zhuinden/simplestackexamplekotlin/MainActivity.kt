@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
+        if (stateChange.isTopNewKeyEqualToPrevious) {
             completionCallback.stateChangeComplete()
             return
         }

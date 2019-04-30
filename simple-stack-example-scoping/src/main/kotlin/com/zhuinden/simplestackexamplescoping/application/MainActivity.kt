@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.application
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -6,6 +6,10 @@ import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
+import com.zhuinden.simplestackexamplescoping.R
+import com.zhuinden.simplestackexamplescoping.core.navigation.FragmentStateChanger
+import com.zhuinden.simplestackexamplescoping.core.scoping.ScopeConfiguration
+import com.zhuinden.simplestackexamplescoping.features.words.WordListKey
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -24,7 +28,6 @@ class MainActivity : AppCompatActivity(), StateChanger {
         Navigator.configure()
             .setStateChanger(this)
             .setScopedServices(ScopeConfiguration())
-            .setShouldPersistContainerChild(false)
             .install(this, root, History.of(WordListKey()))
     }
 
@@ -35,7 +38,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
+        if (stateChange.isTopNewKeyEqualToPrevious) {
             completionCallback.stateChangeComplete()
             return
         }

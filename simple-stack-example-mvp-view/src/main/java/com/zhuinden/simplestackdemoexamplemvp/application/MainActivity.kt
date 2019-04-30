@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         viewStateChanger = ViewStateChanger(this, root)
         val backstack = Navigator.configure()
             .setScopedServices(ServiceProvider())
+            .setShouldPersistContainerChild(true)
             .setDeferredInitialization(true)
             .setStateChanger(this)
             .install(this, root, History.single(TasksKey()))
@@ -83,14 +84,14 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
+        if (stateChange.isTopNewKeyEqualToPrevious) {
             completionCallback.stateChangeComplete()
             return
         }
 
         viewStateChanger.handleStateChange(stateChange) {
             mainView.handleStateChange(stateChange) {
-                mainView.setupViewsForKey(stateChange.topNewState(), root.getChildAt(0))
+                mainView.setupViewsForKey(stateChange.topNewKey(), root.getChildAt(0))
                 completionCallback.stateChangeComplete()
             }
         }

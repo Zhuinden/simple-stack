@@ -101,7 +101,7 @@ public class MainActivity
 
     @Override
     public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(stateChange.isTopNewStateEqualToPrevious()) {
+        if(stateChange.isTopNewKeyEqualToPrevious()) {
             completionCallback.stateChangeComplete();
             return;
         }

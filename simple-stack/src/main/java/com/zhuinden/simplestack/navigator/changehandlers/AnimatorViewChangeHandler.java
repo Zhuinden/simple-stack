@@ -33,7 +33,7 @@ import com.zhuinden.simplestack.navigator.ViewChangeHandler;
 public abstract class AnimatorViewChangeHandler
         implements ViewChangeHandler {
     @Override
-    public void performViewChange(@NonNull final ViewGroup container, @NonNull final View previousView, @NonNull final View newView, final int direction, @NonNull final CompletionCallback completionCallback) {
+    public void performViewChange(@NonNull final ViewGroup container, @NonNull final View previousView, @NonNull final View newView, final int direction, @NonNull final ViewChangeCallback viewChangeCallback) {
         container.addView(newView);
         ViewUtils.waitForMeasure(newView, new ViewUtils.OnMeasuredCallback() {
             @Override
@@ -43,7 +43,7 @@ public abstract class AnimatorViewChangeHandler
                     public void onAnimationEnd(Animator animation) {
                         container.removeView(previousView);
                         resetPreviousViewValues(previousView);
-                        completionCallback.onCompleted();
+                        viewChangeCallback.onCompleted();
                     }
                 });
             }

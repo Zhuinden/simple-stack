@@ -99,14 +99,14 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewStateEqualToPrevious) {
+        if (stateChange.isTopNewKeyEqualToPrevious) {
             // no-op
             completionCallback.stateChangeComplete()
             return
         }
 
         fragmentStateChanger.handleStateChange(stateChange)
-        mainView.setupViewsForKey(stateChange.topNewState())
+        mainView.setupViewsForKey(stateChange.topNewKey())
         completionCallback.stateChangeComplete()
     }
 

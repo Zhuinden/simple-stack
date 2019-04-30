@@ -1,8 +1,10 @@
-package com.zhuinden.simplestackexamplescoping
+package com.zhuinden.simplestackexamplescoping.features.words
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import com.zhuinden.simplestackexamplescoping.R
+import com.zhuinden.simplestackexamplescoping.utils.inflate
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.word_list_item.*
 import java.util.*

@@ -37,6 +37,8 @@ class ScopeManager {
     private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
     private final IdentityHashMap<Object, Set<String>> scopeActivatedServices = new IdentityHashMap<>();
 
+    private final IdentityHashMap<Object, Integer> untrackEventInvocationTracker = new IdentityHashMap<>(); // call unregister/inactivated only once!
+
     private boolean isGlobalScopePendingActivation = true;
 
     void activateGlobalScope() {
@@ -63,18 +65,14 @@ class ScopeManager {
     ScopeManager() {
     }
 
-    private BackstackManager backstackManager;
+    private Backstack backstack;
 
-    void setBackstackManager(BackstackManager backstackManager) {
-        this.backstackManager = backstackManager;
-    }
-
-    BackstackManager getManager() {
-        return backstackManager;
+    void setBackstack(Backstack backstack) {
+        this.backstack = backstack;
     }
 
     Backstack getBackstack() {
-        return backstackManager.getBackstack();
+        return backstack;
     }
 
     private final Map<String, Map<String, Object>> scopes = new LinkedHashMap<>();
@@ -114,7 +112,7 @@ class ScopeManager {
             Map<String, Object> scope = new LinkedHashMap<>();
             scopes.put(scopeTag, scope);
 
-            scopedServices.bindServices(new ScopedServices.ServiceBinder(this, key, scopeTag, scope));
+            scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
 
             restoreAndNotifyServices(scopeTag, scope);
         }
@@ -142,15 +140,16 @@ class ScopeManager {
 
             if(isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 trackServiceInScope(scopeEnteredServices, service, scopeTag);
-                if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onEnterScope(scopeTag);
-                }
             }
         }
     }
 
     private boolean isServiceNotRegistered(Object service) {
         return !scopeEnteredServices.containsKey(service) || scopeEnteredServices.get(service).isEmpty();
+    }
+
+    private boolean isServiceNotActivated(Object service) {
+        return !scopeActivatedServices.containsKey(service) || scopeActivatedServices.get(service).isEmpty();
     }
 
     private boolean isServiceNotTrackedInScope(Map<Object, Set<String>> scopeEventTracker, Object service, String scopeTag) {
@@ -185,7 +184,7 @@ class ScopeManager {
     void finalizeScopes() {
         this.isFinalized = true;
 
-        // this logic is actually mostly inside BackstackManager for some reason
+        // this logic is actually mostly inside Backstack for some reason
         destroyScope(GLOBAL_SCOPE_TAG);
 
         this.latestState = null; // don't use `emptyList()` so that Globals can be re-initialized.
@@ -253,19 +252,16 @@ class ScopeManager {
         List<Object> services = new ArrayList<>(serviceMap.values());
         Collections.reverse(services);
 
-        IdentityHashMap<Object, Integer> unregisterInvocationTracker = new IdentityHashMap<>(); // call unregister only once!
+        untrackEventInvocationTracker.clear();
 
         for(Object service : services) {
             if(!isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 untrackServiceInScope(scopeEnteredServices, service, scopeTag);
-                if(service instanceof ScopedServices.Scoped) {
-                    ((ScopedServices.Scoped) service).onExitScope(scopeTag);
-                }
             }
 
             if(isServiceNotRegistered(service)) {
-                if(service instanceof ScopedServices.Registered && !unregisterInvocationTracker.containsKey(service)) {
-                    unregisterInvocationTracker.put(service, 1);
+                if(service instanceof ScopedServices.Registered && !untrackEventInvocationTracker.containsKey(service)) {
+                    untrackEventInvocationTracker.put(service, 1);
                     ((ScopedServices.Registered) service).onServiceUnregistered();
                 }
             }
@@ -303,12 +299,14 @@ class ScopeManager {
 
     private void notifyScopeActivation(String newScopeTag, Map<String, Object> newServiceMap) {
         for(Object service : newServiceMap.values()) {
+            if(isServiceNotActivated(service)) {
+                if(service instanceof ScopedServices.Activated) {
+                    ((ScopedServices.Activated) service).onServiceActive();
+                }
+            }
+
             if(isServiceNotTrackedInScope(scopeActivatedServices, service, newScopeTag)) {
                 trackServiceInScope(scopeActivatedServices, service, newScopeTag);
-
-                if(service instanceof ScopedServices.Activated) {
-                    ((ScopedServices.Activated) service).onScopeActive(newScopeTag);
-                }
             }
         }
     }
@@ -316,12 +314,18 @@ class ScopeManager {
     private void notifyScopeDeactivation(String previousScopeTag, Map<String, Object> previousServiceMap) {
         List<Object> previousServices = new ArrayList<>(previousServiceMap.values());
         Collections.reverse(previousServices);
+
+        untrackEventInvocationTracker.clear();
+
         for(Object service : previousServices) {
             if(!isServiceNotTrackedInScope(scopeActivatedServices, service, previousScopeTag)) {
                 untrackServiceInScope(scopeActivatedServices, service, previousScopeTag);
+            }
 
-                if(service instanceof ScopedServices.Activated) {
-                    ((ScopedServices.Activated) service).onScopeInactive(previousScopeTag);
+            if(isServiceNotActivated(service)) {
+                if(service instanceof ScopedServices.Activated && !untrackEventInvocationTracker.containsKey(service)) {
+                    untrackEventInvocationTracker.put(service, 1);
+                    ((ScopedServices.Activated) service).onServiceInactive();
                 }
             }
         }

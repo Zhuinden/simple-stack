@@ -55,9 +55,6 @@ public class BackstackDelegateTest {
     Backstack backstack;
 
     @Mock
-    BackstackManager backstackManager;
-
-    @Mock
     Bundle savedInstanceState;
 
     @Rule
@@ -125,7 +122,7 @@ public class BackstackDelegateTest {
             add(restoredKey);
         }};
         StateBundle stateBundle = new StateBundle();
-        stateBundle.putParcelableArrayList(BackstackManager.getHistoryTag(), restoredKeys);
+        stateBundle.putParcelableArrayList(Backstack.getHistoryTag(), restoredKeys);
         Mockito.when(savedInstanceState.getParcelable(backstackDelegate.getHistoryTag())).thenReturn(stateBundle);
         backstackDelegate.onCreate(savedInstanceState, null, History.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isNotNull();
@@ -137,7 +134,6 @@ public class BackstackDelegateTest {
     public void onCreateChoosesInitialKeysIfRestoredHistoryIsEmpty() {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey testKey = new TestKey("hello");
-        ArrayList<Parcelable> restoredKeys = new ArrayList<>();
         backstackDelegate.onCreate(savedInstanceState, null, History.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isNotNull();
         backstackDelegate.setStateChanger(stateChanger);
@@ -181,15 +177,12 @@ public class BackstackDelegateTest {
 
     @Test
     public void onCreateRestoresFromNonConfigInstance() {
-        Mockito.when(backstackManager.getBackstack()).thenReturn(backstack);
-        BackstackDelegate.NonConfigurationInstance nonConfigurationInstance = new BackstackDelegate.NonConfigurationInstance(
-                backstackManager);
+        BackstackDelegate.NonConfigurationInstance nonConfigurationInstance = new BackstackDelegate.NonConfigurationInstance(backstack);
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         TestKey testKey = new TestKey("hello");
         backstackDelegate.onCreate(null, nonConfigurationInstance, History.single(testKey));
         assertThat(backstackDelegate.getBackstack()).isSameAs(backstack);
     }
-
 
     @Test
     public void testRestoreViewFromState() {
@@ -283,7 +276,7 @@ public class BackstackDelegateTest {
         backstackDelegate.onCreate(null, null, History.single(testKey));
         backstackDelegate.setStateChanger(stateChanger);
 
-        assertThat(called.get(0).topNewState()).isSameAs(testKey);
+        assertThat(called.get(0).topNewKey()).isSameAs(testKey);
     }
 
     @Test
@@ -318,18 +311,18 @@ public class BackstackDelegateTest {
     }
 
     @Test
-    public void getManagerReturnsBackstackManager() {
+    public void getBackstackReturnsBackstack() {
         TestKey testKey = new TestKey("Hello");
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.onCreate(null, null, History.single(testKey));
-        assertThat(backstackDelegate.getManager()).isNotNull();
+        assertThat(backstackDelegate.getBackstack()).isNotNull();
     }
 
     @Test
-    public void getManagerBeforeOnCreateThrows() {
+    public void getBackstackBeforeOnCreateThrows() {
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         try {
-            backstackDelegate.getManager();
+            backstackDelegate.getBackstack();
             Assert.fail();
         } catch(IllegalStateException e) {
             // OK
