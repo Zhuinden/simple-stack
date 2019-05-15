@@ -16,6 +16,7 @@
 package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.zhuinden.statebundle.StateBundle;
 
@@ -404,20 +405,16 @@ class ScopeManager {
     }
 
     @NonNull
-    private Set<String> findScopesForKeyAll(Object targetKey) {
-        if(this.latestState == null) {
-            return Collections.emptySet();
-        }
-
+    private LinkedHashSet<String> _findScopesForKey(@NonNull Object targetKey, boolean explicitOnly) {
         LinkedHashSet<String> activeScopes = new LinkedHashSet<>();
 
-        boolean isScopeFound = false;
+        boolean isKeyFound = false;
         for(int i = latestState.size() - 1; i >= 0; i--) {
             Object key = latestState.get(i);
             if(targetKey.equals(key)) {
-                isScopeFound = true;
+                isKeyFound = true;
             }
-            if(!isScopeFound) {
+            if(!isKeyFound) {
                 continue;
             }
             if(key instanceof ScopeKey) {
@@ -434,7 +431,69 @@ class ScopeManager {
                     activeScopes.add(currentScope);
                 }
             }
+
+            if(explicitOnly) {
+                // force explicit only in this mode.
+                break;
+            }
         }
+
+        return activeScopes;
+    }
+
+    @NonNull
+    private LinkedHashSet<String> _findScopesForScopeTag(@Nullable String scopeTag, boolean explicitOnly) {
+        LinkedHashSet<String> activeScopes = new LinkedHashSet<>();
+
+        if(this.latestState == null) {
+            return activeScopes;
+        }
+
+        List<Object> latestState = this.latestState;
+
+        boolean isScopeFound = scopeTag == null;
+        for(int i = latestState.size() - 1; i >= 0; i--) {
+            Object key = latestState.get(i);
+            if(key instanceof ScopeKey) {
+                ScopeKey scopeKey = (ScopeKey) key;
+                String currentScope = scopeKey.getScopeTag();
+                if(!isScopeFound && currentScope.equals(scopeTag)) {
+                    isScopeFound = true;
+                }
+                if(isScopeFound) {
+                    activeScopes.add(currentScope);
+                }
+            }
+            if(key instanceof ScopeKey.Child) {
+                ScopeKey.Child child = (ScopeKey.Child) key;
+                checkParentScopes(child);
+                List<String> parentScopes = child.getParentScopes();
+                for(int j = parentScopes.size() - 1; j >= 0; j--) {
+                    String currentScope = parentScopes.get(j);
+                    if(!isScopeFound && currentScope.equals(scopeTag)) {
+                        isScopeFound = true;
+                    }
+                    if(isScopeFound) {
+                        activeScopes.add(currentScope);
+                    }
+                }
+            }
+
+            if(explicitOnly && isScopeFound) { // force explicit only in this mode.
+                break;
+            }
+        }
+
+        return activeScopes;
+    }
+
+    @NonNull
+    private Set<String> findScopesForKeyAll(Object targetKey) {
+        if(this.latestState == null) {
+            return Collections.emptySet();
+        }
+
+        LinkedHashSet<String> activeScopes = _findScopesForKey(targetKey, false);
 
         if(!isFinalized && !globalServices.getServices().isEmpty()) {
             activeScopes.add(GLOBAL_SCOPE_TAG);
@@ -449,35 +508,7 @@ class ScopeManager {
             return Collections.emptySet();
         }
 
-        LinkedHashSet<String> activeScopes = new LinkedHashSet<>();
-
-        boolean isScopeFound = false;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
-            if(targetKey.equals(key)) {
-                isScopeFound = true;
-            }
-            if(!isScopeFound) {
-                continue;
-            }
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String currentScope = scopeKey.getScopeTag();
-                activeScopes.add(currentScope);
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    String currentScope = parentScopes.get(j);
-                    activeScopes.add(currentScope);
-                }
-            }
-
-            // force explicit only in this mode.
-            break;
-        }
+        LinkedHashSet<String> activeScopes = _findScopesForKey(targetKey, true);
 
         if(!isFinalized && !globalServices.getServices().isEmpty()) {
             activeScopes.add(GLOBAL_SCOPE_TAG);
@@ -505,41 +536,7 @@ class ScopeManager {
             return false;
         }
 
-        Set<String> activeScopes = new LinkedHashSet<>();
-        List<Object> latestState = this.latestState;
-
-        boolean isScopeFound = false;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String currentScope = scopeKey.getScopeTag();
-                if(currentScope.equals(scopeTag)) {
-                    isScopeFound = true;
-                }
-                if(isScopeFound) {
-                    activeScopes.add(currentScope);
-                }
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    String currentScope = parentScopes.get(j);
-                    if(currentScope.equals(scopeTag)) {
-                        isScopeFound = true;
-                    }
-                    if(isScopeFound) {
-                        activeScopes.add(currentScope);
-                    }
-                }
-            }
-
-            if(isScopeFound) { // force explicit only in this mode.
-                break;
-            }
-        }
+        Set<String> activeScopes = _findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
             if(hasService(scope, serviceTag)) {
@@ -560,37 +557,7 @@ class ScopeManager {
             return false;
         }
 
-        Set<String> activeScopes = new LinkedHashSet<>();
-        List<Object> latestState = this.latestState;
-
-        boolean isScopeFound = false;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String currentScope = scopeKey.getScopeTag();
-                if(currentScope.equals(scopeTag)) {
-                    isScopeFound = true;
-                }
-                if(isScopeFound) {
-                    activeScopes.add(currentScope);
-                }
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    String currentScope = parentScopes.get(j);
-                    if(currentScope.equals(scopeTag)) {
-                        isScopeFound = true;
-                    }
-                    if(isScopeFound) {
-                        activeScopes.add(currentScope);
-                    }
-                }
-            }
-        }
+        LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
             if(hasService(scope, serviceTag)) {
@@ -623,41 +590,7 @@ class ScopeManager {
     private <T> T lookupFromScopeExplicit(String scopeTag, String serviceTag) {
         verifyStackIsInitialized();
 
-        Set<String> activeScopes = new LinkedHashSet<>();
-        List<Object> latestState = this.latestState;
-
-        boolean isScopeFound = false;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String currentScope = scopeKey.getScopeTag();
-                if(currentScope.equals(scopeTag)) {
-                    isScopeFound = true;
-                }
-                if(isScopeFound) {
-                    activeScopes.add(currentScope);
-                }
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    String currentScope = parentScopes.get(j);
-                    if(currentScope.equals(scopeTag)) {
-                        isScopeFound = true;
-                    }
-                    if(isScopeFound) {
-                        activeScopes.add(currentScope);
-                    }
-                }
-            }
-
-            if(isScopeFound) { // force explicit only in this mode.
-                break;
-            }
-        }
+        LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
             if(hasService(scope, serviceTag)) {
@@ -676,37 +609,7 @@ class ScopeManager {
     private <T> T lookupFromScopeAll(String scopeTag, String serviceTag) {
         verifyStackIsInitialized();
 
-        Set<String> activeScopes = new LinkedHashSet<>();
-        List<Object> latestState = this.latestState;
-
-        boolean isScopeFound = false;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String currentScope = scopeKey.getScopeTag();
-                if(currentScope.equals(scopeTag)) {
-                    isScopeFound = true;
-                }
-                if(isScopeFound) {
-                    activeScopes.add(currentScope);
-                }
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    String currentScope = parentScopes.get(j);
-                    if(currentScope.equals(scopeTag)) {
-                        isScopeFound = true;
-                    }
-                    if(isScopeFound) {
-                        activeScopes.add(currentScope);
-                    }
-                }
-            }
-        }
+        LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
             if(hasService(scope, serviceTag)) {
@@ -745,23 +648,7 @@ class ScopeManager {
 
         verifyStackIsInitialized();
 
-        Set<String> activeScopes = new LinkedHashSet<>();
-        List<Object> latestState = this.latestState;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                activeScopes.add(scopeKey.getScopeTag());
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    activeScopes.add(parentScopes.get(j));
-                }
-            }
-        }
+        LinkedHashSet<String> activeScopes = _findScopesForScopeTag(null, false);
 
         for(String scopeTag : activeScopes) {
             if(hasService(scopeTag, serviceTag)) {
