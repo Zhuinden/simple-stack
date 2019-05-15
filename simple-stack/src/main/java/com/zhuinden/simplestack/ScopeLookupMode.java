@@ -15,12 +15,50 @@
  */
 package com.zhuinden.simplestack;
 
+import java.util.Set;
+
 /**
  * Specifies the mode used for looking up services within the scopes.
  *
  * Allows customizing whether both implicit and explicit parents are used, or only explicit parents.
  */
 public enum ScopeLookupMode {
-    ALL,
-    EXPLICIT
+    ALL {
+        @Override
+        protected boolean executeCanFindFromService(ScopeManager scopeManager, String scopeTag, String serviceTag) {
+            return scopeManager.canFindFromScopeAll(scopeTag, serviceTag);
+        }
+
+        @Override
+        protected <T> T executeLookupFromScope(ScopeManager scopeManager, String scopeTag, String serviceTag) {
+            return scopeManager.lookupFromScopeAll(scopeTag, serviceTag);
+        }
+
+        @Override
+        protected Set<String> executeFindScopesForKey(ScopeManager scopeManager, Object key) {
+            return scopeManager.findScopesForKeyAll(key);
+        }
+    },
+    EXPLICIT {
+        @Override
+        protected boolean executeCanFindFromService(ScopeManager scopeManager, String scopeTag, String serviceTag) {
+            return scopeManager.canFindFromScopeExplicit(scopeTag, serviceTag);
+        }
+
+        @Override
+        protected <T> T executeLookupFromScope(ScopeManager scopeManager, String scopeTag, String serviceTag) {
+            return scopeManager.lookupFromScopeExplicit(scopeTag, serviceTag);
+        }
+
+        @Override
+        protected Set<String> executeFindScopesForKey(ScopeManager scopeManager, Object key) {
+            return scopeManager.findScopesForKeyExplicit(key);
+        }
+    };
+
+    protected abstract boolean executeCanFindFromService(ScopeManager scopeManager, String scopeTag, String serviceTag);
+    
+    protected abstract <T> T executeLookupFromScope(ScopeManager scopeManager, String scopeTag, String serviceTag);
+
+    protected abstract Set<String> executeFindScopesForKey(ScopeManager scopeManager, Object key);
 }

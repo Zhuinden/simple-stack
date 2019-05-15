@@ -174,7 +174,7 @@ class ScopeManager {
         }
     }
 
-    private List<Object> latestState = null;
+    private List<Object> latestKeys = null;
 
     private boolean isFinalized = false;
 
@@ -188,7 +188,7 @@ class ScopeManager {
         // this logic is actually mostly inside Backstack for some reason
         destroyScope(GLOBAL_SCOPE_TAG);
 
-        this.latestState = null; // don't use `emptyList()` so that Globals can be re-initialized.
+        this.latestKeys = null; // don't use `emptyList()` so that Globals can be re-initialized.
     }
 
     void buildScopes(List<Object> newState) {
@@ -197,10 +197,10 @@ class ScopeManager {
             this.isGlobalScopePendingActivation = true; // if we allow scopes to be rebuilt once finalized, we need to enable activation of globals.
         }
 
-        if(this.latestState == null) { // this seems to be the best way to track that we can safely register and initialize the global scope.
+        if(this.latestKeys == null) { // this seems to be the best way to track that we can safely register and initialize the global scope.
             buildGlobalScope();
         }
-        this.latestState = newState;
+        this.latestKeys = newState;
 
         for(Object key : newState) {
             if(key instanceof ScopeKey.Child) {
@@ -300,10 +300,8 @@ class ScopeManager {
 
     private void notifyScopeActivation(String newScopeTag, Map<String, Object> newServiceMap) {
         for(Object service : newServiceMap.values()) {
-            if(isServiceNotActivated(service)) {
-                if(service instanceof ScopedServices.Activated) {
-                    ((ScopedServices.Activated) service).onServiceActive();
-                }
+            if(isServiceNotActivated(service) && service instanceof ScopedServices.Activated) {
+                ((ScopedServices.Activated) service).onServiceActive();
             }
 
             if(isServiceNotTrackedInScope(scopeActivatedServices, service, newScopeTag)) {
@@ -323,11 +321,12 @@ class ScopeManager {
                 untrackServiceInScope(scopeActivatedServices, service, previousScopeTag);
             }
 
-            if(isServiceNotActivated(service)) {
-                if(service instanceof ScopedServices.Activated && !untrackEventInvocationTracker.containsKey(service)) {
-                    untrackEventInvocationTracker.put(service, 1);
-                    ((ScopedServices.Activated) service).onServiceInactive();
-                }
+            if(isServiceNotActivated(service)
+                    && service instanceof ScopedServices.Activated
+                    && !untrackEventInvocationTracker.containsKey(service)
+            ) {
+                untrackEventInvocationTracker.put(service, 1);
+                ((ScopedServices.Activated) service).onServiceInactive();
             }
         }
     }
@@ -395,13 +394,7 @@ class ScopeManager {
         checkKey(key);
         checkScopeLookupMode(lookupMode);
 
-        if(lookupMode == ScopeLookupMode.ALL) {
-            return findScopesForKeyAll(key);
-        } else if(lookupMode == ScopeLookupMode.EXPLICIT) {
-            return findScopesForKeyExplicit(key);
-        } else {
-            throw new AssertionError("Mode was not handled.");
-        }
+        return lookupMode.executeFindScopesForKey(this, key);
     }
 
     @NonNull
@@ -409,8 +402,8 @@ class ScopeManager {
         LinkedHashSet<String> activeScopes = new LinkedHashSet<>();
 
         boolean isKeyFound = false;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
+        for(int i = latestKeys.size() - 1; i >= 0; i--) {
+            Object key = latestKeys.get(i);
             if(targetKey.equals(key)) {
                 isKeyFound = true;
             }
@@ -445,11 +438,11 @@ class ScopeManager {
     private LinkedHashSet<String> _findScopesForScopeTag(@Nullable String scopeTag, boolean explicitOnly) {
         LinkedHashSet<String> activeScopes = new LinkedHashSet<>();
 
-        if(this.latestState == null) {
+        if(this.latestKeys == null) {
             return activeScopes;
         }
 
-        List<Object> latestState = this.latestState;
+        List<Object> latestState = this.latestKeys;
 
         boolean isScopeFound = scopeTag == null;
         for(int i = latestState.size() - 1; i >= 0; i--) {
@@ -488,8 +481,8 @@ class ScopeManager {
     }
 
     @NonNull
-    private Set<String> findScopesForKeyAll(Object targetKey) {
-        if(this.latestState == null) {
+    Set<String> findScopesForKeyAll(Object targetKey) {
+        if(this.latestKeys == null) {
             return Collections.emptySet();
         }
 
@@ -503,8 +496,8 @@ class ScopeManager {
     }
 
     @NonNull
-    private Set<String> findScopesForKeyExplicit(Object targetKey) {
-        if(this.latestState == null) {
+    Set<String> findScopesForKeyExplicit(Object targetKey) {
+        if(this.latestKeys == null) {
             return Collections.emptySet();
         }
 
@@ -522,17 +515,11 @@ class ScopeManager {
         checkScopeTag(scopeTag);
         checkScopeLookupMode(lookupMode);
 
-        if(lookupMode == ScopeLookupMode.ALL) {
-            return canFindFromScopeAll(scopeTag, serviceTag);
-        } else if(lookupMode == ScopeLookupMode.EXPLICIT) {
-            return canFindFromScopeExplicit(scopeTag, serviceTag);
-        } else {
-            throw new AssertionError("Mode was not handled.");
-        }
+        return lookupMode.executeCanFindFromService(this, scopeTag, serviceTag);
     }
 
-    private boolean canFindFromScopeExplicit(String scopeTag, String serviceTag) {
-        if(this.latestState == null) {
+    boolean canFindFromScopeExplicit(String scopeTag, String serviceTag) {
+        if(this.latestKeys == null) {
             return false;
         }
 
@@ -552,8 +539,8 @@ class ScopeManager {
         return false;
     }
 
-    private boolean canFindFromScopeAll(String scopeTag, String serviceTag) {
-        if(this.latestState == null) {
+    boolean canFindFromScopeAll(String scopeTag, String serviceTag) {
+        if(this.latestKeys == null) {
             return false;
         }
 
@@ -578,16 +565,10 @@ class ScopeManager {
         checkServiceTag(serviceTag);
         checkScopeLookupMode(lookupMode);
 
-        if(lookupMode == ScopeLookupMode.ALL) {
-            return lookupFromScopeAll(scopeTag, serviceTag);
-        } else if(lookupMode == ScopeLookupMode.EXPLICIT) {
-            return lookupFromScopeExplicit(scopeTag, serviceTag);
-        } else {
-            throw new AssertionError("Mode was not handled.");
-        }
+        return lookupMode.executeLookupFromScope(this, scopeTag, serviceTag);
     }
 
-    private <T> T lookupFromScopeExplicit(String scopeTag, String serviceTag) {
+    <T> T lookupFromScopeExplicit(String scopeTag, String serviceTag) {
         verifyStackIsInitialized();
 
         LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, true);
@@ -606,7 +587,7 @@ class ScopeManager {
                 activeScopes.toArray()) + "]!");
     }
 
-    private <T> T lookupFromScopeAll(String scopeTag, String serviceTag) {
+    <T> T lookupFromScopeAll(String scopeTag, String serviceTag) {
         verifyStackIsInitialized();
 
         LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, false);
@@ -662,14 +643,14 @@ class ScopeManager {
 
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
                 activeScopes.toArray()) + "! " +
-                "Is the scope tag registered via a ScopeKey? " +
-                "If yes, make sure the StateChanger has been set by this time, " +
-                "and that you've bound and are trying to lookup the service with the correct service tag. " +
-                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+                                                "Is the scope tag registered via a ScopeKey? " +
+                                                "If yes, make sure the StateChanger has been set by this time, " +
+                                                "and that you've bound and are trying to lookup the service with the correct service tag. " +
+                                                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
     }
 
     private void verifyStackIsInitialized() {
-        if(this.latestState == null) {
+        if(this.latestKeys == null) {
             throw new IllegalStateException("Cannot lookup from an empty stack.");
         }
     }
