@@ -17,7 +17,6 @@ package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,13 +26,13 @@ import java.util.Set;
  * Should be created using {@link GlobalServices#builder()}.
  */
 public class GlobalServices {
-    private final Map<String, Object> services;
+    private final ScopeNode services;
 
-    Map<String, Object> getServices() {
+    ScopeNode getServices() {
         return services;
     }
 
-    private GlobalServices(Map<String, Object> scope) {
+    private GlobalServices(ScopeNode scope) {
         this.services = scope;
     }
 
@@ -44,12 +43,7 @@ public class GlobalServices {
      * @return if it contains the service
      */
     public boolean hasService(@NonNull String serviceTag) {
-        //noinspection ConstantConditions
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("serviceTag cannot be null!");
-        }
-
-        return services.containsKey(serviceTag);
+        return services.hasService(serviceTag);
     }
 
     /**
@@ -61,16 +55,7 @@ public class GlobalServices {
      */
     @NonNull
     public <T> T getService(@NonNull String serviceTag) {
-        //noinspection ConstantConditions
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("serviceTag cannot be null!");
-        }
-
-        if(hasService(serviceTag)) {
-            //noinspection unchecked
-            return (T) services.get(serviceTag);
-        }
-        throw new IllegalArgumentException("The global scope does not contain [" + serviceTag + "]!");
+        return services.getService(serviceTag);
     }
 
     /**
@@ -80,7 +65,7 @@ public class GlobalServices {
      */
     @NonNull
     public Set<Map.Entry<String, Object>> services() {
-        return services.entrySet();
+        return services.services();
     }
 
     /**
@@ -100,7 +85,7 @@ public class GlobalServices {
         private Builder() {
         }
 
-        private final Map<String, Object> scope = new LinkedHashMap<>();
+        private final ScopeNode scope = new ScopeNode();
 
         /**
          * Adds a service to the global scope.
@@ -111,16 +96,7 @@ public class GlobalServices {
          */
         @NonNull
         public Builder addService(@NonNull String serviceTag, @NonNull Object service) {
-            //noinspection ConstantConditions
-            if(serviceTag == null) {
-                throw new IllegalArgumentException("serviceTag cannot be null!");
-            }
-            //noinspection ConstantConditions
-            if(service == null) {
-                throw new IllegalArgumentException("service cannot be null!");
-            }
-
-            scope.put(serviceTag, service);
+            scope.addService(serviceTag, service);
             return this;
         }
 
@@ -131,7 +107,7 @@ public class GlobalServices {
          */
         @NonNull
         public GlobalServices build() {
-            return new GlobalServices(new LinkedHashMap<>(scope));
+            return new GlobalServices(new ScopeNode(scope));
         }
     }
 }

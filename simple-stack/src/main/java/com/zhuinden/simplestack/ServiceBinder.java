@@ -2,8 +2,6 @@ package com.zhuinden.simplestack;
 
 import android.support.annotation.NonNull;
 
-import java.util.Map;
-
 /**
  * The {@link ServiceBinder} allows binding services to a given scope, when that scope is created for the first time.
  *
@@ -14,9 +12,9 @@ public class ServiceBinder {
 
     private final Object key;
     private final String scopeTag;
-    private final Map<String, Object> scope;
+    private final ScopeNode scope;
 
-    ServiceBinder(ScopeManager scopeManager, Object key, String scopeTag, Map<String, Object> scope) {
+    ServiceBinder(ScopeManager scopeManager, Object key, String scopeTag, ScopeNode scope) {
         this.scopeManager = scopeManager;
 
         this.key = key;
@@ -53,15 +51,7 @@ public class ServiceBinder {
      * @param service    the service
      */
     public void addService(@NonNull String serviceTag, @NonNull Object service) {
-        //noinspection ConstantConditions
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("Service tag cannot be null!");
-        }
-        //noinspection ConstantConditions
-        if(service == null) {
-            throw new IllegalArgumentException("The provided service should not be null!");
-        }
-        scope.put(serviceTag, service);
+        scope.addService(serviceTag, service);
     }
 
     /**
@@ -71,10 +61,7 @@ public class ServiceBinder {
      * @return if the service is in the scope
      */
     public boolean hasService(@NonNull String serviceTag) {
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("Service tag cannot be null!");
-        }
-        return scope.containsKey(serviceTag);
+        return scope.hasService(serviceTag);
     }
 
     /**
@@ -87,14 +74,7 @@ public class ServiceBinder {
      */
     @NonNull
     public <T> T getService(@NonNull String serviceTag) {
-        if(serviceTag == null) {
-            throw new IllegalArgumentException("Service tag cannot be null!");
-        }
-        if(!hasService(serviceTag)) {
-            throw new IllegalArgumentException("The service with tag [" + serviceTag + "] was not found!");
-        }
-        //noinspection unchecked
-        return (T) scope.get(serviceTag);
+        return scope.getService(serviceTag);
     }
 
     /**

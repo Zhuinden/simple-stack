@@ -231,7 +231,7 @@ public class ScopingTest {
             backstack.setStateChanger(stateChanger);
             Assert.fail();
         } catch(Exception e) {
-            assertThat(e.getMessage()).isEqualTo("Service tag cannot be null!");
+            assertThat(e.getMessage()).isEqualTo("serviceTag cannot be null!");
         }
     }
 
@@ -260,7 +260,7 @@ public class ScopingTest {
             backstack.setStateChanger(stateChanger);
             Assert.fail();
         } catch(Exception e) {
-            assertThat(e.getMessage()).isEqualTo("The provided service should not be null!");
+            assertThat(e.getMessage()).isEqualTo("service cannot be null!");
         }
     }
 

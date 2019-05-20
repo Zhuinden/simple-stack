@@ -76,7 +76,7 @@ class ScopeManager {
         return backstack;
     }
 
-    private final Map<String, Map<String, Object>> scopes = new LinkedHashMap<>();
+    private final Map<String, ScopeNode> scopes = new LinkedHashMap<>();
 
     private final StateBundle rootBundle = new StateBundle();
 
@@ -97,7 +97,7 @@ class ScopeManager {
 
     private void buildGlobalScope() {
         if(!scopes.containsKey(GLOBAL_SCOPE_TAG)) {
-            Map<String, Object> scope = globalServices.getServices();
+            ScopeNode scope = globalServices.getServices();
             scopes.put(GLOBAL_SCOPE_TAG, scope);
 
             restoreAndNotifyServices(GLOBAL_SCOPE_TAG, scope);
@@ -110,7 +110,7 @@ class ScopeManager {
             throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
         }
         if(!scopes.containsKey(scopeTag)) {
-            Map<String, Object> scope = new LinkedHashMap<>();
+            ScopeNode scope = new ScopeNode();
             scopes.put(scopeTag, scope);
 
             scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
@@ -119,8 +119,8 @@ class ScopeManager {
         }
     }
 
-    private void restoreAndNotifyServices(String scopeTag, Map<String, Object> scope) {
-        for(Map.Entry<String, Object> serviceEntry : scope.entrySet()) {
+    private void restoreAndNotifyServices(String scopeTag, ScopeNode scope) {
+        for(Map.Entry<String, Object> serviceEntry : scope.services()) {
             String serviceTag = serviceEntry.getKey();
             Object service = serviceEntry.getValue();
 
@@ -244,18 +244,22 @@ class ScopeManager {
 
     void destroyScope(String scopeTag) {
         if(scopes.containsKey(scopeTag)) {
-            Map<String, Object> serviceMap = scopes.remove(scopeTag);
+            ScopeNode serviceMap = scopes.remove(scopeTag);
             destroyServicesAndRemoveState(scopeTag, serviceMap);
         }
     }
 
-    private void destroyServicesAndRemoveState(String scopeTag, Map<String, Object> serviceMap) {
-        List<Object> services = new ArrayList<>(serviceMap.values());
-        Collections.reverse(services);
+    private void destroyServicesAndRemoveState(String scopeTag, ScopeNode serviceMap) {
+        Set<Map.Entry<String, Object>> services = serviceMap.services();
+        List<Object> previousServices = new ArrayList<>(services.size());
+        for(Map.Entry<String, Object> entry : services) {
+            previousServices.add(entry.getValue());
+        }
+        Collections.reverse(previousServices);
 
         untrackEventInvocationTracker.clear();
 
-        for(Object service : services) {
+        for(Object service : previousServices) {
             if(!isServiceNotTrackedInScope(scopeEnteredServices, service, scopeTag)) {
                 untrackServiceInScope(scopeEnteredServices, service, scopeTag);
             }
@@ -283,8 +287,8 @@ class ScopeManager {
                         "The new scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
-            Map<String, Object> newServiceMap = scopes.get(newScopeTag);
-            notifyScopeActivation(newScopeTag, newServiceMap);
+            ScopeNode newScope = scopes.get(newScopeTag);
+            notifyScopeActivation(newScopeTag, newScope);
         }
 
         for(String previousScopeTag : scopesToDeactivate) {
@@ -293,13 +297,15 @@ class ScopeManager {
                         "The previous scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
-            Map<String, Object> previousServiceMap = scopes.get(previousScopeTag);
+            ScopeNode previousServiceMap = scopes.get(previousScopeTag);
             notifyScopeDeactivation(previousScopeTag, previousServiceMap);
         }
     }
 
-    private void notifyScopeActivation(String newScopeTag, Map<String, Object> newServiceMap) {
-        for(Object service : newServiceMap.values()) {
+    private void notifyScopeActivation(String newScopeTag, ScopeNode newScope) {
+        for(Map.Entry<String, Object> entry : newScope.services()) {
+            Object service = entry.getValue();
+
             if(isServiceNotActivated(service) && service instanceof ScopedServices.Activated) {
                 ((ScopedServices.Activated) service).onServiceActive();
             }
@@ -310,8 +316,12 @@ class ScopeManager {
         }
     }
 
-    private void notifyScopeDeactivation(String previousScopeTag, Map<String, Object> previousServiceMap) {
-        List<Object> previousServices = new ArrayList<>(previousServiceMap.values());
+    private void notifyScopeDeactivation(String previousScopeTag, ScopeNode previousScope) {
+        Set<Map.Entry<String, Object>> services = previousScope.services();
+        List<Object> previousServices = new ArrayList<>(services.size());
+        for(Map.Entry<String, Object> entry : services) {
+            previousServices.add(entry.getValue());
+        }
         Collections.reverse(previousServices);
 
         untrackEventInvocationTracker.clear();
@@ -333,12 +343,12 @@ class ScopeManager {
 
     StateBundle saveStates() {
         StateBundle rootBundle = new StateBundle();
-        for(Map.Entry<String, Map<String, Object>> scopeSet : scopes.entrySet()) {
+        for(Map.Entry<String, ScopeNode> scopeSet : scopes.entrySet()) {
             String scopeKey = scopeSet.getKey();
-            Map<String, Object> services = scopeSet.getValue();
+            ScopeNode services = scopeSet.getValue();
 
             StateBundle scopeBundle = new StateBundle();
-            for(Map.Entry<String, Object> serviceEntry : services.entrySet()) {
+            for(Map.Entry<String, Object> serviceEntry : services.services()) {
                 String serviceTag = serviceEntry.getKey();
                 Object service = serviceEntry.getValue();
                 if(service instanceof Bundleable) {
@@ -363,8 +373,8 @@ class ScopeManager {
             return false;
         }
 
-        Map<String, Object> services = scopes.get(scopeTag);
-        return services.containsKey(serviceTag);
+        ScopeNode services = scopes.get(scopeTag);
+        return services.hasService(serviceTag);
     }
 
     @NonNull
@@ -376,12 +386,11 @@ class ScopeManager {
             throw new IllegalArgumentException("The specified scope with tag [" + scopeTag + "] does not exist!");
         }
 
-        Map<String, Object> services = scopes.get(scopeTag);
-        if(!services.containsKey(serviceTag)) {
+        ScopeNode services = scopes.get(scopeTag);
+        if(!services.hasService(serviceTag)) {
             throw new IllegalArgumentException("The specified service with tag [" + serviceTag + "] does not exist in scope [" + scopeTag + "]! Did you accidentally try to use the same scope tag with different services?");
         }
-        //noinspection unchecked
-        return (T) services.get(serviceTag);
+        return services.getService(serviceTag);
     }
 
     boolean hasScope(@NonNull String scopeTag) {
@@ -442,11 +451,11 @@ class ScopeManager {
             return activeScopes;
         }
 
-        List<Object> latestState = this.latestKeys;
+        final List<Object> latestKeys = this.latestKeys;
 
         boolean isScopeFound = scopeTag == null;
-        for(int i = latestState.size() - 1; i >= 0; i--) {
-            Object key = latestState.get(i);
+        for(int i = latestKeys.size() - 1; i >= 0; i--) {
+            Object key = latestKeys.get(i);
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 String currentScope = scopeKey.getScopeTag();
@@ -643,10 +652,10 @@ class ScopeManager {
 
         throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
                 activeScopes.toArray()) + "! " +
-                                                "Is the scope tag registered via a ScopeKey? " +
-                                                "If yes, make sure the StateChanger has been set by this time, " +
-                                                "and that you've bound and are trying to lookup the service with the correct service tag. " +
-                                                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+                "Is the scope tag registered via a ScopeKey? " +
+                "If yes, make sure the StateChanger has been set by this time, " +
+                "and that you've bound and are trying to lookup the service with the correct service tag. " +
+                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
     }
 
     private void verifyStackIsInitialized() {
@@ -657,18 +666,21 @@ class ScopeManager {
 
 
     static private void checkKey(@NonNull Object key) {
+        //noinspection ConstantConditions
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
         }
     }
 
     static private void checkScopeTag(@NonNull String scopeTag) {
+        //noinspection ConstantConditions
         if(scopeTag == null) {
             throw new IllegalArgumentException("Scope tag cannot be null!");
         }
     }
 
     static private void checkServiceTag(@NonNull String serviceTag) {
+        //noinspection ConstantConditions
         if(serviceTag == null) {
             throw new IllegalArgumentException("Service tag cannot be null!");
         }
