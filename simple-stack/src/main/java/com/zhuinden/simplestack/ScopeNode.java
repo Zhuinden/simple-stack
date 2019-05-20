@@ -9,6 +9,7 @@ import java.util.Set;
 
 class ScopeNode {
     private final Map<String, Object> services = new LinkedHashMap<>();
+    private final Map<String, Object> aliases = new LinkedHashMap<>();
 
     ScopeNode() {
     }
@@ -19,10 +20,6 @@ class ScopeNode {
             throw new IllegalArgumentException("services cannot be null!");
         }
         this.services.putAll(services.services);
-    }
-
-    Map<String, Object> getServices() {
-        return services;
     }
 
     public boolean isEmpty() {
@@ -40,6 +37,17 @@ class ScopeNode {
         return this.services.containsKey(serviceTag);
     }
 
+    public void addAlias(@NonNull String alias, @NonNull Object service) {
+        checkAlias(alias);
+        checkService(service);
+        this.aliases.put(alias, service);
+    }
+
+    public boolean hasAlias(@NonNull String alias) {
+        checkAlias(alias);
+        return this.aliases.containsKey(alias);
+    }
+
     public Set<Map.Entry<String, Object>> services() {
         return Collections.unmodifiableSet(services.entrySet());
     }
@@ -54,6 +62,36 @@ class ScopeNode {
         throw new IllegalArgumentException("Scope does not contain [" + serviceTag + "]");
     }
 
+    public boolean hasServiceOrAlias(@NonNull String identifier) {
+        checkServiceTag(identifier);
+        checkAlias(identifier);
+
+        if(hasService(identifier)) {
+            return true;
+        }
+
+        //noinspection RedundantIfStatement
+        if(hasAlias(identifier)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public <T> T getServiceOrAlias(@NonNull String identifier) {
+        checkServiceTag(identifier);
+        checkAlias(identifier);
+
+        if(hasService(identifier)) {
+            return getService(identifier);
+        }
+
+        if(hasAlias(identifier)) {
+            //noinspection unchecked
+            return (T) aliases.get(identifier);
+        }
+        throw new IllegalArgumentException("Scope does not contain [" + identifier + "]");
+    }
 
     private static void checkServiceTag(@NonNull String serviceTag) {
         //noinspection ConstantConditions
@@ -66,6 +104,13 @@ class ScopeNode {
         //noinspection ConstantConditions
         if(service == null) {
             throw new IllegalArgumentException("service cannot be null!");
+        }
+    }
+
+    private static void checkAlias(@NonNull String alias) {
+        // noinspection ConstantConditions
+        if(alias == null) {
+            throw new IllegalArgumentException("alias cannot be null!");
         }
     }
 }

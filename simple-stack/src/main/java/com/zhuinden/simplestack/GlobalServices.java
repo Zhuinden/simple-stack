@@ -28,12 +28,34 @@ import java.util.Set;
 public class GlobalServices {
     private final ScopeNode services;
 
-    ScopeNode getServices() {
+    ScopeNode getScope() {
         return services;
+    }
+
+    boolean hasServiceOrAlias(String identifier) {
+        return services.hasServiceOrAlias(identifier);
+    }
+
+    <T> T getServiceOrAlias(@NonNull String identifier) {
+        return services.getServiceOrAlias(identifier);
+    }
+
+    boolean isEmpty() {
+        return services.isEmpty();
     }
 
     private GlobalServices(ScopeNode scope) {
         this.services = scope;
+    }
+
+    /**
+     * Returns if the global scope contains the provided alias.
+     *
+     * @param alias the alias
+     * @return if it contains the alias
+     */
+    public boolean hasAlias(@NonNull String alias) {
+        return services.hasAlias(alias);
     }
 
     /**
@@ -91,12 +113,25 @@ public class GlobalServices {
          * Adds a service to the global scope.
          *
          * @param serviceTag the service tag
-         * @param service  the service
+         * @param service    the service
          * @return the builder
          */
         @NonNull
         public Builder addService(@NonNull String serviceTag, @NonNull Object service) {
             scope.addService(serviceTag, service);
+            return this;
+        }
+
+        /**
+         * Adds an alias to a service in the global scope.
+         *
+         * @param alias   the alias
+         * @param service the service
+         * @return the builder
+         */
+        @NonNull
+        public Builder addAlias(@NonNull String alias, @NonNull Object service) {
+            scope.addAlias(alias, service);
             return this;
         }
 
