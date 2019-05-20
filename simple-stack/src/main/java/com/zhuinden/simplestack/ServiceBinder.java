@@ -78,6 +78,29 @@ public class ServiceBinder {
     }
 
     /**
+     * Adds an alias to the service within the local scope.
+     *
+     * The service must be added with {@link ServiceBinder#addService(String, Object)} before it is also added through an alias.
+     *
+     * @param alias   the alias
+     * @param service the service
+     * @throws IllegalStateException if the service was not added via {@link ServiceBinder#addService(String, Object)} before adding it as an alias.
+     */
+    public void addAlias(@NonNull String alias, @NonNull Object service) {
+        scope.addAlias(alias, service);
+    }
+
+    /**
+     * Returns whether the alias exists in the local scope.
+     *
+     * @param alias the alias
+     * @return if the alias exists in the local scope
+     */
+    public boolean hasAlias(@NonNull String alias) {
+        return scope.hasAlias(alias);
+    }
+
+    /**
      * Returns whether the service can be found within the currently existing active scopes.
      *
      * @param serviceTag the service tag

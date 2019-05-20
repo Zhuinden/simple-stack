@@ -399,6 +399,14 @@ class ScopeManager {
         return scopes.containsKey(scopeTag);
     }
 
+    public boolean hasAlias(@NonNull String scopeTag, @NonNull String alias) {
+        ScopeNode scopeNode = scopes.get(scopeTag);
+        if(scopeNode == null) {
+            return false;
+        }
+        return scopeNode.hasAlias(alias);
+    }
+
     @NonNull
     Set<String> findScopesForKey(@NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
         checkKey(key);

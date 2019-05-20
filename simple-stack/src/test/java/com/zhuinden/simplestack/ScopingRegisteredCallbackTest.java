@@ -18,6 +18,10 @@ package com.zhuinden.simplestack;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 
+import com.zhuinden.simplestack.helpers.HasParentServices;
+import com.zhuinden.simplestack.helpers.ServiceProvider;
+import com.zhuinden.simplestack.helpers.TestKeyWithScope;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -27,50 +31,6 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopingRegisteredCallbackTest {
-    private abstract class TestKeyWithScope
-            extends TestKey
-            implements HasServices {
-        TestKeyWithScope(String name) {
-            super(name);
-        }
-
-        protected TestKeyWithScope(Parcel in) {
-            super(in);
-        }
-
-        @NonNull
-        @Override
-        public String getScopeTag() {
-            return name;
-        }
-    }
-
-    private interface HasServices
-            extends ScopeKey {
-        void bindServices(ServiceBinder serviceBinder);
-    }
-
-    private interface HasParentServices
-            extends ScopeKey.Child {
-        void bindServices(ServiceBinder serviceBinder);
-    }
-
-    private static class ServiceProvider
-            implements ScopedServices {
-        @Override
-        public void bindServices(@NonNull ServiceBinder serviceBinder) {
-            Object key = serviceBinder.getKey();
-            if(key instanceof HasServices) {
-                ((HasServices) key).bindServices(serviceBinder);
-                return;
-            }
-            if(key instanceof HasParentServices) {
-                ((HasParentServices) key).bindServices(serviceBinder);
-                //noinspection UnnecessaryReturnStatement
-                return;
-            }
-        }
-    }
 
     private static abstract class ServiceEvent {
         protected final String name;
@@ -96,37 +56,6 @@ public class ScopingRegisteredCallbackTest {
         public String toString() {
             return "ServiceEvent{" +
                     "name='" + name + '\'' +
-                    '}';
-        }
-    }
-
-    private static class ServiceEventWithScope extends ServiceEvent {
-        private final String scopeTag;
-
-        public ServiceEventWithScope(String name, String scopeTag) {
-            super(name);
-            this.scopeTag = scopeTag;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if(this == o) return true;
-            if(!(o instanceof ServiceEventWithScope)) return false;
-            if(!super.equals(o)) return false;
-            ServiceEventWithScope that = (ServiceEventWithScope) o;
-            return Objects.equals(scopeTag, that.scopeTag);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), scopeTag);
-        }
-
-        @Override
-        public String toString() {
-            return "ServiceEventWithScope{" +
-                    "name='" + name + '\'' +
-                    ", scopeTag='" + scopeTag + '\'' +
                     '}';
         }
     }

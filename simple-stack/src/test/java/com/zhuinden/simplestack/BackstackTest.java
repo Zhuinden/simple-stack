@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.zhuinden.simplestack.helpers.TestKey;
 import com.zhuinden.statebundle.StateBundle;
 
 import junit.framework.Assert;

@@ -292,6 +292,16 @@ public class Navigator {
         return getBackstack(context).goBack();
     }
 
+    /**
+     * Returns if a given alias exists in a given scope.
+     *
+     * @param scopeTag the scope tag
+     * @param alias    the alias
+     * @return whether the alias exists
+     */
+    public static boolean hasAlias(@NonNull Context context, @NonNull String scopeTag, @NonNull String alias) {
+        return getBackstack(context).hasAlias(scopeTag, alias);
+    }
 
     /**
      * Returns if a given scope exists.

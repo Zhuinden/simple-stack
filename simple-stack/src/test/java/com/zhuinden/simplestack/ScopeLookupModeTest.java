@@ -18,35 +18,20 @@ package com.zhuinden.simplestack;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 
-import org.junit.Assert;
+import com.zhuinden.simplestack.helpers.Action;
+import com.zhuinden.simplestack.helpers.HasParentServices;
+import com.zhuinden.simplestack.helpers.HasServices;
+import com.zhuinden.simplestack.helpers.ServiceProvider;
+import com.zhuinden.simplestack.helpers.TestKey;
+
 import org.junit.Test;
 
 import java.util.List;
 
+import static com.zhuinden.simplestack.helpers.AssertionHelper.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopeLookupModeTest {
-    private interface HasServices
-            extends ScopeKey {
-        void bindServices(ServiceBinder serviceBinder);
-    }
-
-    private interface HasParentServices
-            extends ScopeKey.Child {
-        void bindServices(ServiceBinder serviceBinder);
-    }
-
-    private static class ServiceProvider
-            implements ScopedServices {
-        @Override
-        public void bindServices(@NonNull ServiceBinder serviceBinder) {
-            Object key = serviceBinder.getKey();
-            if(key instanceof HasServices) {
-                ((HasServices) key).bindServices(serviceBinder);
-            }
-        }
-    }
-
     @Test
     public void lookupModesWork() {
         final Backstack backstack = new Backstack();
@@ -371,19 +356,6 @@ public class ScopeLookupModeTest {
         assertThat(backstack.lookupFromScope("parent2", "parentService2", ScopeLookupMode.EXPLICIT)).isSameAs(parentService2);
     }
 
-    private interface Action {
-        void doSomething();
-    }
-
-    private void assertThrows(Action action) {
-        try {
-            action.doSomething();
-            Assert.fail("Did not throw exception.");
-        } catch(Exception e) {
-            // OK!
-        }
-    }
-
     @Test
     public void findScopesForKeyWorks() {
         final Backstack backstack = new Backstack();
@@ -605,24 +577,6 @@ public class ScopeLookupModeTest {
                 return name;
             }
         }
-
-        class ServiceProvider
-                implements ScopedServices {
-            @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
-                Object key = serviceBinder.getKey();
-                if(key instanceof HasServices) {
-                    ((HasServices) key).bindServices(serviceBinder);
-                    return;
-                }
-                if(key instanceof HasParentServices) {
-                    ((HasParentServices) key).bindServices(serviceBinder);
-                    //noinspection UnnecessaryReturnStatement
-                    return;
-                }
-            }
-        }
-
 
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ServiceProvider());

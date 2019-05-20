@@ -20,6 +20,7 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.zhuinden.simplestack.helpers.TestKey;
 import com.zhuinden.statebundle.StateBundle;
 
 import junit.framework.Assert;
