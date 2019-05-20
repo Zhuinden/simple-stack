@@ -62,7 +62,7 @@ class ScopeNode {
         throw new IllegalArgumentException("Scope does not contain [" + serviceTag + "]");
     }
 
-    public boolean hasServiceOrAlias(@NonNull String identifier) {
+    boolean hasServiceOrAlias(@NonNull String identifier) {
         checkServiceTag(identifier);
         checkAlias(identifier);
 
@@ -78,7 +78,7 @@ class ScopeNode {
         return false;
     }
 
-    public <T> T getServiceOrAlias(@NonNull String identifier) {
+    <T> T getServiceOrAlias(@NonNull String identifier) {
         checkServiceTag(identifier);
         checkAlias(identifier);
 
