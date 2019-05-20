@@ -26,26 +26,26 @@ import java.util.Set;
  * Should be created using {@link GlobalServices#builder()}.
  */
 public class GlobalServices {
-    private final ScopeNode services;
+    private final ScopeNode scope;
 
     ScopeNode getScope() {
-        return services;
+        return scope;
     }
 
     boolean hasServiceOrAlias(String identifier) {
-        return services.hasServiceOrAlias(identifier);
+        return scope.hasServiceOrAlias(identifier);
     }
 
     <T> T getServiceOrAlias(@NonNull String identifier) {
-        return services.getServiceOrAlias(identifier);
+        return scope.getServiceOrAlias(identifier);
     }
 
     boolean isEmpty() {
-        return services.isEmpty();
+        return scope.isEmpty();
     }
 
     private GlobalServices(ScopeNode scope) {
-        this.services = scope;
+        this.scope = scope;
     }
 
     /**
@@ -55,7 +55,7 @@ public class GlobalServices {
      * @return if it contains the alias
      */
     public boolean hasAlias(@NonNull String alias) {
-        return services.hasAlias(alias);
+        return scope.hasAlias(alias);
     }
 
     /**
@@ -65,7 +65,7 @@ public class GlobalServices {
      * @return if it contains the service
      */
     public boolean hasService(@NonNull String serviceTag) {
-        return services.hasService(serviceTag);
+        return scope.hasService(serviceTag);
     }
 
     /**
@@ -77,7 +77,7 @@ public class GlobalServices {
      */
     @NonNull
     public <T> T getService(@NonNull String serviceTag) {
-        return services.getService(serviceTag);
+        return scope.getService(serviceTag);
     }
 
     /**
@@ -87,7 +87,7 @@ public class GlobalServices {
      */
     @NonNull
     public Set<Map.Entry<String, Object>> services() {
-        return services.services();
+        return scope.services();
     }
 
     /**
