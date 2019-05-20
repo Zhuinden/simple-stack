@@ -42,7 +42,17 @@ class ScopeNode {
 
     public boolean hasService(@NonNull String serviceTag) {
         checkServiceTag(serviceTag);
-        return this.services.containsKey(serviceTag);
+        if(this.services.containsKey(serviceTag)) {
+            return true;
+        }
+
+        checkAlias(serviceTag);
+        //noinspection RedundantIfStatement
+        if(this.aliases.containsKey(serviceTag)) {
+            return true;
+        }
+
+        return false;
     }
 
     public void addAlias(@NonNull String alias, @NonNull Object service) {
@@ -55,54 +65,24 @@ class ScopeNode {
         this.aliases.put(alias, service);
     }
 
-    public boolean hasAlias(@NonNull String alias) {
-        checkAlias(alias);
-        return this.aliases.containsKey(alias);
-    }
-
     public Set<Map.Entry<String, Object>> services() {
         return Collections.unmodifiableSet(services.entrySet());
     }
 
     public <T> T getService(@NonNull String serviceTag) {
         checkServiceTag(serviceTag);
+        checkAlias(serviceTag);
 
-        if(hasService(serviceTag)) {
+        if(services.containsKey(serviceTag)) {
             //noinspection unchecked
             return (T) services.get(serviceTag);
         }
-        throw new IllegalArgumentException("Scope does not contain [" + serviceTag + "]");
-    }
 
-    boolean hasServiceOrAlias(@NonNull String identifier) {
-        checkServiceTag(identifier);
-        checkAlias(identifier);
-
-        if(hasService(identifier)) {
-            return true;
-        }
-
-        //noinspection RedundantIfStatement
-        if(hasAlias(identifier)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    <T> T getServiceOrAlias(@NonNull String identifier) {
-        checkServiceTag(identifier);
-        checkAlias(identifier);
-
-        if(hasService(identifier)) {
-            return getService(identifier);
-        }
-
-        if(hasAlias(identifier)) {
+        if(aliases.containsKey(serviceTag)) {
             //noinspection unchecked
-            return (T) aliases.get(identifier);
+            return (T) aliases.get(serviceTag);
         }
-        throw new IllegalArgumentException("Scope does not contain [" + identifier + "]");
+        throw new IllegalArgumentException("Scope does not contain [" + serviceTag + "]");
     }
 
     private static void checkServiceTag(@NonNull String serviceTag) {

@@ -1,6 +1,11 @@
 # Change log
 
--Simple Stack 2.0.1 (2019-05-20)
+-Simple Stack 2.0.2 (2019-05-20)
+--------------------------------
+
+- FIXED: `hasAlias()` is removed, and merged into `hasService`. Aliases are now treated as service tags, meaning `hasService`/`getService` does not treat them separately.
+
+-Simple Stack 2.0.1 (DEAD ON ARRIVAL)
 --------------------------------
 
 - ADDED: `ServiceBinder.addAlias()` to allow adding an alias to an added service: available for look-up, but without getting callbacks by this registration (thus avoiding unnecessary `toBundle()` calls for a multi-registered service).

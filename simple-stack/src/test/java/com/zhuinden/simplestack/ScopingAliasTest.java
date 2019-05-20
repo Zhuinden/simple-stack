@@ -60,16 +60,16 @@ public class ScopingAliasTest {
             public void bindServices(ServiceBinder serviceBinder) {
                 serviceBinder.addService("service", service);
 
-                assertThat(serviceBinder.hasAlias("alias")).isFalse();
+                assertThat(serviceBinder.hasService("alias")).isFalse();
                 serviceBinder.addAlias("alias", service);
-                assertThat(serviceBinder.hasAlias("alias")).isTrue();
+                assertThat(serviceBinder.hasService("alias")).isTrue();
             }
         };
 
         backstack.setup(History.of(boop));
 
         assertThat(backstack.hasService("boop", "service")).isFalse();
-        assertThat(backstack.hasAlias("boop", "alias")).isFalse();
+        assertThat(backstack.hasService("boop", "alias")).isFalse();
 
         backstack.setStateChanger(new StateChanger() {
             @Override
@@ -80,8 +80,10 @@ public class ScopingAliasTest {
 
         // then
         assertThat(backstack.hasService("boop", "service")).isTrue();
-        assertThat(backstack.hasAlias("boop", "alias")).isTrue();
-        assertThat(backstack.hasService("boop", "alias")).isFalse();
+        assertThat(backstack.hasService("boop", "alias")).isTrue();
+
+        assertThat(backstack.getService("boop", "service")).isSameAs(service);
+        assertThat(backstack.getService("boop", "alias")).isSameAs(service);
 
         assertThat(backstack.canFindFromScope("boop", "alias")).isTrue();
         assertThat(backstack.canFindFromScope("boop", "alias", ScopeLookupMode.ALL)).isTrue();
@@ -294,8 +296,7 @@ public class ScopingAliasTest {
 
         // then
         assertThat(backstack.hasService("parent1", "serviceP1")).isTrue();
-        assertThat(backstack.hasAlias("parent1", "aliasP1")).isTrue();
-        assertThat(backstack.hasService("parent1", "aliasP1")).isFalse();
+        assertThat(backstack.hasService("parent1", "aliasP1")).isTrue();
 
         assertThat(backstack.canFindFromScope("parent1", "aliasP1")).isTrue();
         assertThat(backstack.canFindFromScope("parent1", "aliasP1", ScopeLookupMode.ALL)).isTrue();
@@ -309,8 +310,7 @@ public class ScopingAliasTest {
 
         // then
         assertThat(backstack.hasService(ScopeManager.GLOBAL_SCOPE_TAG, "service0")).isTrue();
-        assertThat(backstack.hasAlias(ScopeManager.GLOBAL_SCOPE_TAG, "alias0")).isTrue();
-        assertThat(backstack.hasService(ScopeManager.GLOBAL_SCOPE_TAG, "alias0")).isFalse();
+        assertThat(backstack.hasService(ScopeManager.GLOBAL_SCOPE_TAG, "alias0")).isTrue();
 
         assertThat(backstack.canFindFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0")).isTrue();
         assertThat(backstack.canFindFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0", ScopeLookupMode.ALL)).isTrue();
@@ -330,7 +330,7 @@ public class ScopingAliasTest {
 
         // then
         assertThat(backstack.hasService("parent1", "serviceP1")).isFalse();
-        assertThat(backstack.hasAlias("parent1", "aliasP1")).isFalse();
+        assertThat(backstack.hasService("parent1", "aliasP1")).isFalse();
 
         assertThat(backstack.canFindFromScope("parent1", "aliasP1")).isFalse();
         assertThat(backstack.canFindFromScope("parent1", "aliasP1", ScopeLookupMode.ALL)).isFalse();
@@ -422,7 +422,7 @@ public class ScopingAliasTest {
         });
 
         assertThat(backstack.hasService("boop", "service")).isTrue();
-        assertThat(backstack.hasAlias("boop", "alias")).isTrue();
+        assertThat(backstack.hasService("boop", "alias")).isTrue();
 
         StateBundle bundle = backstack.toBundle();
 

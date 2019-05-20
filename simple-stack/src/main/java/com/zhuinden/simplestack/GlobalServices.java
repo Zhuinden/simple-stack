@@ -32,30 +32,12 @@ public class GlobalServices {
         return scope;
     }
 
-    boolean hasServiceOrAlias(String identifier) {
-        return scope.hasServiceOrAlias(identifier);
-    }
-
-    <T> T getServiceOrAlias(@NonNull String identifier) {
-        return scope.getServiceOrAlias(identifier);
-    }
-
     boolean isEmpty() {
         return scope.isEmpty();
     }
 
     private GlobalServices(ScopeNode scope) {
         this.scope = scope;
-    }
-
-    /**
-     * Returns if the global scope contains the provided alias.
-     *
-     * @param alias the alias
-     * @return if it contains the alias
-     */
-    public boolean hasAlias(@NonNull String alias) {
-        return scope.hasAlias(alias);
     }
 
     /**

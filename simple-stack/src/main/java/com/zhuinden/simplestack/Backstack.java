@@ -447,17 +447,6 @@ public class Backstack
     }
 
     /**
-     * Returns if the alias exists in a given scope.
-     *
-     * @param scopeTag the scope tag
-     * @param alias    the alias
-     * @return if the alias exists
-     */
-    public boolean hasAlias(String scopeTag, String alias) {
-        return scopeManager.hasAlias(scopeTag, alias);
-    }
-
-    /**
      * Attempts to look-up the service in all currently existing scopes, starting from the last added scope.
      * Returns whether the service exists in any scopes.
      *

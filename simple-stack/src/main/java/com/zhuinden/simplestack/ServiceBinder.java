@@ -91,16 +91,6 @@ public class ServiceBinder {
     }
 
     /**
-     * Returns whether the alias exists in the local scope.
-     *
-     * @param alias the alias
-     * @return if the alias exists in the local scope
-     */
-    public boolean hasAlias(@NonNull String alias) {
-        return scope.hasAlias(alias);
-    }
-
-    /**
      * Returns whether the service can be found within the currently existing active scopes.
      *
      * @param serviceTag the service tag

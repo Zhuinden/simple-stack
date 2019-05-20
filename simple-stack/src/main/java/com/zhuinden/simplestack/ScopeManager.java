@@ -400,16 +400,6 @@ class ScopeManager {
         return scopes.containsKey(scopeTag);
     }
 
-    public boolean hasAlias(@NonNull String scopeTag, @NonNull String alias) {
-        checkScopeTag(scopeTag);
-
-        ScopeNode scopeNode = scopes.get(scopeTag);
-        if(scopeNode == null) {
-            return false;
-        }
-        return scopeNode.hasAlias(alias);
-    }
-
     @NonNull
     Set<String> findScopesForKey(@NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
         checkKey(key);
@@ -548,13 +538,13 @@ class ScopeManager {
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
+            if(scopeNode != null && scopeNode.hasService(identifier)) {
                 return true;
             }
         }
 
         //noinspection RedundantIfStatement
-        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
+        if(!isFinalized && globalServices.hasService(identifier)) {
             return true;
         }
 
@@ -570,13 +560,13 @@ class ScopeManager {
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
+            if(scopeNode != null && scopeNode.hasService(identifier)) {
                 return true;
             }
         }
 
         //noinspection RedundantIfStatement
-        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
+        if(!isFinalized && globalServices.hasService(identifier)) {
             return true;
         }
 
@@ -598,13 +588,13 @@ class ScopeManager {
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
-                return scopeNode.getServiceOrAlias(identifier);
+            if(scopeNode != null && scopeNode.hasService(identifier)) {
+                return scopeNode.getService(identifier);
             }
         }
 
-        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
-            return globalServices.getServiceOrAlias(identifier);
+        if(!isFinalized && globalServices.hasService(identifier)) {
+            return globalServices.getService(identifier);
         }
 
         throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
@@ -618,13 +608,13 @@ class ScopeManager {
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
-                return scopeNode.getServiceOrAlias(identifier);
+            if(scopeNode != null && scopeNode.hasService(identifier)) {
+                return scopeNode.getService(identifier);
             }
         }
 
-        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
-            return globalServices.getServiceOrAlias(identifier);
+        if(!isFinalized && globalServices.hasService(identifier)) {
+            return globalServices.getService(identifier);
         }
 
         throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
@@ -636,13 +626,13 @@ class ScopeManager {
         List<String> activeScopes = getActiveScopesReverse();
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
+            if(scopeNode != null && scopeNode.hasService(identifier)) {
                 return true;
             }
         }
 
         //noinspection RedundantIfStatement
-        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
+        if(!isFinalized && globalServices.hasService(identifier)) {
             return true;
         }
 
@@ -659,13 +649,13 @@ class ScopeManager {
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
-                return scopeNode.getServiceOrAlias(identifier);
+            if(scopeNode != null && scopeNode.hasService(identifier)) {
+                return scopeNode.getService(identifier);
             }
         }
 
-        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
-            return globalServices.getServiceOrAlias(identifier);
+        if(!isFinalized && globalServices.hasService(identifier)) {
+            return globalServices.getService(identifier);
         }
 
         throw new IllegalStateException("The service [" + identifier + "] does not exist in any scopes, which are " + Arrays.toString(
