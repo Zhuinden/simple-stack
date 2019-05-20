@@ -113,7 +113,7 @@ public class GlobalServices {
         public Builder addService(@NonNull String serviceTag, @NonNull Object service) {
             //noinspection ConstantConditions
             if(serviceTag == null) {
-                throw new IllegalArgumentException("serviceTagTag cannot be null!");
+                throw new IllegalArgumentException("serviceTag cannot be null!");
             }
             //noinspection ConstantConditions
             if(service == null) {
