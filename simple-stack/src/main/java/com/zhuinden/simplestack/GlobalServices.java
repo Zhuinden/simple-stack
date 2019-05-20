@@ -113,6 +113,7 @@ public class GlobalServices {
          */
         @NonNull
         public Builder addAlias(@NonNull String alias, @NonNull Object service) {
+            // TODO (ALIAS): add restriction that `addAlias` can only be called if the `Object service` is added to the global scope
             scope.addAlias(alias, service);
             return this;
         }

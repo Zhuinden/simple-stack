@@ -78,15 +78,13 @@ public class ServiceBinder {
     }
 
     /**
-     * Adds an alias to the service within the local scope.
-     *
-     * The service must be added with {@link ServiceBinder#addService(String, Object)} before it is also added through an alias.
+     * Adds an alias to the service within the local scope. Callbacks are not called for aliases, but they can be found as services.
      *
      * @param alias   the alias
      * @param service the service
-     * @throws IllegalStateException if the service was not added via {@link ServiceBinder#addService(String, Object)} before adding it as an alias.
      */
     public void addAlias(@NonNull String alias, @NonNull Object service) {
+        // TODO (ALIAS): add restriction that `addAlias` can only be called if the `Object service` is added to this scope or any of its parent scopes
         scope.addAlias(alias, service);
     }
 

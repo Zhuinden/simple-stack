@@ -928,7 +928,7 @@ public class Backstack
     /**
      * Returns the root (first) element of this history, or null if the history is empty.
      *
-     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
+     * @throws IllegalStateException if the history doesn't contain any elements yet.
      *
      * @param <K> the type of the key
      * @return the root (first) key
@@ -941,7 +941,7 @@ public class Backstack
     /**
      * Returns the last element in the list, or null if the history is empty.
      *
-     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
+     * @throws IllegalStateException if the history doesn't contain any elements yet.
      *
      * @param <K> the type of the key
      * @return the top key
@@ -959,7 +959,7 @@ public class Backstack
      *
      * Accepted values are in range of [-size, size).
      *
-     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
+     * @throws IllegalStateException if the history doesn't contain any elements yet.
      * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
      *
      * @param offset the offset from the top

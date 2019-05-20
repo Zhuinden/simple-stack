@@ -3,7 +3,6 @@ package com.zhuinden.simplestack;
 import android.support.annotation.NonNull;
 
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -11,8 +10,6 @@ import java.util.Set;
 class ScopeNode {
     private final Map<String, Object> services = new LinkedHashMap<>();
     private final Map<String, Object> aliases = new LinkedHashMap<>();
-
-    private final IdentityHashMap<Object, Integer> serviceTracker = new IdentityHashMap<>();
 
     ScopeNode() {
     }
@@ -33,11 +30,8 @@ class ScopeNode {
     public void addService(@NonNull String serviceTag, @NonNull Object service) {
         checkServiceTag(serviceTag);
         checkService(service);
-        this.services.put(serviceTag, service);
 
-        if(!serviceTracker.containsKey(service)) {
-            this.serviceTracker.put(service, 1); // for alias restriction
-        }
+        this.services.put(serviceTag, service);
     }
 
     public boolean hasService(@NonNull String serviceTag) {
@@ -59,9 +53,6 @@ class ScopeNode {
         checkAlias(alias);
         checkService(service);
 
-        if(!serviceTracker.containsKey(service)) {
-            throw new IllegalStateException("A service should be added to the scope before it is bound to aliases.");
-        }
         this.aliases.put(alias, service);
     }
 
@@ -71,13 +62,12 @@ class ScopeNode {
 
     public <T> T getService(@NonNull String serviceTag) {
         checkServiceTag(serviceTag);
-        checkAlias(serviceTag);
-
         if(services.containsKey(serviceTag)) {
             //noinspection unchecked
             return (T) services.get(serviceTag);
         }
 
+        checkAlias(serviceTag);
         if(aliases.containsKey(serviceTag)) {
             //noinspection unchecked
             return (T) aliases.get(serviceTag);

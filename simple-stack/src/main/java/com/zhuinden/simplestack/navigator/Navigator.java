@@ -357,7 +357,6 @@ public class Navigator {
      *
      * @param serviceTag the tag of the service
      * @return whether the service exists in any active scopes
-     * @throws IllegalStateException if the service doesn't exist in any scope
      */
     public static boolean canFindService(@NonNull Context context, @NonNull String serviceTag) {
         return getBackstack(context).canFindService(serviceTag);
