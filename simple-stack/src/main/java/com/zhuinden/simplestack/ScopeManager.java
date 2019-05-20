@@ -396,10 +396,13 @@ class ScopeManager {
 
     boolean hasScope(@NonNull String scopeTag) {
         checkScopeTag(scopeTag);
+
         return scopes.containsKey(scopeTag);
     }
 
     public boolean hasAlias(@NonNull String scopeTag, @NonNull String alias) {
+        checkScopeTag(scopeTag);
+
         ScopeNode scopeNode = scopes.get(scopeTag);
         if(scopeNode == null) {
             return false;
