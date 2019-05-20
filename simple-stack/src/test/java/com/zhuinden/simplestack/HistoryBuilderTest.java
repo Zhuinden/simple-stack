@@ -16,6 +16,8 @@
 
 package com.zhuinden.simplestack;
 
+import com.zhuinden.simplestack.helpers.TestKey;
+
 import org.junit.Assert;
 import org.junit.Test;
 

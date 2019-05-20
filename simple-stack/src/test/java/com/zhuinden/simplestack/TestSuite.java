@@ -36,7 +36,8 @@ import org.junit.runners.Suite;
         ScopingExplicitParentsTest.class,
         ScopeLookupModeTest.class,
         ScopingGlobalScopeTest.class,
-        ScopingRegisteredCallbackTest.class
+        ScopingRegisteredCallbackTest.class,
+        ScopingAliasTest.class
 })
 public class TestSuite {
 }

@@ -18,6 +18,8 @@ package com.zhuinden.simplestack;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import com.zhuinden.simplestack.helpers.TestKey;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;

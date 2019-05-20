@@ -3,12 +3,16 @@ package com.zhuinden.simplestack;
 import android.support.annotation.NonNull;
 
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 class ScopeNode {
     private final Map<String, Object> services = new LinkedHashMap<>();
+    private final Map<String, Object> aliases = new LinkedHashMap<>();
+
+    private final IdentityHashMap<Object, Integer> serviceTracker = new IdentityHashMap<>();
 
     ScopeNode() {
     }
@@ -19,10 +23,7 @@ class ScopeNode {
             throw new IllegalArgumentException("services cannot be null!");
         }
         this.services.putAll(services.services);
-    }
-
-    Map<String, Object> getServices() {
-        return services;
+        this.aliases.putAll(services.aliases);
     }
 
     public boolean isEmpty() {
@@ -33,11 +34,30 @@ class ScopeNode {
         checkServiceTag(serviceTag);
         checkService(service);
         this.services.put(serviceTag, service);
+
+        if(!serviceTracker.containsKey(service)) {
+            this.serviceTracker.put(service, 1); // for alias restriction
+        }
     }
 
     public boolean hasService(@NonNull String serviceTag) {
         checkServiceTag(serviceTag);
         return this.services.containsKey(serviceTag);
+    }
+
+    public void addAlias(@NonNull String alias, @NonNull Object service) {
+        checkAlias(alias);
+        checkService(service);
+
+        if(!serviceTracker.containsKey(service)) {
+            throw new IllegalStateException("A service should be added to the scope before it is bound to aliases.");
+        }
+        this.aliases.put(alias, service);
+    }
+
+    public boolean hasAlias(@NonNull String alias) {
+        checkAlias(alias);
+        return this.aliases.containsKey(alias);
     }
 
     public Set<Map.Entry<String, Object>> services() {
@@ -54,6 +74,36 @@ class ScopeNode {
         throw new IllegalArgumentException("Scope does not contain [" + serviceTag + "]");
     }
 
+    boolean hasServiceOrAlias(@NonNull String identifier) {
+        checkServiceTag(identifier);
+        checkAlias(identifier);
+
+        if(hasService(identifier)) {
+            return true;
+        }
+
+        //noinspection RedundantIfStatement
+        if(hasAlias(identifier)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    <T> T getServiceOrAlias(@NonNull String identifier) {
+        checkServiceTag(identifier);
+        checkAlias(identifier);
+
+        if(hasService(identifier)) {
+            return getService(identifier);
+        }
+
+        if(hasAlias(identifier)) {
+            //noinspection unchecked
+            return (T) aliases.get(identifier);
+        }
+        throw new IllegalArgumentException("Scope does not contain [" + identifier + "]");
+    }
 
     private static void checkServiceTag(@NonNull String serviceTag) {
         //noinspection ConstantConditions
@@ -66,6 +116,13 @@ class ScopeNode {
         //noinspection ConstantConditions
         if(service == null) {
             throw new IllegalArgumentException("service cannot be null!");
+        }
+    }
+
+    private static void checkAlias(@NonNull String alias) {
+        // noinspection ConstantConditions
+        if(alias == null) {
+            throw new IllegalArgumentException("alias cannot be null!");
         }
     }
 }

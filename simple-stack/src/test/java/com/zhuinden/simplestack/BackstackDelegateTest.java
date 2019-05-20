@@ -23,6 +23,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.zhuinden.simplestack.helpers.TestKey;
 import com.zhuinden.statebundle.StateBundle;
 
 import org.junit.Assert;
@@ -50,6 +51,9 @@ public class BackstackDelegateTest {
 
     @Mock
     Context context;
+
+    @Mock
+    Activity activity;
 
     @Mock
     Backstack backstack;
@@ -379,7 +383,7 @@ public class BackstackDelegateTest {
             backstackDelegate.setKeyParceler(new KeyParceler() {
                 @Override
                 public Parcelable toParcelable(Object object) {
-                    return (Parcelable)object;
+                    return (Parcelable) object;
                 }
 
                 @Override
@@ -475,5 +479,28 @@ public class BackstackDelegateTest {
         } catch(IllegalStateException e) {
             // OK!
         }
+    }
+
+    @Test
+    public void globalServicesWorks() {
+        BackstackDelegate backstackDelegate = new BackstackDelegate();
+        final Object service = new Object();
+        backstackDelegate.setGlobalServices(null, GlobalServices.builder()
+                .addService("service", service)
+                .addAlias("alias", service)
+                .build());
+        TestKey testKey = new TestKey("hello");
+        backstackDelegate.onCreate(null, null, History.of(testKey));
+        backstackDelegate.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstackDelegate.canFindService("service")).isTrue();
+        assertThat(backstackDelegate.lookupService("service")).isSameAs(service);
+        assertThat(backstackDelegate.canFindService("alias")).isTrue();
+        assertThat(backstackDelegate.lookupService("alias")).isSameAs(service);
     }
 }

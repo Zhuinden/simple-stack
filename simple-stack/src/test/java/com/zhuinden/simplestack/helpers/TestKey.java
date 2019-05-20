@@ -15,16 +15,16 @@
  */
 
 
-package com.zhuinden.simplestack;
+package com.zhuinden.simplestack.helpers;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class TestKey
+public class TestKey
         implements Parcelable {
-    final String name;
+    public final String name;
 
-    TestKey(String name) {
+    public TestKey(String name) {
         this.name = name;
     }
 

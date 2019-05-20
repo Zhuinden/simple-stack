@@ -26,14 +26,36 @@ import java.util.Set;
  * Should be created using {@link GlobalServices#builder()}.
  */
 public class GlobalServices {
-    private final ScopeNode services;
+    private final ScopeNode scope;
 
-    ScopeNode getServices() {
-        return services;
+    ScopeNode getScope() {
+        return scope;
+    }
+
+    boolean hasServiceOrAlias(String identifier) {
+        return scope.hasServiceOrAlias(identifier);
+    }
+
+    <T> T getServiceOrAlias(@NonNull String identifier) {
+        return scope.getServiceOrAlias(identifier);
+    }
+
+    boolean isEmpty() {
+        return scope.isEmpty();
     }
 
     private GlobalServices(ScopeNode scope) {
-        this.services = scope;
+        this.scope = scope;
+    }
+
+    /**
+     * Returns if the global scope contains the provided alias.
+     *
+     * @param alias the alias
+     * @return if it contains the alias
+     */
+    public boolean hasAlias(@NonNull String alias) {
+        return scope.hasAlias(alias);
     }
 
     /**
@@ -43,7 +65,7 @@ public class GlobalServices {
      * @return if it contains the service
      */
     public boolean hasService(@NonNull String serviceTag) {
-        return services.hasService(serviceTag);
+        return scope.hasService(serviceTag);
     }
 
     /**
@@ -55,7 +77,7 @@ public class GlobalServices {
      */
     @NonNull
     public <T> T getService(@NonNull String serviceTag) {
-        return services.getService(serviceTag);
+        return scope.getService(serviceTag);
     }
 
     /**
@@ -65,7 +87,7 @@ public class GlobalServices {
      */
     @NonNull
     public Set<Map.Entry<String, Object>> services() {
-        return services.services();
+        return scope.services();
     }
 
     /**
@@ -91,12 +113,25 @@ public class GlobalServices {
          * Adds a service to the global scope.
          *
          * @param serviceTag the service tag
-         * @param service  the service
+         * @param service    the service
          * @return the builder
          */
         @NonNull
         public Builder addService(@NonNull String serviceTag, @NonNull Object service) {
             scope.addService(serviceTag, service);
+            return this;
+        }
+
+        /**
+         * Adds an alias to a service in the global scope.
+         *
+         * @param alias   the alias
+         * @param service the service
+         * @return the builder
+         */
+        @NonNull
+        public Builder addAlias(@NonNull String alias, @NonNull Object service) {
+            scope.addAlias(alias, service);
             return this;
         }
 

@@ -19,6 +19,11 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.zhuinden.simplestack.helpers.HasParentServices;
+import com.zhuinden.simplestack.helpers.HasServices;
+import com.zhuinden.simplestack.helpers.ServiceProvider;
+import com.zhuinden.simplestack.helpers.TestKey;
+import com.zhuinden.simplestack.helpers.TestKeyWithScope;
 import com.zhuinden.statebundle.StateBundle;
 
 import org.junit.Test;
@@ -30,53 +35,6 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopingGlobalScopeTest {
-    private abstract class TestKeyWithScope
-            extends TestKey
-            implements HasServices {
-        TestKeyWithScope(String name) {
-            super(name);
-        }
-
-        protected TestKeyWithScope(Parcel in) {
-            super(in);
-        }
-
-        @NonNull
-        @Override
-        public String getScopeTag() {
-            return name;
-        }
-    }
-
-
-    private interface HasServices
-            extends ScopeKey {
-        void bindServices(ServiceBinder serviceBinder);
-    }
-
-    private interface HasParentServices
-            extends ScopeKey.Child {
-        void bindServices(ServiceBinder serviceBinder);
-    }
-
-
-    private static class ServiceProvider
-            implements ScopedServices {
-        @Override
-        public void bindServices(@NonNull ServiceBinder serviceBinder) {
-            Object key = serviceBinder.getKey();
-            if(key instanceof HasServices) {
-                ((HasServices) key).bindServices(serviceBinder);
-                return;
-            }
-            if(key instanceof HasParentServices) {
-                ((HasParentServices) key).bindServices(serviceBinder);
-                //noinspection UnnecessaryReturnStatement
-                return;
-            }
-        }
-    }
-
     @Test
     public void globalScopeExists() {
         Object service = new Object();

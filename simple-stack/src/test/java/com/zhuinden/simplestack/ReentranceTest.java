@@ -20,6 +20,8 @@ package com.zhuinden.simplestack;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.zhuinden.simplestack.helpers.TestKey;
+
 import org.junit.Before;
 import org.junit.Test;
 

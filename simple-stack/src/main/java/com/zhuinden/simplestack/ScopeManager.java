@@ -43,11 +43,11 @@ class ScopeManager {
     private boolean isGlobalScopePendingActivation = true;
 
     void activateGlobalScope() {
-        notifyScopeActivation(GLOBAL_SCOPE_TAG, globalServices.getServices());
+        notifyScopeActivation(GLOBAL_SCOPE_TAG, globalServices.getScope());
     }
 
     void deactivateGlobalScope() {
-        notifyScopeDeactivation(GLOBAL_SCOPE_TAG, globalServices.getServices());
+        notifyScopeDeactivation(GLOBAL_SCOPE_TAG, globalServices.getScope());
     }
 
     static class AssertingScopedServices
@@ -97,7 +97,7 @@ class ScopeManager {
 
     private void buildGlobalScope() {
         if(!scopes.containsKey(GLOBAL_SCOPE_TAG)) {
-            ScopeNode scope = globalServices.getServices();
+            ScopeNode scope = globalServices.getScope();
             scopes.put(GLOBAL_SCOPE_TAG, scope);
 
             restoreAndNotifyServices(GLOBAL_SCOPE_TAG, scope);
@@ -369,6 +369,7 @@ class ScopeManager {
     boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
         checkScopeTag(scopeTag);
         checkServiceTag(serviceTag);
+
         if(!scopes.containsKey(scopeTag)) {
             return false;
         }
@@ -395,7 +396,18 @@ class ScopeManager {
 
     boolean hasScope(@NonNull String scopeTag) {
         checkScopeTag(scopeTag);
+
         return scopes.containsKey(scopeTag);
+    }
+
+    public boolean hasAlias(@NonNull String scopeTag, @NonNull String alias) {
+        checkScopeTag(scopeTag);
+
+        ScopeNode scopeNode = scopes.get(scopeTag);
+        if(scopeNode == null) {
+            return false;
+        }
+        return scopeNode.hasAlias(alias);
     }
 
     @NonNull
@@ -497,7 +509,7 @@ class ScopeManager {
 
         LinkedHashSet<String> activeScopes = _findScopesForKey(targetKey, false);
 
-        if(!isFinalized && !globalServices.getServices().isEmpty()) {
+        if(!isFinalized && !globalServices.isEmpty()) {
             activeScopes.add(GLOBAL_SCOPE_TAG);
         }
 
@@ -512,7 +524,7 @@ class ScopeManager {
 
         LinkedHashSet<String> activeScopes = _findScopesForKey(targetKey, true);
 
-        if(!isFinalized && !globalServices.getServices().isEmpty()) {
+        if(!isFinalized && !globalServices.isEmpty()) {
             activeScopes.add(GLOBAL_SCOPE_TAG);
         }
 
@@ -527,7 +539,7 @@ class ScopeManager {
         return lookupMode.executeCanFindFromService(this, scopeTag, serviceTag);
     }
 
-    boolean canFindFromScopeExplicit(String scopeTag, String serviceTag) {
+    boolean canFindFromScopeExplicit(String scopeTag, String identifier) {
         if(this.latestKeys == null) {
             return false;
         }
@@ -535,20 +547,21 @@ class ScopeManager {
         Set<String> activeScopes = _findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
-            if(hasService(scope, serviceTag)) {
+            ScopeNode scopeNode = scopes.get(scope);
+            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
                 return true;
             }
         }
 
         //noinspection RedundantIfStatement
-        if(!isFinalized && globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
             return true;
         }
 
         return false;
     }
 
-    boolean canFindFromScopeAll(String scopeTag, String serviceTag) {
+    boolean canFindFromScopeAll(String scopeTag, String identifier) {
         if(this.latestKeys == null) {
             return false;
         }
@@ -556,13 +569,14 @@ class ScopeManager {
         LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
-            if(hasService(scope, serviceTag)) {
+            ScopeNode scopeNode = scopes.get(scope);
+            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
                 return true;
             }
         }
 
         //noinspection RedundantIfStatement
-        if(!isFinalized && globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
             return true;
         }
 
@@ -577,55 +591,58 @@ class ScopeManager {
         return lookupMode.executeLookupFromScope(this, scopeTag, serviceTag);
     }
 
-    <T> T lookupFromScopeExplicit(String scopeTag, String serviceTag) {
+    <T> T lookupFromScopeExplicit(String scopeTag, String identifier) {
         verifyStackIsInitialized();
 
         LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
-            if(hasService(scope, serviceTag)) {
-                return getService(scope, serviceTag);
+            ScopeNode scopeNode = scopes.get(scope);
+            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
+                return scopeNode.getServiceOrAlias(identifier);
             }
         }
 
-        if(!isFinalized && globalServices.hasService(serviceTag)) {
-            return globalServices.getService(serviceTag);
+        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
+            return globalServices.getServiceOrAlias(identifier);
         }
 
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
+        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
                 activeScopes.toArray()) + "]!");
     }
 
-    <T> T lookupFromScopeAll(String scopeTag, String serviceTag) {
+    <T> T lookupFromScopeAll(String scopeTag, String identifier) {
         verifyStackIsInitialized();
 
         LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
-            if(hasService(scope, serviceTag)) {
-                return getService(scope, serviceTag);
+            ScopeNode scopeNode = scopes.get(scope);
+            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
+                return scopeNode.getServiceOrAlias(identifier);
             }
         }
 
-        if(!isFinalized && globalServices.hasService(serviceTag)) {
-            return globalServices.getService(serviceTag);
+        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
+            return globalServices.getServiceOrAlias(identifier);
         }
 
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
+        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
                 activeScopes.toArray()) + "]!");
     }
 
-    boolean canFindService(@NonNull String serviceTag) {
-        checkServiceTag(serviceTag);
+    boolean canFindService(@NonNull String identifier) {
+        checkServiceTag(identifier);
         List<String> activeScopes = getActiveScopesReverse();
-        for(String scopeTag : activeScopes) {
-            if(hasService(scopeTag, serviceTag)) {
+        for(String scope : activeScopes) {
+            ScopeNode scopeNode = scopes.get(scope);
+            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
                 return true;
             }
         }
 
         //noinspection RedundantIfStatement
-        if(!isFinalized && globalServices.hasService(serviceTag)) {
+        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
             return true;
         }
 
@@ -633,24 +650,25 @@ class ScopeManager {
     }
 
     @NonNull
-    <T> T lookupService(@NonNull String serviceTag) {
-        checkServiceTag(serviceTag);
+    <T> T lookupService(@NonNull String identifier) {
+        checkServiceTag(identifier);
 
         verifyStackIsInitialized();
 
         LinkedHashSet<String> activeScopes = _findScopesForScopeTag(null, false);
 
-        for(String scopeTag : activeScopes) {
-            if(hasService(scopeTag, serviceTag)) {
-                return getService(scopeTag, serviceTag);
+        for(String scope : activeScopes) {
+            ScopeNode scopeNode = scopes.get(scope);
+            if(scopeNode != null && scopeNode.hasServiceOrAlias(identifier)) {
+                return scopeNode.getServiceOrAlias(identifier);
             }
         }
 
-        if(!isFinalized && globalServices.hasService(serviceTag)) {
-            return globalServices.getService(serviceTag);
+        if(!isFinalized && globalServices.hasServiceOrAlias(identifier)) {
+            return globalServices.getServiceOrAlias(identifier);
         }
 
-        throw new IllegalStateException("The service [" + serviceTag + "] does not exist in any scopes, which are " + Arrays.toString(
+        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scopes, which are " + Arrays.toString(
                 activeScopes.toArray()) + "! " +
                 "Is the scope tag registered via a ScopeKey? " +
                 "If yes, make sure the StateChanger has been set by this time, " +
