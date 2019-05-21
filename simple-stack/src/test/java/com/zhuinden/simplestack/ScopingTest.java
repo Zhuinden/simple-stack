@@ -699,8 +699,8 @@ public class ScopingTest {
                 assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
                 assertThat(serviceBinder.hasService("SERVICE2")).isFalse();
                 serviceBinder.addService("SERVICE2", service2);
-                assertThat(serviceBinder.hasService("SERVICE1")).isFalse();
-                assertThat(serviceBinder.canFindService("SERVICE1")).isTrue();
+                assertThat(serviceBinder.hasService("SERVICE2")).isTrue();
+                assertThat(serviceBinder.canFindService("SERVICE2")).isTrue();
                 assertThat(serviceBinder.hasService("SERVICE2")).isTrue();
 
                 assertThat(serviceBinder.lookupService("SERVICE1")).isSameAs(service1);
