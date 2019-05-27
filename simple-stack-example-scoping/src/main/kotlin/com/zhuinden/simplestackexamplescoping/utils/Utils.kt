@@ -44,6 +44,12 @@ inline fun <reified T> ServiceBinder.add(service: T, serviceTag: String = T::cla
     addService(serviceTag, service as Any)
 }
 
+inline fun <reified T> ServiceBinder.get(serviceTag: String = T::class.java.name) = getService<T>(serviceTag)
+
+inline fun <reified T> ServiceBinder.rebind(service: Any, serviceTag: String = T::class.java.name) {
+    addAlias(serviceTag, service)
+}
+
 fun Context.showToast(text: String, duration: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this, text, duration).show()
 }

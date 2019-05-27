@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackexamplescoping.features.words
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -16,11 +17,21 @@ import kotlinx.android.synthetic.main.word_list_view.*
  */
 
 class WordListFragment : BaseFragment() {
-    val adapter = WordListAdapter()
+    interface ActionHandler {
+        fun onAddNewWordClicked()
+    }
 
-    private val wordController by lazy { lookup<WordController>() }
-    private val commandQueue by lazy { wordController.commandQueue }
-    private val wordList by lazy { wordController.wordList }
+    interface DataProvider {
+        val wordList: LiveData<List<String>>
+    }
+
+    private val actionHandler by lazy { lookup<ActionHandler>() }
+    private val dataProvider by lazy { lookup<DataProvider>() }
+    private val wordList by lazy { dataProvider.wordList }
+
+    private val controllerEvents by lazy { lookup<EventEmitter<WordController.Events>>(WordListKey.WORD_CONTROLLER_EVENTS) }
+
+    val adapter = WordListAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.word_list_view, container, false)
@@ -33,7 +44,7 @@ class WordListFragment : BaseFragment() {
         recyclerView.adapter = adapter
 
         buttonGoToAddNewWord.onClick { view ->
-            backstack.goTo(NewWordKey())
+            actionHandler.onAddNewWordClicked()
         }
 
         wordList.observe(this /*getViewLifecycle()*/, Observer { words ->
@@ -41,9 +52,11 @@ class WordListFragment : BaseFragment() {
         })
     }
 
+    val notificationTokens = CompositeNotificationToken()
+
     override fun onStart() {
         super.onStart()
-        commandQueue.setReceiver { event ->
+        notificationTokens += controllerEvents.startListening { event ->
             when (event) {
                 is WordController.Events.NewWordAdded -> showToast("Added ${event.word}")
             }.safe()
@@ -51,7 +64,7 @@ class WordListFragment : BaseFragment() {
     }
 
     override fun onStop() {
-        commandQueue.detachReceiver()
+        notificationTokens.stopListening()
         super.onStop()
     }
 }
