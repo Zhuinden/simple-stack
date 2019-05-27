@@ -244,13 +244,13 @@ class ScopeManager {
 
     void destroyScope(String scopeTag) {
         if(scopes.containsKey(scopeTag)) {
-            ScopeNode serviceMap = scopes.remove(scopeTag);
-            destroyServicesAndRemoveState(scopeTag, serviceMap);
+            ScopeNode scopeNode = scopes.remove(scopeTag);
+            destroyServicesAndRemoveState(scopeTag, scopeNode);
         }
     }
 
-    private void destroyServicesAndRemoveState(String scopeTag, ScopeNode serviceMap) {
-        Set<Map.Entry<String, Object>> services = serviceMap.services();
+    private void destroyServicesAndRemoveState(String scopeTag, ScopeNode scopeNode) {
+        Set<Map.Entry<String, Object>> services = scopeNode.services();
         List<Object> previousServices = new ArrayList<>(services.size());
         for(Map.Entry<String, Object> entry : services) {
             previousServices.add(entry.getValue());
@@ -297,8 +297,8 @@ class ScopeManager {
                         "The previous scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
-            ScopeNode previousServiceMap = scopes.get(previousScopeTag);
-            notifyScopeDeactivation(previousScopeTag, previousServiceMap);
+            ScopeNode previousScopeNode = scopes.get(previousScopeTag);
+            notifyScopeDeactivation(previousScopeTag, previousScopeNode);
         }
     }
 
