@@ -7,6 +7,8 @@ import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestackexamplescoping.utils.EventEmitter
 import com.zhuinden.statebundle.StateBundle
 
+open class WordEventEmitter : EventEmitter<WordController.Events>()
+
 class WordController(
     private val backstack: Backstack
 ) : NewWordFragment.ActionHandler,
@@ -17,14 +19,14 @@ class WordController(
         data class NewWordAdded(val word: String) : Events()
     }
 
-    private inner class WordEventEmitter : EventEmitter<Events>() {
+    private inner class MutableWordEventEmitter : WordEventEmitter() { // Kotlin's visibility is rather hacky, this is a workaround for that.
         public override fun emit(event: Events) {
             super.emit(event)
         }
     }
 
-    private val wordEventEmitter = WordEventEmitter()
-    val eventEmitter: EventEmitter<Events> get() = wordEventEmitter
+    private val wordEventEmitter = MutableWordEventEmitter()
+    val eventEmitter: WordEventEmitter get() = wordEventEmitter
 
     private val mutableWords: MutableLiveData<List<String>> = MutableLiveData()
     override val wordList: LiveData<List<String>>
@@ -41,11 +43,11 @@ class WordController(
         wordEventEmitter.emit(Events.NewWordAdded(word))
     }
 
-    override fun onAddNewWordClicked() {
+    override fun onAddNewWordClicked(wordListFragment: WordListFragment) {
         backstack.goTo(NewWordKey())
     }
 
-    override fun onAddWordClicked(word: String) {
+    override fun onAddWordClicked(newWordFragment: NewWordFragment, word: String) {
         if (word.isNotEmpty()) {
             addWordToList(word)
         }

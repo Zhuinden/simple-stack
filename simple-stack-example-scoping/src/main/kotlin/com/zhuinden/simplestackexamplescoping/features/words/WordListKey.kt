@@ -13,10 +13,6 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class WordListKey(val placeholder: String = "") : BaseKey, HasServices {
-    companion object {
-        const val WORD_CONTROLLER_EVENTS = "WordController.Events"
-    }
-
     override fun getScopeTag(): String = fragmentTag
 
     override fun bindServices(serviceBinder: ServiceBinder) {
@@ -25,7 +21,7 @@ data class WordListKey(val placeholder: String = "") : BaseKey, HasServices {
             rebind<WordListFragment.DataProvider>(get<WordController>())
             rebind<WordListFragment.ActionHandler>(get<WordController>())
             rebind<NewWordFragment.ActionHandler>(get<WordController>())
-            add(get<WordController>().eventEmitter, WORD_CONTROLLER_EVENTS)
+            add(get<WordController>().eventEmitter)
         }
     }
 

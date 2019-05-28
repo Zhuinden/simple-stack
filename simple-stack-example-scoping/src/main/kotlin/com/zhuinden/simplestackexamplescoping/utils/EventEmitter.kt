@@ -23,11 +23,9 @@ abstract class EventEmitter<E> {
         if (threadId != Thread.currentThread().id) {
             throw IllegalStateException("You should register observers only on the thread where the emitter was created")
         }
-        val observerCount = observers.size
 
         observers.add(observer)
-
-        if (observerCount == 0) {
+        if (observers.size == 1) {
             commandQueue.setReceiver(notifyObservers)
         }
 
@@ -37,10 +35,8 @@ abstract class EventEmitter<E> {
                     throw IllegalStateException("You should unregister observers only on the thread where the emitter was created")
                 }
 
-                @Suppress("NAME_SHADOWING")
-                val observerCount = observers.size
                 observers.remove(observer)
-                if (observerCount == 1) {
+                if (observers.size == 0) {
                     commandQueue.detachReceiver()
                 }
             }

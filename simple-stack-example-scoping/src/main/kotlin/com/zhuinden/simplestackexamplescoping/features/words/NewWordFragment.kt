@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.new_word_fragment.*
 
 class NewWordFragment : BaseFragment() {
     interface ActionHandler {
-        fun onAddWordClicked(word: String)
+        fun onAddWordClicked(newWordFragment: NewWordFragment, word: String)
     }
 
     private val actionHandler by lazy { lookup<ActionHandler>() }
@@ -30,7 +30,7 @@ class NewWordFragment : BaseFragment() {
 
         buttonAddNewWord.onClick {
             val word = textInputNewWord.text.toString().trim()
-            actionHandler.onAddWordClicked(word)
+            actionHandler.onAddWordClicked(this, word)
         }
     }
 }

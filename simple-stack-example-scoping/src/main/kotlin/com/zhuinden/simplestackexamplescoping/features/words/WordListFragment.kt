@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.word_list_view.*
 
 class WordListFragment : BaseFragment() {
     interface ActionHandler {
-        fun onAddNewWordClicked()
+        fun onAddNewWordClicked(wordListFragment: WordListFragment)
     }
 
     interface DataProvider {
@@ -29,7 +29,7 @@ class WordListFragment : BaseFragment() {
     private val dataProvider by lazy { lookup<DataProvider>() }
     private val wordList by lazy { dataProvider.wordList }
 
-    private val controllerEvents by lazy { lookup<EventEmitter<WordController.Events>>(WordListKey.WORD_CONTROLLER_EVENTS) }
+    private val controllerEvents by lazy { lookup<WordEventEmitter>() }
 
     val adapter = WordListAdapter()
 
@@ -44,7 +44,7 @@ class WordListFragment : BaseFragment() {
         recyclerView.adapter = adapter
 
         buttonGoToAddNewWord.onClick { view ->
-            actionHandler.onAddNewWordClicked()
+            actionHandler.onAddNewWordClicked(this)
         }
 
         wordList.observe(this /*getViewLifecycle()*/, Observer { words ->
