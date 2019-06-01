@@ -1,49 +1,52 @@
-apply plugin: 'com.android.application'
-
+plugins {
+    id("com.android.application")
+}
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion(27)
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     defaultConfig {
-        applicationId "com.zhuinden.simplestackdemomultistack"
-        minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        applicationId = "com.zhuinden.simplestackdemomultistack"
+        minSdkVersion(16)
+        targetSdkVersion(27)
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':simple-stack')
+    //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
+    implementation(project(":simple-stack"))
 
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    testImplementation 'junit:junit:4.12'
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.1") {
+        exclude(group = "com.android.support", module = "support-annotations")
+    }
+    testImplementation("junit:junit:4.12")
 
-    implementation 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation("com.jakewharton:butterknife:8.8.1")
+    annotationProcessor("com.jakewharton:butterknife-compiler:8.8.1")
 
-    annotationProcessor 'frankiesardo:auto-parcel:1.0.3'
+    annotationProcessor("frankiesardo:auto-parcel:1.0.3")
 
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
-    implementation 'com.google.dagger:dagger:2.14.1'
-    compileOnly 'org.glassfish:javax.annotation:10.0-b28'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation "com.android.support:recyclerview-v7:27.1.1"
-    implementation "com.android.support:design:27.1.1"
+    annotationProcessor("com.google.dagger:dagger-compiler:2.14.1")
+    implementation("com.google.dagger:dagger:2.14.1")
+    compileOnly("org.glassfish:javax.annotation:10.0-b28")
+    implementation("com.android.support:appcompat-v7:27.1.1")
+    implementation("com.android.support:recyclerview-v7:27.1.1")
+    implementation("com.android.support:design:27.1.1")
 
-    implementation 'it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.1-rc1'
+    implementation("it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.1-rc1")
 }

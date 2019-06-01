@@ -1,68 +1,72 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'realm-android'
+plugins {
+    id("com.android.application")
+    kotlin("android")
+    kotlin("android.extensions")
+    kotlin("kapt")
+    id("realm-android")
+}
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion(27)
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     defaultConfig {
-        applicationId "com.zhuinden.simplestackdemoexamplefragments"
-        minSdkVersion 14
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        applicationId = "com.zhuinden.simplestackdemoexamplefragments"
+        minSdkVersion(14)
+        targetSdkVersion(27)
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
 }
 
 androidExtensions {
-    experimental = true
+    isExperimental = true
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.21"
+    //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.31")
 
-    implementation project(':simple-stack')
+    implementation(project(":simple-stack"))
 
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation "com.android.support:recyclerview-v7:27.1.1"
-    implementation "com.android.support:design:27.1.1"
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.1") {
+        exclude(group = "com.android.support", module = "support-annotations")
+    }
+    implementation("com.android.support:appcompat-v7:27.1.1")
+    implementation("com.android.support:recyclerview-v7:27.1.1")
+    implementation("com.android.support:design:27.1.1")
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation("junit:junit:4.12")
 
-    implementation 'com.jakewharton:butterknife:8.8.1'
-    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation("com.jakewharton:butterknife:8.8.1")
+    kapt("com.jakewharton:butterknife-compiler:8.8.1")
 
-    kapt 'frankiesardo:auto-parcel:1.0.3'
+    kapt("frankiesardo:auto-parcel:1.0.3")
 
-    kapt 'com.google.dagger:dagger-compiler:2.14.1'
-    implementation 'com.google.dagger:dagger:2.14.1'
-    compileOnly 'org.glassfish:javax.annotation:10.0-b28'
+    kapt("com.google.dagger:dagger-compiler:2.14.1")
+    implementation("com.google.dagger:dagger:2.14.1")
+    compileOnly("org.glassfish:javax.annotation:10.0-b28")
 
-    implementation "io.reactivex.rxjava2:rxjava:2.1.10"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
-    implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
+    implementation("io.reactivex.rxjava2:rxjava:2.1.10")
+    implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
+    implementation("com.jakewharton.rxbinding2:rxbinding:2.1.1")
+    implementation("com.jakewharton.rxrelay2:rxrelay:2.0.0")
 
-    kapt 'dk.ilios:realmfieldnameshelper:1.1.1'
+    kapt("dk.ilios:realmfieldnameshelper:1.1.1")
 
-    implementation "com.andkulikov:transitionseverywhere:1.7.0"
+    implementation("com.andkulikov:transitionseverywhere:1.7.0")
 
-    implementation 'org.javatuples:javatuples:1.2'
+    implementation("org.javatuples:javatuples:1.2")
 }

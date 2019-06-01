@@ -1,1 +1,12 @@
-include ':simple-stack', ':simple-stack-example-basic-java-view', ':simple-stack-example-basic-java-fragment', ':simple-stack-example-conductor', ':simple-stack-example-basic-kotlin', ':simple-stack-example-mvp-view', ':simple-stack-example-mvp-fragments', ':simple-stack-example-mvvm-fragments', ':simple-stack-example-multistack', ':simple-stack-example-sharedelement-fragment', ':simple-stack-example-kotlin-community-sample', ':simple-stack-example-scoping'
+include(":simple-stack")
+include(":simple-stack-example-basic-java-fragment")
+include(":simple-stack-example-basic-java-view")
+include(":simple-stack-example-basic-kotlin")
+include(":simple-stack-example-conductor")
+include(":simple-stack-example-kotlin-community-sample")
+include(":simple-stack-example-multistack")
+include(":simple-stack-example-mvp-fragments")
+include(":simple-stack-example-mvp-view")
+include(":simple-stack-example-mvvm-fragments")
+include(":simple-stack-example-scoping")
+include(":simple-stack-example-sharedelement-fragment")

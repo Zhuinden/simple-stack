@@ -46,27 +46,31 @@ The keys used by a DefaultStateChanger must implement DefaultViewKey, which expe
 
 ## Using Simple Stack
 
-In order to use Simple Stack, you need to add jitpack to your project root gradle:
+In order to use Simple Stack, you need to add `jitpack` to your project root `build.gradle.kts`
+(or `build.gradle`):
 
-    buildscript {
-        repositories {
-            // ...
-            maven { url "https://jitpack.io" }
-        }
+``` kotlin
+buildscript {
+    repositories {
         // ...
+        maven { setUrl("https://jitpack.io") }
     }
-    allprojects {
-        repositories {
-            // ...
-            maven { url "https://jitpack.io" }
-        }
+    // ...
+}
+allprojects {
+    repositories {
         // ...
+        maven { setUrl("https://jitpack.io") }
     }
+    // ...
+}
+```
 
+and then, add the dependency to your module's `build.gradle.kts` (or `build.gradle`):
 
-and add the dependency to your module level gradle.
-
-    implementation 'com.github.Zhuinden:simple-stack:2.0.3'
+``` kotlin
+implementation("com.github.Zhuinden:simple-stack:2.0.3")
+```
 
 ## How does it work?
 
@@ -120,7 +124,8 @@ data class FirstKey(val placeholder: String = "") : DefaultViewKey {
 
 ``` xml
 <?xml version="1.0" encoding="utf-8"?>
-<com.zhuinden.simplestackdemoexample.FirstView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zhuinden.simplestackdemoexample.FirstView
+              xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center"
@@ -177,7 +182,8 @@ Services bound to a ServiceBinder (received inside ScopedServices) get lifecycle
 This lets you easily share a class between screens, while still letting you handle Android's lifecycles seamlessly.
 
 ``` kotlin
-inline fun <reified T> Fragment.lookup(serviceTag: String = T::class.java.name) = Navigator.lookupService<T>(requireContext(), serviceTag)
+inline fun <reified T> Fragment.lookup(serviceTag: String = T::class.java.name) =
+    Navigator.lookupService<T>(requireContext(), serviceTag)
 
 Navigator.configure()
     .setStateChanger(this)
