@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(28)
 
     defaultConfig {
         minSdkVersion(1)
-        targetSdkVersion(27)
+        targetSdkVersion(28)
         versionCode = 1
         versionName = "0.6.0"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -28,7 +28,7 @@ android {
 
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
-    implementation("com.android.support:support-annotations:27.1.1")
+    implementation("com.android.support:support-annotations:28.0.0")
     api("com.github.Zhuinden:state-bundle:1.2.1")
     testImplementation("junit:junit:4.12")
     testImplementation("org.assertj:assertj-core:3.9.1")

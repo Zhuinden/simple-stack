@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(28)
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplekotlin"
         minSdkVersion(14)
-        targetSdkVersion(27)
+        targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -36,8 +36,8 @@ dependencies {
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.1") {
         exclude(group = "com.android.support", module = "support-annotations")
     }
-    implementation("com.android.support:appcompat-v7:27.1.1")
-    implementation("com.android.support:design:27.1.1")
+    implementation("com.android.support:appcompat-v7:28.0.0")
+    implementation("com.android.support:design:28.0.0")
     testImplementation("junit:junit:4.12")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.31")

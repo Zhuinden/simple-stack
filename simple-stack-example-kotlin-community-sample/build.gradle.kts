@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(28)
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackkotlindaggerexample"
         minSdkVersion(16)
-        targetSdkVersion(27)
+        targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
 
@@ -34,12 +34,12 @@ androidExtensions {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.31")
-    implementation("com.android.support:appcompat-v7:27.1.1")
-    implementation("com.android.support:recyclerview-v7:27.1.1")
+    implementation("com.android.support:appcompat-v7:28.0.0")
+    implementation("com.android.support:recyclerview-v7:28.0.0")
     implementation("com.squareup.okhttp3:okhttp:3.10.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.10.0")
     implementation("com.google.dagger:dagger:2.16")
-    implementation("com.android.support:support-v4:27.1.1")
+    implementation("com.android.support:support-v4:28.0.0")
     kapt("com.google.dagger:dagger-compiler:2.16")
     implementation(project(":simple-stack"))
 
