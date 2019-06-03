@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(28)
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplemvvm"
         minSdkVersion(14)
-        targetSdkVersion(27)
+        targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
 
@@ -51,11 +51,11 @@ dependencies {
     implementation(project(":simple-stack"))
 
     // App's dependencies, including test
-    implementation("com.android.support:appcompat-v7:27.1.1")
-    implementation("com.android.support:cardview-v7:27.1.1")
-    implementation("com.android.support:design:27.1.1")
-    implementation("com.android.support:recyclerview-v7:27.1.1")
-    implementation("com.android.support:support-v4:27.1.1")
+    implementation("com.android.support:appcompat-v7:28.0.0")
+    implementation("com.android.support:cardview-v7:28.0.0")
+    implementation("com.android.support:design:28.0.0")
+    implementation("com.android.support:recyclerview-v7:28.0.0")
+    implementation("com.android.support:support-v4:28.0.0")
 
     // live data
     implementation("android.arch.lifecycle:runtime:1.1.0")

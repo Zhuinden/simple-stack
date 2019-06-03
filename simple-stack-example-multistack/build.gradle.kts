@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion(27)
+    compileSdkVersion(28)
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.zhuinden.simplestackdemomultistack"
         minSdkVersion(16)
-        targetSdkVersion(27)
+        targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -44,9 +44,9 @@ dependencies {
     annotationProcessor("com.google.dagger:dagger-compiler:2.14.1")
     implementation("com.google.dagger:dagger:2.14.1")
     compileOnly("org.glassfish:javax.annotation:10.0-b28")
-    implementation("com.android.support:appcompat-v7:27.1.1")
-    implementation("com.android.support:recyclerview-v7:27.1.1")
-    implementation("com.android.support:design:27.1.1")
+    implementation("com.android.support:appcompat-v7:28.0.0")
+    implementation("com.android.support:recyclerview-v7:28.0.0")
+    implementation("com.android.support:design:28.0.0")
 
     implementation("it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.1-rc1")
 }
