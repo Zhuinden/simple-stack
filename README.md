@@ -50,13 +50,7 @@ In order to use Simple Stack, you need to add `jitpack` to your project root `bu
 (or `build.gradle`):
 
 ``` kotlin
-buildscript {
-    repositories {
-        // ...
-        maven { setUrl("https://jitpack.io") }
-    }
-    // ...
-}
+// build.gradle.kts
 allprojects {
     repositories {
         // ...
@@ -66,10 +60,31 @@ allprojects {
 }
 ```
 
+or
+
+``` groovy
+// build.gradle
+allprojects {
+    repositories {
+        // ...
+        maven { url "https://jitpack.io" }
+    }
+    // ...
+}
+```
+
 and then, add the dependency to your module's `build.gradle.kts` (or `build.gradle`):
 
 ``` kotlin
+// build.gradle.kts
 implementation("com.github.Zhuinden:simple-stack:2.0.3")
+```
+
+or
+
+``` groovy
+// build.gradle
+implementation 'com.github.Zhuinden:simple-stack:2.0.3'
 ```
 
 ## How does it work?
@@ -190,7 +205,7 @@ Navigator.configure()
     .setScopedServices(ScopeConfiguration())
     .install(this, root, History.of(WordListKey()))
 
-class WordController : Bundleable {
+class WordController : Bundleable, ScopedServices.Registered {
     ...
 }
 
