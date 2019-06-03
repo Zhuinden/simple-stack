@@ -41,8 +41,8 @@ dependencies {
 
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
 
-    annotationProcessor("com.google.dagger:dagger-compiler:2.14.1")
-    implementation("com.google.dagger:dagger:2.14.1")
+    annotationProcessor("com.google.dagger:dagger-compiler:2.22.1")
+    implementation("com.google.dagger:dagger:2.22.1")
     compileOnly("org.glassfish:javax.annotation:10.0-b28")
     implementation("com.android.support:appcompat-v7:28.0.0")
     implementation("com.android.support:recyclerview-v7:28.0.0")

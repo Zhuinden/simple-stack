@@ -40,8 +40,8 @@ dependencies {
     implementation("com.android.support:design:28.0.0")
     testImplementation("junit:junit:4.12")
 
-    implementation("io.reactivex.rxjava2:rxjava:2.1.16")
-    implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.2")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.0")
     implementation("com.jakewharton.rxbinding2:rxbinding:2.1.1")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.0.0")
 

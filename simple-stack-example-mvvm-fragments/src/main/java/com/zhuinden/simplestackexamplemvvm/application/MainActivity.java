@@ -150,9 +150,9 @@ public class MainActivity
         setCheckedItem(key.navigationViewId());
         supportInvalidateOptionsMenu();
         if(key.isFabVisible()) {
-            fab.setVisibility(View.VISIBLE);
+            fab.show();
         } else {
-            fab.setVisibility(View.GONE);
+            fab.hide();
         }
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(key.getFragmentTag());
         key.setupFab(fragment, fab);
