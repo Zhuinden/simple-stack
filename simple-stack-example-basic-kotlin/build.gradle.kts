@@ -23,6 +23,9 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+
+    // See https://kotlinlang.org/docs/reference/using-gradle.html#android-studio
+    sourceSets["main"].java.srcDir("src/main/kotlin")
 }
 
 androidExtensions {
