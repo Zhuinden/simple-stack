@@ -55,18 +55,20 @@ dependencies {
 
     kapt("frankiesardo:auto-parcel:1.0.3")
 
-    kapt("com.google.dagger:dagger-compiler:2.14.1")
-    implementation("com.google.dagger:dagger:2.14.1")
+    kapt("com.google.dagger:dagger-compiler:2.22.1")
+    implementation("com.google.dagger:dagger:2.22.1")
     compileOnly("org.glassfish:javax.annotation:10.0-b28")
 
-    implementation("io.reactivex.rxjava2:rxjava:2.1.10")
-    implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.2")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.0")
     implementation("com.jakewharton.rxbinding2:rxbinding:2.1.1")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.0.0")
 
     kapt("dk.ilios:realmfieldnameshelper:1.1.1")
 
-    implementation("com.andkulikov:transitionseverywhere:1.7.0")
+    implementation("com.andkulikov:transitionseverywhere:1.7.0") {
+        exclude(group = "com.android.support", module = "support-v4")
+    }
 
     implementation("org.javatuples:javatuples:1.2")
 }

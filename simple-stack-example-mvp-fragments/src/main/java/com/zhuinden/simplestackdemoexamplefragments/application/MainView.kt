@@ -74,7 +74,7 @@ class MainView : DrawerLayout {
 
         buttonAddTask.showIf { key.isFabVisible }
 
-        val fragment = MainActivity[context].supportFragmentManager.findFragmentByTag(key.fragmentTag)
+        val fragment = MainActivity[context].supportFragmentManager.findFragmentByTag(key.fragmentTag)!!
         buttonAddTask.setOnClickListener(key.fabClickListener(fragment))
         if (key.fabDrawableIcon() != 0) {
             buttonAddTask.setImageResource(key.fabDrawableIcon())

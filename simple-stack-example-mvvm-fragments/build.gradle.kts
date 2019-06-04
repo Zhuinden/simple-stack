@@ -58,9 +58,9 @@ dependencies {
     implementation("com.android.support:support-v4:28.0.0")
 
     // live data
-    implementation("android.arch.lifecycle:runtime:1.1.0")
-    implementation("android.arch.lifecycle:extensions:1.1.0")
-    annotationProcessor("android.arch.lifecycle:compiler:1.1.0")
+    implementation("android.arch.lifecycle:runtime:1.1.1")
+    implementation("android.arch.lifecycle:extensions:1.1.1")
+    annotationProcessor("android.arch.lifecycle:compiler:1.1.1")
 
     // useful stuff
     implementation("com.jakewharton:butterknife:8.8.1")
@@ -70,8 +70,8 @@ dependencies {
     implementation("nz.bradcampbell:paperparcel:2.0.4")
     annotationProcessor("nz.bradcampbell:paperparcel-compiler:2.0.4")
     annotationProcessor("com.github.reggar:auto-value-ignore-hash-equals:1.1.4")
-    implementation("com.google.dagger:dagger:2.14.1")
-    annotationProcessor("com.google.dagger:dagger-compiler:2.14.1")
+    implementation("com.google.dagger:dagger:2.22.1")
+    annotationProcessor("com.google.dagger:dagger-compiler:2.22.1")
 
     // Dependencies for local unit tests
     testImplementation("junit:junit:4.12")
@@ -100,7 +100,7 @@ dependencies {
     androidTestImplementation("com.google.dexmaker:dexmaker-mockito:1.2")
 
     // Android Testing Support Library's runner and rules
-    androidTestImplementation("org.assertj:assertj-core:3.9.1")
+    androidTestImplementation("org.assertj:assertj-core:3.11.1")
 
     androidTestImplementation("com.android.support.test:runner:1.0.1") {
         exclude(group = "com.android.support", module = "support-annotations")

@@ -39,8 +39,8 @@ dependencies {
     implementation("nz.bradcampbell:paperparcel:2.0.4")
     annotationProcessor("nz.bradcampbell:paperparcel-compiler:2.0.4")
     annotationProcessor("com.github.reggar:auto-value-ignore-hash-equals:1.1.4")
-    implementation("com.google.dagger:dagger:2.14.1")
-    annotationProcessor("com.google.dagger:dagger-compiler:2.14.1")
+    implementation("com.google.dagger:dagger:2.22.1")
+    annotationProcessor("com.google.dagger:dagger-compiler:2.22.1")
 }
 
 configurations.all {
