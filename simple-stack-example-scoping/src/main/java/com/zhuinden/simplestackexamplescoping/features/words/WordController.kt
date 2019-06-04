@@ -4,10 +4,13 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestackexamplescoping.utils.EventEmitter
+import com.zhuinden.simplestackexamplescoping.core.eventemitter.EventEmitter
+import com.zhuinden.simplestackexamplescoping.core.eventemitter.EventSource
 import com.zhuinden.statebundle.StateBundle
 
-open class WordEventEmitter : EventEmitter<WordController.Events>()
+class WordEventEmitter(
+    private val eventEmitter: EventSource<WordController.Events>
+) : EventSource<WordController.Events> by eventEmitter
 
 class WordController(
     private val backstack: Backstack
@@ -19,14 +22,8 @@ class WordController(
         data class NewWordAdded(val word: String) : Events()
     }
 
-    private inner class MutableWordEventEmitter : WordEventEmitter() { // Kotlin's visibility is rather hacky, this is a workaround for that.
-        public override fun emit(event: Events) {
-            super.emit(event)
-        }
-    }
-
-    private val wordEventEmitter = MutableWordEventEmitter()
-    val eventEmitter: WordEventEmitter get() = wordEventEmitter
+    private val wordEventEmitter = EventEmitter<Events>()
+    val eventEmitter = WordEventEmitter(wordEventEmitter)
 
     private val mutableWords: MutableLiveData<List<String>> = MutableLiveData()
     override val wordList: LiveData<List<String>>

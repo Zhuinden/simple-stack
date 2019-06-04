@@ -8,8 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.zhuinden.simplestackexamplescoping.R
+import com.zhuinden.simplestackexamplescoping.core.eventemitter.CompositeNotificationToken
 import com.zhuinden.simplestackexamplescoping.core.navigation.BaseFragment
-import com.zhuinden.simplestackexamplescoping.utils.*
+import com.zhuinden.simplestackexamplescoping.utils.lookup
+import com.zhuinden.simplestackexamplescoping.utils.onClick
+import com.zhuinden.simplestackexamplescoping.utils.safe
+import com.zhuinden.simplestackexamplescoping.utils.showToast
 import kotlinx.android.synthetic.main.word_list_view.*
 
 /**
@@ -52,7 +56,7 @@ class WordListFragment : BaseFragment() {
         })
     }
 
-    val notificationTokens = CompositeNotificationToken()
+    private val notificationTokens = CompositeNotificationToken()
 
     override fun onStart() {
         super.onStart()

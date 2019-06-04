@@ -1,14 +1,10 @@
-package com.zhuinden.simplestackexamplescoping.utils
+package com.zhuinden.simplestackexamplescoping.core.eventemitter
 
 import com.zhuinden.commandqueue.CommandQueue
 import java.util.*
 
-abstract class EventEmitter<E> {
+class EventEmitter<E> : EventSource<E> {
     private val threadId = Thread.currentThread().id
-
-    interface NotificationToken {
-        fun stopListening()
-    }
 
     private val commandQueue: CommandQueue<E> = CommandQueue()
     private val notifyObservers: (E) -> Unit = { event ->
@@ -19,7 +15,7 @@ abstract class EventEmitter<E> {
 
     private val observers: LinkedList<(E) -> Unit> = LinkedList()
 
-    fun startListening(observer: (E) -> Unit): NotificationToken {
+    override fun startListening(observer: (E) -> Unit): EventSource.NotificationToken {
         if (threadId != Thread.currentThread().id) {
             throw IllegalStateException("You should register observers only on the thread where the emitter was created")
         }
@@ -29,7 +25,7 @@ abstract class EventEmitter<E> {
             commandQueue.setReceiver(notifyObservers)
         }
 
-        return object : NotificationToken {
+        return object : EventSource.NotificationToken {
             override fun stopListening() {
                 if (threadId != Thread.currentThread().id) {
                     throw IllegalStateException("You should unregister observers only on the thread where the emitter was created")
@@ -43,7 +39,7 @@ abstract class EventEmitter<E> {
         }
     }
 
-    protected open fun emit(event: E) {
+    fun emit(event: E) {
         commandQueue.sendEvent(event)
     }
 }
