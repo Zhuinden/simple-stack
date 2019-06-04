@@ -1,5 +1,6 @@
-package com.zhuinden.simplestackexamplescoping.core.eventemitter
+package com.zhuinden.simplestackexamplescoping.utils
 
+import com.zhuinden.eventemitter.EventSource
 import java.util.*
 
 class CompositeNotificationToken : EventSource.NotificationToken {

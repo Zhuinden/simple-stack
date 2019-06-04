@@ -2,10 +2,10 @@ package com.zhuinden.simplestackexamplescoping.features.words
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import com.zhuinden.eventemitter.EventEmitter
+import com.zhuinden.eventemitter.EventSource
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestackexamplescoping.core.eventemitter.EventEmitter
-import com.zhuinden.simplestackexamplescoping.core.eventemitter.EventSource
 import com.zhuinden.statebundle.StateBundle
 
 class WordEventEmitter(
@@ -51,7 +51,7 @@ class WordController(
         backstack.goBack()
     }
 
-    // NOTE: Data is typically in the database, so do this only for transient state.
+    // NOTE: Data is typically in the database, so do this only for non-transient state.
     override fun toBundle(): StateBundle = StateBundle().apply {
         putStringArrayList("words", ArrayList(mutableWords.value))
     }
