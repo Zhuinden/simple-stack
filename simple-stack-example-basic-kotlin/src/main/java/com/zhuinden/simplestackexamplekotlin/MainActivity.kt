@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
                 lastCustomNonConfigurationInstance,
                 History.single(HomeKey()))
         backstackDelegate.registerForLifecycleCallbacks(this)
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
@@ -39,7 +40,9 @@ class MainActivity : AppCompatActivity(), StateChanger {
                 true
             } ?: false
         }
+
         fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+
         backstackDelegate.setStateChanger(this)
     }
 
@@ -76,7 +79,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     companion object {
-        private val TAG = "MainActivity"
+        private const val TAG = "MainActivity"
 
         @SuppressLint("WrongConstant")
         operator fun get(context: Context): MainActivity {

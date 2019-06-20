@@ -1,6 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    var kotlin_version: String by extra
+    kotlin_version = "1.3.40"
     repositories {
         google()
         mavenCentral()
@@ -10,10 +12,10 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.0")
+        classpath("com.android.tools.build:gradle:3.4.1")
         classpath("me.tatarka:gradle-retrolambda:3.7.0")
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.0")
-        classpath("io.realm:realm-gradle-plugin:5.1.0")
+        classpath("io.realm:realm-gradle-plugin:5.11.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.31")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

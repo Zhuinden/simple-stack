@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     companion object {
-        private val TAG = "MainActivity"
+        private const val TAG = "MainActivity"
 
         @SuppressLint("WrongConstant")
         operator fun get(context: Context): MainActivity {
