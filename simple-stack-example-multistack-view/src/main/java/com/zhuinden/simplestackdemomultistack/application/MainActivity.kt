@@ -1,7 +1,6 @@
 package com.zhuinden.simplestackdemomultistack.application
 
 import android.os.Bundle
-import android.support.annotation.IdRes
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
 import com.zhuinden.simplestackdemomultistack.R
@@ -11,7 +10,7 @@ import com.zhuinden.simplestackdemomultistack.features.main.chromecast.ChromeCas
 import com.zhuinden.simplestackdemomultistack.features.main.cloudsync.CloudSyncKey
 import com.zhuinden.simplestackdemomultistack.features.main.list.ListKey
 import com.zhuinden.simplestackdemomultistack.features.main.mail.MailKey
-import it.sephiroth.android.library.bottomnavigation.BottomNavigation
+import com.zhuinden.simplestackdemomultistack.util.onMenuItemSelected
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationStateListener {
@@ -43,15 +42,9 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
 
         setContentView(R.layout.activity_main)
 
-        bottomNavigationView.setOnMenuItemClickListener(object : BottomNavigation.OnMenuItemSelectionListener {
-            override fun onMenuItemSelect(@IdRes menuItemId: Int, itemIndex: Int, b: Boolean) {
-                multistack.setSelectedStack(StackType.values()[itemIndex].name)
-            }
-
-            override fun onMenuItemReselect(@IdRes menuItemId: Int, itemIndex: Int, b: Boolean) {
-
-            }
-        })
+        bottomNavigationView.onMenuItemSelected { menuItemId: Int, itemIndex: Int, b: Boolean ->
+            multistack.setSelectedStack(StackType.values()[itemIndex].name)
+        }
         multistack.setStateChanger(MultistackViewStateChanger(this, multistack, root, this))
     }
 
