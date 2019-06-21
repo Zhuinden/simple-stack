@@ -1,110 +1,86 @@
 package com.zhuinden.simplestackdemomultistack.core.navigation
 
-import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
-
 import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestack.BackstackDelegate
+import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.statebundle.StateBundle
+import java.util.*
 
-import java.util.HashMap
-import java.util.LinkedHashMap
-
-/**
- * Created by Zhuinden on 2017.02.19..
- */
-class Multistack {
-    private val backstackDelegates = LinkedHashMap<String, BackstackDelegate>()
+class Multistack : Bundleable {
+    private val backstacks = LinkedHashMap<String, Backstack>()
     private var selectedStack: String? = null
     private var stateChanger: StateChanger? = null
 
     private var isPaused = false
 
-    fun add(identifier: String, backstackDelegate: BackstackDelegate): BackstackDelegate {
+    fun add(initialKey: MultistackKey) {
+        val identifier = initialKey.stackIdentifier()
+
+        if (has(identifier)) {
+            throw IllegalArgumentException("The identifier [$identifier] is already registered to the multistack")
+        }
         if (selectedStack == null) {
             selectedStack = identifier
         }
-        backstackDelegates[identifier] = backstackDelegate
-        backstackDelegate.setPersistenceTag(identifier)
-        return backstackDelegate
-    }
-
-    fun has(identifier: String): Boolean = backstackDelegates.containsKey(identifier)
-
-    fun get(identifier: String): BackstackDelegate {
-        return backstackDelegates.get(identifier)!!
-    }
-
-    fun onCreate(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null) {
-            selectedStack = savedInstanceState.getString("selectedStack")
+        val backstack = Backstack().apply {
+            setup(History.of(initialKey))
         }
+        backstacks[identifier] = backstack
     }
 
-    fun onCreate(identifier: String, savedInstanceState: Bundle?, nonConfigurationInstance: NonConfigurationInstance?, key: Parcelable) {
-        get(identifier).onCreate(savedInstanceState,
-            nonConfigurationInstance?.getNonConfigInstance(identifier),
-            History.single(key))
+    fun has(identifier: String): Boolean = backstacks.containsKey(identifier)
+
+    fun get(identifier: String): Backstack {
+        return backstacks.get(identifier)!!
     }
 
-    fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("selectedStack", selectedStack)
-        for (backstackDelegate in backstackDelegates.values) {
-            backstackDelegate.onSaveInstanceState(outState)
-        }
-    }
-
-    fun onRetainCustomNonConfigurationInstance(): Any {
-        val nonConfigurationInstance = NonConfigurationInstance()
-        for ((key, value) in backstackDelegates) {
-            nonConfigurationInstance.putNonConfigInstance(key, value.onRetainCustomNonConfigurationInstance())
-        }
-        return nonConfigurationInstance
-    }
+    fun getSelectedStack(): Backstack = backstacks.get(selectedStack)!!
 
     fun setStateChanger(stateChanger: StateChanger?) {
         this.stateChanger = stateChanger
-        for ((key, value) in backstackDelegates) {
+        for ((key, value) in backstacks) {
             if (key != selectedStack) {
-                value.onPause() // FIXME maybe this should be exposed better.
+                value.detachStateChanger()
             } else {
                 value.setStateChanger(stateChanger)
             }
         }
     }
 
-    fun onPostResume() {
+    fun unpause() {
         isPaused = false
-        for ((key, value) in backstackDelegates) {
+        for ((key, value) in backstacks) {
             if (key != selectedStack) {
-                value.onPause() // FIXME maybe this should be exposed better.
+                value.detachStateChanger()
             } else {
-                value.onPostResume()
+                value.reattachStateChanger()
             }
         }
     }
 
-    fun onPause() {
+    fun pause() {
         isPaused = true
-        for ((_, value) in backstackDelegates) {
-            value.onPause()
+        for ((_, value) in backstacks) {
+            value.detachStateChanger()
         }
     }
 
-    fun onBackPressed(): Boolean {
-        return get(selectedStack!!).onBackPressed()
+    fun executePendingStateChange() {
+        for ((_, backstack) in backstacks) {
+            backstack.executePendingStateChange()
+        }
     }
 
-    fun onDestroy() {
-        for ((_, value) in backstackDelegates) {
-            value.onDestroy()
+    fun finalize() {
+        for ((_, backstack) in backstacks) {
+            backstack.finalizeScopes()
         }
     }
 
     fun setSelectedStack(identifier: String) {
-        if (!backstackDelegates.containsKey(identifier)) {
+        if (!backstacks.containsKey(identifier)) {
             throw IllegalArgumentException("You cannot specify a stack [$identifier] that does not exist!")
         }
         if (selectedStack != identifier) {
@@ -113,29 +89,33 @@ class Multistack {
         }
     }
 
-    class NonConfigurationInstance {
-        internal var nonConfigInstances: MutableMap<String, BackstackDelegate.NonConfigurationInstance> = HashMap()
-
-        fun getNonConfigInstance(key: String): BackstackDelegate.NonConfigurationInstance? {
-            return nonConfigInstances[key]
-        }
-
-        fun putNonConfigInstance(key: String, nonConfigurationInstance: BackstackDelegate.NonConfigurationInstance) {
-            nonConfigInstances[key] = nonConfigurationInstance
-        }
-    }
-
     fun persistViewToState(view: View?) {
         if (view != null) {
             val key = Backstack.getKey<MultistackKey>(view.context)
-            val backstackDelegate = key.selectDelegate(view.context)
+            val backstackDelegate = key.selectBackstack(view.context)
             backstackDelegate.persistViewToState(view)
         }
     }
 
     fun restoreViewFromState(view: View) {
         val key = Backstack.getKey<MultistackKey>(view.context)
-        val backstackDelegate = key.selectDelegate(view.context)
-        backstackDelegate.restoreViewFromState(view)
+        val backstack = key.selectBackstack(view.context)
+        backstack.restoreViewFromState(view)
+    }
+
+    override fun toBundle(): StateBundle = StateBundle().apply {
+        putString("multistack_selectedStack", selectedStack)
+        for ((identifier, backstack) in backstacks.entries) {
+            putBundle("multistack_identifier_$identifier", backstack.toBundle())
+        }
+    }
+
+    override fun fromBundle(bundle: StateBundle?) {
+        bundle?.run {
+            selectedStack = getString("multistack_selectedStack")
+            for ((identifier, backstack) in backstacks.entries) {
+                backstack.fromBundle(getBundle("multistack_identifier_$identifier"))
+            }
+        }
     }
 }
