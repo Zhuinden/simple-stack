@@ -5,7 +5,7 @@ import android.os.Parcelable
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestackdemomultistack.util.ServiceLocator
 
-abstract class MultistackKey : Parcelable {
+abstract class MultistackViewKey : Parcelable {
     abstract fun layout(): Int
 
     fun selectBackstack(context: Context): Backstack {

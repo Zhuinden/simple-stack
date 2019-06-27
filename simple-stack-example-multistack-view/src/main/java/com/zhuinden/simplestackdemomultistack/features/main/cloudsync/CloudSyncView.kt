@@ -3,17 +3,14 @@ package com.zhuinden.simplestackdemomultistack.features.main.cloudsync
 import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.RelativeLayout
 import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackKey
+import com.zhuinden.simplestackdemomultistack.core.navigation.backstack
 import com.zhuinden.simplestackdemomultistack.features.main.cloudsync.another.AnotherKey
 import com.zhuinden.simplestackdemomultistack.util.onClick
-import com.zhuinden.statebundle.StateBundle
 import kotlinx.android.synthetic.main.cloudsync_view.view.*
 
-class CloudSyncView : RelativeLayout, Bundleable {
+class CloudSyncView : RelativeLayout {
     lateinit var cloudSyncKey: CloudSyncKey
 
     constructor(context: Context) : super(context)
@@ -32,22 +29,7 @@ class CloudSyncView : RelativeLayout, Bundleable {
         super.onFinishInflate()
 
         buttonFirst.onClick {
-            val key = Backstack.getKey<MultistackKey>(context)
-            key.selectBackstack(context).goTo(AnotherKey())
+            backstack.goTo(AnotherKey())
         }
-    }
-
-    override fun toBundle(): StateBundle = StateBundle().apply {
-        putString("HELLO", "WORLD")
-    }
-
-    override fun fromBundle(bundle: StateBundle?) {
-        bundle?.run {
-            Log.i(TAG, getString("HELLO"))
-        }
-    }
-
-    companion object {
-        private const val TAG = "FirstView"
     }
 }

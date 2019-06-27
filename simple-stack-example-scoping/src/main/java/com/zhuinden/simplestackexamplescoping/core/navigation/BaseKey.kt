@@ -7,7 +7,7 @@ import com.zhuinden.simplestack.ScopeKey
 /**
  * Created by Zhuinden on 2018.09.17.
  */
-interface BaseKey : ScopeKey, Parcelable {
+abstract class BaseKey : ScopeKey, Parcelable {
     val fragmentTag: String
         get() = toString()
 
@@ -19,5 +19,5 @@ interface BaseKey : ScopeKey, Parcelable {
 
     override fun getScopeTag(): String = fragmentTag
 
-    fun createFragment(): BaseFragment
+    protected abstract fun createFragment(): BaseFragment
 }

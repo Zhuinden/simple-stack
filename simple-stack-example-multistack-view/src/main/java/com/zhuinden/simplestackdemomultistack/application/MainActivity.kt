@@ -77,8 +77,8 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        multistack.persistViewToState(root.getChildAt(0))
         outState.putParcelable("multistack", multistack.toBundle())
+        multistack.persistViewToState(root.getChildAt(0)) // this is needed for views only
     }
 
     override fun onDestroy() {

@@ -28,7 +28,7 @@ class MultistackViewStateChanger(
         fun onAnimationEnded()
     }
 
-    private fun exchangeViewForKey(newKey: MultistackKey, direction: Int) {
+    private fun exchangeViewForKey(newKey: MultistackViewKey, direction: Int) {
         multistack.persistViewToState(root.getChildAt(0))
         multistack.setSelectedStack(newKey.stackIdentifier())
         val newContext = KeyContextWrapper(activity, newKey)
@@ -64,9 +64,9 @@ class MultistackViewStateChanger(
         val currentView: View? = root.getChildAt(0)
 
         if (currentView != null) {
-            val previousKey = Backstack.getKey<MultistackKey>(currentView.context)
+            val previousKey = Backstack.getKey<MultistackViewKey>(currentView.context)
             val previousStack = MainActivity.StackType.valueOf(previousKey.stackIdentifier())
-            val newStack = MainActivity.StackType.valueOf((stateChange.topNewKey<Any>() as MultistackKey).stackIdentifier())
+            val newStack = MainActivity.StackType.valueOf((stateChange.topNewKey<Any>() as MultistackViewKey).stackIdentifier())
             direction = when {
                 previousStack.ordinal < newStack.ordinal -> StateChange.FORWARD
                 previousStack.ordinal > newStack.ordinal -> StateChange.BACKWARD

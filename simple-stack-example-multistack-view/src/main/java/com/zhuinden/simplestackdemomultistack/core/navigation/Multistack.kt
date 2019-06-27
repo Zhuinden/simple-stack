@@ -15,7 +15,7 @@ class Multistack : Bundleable {
 
     private var isPaused = false
 
-    fun add(initialKey: MultistackKey) {
+    fun add(initialKey: MultistackViewKey) {
         val identifier = initialKey.stackIdentifier()
 
         if (has(identifier)) {
@@ -91,14 +91,14 @@ class Multistack : Bundleable {
 
     fun persistViewToState(view: View?) {
         if (view != null) {
-            val key = Backstack.getKey<MultistackKey>(view.context)
+            val key = Backstack.getKey<MultistackViewKey>(view.context)
             val backstackDelegate = key.selectBackstack(view.context)
             backstackDelegate.persistViewToState(view)
         }
     }
 
     fun restoreViewFromState(view: View) {
-        val key = Backstack.getKey<MultistackKey>(view.context)
+        val key = Backstack.getKey<MultistackViewKey>(view.context)
         val backstack = key.selectBackstack(view.context)
         backstack.restoreViewFromState(view)
     }

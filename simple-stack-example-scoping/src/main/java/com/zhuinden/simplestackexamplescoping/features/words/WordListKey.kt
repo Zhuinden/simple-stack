@@ -12,7 +12,7 @@ import kotlinx.android.parcel.Parcelize
  * Created by Zhuinden on 2018.09.17.
  */
 @Parcelize
-data class WordListKey(val placeholder: String = "") : BaseKey, HasServices {
+data class WordListKey(val placeholder: String = "") : BaseKey(), HasServices {
     override fun getScopeTag(): String = fragmentTag
 
     override fun bindServices(serviceBinder: ServiceBinder) {
