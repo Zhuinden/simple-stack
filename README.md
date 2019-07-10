@@ -10,6 +10,58 @@ A screen key can also be associated with a "scope", allowing you to easily store
 
 This way, you can easily create single-Activity applications using either views, fragments, or whatevers.
 
+## Why would I want to use this?
+
+Making your navigation state explicit means you're in control of your application. 
+
+Instead of hacking around with the right fragment transaction tags, or calling `NEW_TASK | CLEAR_TASK` and making the screen flicker - you can just say `backstack.setHistory(History.of(SomeScreen(), OtherScreen())` and that is now your active navigation history.
+
+Using `Backstack` to navigate allows you to move navigation responsibilities out of your view layer. No need to run FragmentTransactions directly in a click listener each time you want to move to a different screen. No need to mess around with  `LiveData<Event<T>>` or `SingleLiveData` to get your "view" to decide what state your app should be in either.
+
+``` java
+public class MyViewModel {
+    private final Backstack backstack;
+
+    public MyViewModel(Backstack backstack) {
+        this.backstack = backstack;
+    }
+    
+    // ...
+    
+    public void doSomething() {
+        // ...
+        backstack.goTo(new OtherScreen());
+    }
+}
+```
+
+Another additional benefit is that your navigation history can be unit tested.
+
+``` java
+assertThat(backstack.getHistory()).containsExactly(new SomeScreen(), new OtherScreen());
+```
+
+And most importantly, navigation (swapping screens) happens in one place, and you are in direct control of what happens in such a scenario. By writing a `StateChanger`, you can set up "how to display my current navigation state" in any way you want. No more `((MainActivity)getActivity()).setTitleText("blah");` inside Fragment's `onStart()`.
+
+Write once, works in all cases.
+
+``` java
+public void handleStateChange(StateChange stateChange, StateChanger.Callback callback) {
+    if (stateChange.isTopNewEqualToPrevious()) {
+        callback.stateChangeComplete();
+        return;
+    }
+    Key key = stateChange.topNewKey();
+    setTitle(key.title);
+    
+    ... // set up fragments, set up views, whatever you want
+    
+    callback.stateChangeComplete();
+}
+```
+
+Whether you navigate forward or backward, or you rotate the screen, or you come back after low memory condition - it's irrelevant. The `StateChanger` will ***always*** handle the scenario in a predictable way.
+
 ## Operators
 
 The Backstack provides 3 primary operators for manipulating navigation history.
