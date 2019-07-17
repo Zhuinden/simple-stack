@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackexamplekotlin;
+package com.zhuinden.simplestackdemomultistack;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

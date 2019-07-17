@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.zhuinden.navigationexamplefrag.MainActivity">
+    tools:context="com.zhuinden.navigationexamplefrag.application.MainActivity">
 
     <FrameLayout
         android:id="@+id/root"

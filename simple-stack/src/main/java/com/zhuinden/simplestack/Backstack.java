@@ -297,7 +297,7 @@ public class Backstack
      * @param stateChanger the state changer
      */
     public void setStateChanger(@Nullable StateChanger stateChanger) {
-        checkBackstack("You must call `setup()` before calling `setStateChanger().");
+        checkBackstack("You must call `setup()` before calling `setStateChanger()`.");
         if(core.hasStateChanger()) {
             core.removeStateChanger();
         }
@@ -309,7 +309,7 @@ public class Backstack
      * Detaches the {@link StateChanger} from the {@link Backstack}. This can only be called after {@link Backstack#setup(List)}.
      */
     public void detachStateChanger() {
-        checkBackstack("You must call `setup()` before calling `detachStateChanger().`");
+        checkBackstack("You must call `setup()` before calling `detachStateChanger()`.");
         if(core.hasStateChanger()) {
             core.removeStateChanger();
         }
@@ -319,7 +319,7 @@ public class Backstack
      * Reattaches the {@link StateChanger} to the {@link Backstack}. This can only be called after {@link Backstack#setup(List)}.
      */
     public void reattachStateChanger() {
-        checkBackstack("You must call `setup()` before calling `reattachStateChanger().`");
+        checkBackstack("You must call `setup()` before calling `reattachStateChanger()`.");
         if(!core.hasStateChanger()) {
             core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
         }

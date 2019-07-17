@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.zhuinden.navigationexamplefrag.MainActivity"
+            android:name="com.zhuinden.navigationexamplefrag.application.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

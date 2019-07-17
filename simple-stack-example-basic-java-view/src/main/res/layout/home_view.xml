@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.zhuinden.navigationexampleview.HomeView xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent"
+<com.zhuinden.navigationexampleview.screens.HomeView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -30,4 +32,4 @@
             android:text="Go to Other View"/>
     </LinearLayout>
 
-</com.zhuinden.navigationexampleview.HomeView>
+</com.zhuinden.navigationexampleview.screens.HomeView>
