@@ -11,8 +11,8 @@ import com.zhuinden.simplestackexamplekotlinfragment.core.navigation.FragmentSta
 import com.zhuinden.simplestackexamplekotlinfragment.screens.DashboardKey
 import com.zhuinden.simplestackexamplekotlinfragment.screens.HomeKey
 import com.zhuinden.simplestackexamplekotlinfragment.screens.NotificationKey
-import com.zhuinden.utils.backstack
-import com.zhuinden.utils.replaceHistory
+import com.zhuinden.simplestackexamplekotlinfragment.utils.backstack
+import com.zhuinden.simplestackexamplekotlinfragment.utils.replaceHistory
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**

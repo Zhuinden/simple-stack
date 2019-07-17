@@ -1,7 +1,7 @@
 package com.zhuinden.simplestackexamplekotlinfragment.core.navigation
 
 import android.support.v4.app.Fragment
-import com.zhuinden.utils.requireArguments
+import com.zhuinden.simplestackexamplekotlinfragment.utils.requireArguments
 
 /**
  * Created by Owner on 2017.11.13.

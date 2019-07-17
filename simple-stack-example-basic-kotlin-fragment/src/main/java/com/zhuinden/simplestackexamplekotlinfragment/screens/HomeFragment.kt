@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.zhuinden.simplestackexamplekotlinfragment.R
 import com.zhuinden.simplestackexamplekotlinfragment.core.navigation.BaseFragment
-import com.zhuinden.utils.backstack
-import com.zhuinden.utils.onClick
+import com.zhuinden.simplestackexamplekotlinfragment.utils.backstack
+import com.zhuinden.simplestackexamplekotlinfragment.utils.onClick
 
 import kotlinx.android.synthetic.main.home_view.*
 
