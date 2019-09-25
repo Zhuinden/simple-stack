@@ -147,6 +147,41 @@ class ScopeManager {
 
             return scopeTags;
         }
+
+        public LinkedHashSet<String> findScopesForScopeTag(@NonNull String scopeTag, boolean explicitOnly) {
+            LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
+
+            int indexInRegistrations = -1;
+            List<ScopeRegistration> registrations = new ArrayList<>(scopes.keySet());
+            for(int i = registrations.size() - 1; i >= 0; i--) {
+                ScopeRegistration registration = registrations.get(i);
+                if(scopeTag.equals(registration.scopeTag)) {
+                    indexInRegistrations = i;
+                    break;
+                }
+            }
+
+            if(indexInRegistrations >= 0) {
+                int initialIndex = explicitOnly ? indexInRegistrations : 0;
+                for(int x = indexInRegistrations; x >= initialIndex; x--) {
+                    ScopeRegistration registration = registrations.get(x);
+                    int indexOfParentScope = registration.explicitParentScopes.indexOf(scopeTag);
+                    if(indexOfParentScope != -1) { // scopeTag is an explicit parent
+                        for(int i = indexOfParentScope; i >= 0; i--) {
+                            scopeTags.add(registration.explicitParentScopes.get(i));
+                        }
+                    } else {
+                        scopeTags.add(registration.scopeTag);
+
+                        List<String> explicitParents = new ArrayList<>(registration.explicitParentScopes);
+                        Collections.reverse(explicitParents);
+                        scopeTags.addAll(explicitParents);
+                    }
+                }
+            }
+
+            return scopeTags;
+        }
     }
 
     private static class ScopeRegistration {
@@ -335,7 +370,7 @@ class ScopeManager {
         }
     }
 
-    private List<Object> latestKeys = null;
+    private boolean isInitialized = false;
 
     private boolean isFinalized = false;
 
@@ -349,7 +384,7 @@ class ScopeManager {
         // this logic is actually mostly inside Backstack for some reason
         destroyScope(GLOBAL_SCOPE_TAG);
 
-        this.latestKeys = null; // don't use `emptyList()` so that Globals can be re-initialized.
+        this.isInitialized = false;
     }
 
     void buildScopes(List<Object> newKeys) {
@@ -358,10 +393,10 @@ class ScopeManager {
             this.isGlobalScopePendingActivation = true; // if we allow scopes to be rebuilt once finalized, we need to enable activation of globals.
         }
 
-        if(this.latestKeys == null) { // this seems to be the best way to track that we can safely register and initialize the global scope.
+        if(!isInitialized) { // this seems to be the best way to track that we can safely register and initialize the global scope.
             buildGlobalScope();
         }
-        this.latestKeys = newKeys;
+        isInitialized = true;
 
         trackedKeys.addAll(newKeys);
 
@@ -574,63 +609,12 @@ class ScopeManager {
     }
 
     @NonNull
-    private LinkedHashSet<String> _findScopesForKey(@NonNull Object targetKey, boolean explicitOnly) {
-        return scopes.findScopesForKey(targetKey, explicitOnly);
-    }
-
-    @NonNull
-    private LinkedHashSet<String> _findScopesForScopeTag(@Nullable String scopeTag, boolean explicitOnly) {
-        LinkedHashSet<String> activeScopes = new LinkedHashSet<>();
-
-        if(this.latestKeys == null) {
-            return activeScopes;
-        }
-
-        final List<Object> latestKeys = this.latestKeys;
-
-        boolean isScopeFound = scopeTag == null;
-        for(int i = latestKeys.size() - 1; i >= 0; i--) {
-            Object key = latestKeys.get(i);
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String currentScope = scopeKey.getScopeTag();
-                if(!isScopeFound && currentScope.equals(scopeTag)) {
-                    isScopeFound = true;
-                }
-                if(isScopeFound) {
-                    activeScopes.add(currentScope);
-                }
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    String currentScope = parentScopes.get(j);
-                    if(!isScopeFound && currentScope.equals(scopeTag)) {
-                        isScopeFound = true;
-                    }
-                    if(isScopeFound) {
-                        activeScopes.add(currentScope);
-                    }
-                }
-            }
-
-            if(explicitOnly && isScopeFound) { // force explicit only in this mode.
-                break;
-            }
-        }
-
-        return activeScopes;
-    }
-
-    @NonNull
     Set<String> findScopesForKeyAll(Object targetKey) {
-        if(this.latestKeys == null) {
+        if(!isInitialized) {
             return Collections.emptySet();
         }
 
-        LinkedHashSet<String> activeScopes = _findScopesForKey(targetKey, false);
+        LinkedHashSet<String> activeScopes = scopes.findScopesForKey(targetKey, false);
 
         if(!isFinalized && !globalServices.isEmpty()) {
             activeScopes.add(GLOBAL_SCOPE_TAG);
@@ -641,11 +625,11 @@ class ScopeManager {
 
     @NonNull
     Set<String> findScopesForKeyExplicit(Object targetKey) {
-        if(this.latestKeys == null) {
+        if(!isInitialized) {
             return Collections.emptySet();
         }
 
-        LinkedHashSet<String> activeScopes = _findScopesForKey(targetKey, true);
+        LinkedHashSet<String> activeScopes = scopes.findScopesForKey(targetKey, true);
 
         if(!isFinalized && !globalServices.isEmpty()) {
             activeScopes.add(GLOBAL_SCOPE_TAG);
@@ -663,11 +647,11 @@ class ScopeManager {
     }
 
     boolean canFindFromScopeExplicit(String scopeTag, String identifier) {
-        if(this.latestKeys == null) {
+        if(!isInitialized) {
             return false;
         }
 
-        Set<String> activeScopes = _findScopesForScopeTag(scopeTag, true);
+        Set<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
@@ -685,11 +669,11 @@ class ScopeManager {
     }
 
     boolean canFindFromScopeAll(String scopeTag, String identifier) {
-        if(this.latestKeys == null) {
+        if(!isInitialized) {
             return false;
         }
 
-        LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, false);
+        LinkedHashSet<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
@@ -717,7 +701,7 @@ class ScopeManager {
     <T> T lookupFromScopeExplicit(String scopeTag, String identifier) {
         verifyStackIsInitialized();
 
-        LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, true);
+        LinkedHashSet<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
@@ -737,7 +721,7 @@ class ScopeManager {
     <T> T lookupFromScopeAll(String scopeTag, String identifier) {
         verifyStackIsInitialized();
 
-        LinkedHashSet<String> activeScopes = _findScopesForScopeTag(scopeTag, false);
+        LinkedHashSet<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
@@ -762,11 +746,6 @@ class ScopeManager {
             if(scopeNode != null && scopeNode.hasService(identifier)) {
                 return true;
             }
-        }
-
-        //noinspection RedundantIfStatement
-        if(!isFinalized && globalServices.hasService(identifier)) {
-            return true;
         }
 
         return false;
@@ -803,7 +782,7 @@ class ScopeManager {
     }
 
     private void verifyStackIsInitialized() {
-        if(this.latestKeys == null) {
+        if(!isInitialized) {
             throw new IllegalStateException("Cannot lookup from an empty stack.");
         }
     }

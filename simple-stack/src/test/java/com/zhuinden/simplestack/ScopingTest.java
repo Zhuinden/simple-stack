@@ -1907,6 +1907,7 @@ public class ScopingTest {
         final Object helloService = new Object();
         final Object worldService = new Object();
         final Object kappaService = new Object();
+        final Object parentService = new Object();
 
         backstack.setScopedServices(new ScopedServices() {
             @Override
@@ -1917,12 +1918,34 @@ public class ScopingTest {
                     serviceBinder.addService("world", worldService);
                 } else if("kappa".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("kappa", kappaService);
+                } else if("parent".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("parent", parentService);
                 }
             }
         });
 
+
+        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+            private String[] parentScopes;
+
+            TestKeyWithExplicitParent(String name, String... parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.from(Arrays.asList(parentScopes));
+            }
+        }
+
         TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
-        TestKeyWithScope scopeKey2 = new TestKeyWithScope("world");
+        TestKeyWithScope scopeKey2 = new TestKeyWithExplicitParent("world", "parent");
         TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
 
         backstack.setup(History.of(scopeKey1, scopeKey2));
@@ -1939,7 +1962,6 @@ public class ScopingTest {
         callbackRef.get().stateChangeComplete();
 
         backstack.setHistory(History.of(scopeKey1, scopeKey3), StateChange.REPLACE);
-
 
         assertThat(backstack.lookupFromScope("hello", "hello")).isSameAs(helloService);
         assertThat(backstack.lookupFromScope("world", "world")).isSameAs(worldService);
@@ -1963,10 +1985,7 @@ public class ScopingTest {
         assertThat(backstack.lookupFromScope("kappa", "hello", ScopeLookupMode.ALL)).isSameAs(helloService);
         assertThat(backstack.lookupFromScope("kappa", "world", ScopeLookupMode.ALL)).isSameAs(worldService);
 
-        assertThat(backstack.lookupFromScope("world", "hello", ScopeLookupMode.EXPLICIT)).isSameAs(helloService);
-
-        assertThat(backstack.lookupFromScope("kappa", "hello", ScopeLookupMode.EXPLICIT)).isSameAs(helloService);
-        assertThat(backstack.lookupFromScope("kappa", "world", ScopeLookupMode.EXPLICIT)).isSameAs(worldService);
+        assertThat(backstack.lookupFromScope("world", "parent", ScopeLookupMode.EXPLICIT)).isSameAs(parentService);
 
         //
 
@@ -1992,9 +2011,6 @@ public class ScopingTest {
         assertThat(backstack.canFindFromScope("kappa", "hello", ScopeLookupMode.ALL)).isTrue();
         assertThat(backstack.canFindFromScope("kappa", "world", ScopeLookupMode.ALL)).isTrue();
 
-        assertThat(backstack.canFindFromScope("world", "hello", ScopeLookupMode.EXPLICIT)).isTrue();
-
-        assertThat(backstack.canFindFromScope("kappa", "hello", ScopeLookupMode.EXPLICIT)).isTrue();
-        assertThat(backstack.canFindFromScope("kappa", "world", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("world", "parent", ScopeLookupMode.EXPLICIT)).isTrue();
     }
 }
