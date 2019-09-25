@@ -229,7 +229,6 @@ class ScopeManager {
 
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
-    private final LinkedHashSet<Object> trackedKeys = new LinkedHashSet<>();
     private final ScopeRegistrations scopes = new ScopeRegistrations();
 
     private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
@@ -398,8 +397,6 @@ class ScopeManager {
         }
         isInitialized = true;
 
-        trackedKeys.addAll(newKeys);
-
         for(Object key : newKeys) {
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
@@ -438,8 +435,6 @@ class ScopeManager {
                 destroyScope(activeScope);
             }
         }
-
-        trackedKeys.retainAll(newState);
     }
 
     void destroyScope(String scopeTag) {
