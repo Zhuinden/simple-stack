@@ -63,14 +63,14 @@ class ScopeManager {
             return Collections.unmodifiableSet(set);
         }
 
-        public void putKey(Object key, String scopeTag, ScopeNode scopeNode) {
+        public void putKey(Object key, String scopeTag, ScopeNode scopeNode, boolean isExplicitParent) {
             final List<String> explicitParentScopes;
             if(key instanceof ScopeKey.Child) {
                 explicitParentScopes = ((ScopeKey.Child) key).getParentScopes();
             } else {
                 explicitParentScopes = Collections.emptyList();
             }
-            ScopeRegistration scopeRegistration = new ScopeRegistration(scopeTag, explicitParentScopes);
+            ScopeRegistration scopeRegistration = new ScopeRegistration(key, scopeTag, explicitParentScopes, isExplicitParent);
             put(scopeRegistration, scopeNode);
         }
 
@@ -116,13 +116,48 @@ class ScopeManager {
             List<String> scopeTagList = new ArrayList<>(scopeTags);
             return Collections.unmodifiableList(scopeTagList);
         }
+
+        public LinkedHashSet<String> findScopesForKey(@NonNull Object targetKey, boolean explicitOnly) {
+            LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
+
+            int indexInRegistrations = -1;
+            List<ScopeRegistration> registrations = new ArrayList<>(scopes.keySet());
+            for(int i = registrations.size() - 1; i >= 0; i--) {
+                ScopeRegistration registration = registrations.get(i);
+                if(registration.key != null && registration.key.equals(targetKey)) {
+                    indexInRegistrations = i;
+                    break;
+                }
+            }
+
+            if(indexInRegistrations >= 0) {
+                int initialIndex = explicitOnly ? indexInRegistrations : 0;
+
+                for(int i = indexInRegistrations; i >= initialIndex; i--) {
+                    ScopeRegistration currentRegistration = registrations.get(i);
+                    if(!currentRegistration.isExplicitParent) {
+                        scopeTags.add(currentRegistration.scopeTag);
+
+                        List<String> explicitParents = new ArrayList<>(currentRegistration.explicitParentScopes);
+                        Collections.reverse(explicitParents);
+                        scopeTags.addAll(explicitParents);
+                    }
+                }
+            }
+
+            return scopeTags;
+        }
     }
 
     private static class ScopeRegistration {
+        private Object key; // null if GlobalScope
         private String scopeTag;
         private List<String> explicitParentScopes;
+        private boolean isExplicitParent;
 
-        public ScopeRegistration(@NonNull String scopeTag, @NonNull List<String> explicitParentScopes) {
+        public ScopeRegistration(@Nullable Object key, @NonNull String scopeTag, @NonNull List<String> explicitParentScopes, boolean isExplicitParent) {
+            // key is null if global scope
+
             //noinspection ConstantConditions
             if(scopeTag == null) {
                 throw new NullPointerException("scopeTag must not be null!");
@@ -131,8 +166,10 @@ class ScopeManager {
             if(explicitParentScopes == null) {
                 throw new NullPointerException("explicitParentScopes must not be null!");
             }
+            this.key = key;
             this.scopeTag = scopeTag;
             this.explicitParentScopes = explicitParentScopes;
+            this.isExplicitParent = isExplicitParent;
         }
 
         @Override
@@ -153,10 +190,11 @@ class ScopeManager {
     }
 
     static final String GLOBAL_SCOPE_TAG = "__SIMPLE_STACK_INTERNAL_GLOBAL_SCOPE__";
-    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(GLOBAL_SCOPE_TAG, Collections.<String>emptyList());
+    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null, GLOBAL_SCOPE_TAG, Collections.<String>emptyList(), true);
 
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
+    private final LinkedHashSet<Object> trackedKeys = new LinkedHashSet<>();
     private final ScopeRegistrations scopes = new ScopeRegistrations();
 
     private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
@@ -182,6 +220,7 @@ class ScopeManager {
             throw new IllegalStateException(
                     "No scoped services are defined. To create scoped services, an instance of ScopedServices must be provided to configure the services that are available in a given scope.");
         }
+
     }
 
     private GlobalServices globalServices = EMPTY_GLOBAL_SERVICES;
@@ -226,14 +265,14 @@ class ScopeManager {
         }
     }
 
-    private void buildScope(Object key, String scopeTag) {
+    private void buildScope(Object key, String scopeTag, boolean isExplicitParent) {
         //noinspection ConstantConditions
         if(scopeTag == null) {
             throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
         }
         if(!scopes.containsKey(scopeTag)) {
             ScopeNode scope = new ScopeNode();
-            scopes.putKey(key, scopeTag, scope);
+            scopes.putKey(key, scopeTag, scope, isExplicitParent);
 
             scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
 
@@ -313,7 +352,7 @@ class ScopeManager {
         this.latestKeys = null; // don't use `emptyList()` so that Globals can be re-initialized.
     }
 
-    void buildScopes(List<Object> newState) {
+    void buildScopes(List<Object> newKeys) {
         if(isFinalized) {
             this.isFinalized = false; // reset this for future travellers, I guess.
             this.isGlobalScopePendingActivation = true; // if we allow scopes to be rebuilt once finalized, we need to enable activation of globals.
@@ -322,20 +361,22 @@ class ScopeManager {
         if(this.latestKeys == null) { // this seems to be the best way to track that we can safely register and initialize the global scope.
             buildGlobalScope();
         }
-        this.latestKeys = newState;
+        this.latestKeys = newKeys;
 
-        for(Object key : newState) {
+        trackedKeys.addAll(newKeys);
+
+        for(Object key : newKeys) {
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
                 checkParentScopes(child);
                 for(String parent : child.getParentScopes()) {
-                    buildScope(key, parent);
+                    buildScope(key, parent, true);
                 }
             }
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 String scopeTag = scopeKey.getScopeTag();
-                buildScope(key, scopeTag);
+                buildScope(key, scopeTag, false);
             }
         }
     }
@@ -362,6 +403,8 @@ class ScopeManager {
                 destroyScope(activeScope);
             }
         }
+
+        trackedKeys.retainAll(newState);
     }
 
     void destroyScope(String scopeTag) {
@@ -532,39 +575,7 @@ class ScopeManager {
 
     @NonNull
     private LinkedHashSet<String> _findScopesForKey(@NonNull Object targetKey, boolean explicitOnly) {
-        LinkedHashSet<String> activeScopes = new LinkedHashSet<>();
-
-        boolean isKeyFound = false;
-        for(int i = latestKeys.size() - 1; i >= 0; i--) {
-            Object key = latestKeys.get(i);
-            if(targetKey.equals(key)) {
-                isKeyFound = true;
-            }
-            if(!isKeyFound) {
-                continue;
-            }
-            if(key instanceof ScopeKey) {
-                ScopeKey scopeKey = (ScopeKey) key;
-                String currentScope = scopeKey.getScopeTag();
-                activeScopes.add(currentScope);
-            }
-            if(key instanceof ScopeKey.Child) {
-                ScopeKey.Child child = (ScopeKey.Child) key;
-                checkParentScopes(child);
-                List<String> parentScopes = child.getParentScopes();
-                for(int j = parentScopes.size() - 1; j >= 0; j--) {
-                    String currentScope = parentScopes.get(j);
-                    activeScopes.add(currentScope);
-                }
-            }
-
-            if(explicitOnly) {
-                // force explicit only in this mode.
-                break;
-            }
-        }
-
-        return activeScopes;
+        return scopes.findScopesForKey(targetKey, explicitOnly);
     }
 
     @NonNull

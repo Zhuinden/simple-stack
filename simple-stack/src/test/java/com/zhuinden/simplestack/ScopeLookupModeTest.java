@@ -429,7 +429,7 @@ public class ScopeLookupModeTest {
             @NonNull
             @Override
             public List<String> getParentScopes() {
-                return History.of("parent2");
+                return History.of("parent2", "parent3");
             }
         }
 
@@ -448,9 +448,9 @@ public class ScopeLookupModeTest {
         });
 
         assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2");
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent3", "parent2");
         assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1");
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1");
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent3", "parent2", "beep", "parent1");
     }
 
     @Test
