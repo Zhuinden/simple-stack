@@ -1784,4 +1784,49 @@ public class ScopingTest {
             Assert.fail("Should be no-op.");
         }
     }
+
+    @Test
+    public void scopeBuiltByNavigationButNotInLatestKeysShouldBeAccessibleByLookup() {
+        Backstack backstack = new Backstack();
+
+        final Object helloService = new Object();
+        final Object worldService = new Object();
+        final Object kappaService = new Object();
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if("hello".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("hello", helloService);
+                } else if("world".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("world", worldService);
+                } else if("kappa".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("kappa", kappaService);
+                }
+            }
+        });
+
+        TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
+        TestKeyWithScope scopeKey2 = new TestKeyWithScope("world");
+        TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
+
+        backstack.setup(History.of(scopeKey1, scopeKey2));
+
+        final AtomicReference<StateChanger.Callback> callbackRef = new AtomicReference<>();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                callbackRef.set(completionCallback);
+            }
+        });
+
+        callbackRef.get().stateChangeComplete();
+
+        backstack.setHistory(History.of(scopeKey1, scopeKey3), StateChange.REPLACE);
+
+        assertThat(backstack.lookupService("hello")).isSameAs(helloService);
+        assertThat(backstack.lookupService("kappa")).isSameAs(kappaService);
+        assertThat(backstack.lookupService("world")).isSameAs(worldService);
+    }
 }
