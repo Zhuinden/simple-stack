@@ -7,7 +7,7 @@ android {
     compileSdkVersion(28)
 
     defaultConfig {
-        minSdkVersion(1)
+        minSdkVersion(9)
         targetSdkVersion(28)
         versionCode = 1
         versionName = "0.6.0"
@@ -23,6 +23,11 @@ android {
 
     lintOptions {
         isAbortOnError = false
+    }
+
+    compileOptions {
+        this.setSourceCompatibility(JavaVersion.VERSION_1_7)
+        this.setTargetCompatibility(JavaVersion.VERSION_1_7)
     }
 }
 

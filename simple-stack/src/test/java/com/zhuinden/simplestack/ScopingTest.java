@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -1783,5 +1784,233 @@ public class ScopingTest {
         } catch(Throwable e) {
             Assert.fail("Should be no-op.");
         }
+    }
+
+    @Test
+    public void scopeBuiltByNavigationButNotInLatestKeysShouldBeAccessibleByLookup() {
+        Backstack backstack = new Backstack();
+
+        final Object helloService = new Object();
+        final Object worldService = new Object();
+        final Object kappaService = new Object();
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if("hello".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("hello", helloService);
+                } else if("world".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("world", worldService);
+                } else if("kappa".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("kappa", kappaService);
+                }
+            }
+        });
+
+        TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
+        TestKeyWithScope scopeKey2 = new TestKeyWithScope("world");
+        TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
+
+        backstack.setup(History.of(scopeKey1, scopeKey2));
+
+        final AtomicReference<StateChanger.Callback> callbackRef = new AtomicReference<>();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                callbackRef.set(completionCallback);
+            }
+        });
+
+        callbackRef.get().stateChangeComplete();
+
+        backstack.setHistory(History.of(scopeKey1, scopeKey3), StateChange.REPLACE);
+
+        assertThat(backstack.lookupService("hello")).isSameAs(helloService);
+        assertThat(backstack.lookupService("kappa")).isSameAs(kappaService);
+        assertThat(backstack.lookupService("world")).isSameAs(worldService);
+    }
+
+    @Test
+    public void scopeBuiltByNavigationButNotInLatestKeysCanBeFoundByKey() {
+        Backstack backstack = new Backstack();
+
+        final Object helloService = new Object();
+        final Object worldService = new Object();
+        final Object kappaService = new Object();
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if("hello".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("hello", helloService);
+                } else if("world".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("world", worldService);
+                } else if("kappa".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("kappa", kappaService);
+                }
+            }
+        });
+
+        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+            private String[] parentScopes;
+
+            TestKeyWithExplicitParent(String name, String... parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.from(Arrays.asList(parentScopes));
+            }
+        }
+
+        TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
+        TestKeyWithScope scopeKey2 = new TestKeyWithExplicitParent("world", "parent");
+        TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
+
+        backstack.setup(History.of(scopeKey1, scopeKey2));
+
+        final AtomicReference<StateChanger.Callback> callbackRef = new AtomicReference<>();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                callbackRef.set(completionCallback);
+            }
+        });
+
+        callbackRef.get().stateChangeComplete();
+
+        backstack.setHistory(History.of(scopeKey1, scopeKey3), StateChange.REPLACE);
+
+        assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.ALL)).containsExactly("hello");
+        assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.ALL)).containsExactly("world", "parent", "hello");
+        assertThat(backstack.findScopesForKey(scopeKey3, ScopeLookupMode.ALL)).containsExactly("kappa", "world", "parent", "hello");
+
+        assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.EXPLICIT)).containsExactly("hello");
+        assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.EXPLICIT)).containsExactly("world", "parent");
+        assertThat(backstack.findScopesForKey(scopeKey3, ScopeLookupMode.EXPLICIT)).containsExactly("kappa");
+    }
+
+
+    @Test
+    public void scopeBuiltByNavigationButNotInLatestKeysCanBeFoundFromScope() {
+        Backstack backstack = new Backstack();
+
+        final Object helloService = new Object();
+        final Object worldService = new Object();
+        final Object kappaService = new Object();
+        final Object parentService = new Object();
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if("hello".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("hello", helloService);
+                } else if("world".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("world", worldService);
+                } else if("kappa".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("kappa", kappaService);
+                } else if("parent".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("parent", parentService);
+                }
+            }
+        });
+
+
+        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+            private String[] parentScopes;
+
+            TestKeyWithExplicitParent(String name, String... parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.from(Arrays.asList(parentScopes));
+            }
+        }
+
+        TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
+        TestKeyWithScope scopeKey2 = new TestKeyWithExplicitParent("world", "parent");
+        TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
+
+        backstack.setup(History.of(scopeKey1, scopeKey2));
+
+        final AtomicReference<StateChanger.Callback> callbackRef = new AtomicReference<>();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                callbackRef.set(completionCallback);
+            }
+        });
+
+        callbackRef.get().stateChangeComplete();
+
+        backstack.setHistory(History.of(scopeKey1, scopeKey3), StateChange.REPLACE);
+
+        assertThat(backstack.lookupFromScope("hello", "hello")).isSameAs(helloService);
+        assertThat(backstack.lookupFromScope("world", "world")).isSameAs(worldService);
+        assertThat(backstack.lookupFromScope("kappa", "kappa")).isSameAs(kappaService);
+
+        assertThat(backstack.lookupFromScope("hello", "hello", ScopeLookupMode.ALL)).isSameAs(helloService);
+        assertThat(backstack.lookupFromScope("world", "world", ScopeLookupMode.ALL)).isSameAs(worldService);
+        assertThat(backstack.lookupFromScope("kappa", "kappa", ScopeLookupMode.ALL)).isSameAs(kappaService);
+
+        assertThat(backstack.lookupFromScope("hello", "hello", ScopeLookupMode.EXPLICIT)).isSameAs(helloService);
+        assertThat(backstack.lookupFromScope("world", "world", ScopeLookupMode.EXPLICIT)).isSameAs(worldService);
+        assertThat(backstack.lookupFromScope("kappa", "kappa", ScopeLookupMode.EXPLICIT)).isSameAs(kappaService);
+
+        assertThat(backstack.lookupFromScope("world", "hello")).isSameAs(helloService);
+
+        assertThat(backstack.lookupFromScope("kappa", "hello")).isSameAs(helloService);
+        assertThat(backstack.lookupFromScope("kappa", "world")).isSameAs(worldService);
+
+        assertThat(backstack.lookupFromScope("world", "hello", ScopeLookupMode.ALL)).isSameAs(helloService);
+
+        assertThat(backstack.lookupFromScope("kappa", "hello", ScopeLookupMode.ALL)).isSameAs(helloService);
+        assertThat(backstack.lookupFromScope("kappa", "world", ScopeLookupMode.ALL)).isSameAs(worldService);
+
+        assertThat(backstack.lookupFromScope("world", "parent", ScopeLookupMode.EXPLICIT)).isSameAs(parentService);
+
+        //
+
+        assertThat(backstack.canFindFromScope("hello", "hello")).isTrue();
+        assertThat(backstack.canFindFromScope("world", "world")).isTrue();
+        assertThat(backstack.canFindFromScope("kappa", "kappa")).isTrue();
+
+        assertThat(backstack.canFindFromScope("hello", "hello", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("world", "world", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("kappa", "kappa", ScopeLookupMode.ALL)).isTrue();
+
+        assertThat(backstack.canFindFromScope("hello", "hello", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("world", "world", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope("kappa", "kappa", ScopeLookupMode.EXPLICIT)).isTrue();
+
+        assertThat(backstack.canFindFromScope("world", "hello")).isTrue();
+
+        assertThat(backstack.canFindFromScope("kappa", "hello")).isTrue();
+        assertThat(backstack.canFindFromScope("kappa", "world")).isTrue();
+
+        assertThat(backstack.canFindFromScope("world", "hello", ScopeLookupMode.ALL)).isTrue();
+
+        assertThat(backstack.canFindFromScope("kappa", "hello", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope("kappa", "world", ScopeLookupMode.ALL)).isTrue();
+
+        assertThat(backstack.canFindFromScope("world", "parent", ScopeLookupMode.EXPLICIT)).isTrue();
     }
 }
