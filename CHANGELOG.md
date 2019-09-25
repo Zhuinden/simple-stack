@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stack 2.1.0 (2019-09-25)
+--------------------------------
+
+- FIX: Ensure that while navigation is in progress, `lookupService()` (and other service lookup methods) can access all currently built scopes, rather than only the latest navigation history currently being navigated to.
+
+This fix is crucial when `lookupService` is used inside `onFinishInflate` method of views inflated by ViewPager adapters; and returning from process death, navigation to a different screen is immediate (f.ex. deep-linking via notifications).
+
 -Simple Stack 2.0.3 (2019-05-20)
 --------------------------------
 
