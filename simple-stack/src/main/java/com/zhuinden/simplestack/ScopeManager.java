@@ -63,14 +63,14 @@ class ScopeManager {
             return Collections.unmodifiableSet(set);
         }
 
-        public void putKey(Object key, String scopeTag, ScopeNode scopeNode, boolean isExplicitParent) {
+        public void putKey(Object key, String scopeTag, ScopeNode scopeNode, boolean isExplicitParent, boolean isGlobalScope) {
             final List<String> explicitParentScopes;
             if(key instanceof ScopeKey.Child) {
                 explicitParentScopes = ((ScopeKey.Child) key).getParentScopes();
             } else {
                 explicitParentScopes = Collections.emptyList();
             }
-            ScopeRegistration scopeRegistration = new ScopeRegistration(key, scopeTag, explicitParentScopes, isExplicitParent);
+            ScopeRegistration scopeRegistration = new ScopeRegistration(key, scopeTag, explicitParentScopes, isExplicitParent, isGlobalScope);
             put(scopeRegistration, scopeNode);
         }
 
@@ -135,7 +135,7 @@ class ScopeManager {
 
                 for(int i = indexInRegistrations; i >= initialIndex; i--) {
                     ScopeRegistration currentRegistration = registrations.get(i);
-                    if(!currentRegistration.isExplicitParent) {
+                    if(!currentRegistration.isGlobalScope) {
                         scopeTags.add(currentRegistration.scopeTag);
 
                         List<String> explicitParents = new ArrayList<>(currentRegistration.explicitParentScopes);
@@ -189,8 +189,9 @@ class ScopeManager {
         private String scopeTag;
         private List<String> explicitParentScopes;
         private boolean isExplicitParent;
+        private boolean isGlobalScope;
 
-        public ScopeRegistration(@Nullable Object key, @NonNull String scopeTag, @NonNull List<String> explicitParentScopes, boolean isExplicitParent) {
+        public ScopeRegistration(@Nullable Object key, @NonNull String scopeTag, @NonNull List<String> explicitParentScopes, boolean isExplicitParent, boolean isGlobalScope) {
             // key is null if global scope
 
             //noinspection ConstantConditions
@@ -205,6 +206,7 @@ class ScopeManager {
             this.scopeTag = scopeTag;
             this.explicitParentScopes = explicitParentScopes;
             this.isExplicitParent = isExplicitParent;
+            this.isGlobalScope = isGlobalScope;
         }
 
         @Override
@@ -225,7 +227,7 @@ class ScopeManager {
     }
 
     static final String GLOBAL_SCOPE_TAG = "__SIMPLE_STACK_INTERNAL_GLOBAL_SCOPE__";
-    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null, GLOBAL_SCOPE_TAG, Collections.<String>emptyList(), true);
+    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null, GLOBAL_SCOPE_TAG, Collections.<String>emptyList(), true, true);
 
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
@@ -306,7 +308,7 @@ class ScopeManager {
         }
         if(!scopes.containsKey(scopeTag)) {
             ScopeNode scope = new ScopeNode();
-            scopes.putKey(key, scopeTag, scope, isExplicitParent);
+            scopes.putKey(key, scopeTag, scope, isExplicitParent, false);
 
             scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
 
