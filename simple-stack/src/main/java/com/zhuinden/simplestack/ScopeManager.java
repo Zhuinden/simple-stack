@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 class ScopeManager {
-    private static class ScopeRegistrations {
+    private class ScopeRegistrations {
         private final Map<ScopeRegistration, ScopeNode> scopes = new LinkedHashMap<>();
 
         public boolean containsKey(String scopeTag) {
@@ -127,6 +127,29 @@ class ScopeManager {
                 if(registration.key != null && registration.key.equals(targetKey)) {
                     indexInRegistrations = i;
                     break;
+                }
+            }
+
+            if(!explicitOnly && indexInRegistrations < 0 && trackedKeys.contains(targetKey)) { // handle when the key has no scope but is part of history
+                List<Object> trackedKeyList = new ArrayList<>(trackedKeys);
+                int indexOfTarget = trackedKeyList.indexOf(targetKey);
+                for(int i = indexOfTarget - 1; i >= 0; i--) {
+                    boolean foundCandidate = false;
+                    Object firstCandidate = trackedKeyList.get(i);
+                    int indexOfCandidate = -1;
+                    for(int j = registrations.size() - 1; j >= 0; j--) {
+                        ScopeRegistration registration = registrations.get(j);
+                        if(firstCandidate.equals(registration.key)) {
+                            foundCandidate = true;
+                            indexOfCandidate = j;
+                            break;
+                        }
+                    }
+
+                    if(foundCandidate) {
+                        indexInRegistrations = indexOfCandidate;
+                        break;
+                    }
                 }
             }
 
@@ -232,6 +255,7 @@ class ScopeManager {
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
     private final ScopeRegistrations scopes = new ScopeRegistrations();
+    private final LinkedHashSet<Object> trackedKeys = new LinkedHashSet<>();
 
     private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
     private final IdentityHashMap<Object, Set<String>> scopeActivatedServices = new IdentityHashMap<>();
@@ -399,6 +423,8 @@ class ScopeManager {
         }
         isInitialized = true;
 
+        trackedKeys.addAll(newKeys);
+
         for(Object key : newKeys) {
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
@@ -415,11 +441,11 @@ class ScopeManager {
         }
     }
 
-    void clearScopesNotIn(List<Object> newState) {
+    void clearScopesNotIn(List<Object> newKeys) {
         Set<String> currentScopes = new LinkedHashSet<>();
         currentScopes.add(GLOBAL_SCOPE_TAG); // prevent global scope from being destroyed
 
-        for(Object key : newState) {
+        for(Object key : newKeys) {
             if(key instanceof ScopeKey.Child) {
                 ScopeKey.Child child = (ScopeKey.Child) key;
                 checkParentScopes(child);
@@ -437,6 +463,8 @@ class ScopeManager {
                 destroyScope(activeScope);
             }
         }
+
+        trackedKeys.retainAll(newKeys);
     }
 
     void destroyScope(String scopeTag) {
