@@ -276,7 +276,7 @@ public class Navigator {
      *
      * @param context the context to which an activity belongs that hosts the backstack
      */
-    public static void executeDeferredInitialization(Context context) {
+    public static void executeDeferredInitialization(@NonNull Context context) {
         Activity activity = findActivity(context);
         BackstackHost backstackHost = findBackstackHost(activity);
         backstackHost.initialize(false);
@@ -288,7 +288,7 @@ public class Navigator {
      * @param context the Context that belongs to an Activity which hosts the backstack.
      * @return true if a state change was handled or is in progress, false otherwise
      */
-    public static boolean onBackPressed(Context context) {
+    public static boolean onBackPressed(@NonNull Context context) {
         return getBackstack(context).goBack();
     }
 
@@ -454,7 +454,7 @@ public class Navigator {
      * @return the backstack
      */
     @NonNull
-    public static Backstack getBackstack(Context context) {
+    public static Backstack getBackstack(@NonNull Context context) {
         BackstackHost backstackHost = getBackstackHost(context);
         return backstackHost.getBackstack();
     }

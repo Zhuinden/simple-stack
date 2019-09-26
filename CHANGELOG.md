@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stack 2.1.1 (2019-09-26)
+--------------------------------
+
+- FIX: Make `findScopesForKey` work consistently even if a key is not a `ScopeKey`.
+
+- FIX: Add missing `@NonNull` on Context argument on some methods of Navigator.
+
 -Simple Stack 2.1.0 (2019-09-25)
 --------------------------------
 
