@@ -1829,6 +1829,17 @@ public class ScopingTest {
         assertThat(backstack.lookupService("hello")).isSameAs(helloService);
         assertThat(backstack.lookupService("kappa")).isSameAs(kappaService);
         assertThat(backstack.lookupService("world")).isSameAs(worldService);
+
+        assertThat(backstack.canFindService("hello")).isTrue();
+        assertThat(backstack.canFindService("kappa")).isTrue();
+        assertThat(backstack.canFindService("world")).isTrue();
+
+        callbackRef.get().stateChangeComplete();
+
+
+        assertThat(backstack.canFindService("hello")).isTrue();
+        assertThat(backstack.canFindService("kappa")).isTrue();
+        assertThat(backstack.canFindService("world")).isFalse();
     }
 
     @Test
@@ -1896,6 +1907,16 @@ public class ScopingTest {
 
         assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.EXPLICIT)).containsExactly("hello");
         assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.EXPLICIT)).containsExactly("world", "parent");
+        assertThat(backstack.findScopesForKey(scopeKey3, ScopeLookupMode.EXPLICIT)).containsExactly("kappa");
+
+        callbackRef.get().stateChangeComplete();
+
+        assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.ALL)).containsExactly("hello");
+        assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(scopeKey3, ScopeLookupMode.ALL)).containsExactly("kappa", "hello");
+
+        assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.EXPLICIT)).containsExactly("hello");
+        assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.EXPLICIT)).isEmpty();
         assertThat(backstack.findScopesForKey(scopeKey3, ScopeLookupMode.EXPLICIT)).containsExactly("kappa");
     }
 
@@ -2012,5 +2033,199 @@ public class ScopingTest {
         assertThat(backstack.canFindFromScope("kappa", "world", ScopeLookupMode.ALL)).isTrue();
 
         assertThat(backstack.canFindFromScope("world", "parent", ScopeLookupMode.EXPLICIT)).isTrue();
+
+        assertThat(backstack.canFindFromScope("parent", "parent", ScopeLookupMode.EXPLICIT)).isTrue();
+
+        callbackRef.get().stateChangeComplete();
+
+        assertThat(backstack.canFindFromScope("world", "world", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("world", "parent", ScopeLookupMode.ALL)).isFalse();
+        assertThat(backstack.canFindFromScope("parent", "parent", ScopeLookupMode.ALL)).isFalse();
+
+        assertThat(backstack.canFindFromScope("world", "world", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("world", "parent", ScopeLookupMode.EXPLICIT)).isFalse();
+        assertThat(backstack.canFindFromScope("parent", "parent", ScopeLookupMode.EXPLICIT)).isFalse();
+    }
+
+    @Test
+    public void keyWithinNavigationButWithoutScopeStillAbleToFindScopes() {
+        Backstack backstack = new Backstack();
+
+        final Object helloService = new Object();
+        final Object worldService = new Object();
+        final Object kappaService = new Object();
+        final Object parentService = new Object();
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if("hello".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("hello", helloService);
+                } else if("world".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("world", worldService);
+                } else if("kappa".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("kappa", kappaService);
+                } else if("parent".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("parent", parentService);
+                }
+            }
+        });
+
+
+        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+            private String[] parentScopes;
+
+            TestKeyWithExplicitParent(String name, String... parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.from(Arrays.asList(parentScopes));
+            }
+        }
+
+        TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
+        TestKeyWithScope scopeKey2 = new TestKeyWithExplicitParent("world", "parent");
+        TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
+        TestKey key4 = new TestKey("360noscope");
+        TestKey key5 = new TestKey("180noscope");
+
+        backstack.setup(History.of(scopeKey1, scopeKey2, key4));
+
+        final AtomicReference<StateChanger.Callback> callbackRef = new AtomicReference<>();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                callbackRef.set(completionCallback);
+            }
+        });
+
+        callbackRef.get().stateChangeComplete();
+
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.ALL)).containsExactly("world", "parent", "hello");
+
+        backstack.setHistory(History.of(scopeKey1, scopeKey3, key5), StateChange.REPLACE);
+
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.ALL)).containsExactly("world", "parent", "hello");
+
+        assertThat(backstack.findScopesForKey(key5, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key5, ScopeLookupMode.ALL)).containsExactly("kappa", "world", "parent", "hello");
+
+        callbackRef.get().stateChangeComplete();
+
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.ALL)).isEmpty();
+
+        assertThat(backstack.findScopesForKey(key5, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key5, ScopeLookupMode.ALL)).containsExactly("kappa", "hello");
+    }
+
+    @Test
+    public void keyWithinNavigationWithOnlyExplicitScopeStillAbleToFindScopes() {
+        Backstack backstack = new Backstack();
+
+        final Object helloService = new Object();
+        final Object worldService = new Object();
+        final Object kappaService = new Object();
+        final Object parentService = new Object();
+        final Object parent2Service = new Object();
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+                if("hello".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("hello", helloService);
+                } else if("world".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("world", worldService);
+                } else if("kappa".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("kappa", kappaService);
+                } else if("parent".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("parent", parentService);
+                } else if("parent2".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("parent2", parent2Service);
+                }
+            }
+        });
+
+
+        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+            private String[] parentScopes;
+
+            TestKeyWithExplicitParent(String name, String... parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.from(Arrays.asList(parentScopes));
+            }
+        }
+
+
+        class TestKeyWithOnlyExplicitParent extends TestKey implements ScopeKey.Child {
+            private String[] parentScopes;
+
+            TestKeyWithOnlyExplicitParent(String name, String... parentScopes) {
+                super(name);
+                this.parentScopes = parentScopes;
+            }
+
+            protected TestKeyWithOnlyExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @NonNull
+            @Override
+            public List<String> getParentScopes() {
+                return History.from(Arrays.asList(parentScopes));
+            }
+        }
+
+        TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
+        TestKeyWithScope scopeKey2 = new TestKeyWithExplicitParent("world", "parent");
+        TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
+        TestKey key4 = new TestKeyWithOnlyExplicitParent("parentpls", "parent2");
+
+        backstack.setup(History.of(scopeKey1, scopeKey2, key4));
+
+        final AtomicReference<StateChanger.Callback> callbackRef = new AtomicReference<>();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                callbackRef.set(completionCallback);
+            }
+        });
+
+        callbackRef.get().stateChangeComplete();
+
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.EXPLICIT)).containsExactly("parent2");
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.ALL)).containsExactly("parent2", "world", "parent", "hello");
+
+        backstack.setHistory(History.of(scopeKey1, scopeKey3), StateChange.REPLACE);
+
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.EXPLICIT)).containsExactly("parent2");
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.ALL)).containsExactly("parent2", "world", "parent", "hello");
+
+        callbackRef.get().stateChangeComplete();
+
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.ALL)).isEmpty();
     }
 }
