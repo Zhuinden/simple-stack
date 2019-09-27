@@ -52,8 +52,7 @@ dependencies {
     implementation("android.arch.lifecycle:runtime:1.1.1") // not necessary if you are using Support Library 26.1+
     implementation("android.arch.lifecycle:extensions:1.1.1")
 
-    implementation("com.github.Zhuinden:command-queue:0.1.3")
-    implementation("com.github.Zhuinden:event-emitter:0.0.1")
+    implementation("com.github.Zhuinden:event-emitter:1.0.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.31")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.41")
 }

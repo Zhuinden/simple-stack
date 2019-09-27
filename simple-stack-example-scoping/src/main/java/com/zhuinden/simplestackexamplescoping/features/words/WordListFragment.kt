@@ -47,25 +47,14 @@ class WordListFragment : BaseFragment() {
             actionHandler.onAddNewWordClicked(this)
         }
 
-        wordList.observe(this /*getViewLifecycle()*/, Observer { words ->
+        wordList.observe(this /*getViewLifecycleOwner()*/, Observer { words ->
             adapter.updateWords(words!!)
         })
-    }
 
-    private val notificationTokens = CompositeNotificationToken()
-
-    override fun onStart() {
-        super.onStart()
-        notificationTokens += controllerEvents.startListening { event ->
+        controllerEvents.observe(this /*getViewLifecycleOwner()*/) { event ->
             when (event) {
                 is WordController.Events.NewWordAdded -> showToast("Added ${event.word}")
             }.safe()
         }
     }
-
-    override fun onStop() {
-        notificationTokens.stopListening()
-        super.onStop()
-    }
 }
-
