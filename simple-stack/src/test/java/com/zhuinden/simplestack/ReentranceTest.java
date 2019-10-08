@@ -285,7 +285,7 @@ public class ReentranceTest {
     }
 
     @Test
-    public void handleStateChangeerSetInMidFlightWithBigQueueNeedsNoBootstrap() {
+    public void handleStateChangerSetInMidFlightWithBigQueueNeedsNoBootstrap() {
         final AtomicInteger secondDispatcherCount = new AtomicInteger(0);
         flow = new Backstack();
         flow.setup(History.single(new Catalog()));

@@ -204,29 +204,6 @@ public class BackstackCoreTest {
     }
 
     @Test
-    public void pendingStateChangeCannotGoBackwards() {
-        PendingStateChange pendingStateChange = new PendingStateChange(null, StateChange.REPLACE, false);
-        pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
-        try {
-            pendingStateChange.setStatus(PendingStateChange.Status.IN_PROGRESS);
-            Assert.fail();
-        } catch(IllegalStateException e) {
-            // Good!
-        }
-    }
-
-    @Test
-    public void pendingStateChangeStatusShouldNotBeNull() {
-        PendingStateChange pendingStateChange = new PendingStateChange(null, StateChange.REPLACE, false);
-        try {
-            pendingStateChange.setStatus(null);
-            Assert.fail();
-        } catch(NullPointerException e) {
-            // Good!
-        }
-    }
-
-    @Test
     public void forceExecuteShouldExecuteAndSecondCallbackIsSwallowed() {
         TestKey initial = new TestKey("hello");
         Backstack backstack = new Backstack();
