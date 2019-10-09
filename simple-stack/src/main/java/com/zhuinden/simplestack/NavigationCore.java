@@ -211,7 +211,7 @@ class NavigationCore {
             historyBuilder.removeLast();
         }
         historyBuilder.add(newTop);
-        executeOrConsumeNavigationOp(historyBuilder.build(), direction, false, false);
+        executeOrConsumeNavigationOp(historyBuilder.build(), direction, true, false);
     }
 
     /**

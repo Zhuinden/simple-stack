@@ -401,12 +401,19 @@ public class BackstackCoreTest {
         assertThat(backstack.getHistory()).containsExactly(initial, other);
 
         backstack.replaceTop(another, StateChange.BACKWARD);
-        backstack.replaceTop(yetAnother, StateChange.REPLACE);
+        backstack.replaceTop(yetAnother, StateChange.REPLACE); // replaceTop is terminal, so this is ignored
         assertThat(stateChange.getDirection()).isEqualTo(StateChange.BACKWARD);
+        assertThat(stateChange.getNewKeys()).containsExactly(initial, another);
         callback.stateChangeComplete();
-        assertThat(stateChange.getDirection()).isEqualTo(StateChange.REPLACE);
-        callback.stateChangeComplete();
-        assertThat(backstack.getHistory()).containsExactly(initial, yetAnother);
+        assertThat(backstack.getHistory()).containsExactly(initial, another);
+
+        try {
+            callback.stateChangeComplete();
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK
+        }
+        assertThat(backstack.getHistory()).containsExactly(initial, another);
     }
 
     @Test
