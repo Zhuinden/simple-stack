@@ -1,5 +1,17 @@
 # Change log
 
+-Simple Stack X.X.X (XXXX-XX-XX)
+--------------------------------
+
+- BEHAVIOR CHANGE: The navigation operations `goBack()`, `replaceTop()`, `jumpToRoot()`, `goUp()`, `goUpChain()`, and `goTo()` (when going to existing element) are now considered "terminal" operations.
+
+Terminal operation means that actions (that are not `setHistory`) called on the Backstack are ignored while the state change of the terminal action has not been completed yet.
+
+This is done to eliminate the possibility of enqueueing incorrect "forward" navigation immediately when a "back" navigation is happening, that could potentially create illegal navigation history.
+
+Illegal navigation history is a problem when using implicit scopes, as with the right button mashing, you could potentially "skip" an expected screen, and not have registered its services.
+
+
 -Simple Stack 2.1.1 (2019-09-26)
 --------------------------------
 
