@@ -146,7 +146,7 @@ class NavigationCore {
                 if(stack.isEmpty()) {
                     stack = initialParameters;
                 }
-                enqueueStateChange(newHistory, StateChange.REPLACE, true);
+                enqueueStateChange(newHistory, StateChange.REPLACE, true, false, true);
             }
             return;
         }
@@ -180,14 +180,17 @@ class NavigationCore {
         History.Builder historyBuilder = History.builderFrom(activeHistory);
 
         int direction;
+        boolean isTerminal;
         if(historyBuilder.contains(newKey)) {
             historyBuilder.removeUntil(newKey);
             direction = StateChange.BACKWARD;
+            isTerminal = true;
         } else {
             historyBuilder.add(newKey);
             direction = StateChange.FORWARD;
+            isTerminal = false;
         }
-        setHistory(historyBuilder.build(), direction);
+        executeOrConsumeNavigationOp(historyBuilder.build(), direction, isTerminal, false);
     }
 
     /**
@@ -208,7 +211,7 @@ class NavigationCore {
             historyBuilder.removeLast();
         }
         historyBuilder.add(newTop);
-        setHistory(historyBuilder.build(), direction);
+        executeOrConsumeNavigationOp(historyBuilder.build(), direction, true, false);
     }
 
     /**
@@ -250,7 +253,7 @@ class NavigationCore {
         }
         if(activeHistory.contains(newKey)) {
             if(fallbackToBack) {
-                setHistory(History.builderFrom(activeHistory).removeLast().build(), StateChange.BACKWARD);
+                executeOrConsumeNavigationOp(History.builderFrom(activeHistory).removeLast().build(), StateChange.BACKWARD, true, false);
             } else {
                 goTo(newKey);
             }
@@ -281,7 +284,7 @@ class NavigationCore {
             historyBuilder.remove(newKey);
         }
         historyBuilder.add(newKey);
-        setHistory(historyBuilder.build(), direction);
+        executeOrConsumeNavigationOp(historyBuilder.build(), direction, false, false);
     }
 
     /**
@@ -319,7 +322,7 @@ class NavigationCore {
 
         List<?> activeHistory = selectActiveHistory();
         History<?> currentHistory = History.from(activeHistory);
-        setHistory(History.of(currentHistory.root()), direction);
+        executeOrConsumeNavigationOp(History.of(currentHistory.root()), direction, true, false);
     }
 
     /**
@@ -369,7 +372,7 @@ class NavigationCore {
             // if the parent chain is found as is, then decide based on fallback what should happen
             if(fallbackToBack) {
                 // last item is already removed, and we're defaulting to back.
-                setHistory(historyBuilder.build(), StateChange.BACKWARD);
+                executeOrConsumeNavigationOp(historyBuilder.build(), StateChange.BACKWARD, true, false);
             } else {
                 // we clear all on top of it and go back to the chain
                 goTo(parentChain.get(parentChainSize-1));
@@ -400,7 +403,7 @@ class NavigationCore {
                         }
                         newHistory.add(nextKey);
                     }
-                    setHistory(newHistory.build(), StateChange.BACKWARD);
+                    executeOrConsumeNavigationOp(newHistory.build(), StateChange.BACKWARD, true, false);
                     return;
                 }
             }
@@ -408,7 +411,7 @@ class NavigationCore {
             // no elements in the current history were found in the parent chain
             // default behavior is to add the newly received list in place of the original key
             History.Builder newHistory = historyBuilder.addAll(parentChain);
-            setHistory(newHistory.build(), StateChange.BACKWARD);
+            executeOrConsumeNavigationOp(newHistory.build(), StateChange.BACKWARD, true, false);
         }
     }
 
@@ -433,7 +436,7 @@ class NavigationCore {
         List<?> activeHistory = selectActiveHistory();
         History.Builder historyBuilder = History.builderFrom(activeHistory);
         historyBuilder.removeLast();
-        setHistory(historyBuilder.build(), StateChange.BACKWARD);
+        executeOrConsumeNavigationOp(historyBuilder.build(), StateChange.BACKWARD, true, false);
         return true;
     }
 
@@ -465,10 +468,20 @@ class NavigationCore {
     @MainThread
     public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
-
         assertCorrectThread();
 
-        enqueueStateChange(newHistory, direction, false); // must use enqueue!
+        executeOrConsumeNavigationOp(newHistory, direction, false, true);
+    }
+
+
+    private void executeOrConsumeNavigationOp(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction, boolean isTerminal, boolean isForceEnqueued) {
+        checkNewHistory(newHistory);
+        assertCorrectThread();
+
+        if(!queuedStateChanges.isEmpty() && (queuedStateChanges.peekLast().isTerminal && !isForceEnqueued)) {
+            return; // eliminate ability to create inconsistent nav history by consuming changes [A,B] -> [A,B,D] vs [A,B] -> [A] -> [A,D] with fast taps
+        }
+        enqueueStateChange(newHistory, direction, false, isTerminal, isForceEnqueued);
     }
 
     /**
@@ -482,7 +495,7 @@ class NavigationCore {
     @NonNull
     public <K> K root() {
         if(stack.isEmpty()) {
-            throw new IllegalStateException("Cannot obtain elements from an uninitialized NavigationCore.");
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
         }
         // noinspection unchecked
         return (K) stack.get(0);
@@ -499,7 +512,7 @@ class NavigationCore {
     @NonNull
     public <K> K top() {
         if(stack.isEmpty()) {
-            throw new IllegalStateException("Cannot obtain elements from an uninitialized NavigationCore.");
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
         }
         // noinspection unchecked
         return (K) stack.get(stack.size() - 1);
@@ -524,7 +537,7 @@ class NavigationCore {
     public <K> K fromTop(int offset) {
         int size = stack.size();
         if(size <= 0) {
-            throw new IllegalStateException("Cannot obtain elements from an uninitialized NavigationCore.");
+            throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
         }
         if(offset < -size || offset >= size) {
             throw new IllegalArgumentException("The provided offset value [" + offset + "] was out of range: [" + -size + "; " + size + ")");
@@ -579,8 +592,8 @@ class NavigationCore {
         return !queuedStateChanges.isEmpty();
     }
 
-    private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization) {
-        PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization);
+    private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization, boolean isTerminal, boolean isForceEnqueued) {
+        PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization, isTerminal, isForceEnqueued);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
     }

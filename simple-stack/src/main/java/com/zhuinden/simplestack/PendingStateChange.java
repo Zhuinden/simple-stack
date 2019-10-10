@@ -30,16 +30,20 @@ class PendingStateChange {
     final List<?> newHistory;
     final int direction;
     final boolean initialization;
+    final boolean isTerminal;
+    final boolean isForceEnqueued;
 
     private Status status = Status.ENQUEUED;
 
     StateChanger.Callback completionCallback;
     boolean didForceExecute = false;
 
-    PendingStateChange(List<?> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization) {
+    PendingStateChange(List<?> newHistory, @StateChange.StateChangeDirection int direction, boolean initialization, boolean isTerminal, boolean isForceEnqueued) {
         this.newHistory = newHistory;
         this.direction = direction;
         this.initialization = initialization;
+        this.isTerminal = isTerminal;
+        this.isForceEnqueued = isForceEnqueued;
     }
 
     Status getStatus() {
