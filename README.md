@@ -47,11 +47,12 @@ Write once, works in all cases.
 
 ``` java
 public void handleStateChange(StateChange stateChange, StateChanger.Callback callback) {
-    if (stateChange.isTopNewEqualToPrevious()) {
+    if (stateChange.isTopNewEqualToPrevious()) { // check if navigating to the same screen first!
         callback.stateChangeComplete();
         return;
     }
-    Key key = stateChange.topNewKey();
+
+    Key key = stateChange.topNewKey(); // use your new navigation state
     setTitle(key.title);
     
     ... // set up fragments, set up views, whatever you want
@@ -129,14 +130,14 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.1.1")
+implementation("com.github.Zhuinden:simple-stack:2.1.2")
 ```
 
 or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.1.1'
+implementation 'com.github.Zhuinden:simple-stack:2.1.2'
 ```
 
 ## How does it work?
