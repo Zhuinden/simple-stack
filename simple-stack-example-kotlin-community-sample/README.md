@@ -1,11 +1,11 @@
-# Simple example of using fragments with simple-stack
+# Community sample for using fragments with simple-stack
 
-## Run local host backend to server sample `users.json`
+## Run local host backend to host `users.json`
 
-* In the example root folder run `python - m SimpleHTTPServer 3000`
+* In the example root folder, run `python - m SimpleHTTPServer 3000`
 
 ## Notable things
 
-* Simple realm implementation.
-* Simple dagger implementation.
-* Using Kotlin-
+* Realm implementation
+* Dagger implementation
+* Using Kotlin

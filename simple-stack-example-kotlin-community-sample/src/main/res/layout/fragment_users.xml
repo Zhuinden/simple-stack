@@ -1,38 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootUsers"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ViewAnimator
-        android:id="@+id/viewAnimator"
+    <LinearLayout
+        android:id="@+id/containerUsers"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/contentView"
+        <EditText
+            android:id="@+id/textUserSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_margin="16dp"
+            android:padding="16dp"
+            android:hint="enter name search"
+            android:singleLine="true"
+            android:textSize="24dp" />
 
-            <EditText
-                android:layout_marginBottom="16dp"
-                android:hint="enter name search"
-                android:id="@+id/usersSearchView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/search_view"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listContacts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/contactsView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-        </LinearLayout>
-
-        <include layout="@layout/view_loading"/>
-
-    </ViewAnimator>
-
-
+    <include
+        android:id="@+id/loadingView"
+        layout="@layout/view_loading" />
 </FrameLayout>

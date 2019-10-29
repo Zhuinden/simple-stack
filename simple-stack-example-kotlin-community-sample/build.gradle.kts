@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.zhuinden.simplestackkotlindaggerexample"
+        applicationId = "com.community.simplestackkotlindaggerexample"
         minSdkVersion(16)
         targetSdkVersion(28)
         versionCode = 1
