@@ -66,7 +66,7 @@ class TasksFragment : BaseFragment<TasksFragment, TasksFragment.Presenter>(), Me
     class SavedSuccessfullyMessage
 
     override val presenter: Presenter by lazy {
-        backstackDelegate.lookupService<TasksFragment.Presenter>(CONTROLLER_TAG)
+        lookup<Presenter>(CONTROLLER_TAG)
     }
 
     override fun getThis(): TasksFragment = this

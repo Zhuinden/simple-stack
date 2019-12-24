@@ -9,8 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.zhuinden.simplestack.BackstackDelegate
-import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity
+import com.zhuinden.simplestack.navigator.Navigator
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 
@@ -25,8 +24,8 @@ fun View.hide() {
 val Fragment.requireArguments: Bundle
     get() = arguments ?: throw Exception("No arguments found!")
 
-val Fragment.backstackDelegate: BackstackDelegate
-    get() = MainActivity.getBackstackDelegate(requireActivity())
+inline fun <reified T> Fragment.lookup(serviceTag: String = T::class.java.name) =
+    Navigator.lookupService<T>(requireContext(), serviceTag)
 
 inline fun <T : View> T.showIf(predicate: (T) -> Boolean) {
     if (predicate(this)) {

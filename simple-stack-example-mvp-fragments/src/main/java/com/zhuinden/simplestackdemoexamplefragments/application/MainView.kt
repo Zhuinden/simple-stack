@@ -8,7 +8,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.util.AttributeSet
 import android.view.View
-import com.zhuinden.simplestack.Backstack
+import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
 import com.zhuinden.simplestackdemoexamplefragments.features.statistics.StatisticsKey
@@ -25,21 +25,14 @@ class MainView : DrawerLayout {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle)
 
-    init {
-        if (!isInEditMode) {
-            backstack = Injector.get().backstackHolder().backstack
-        }
-    }
-
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var backstack: Backstack
 
     private lateinit var drawerToggle: ActionBarDrawerToggle
 
     private val navigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.list_navigation_menu_item -> backstack.goTo(TasksKey())
-            R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey())
+            R.id.list_navigation_menu_item -> Navigator.getBackstack(context).goTo(TasksKey())
+            R.id.statistics_navigation_menu_item -> Navigator.getBackstack(context).goTo(StatisticsKey())
             else -> {
             }
         }
@@ -107,7 +100,7 @@ class MainView : DrawerLayout {
         @Suppress("DEPRECATION")
         drawerLayout.setDrawerListener(drawerToggle)
 
-        drawerToggle.setToolbarNavigationClickListener { _ -> backstack.goBack() }
+        drawerToggle.setToolbarNavigationClickListener { _ -> Navigator.getBackstack(context).goBack() }
         actionBar.setDisplayHomeAsUpEnabled(false)
         actionBar.setHomeButtonEnabled(true)
     }

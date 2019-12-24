@@ -1,5 +1,17 @@
 # Change log
 
+-Simple Stack X.X.X (XXXX-XX-XX)
+--------------------------------
+
+- DEPRECATED: `BackstackDelegate`.
+
+With the renaming of `BackstackManager` to `Backstack` in 2.0.x, it's become easier to use `Backstack` directly than juggling the `BackstackDelegate`.
+
+Also, using `Navigator` with Fragments seems to have no side-effects, therefore this is now the preferred approach (since setting a non-default state changer calls `setShouldPersistContainerChild(false)`, also since 2.0.x).
+
+Therefore, using `Navigator` is now preferred over `BackstackDelegate`.
+
+
 -Simple Stack 2.1.2 (2019-10-10)
 --------------------------------
 

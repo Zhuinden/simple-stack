@@ -83,11 +83,9 @@ The secondary operators are:
 
 The Backstack stores the screen keys. It also allows navigation between the keys (works as a router), and enables handling this change in navigation state using the StateChanger.
 
-The library also provides two different ways to simplify integrating the Backstack into the Activity lifecycle (survive config changes / process death, among other things):
+The library also provides a way to simplify integrating the Backstack into the Activity lifecycle (survive config changes / process death, among other things):
 
 - The Navigator, which uses the BackstackHost retained fragment (API 11+) to automatically receive the lifecycle callbacks, and survive configuration change.
-
-- The BackstackDelegate, which works via manual Activity lifecycle callbacks.
 
 But the Backstack can also be used directly.
 
@@ -144,7 +142,7 @@ implementation 'com.github.Zhuinden:simple-stack:2.1.2'
 
 The Backstack is setup with an initial navigation history, then a StateChanger must be set when it is able to handle the state change.
 
-BackstackDelegate and Navigator are two possible ways to help with the integration of Backstack to the Activity lifecycle.
+Navigator is a possible way to help with the integration of Backstack to the Activity lifecycle.
 
 Setting a StateChanger sends an initialization, which provides a StateChange in form of `{[], [{...}, {...}]}` (meaning the previous keys are empty, the new keys are the initial keys).
 

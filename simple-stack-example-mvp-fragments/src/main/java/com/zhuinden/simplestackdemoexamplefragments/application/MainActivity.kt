@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.zhuinden.simplestack.BackstackDelegate
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentStateChanger
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
@@ -18,7 +18,6 @@ import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.ServiceP
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), StateChanger {
-    lateinit var backstackDelegate: BackstackDelegate
     lateinit var fragmentStateChanger: FragmentStateChanger
 
     private val databaseManager: DatabaseManager = Injector.get().databaseManager()
@@ -26,16 +25,6 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         databaseManager.init(this)
-
-        backstackDelegate = BackstackDelegate()
-        backstackDelegate.setScopedServices(this, ServiceProvider())
-        backstackDelegate.onCreate(savedInstanceState, //
-            lastCustomNonConfigurationInstance, //
-            History.single(TasksKey()))
-
-        backstackDelegate.registerForLifecycleCallbacks(this)
-
-        backstackHolder.backstack = backstackDelegate.backstack
 
         super.onCreate(savedInstanceState)
 
@@ -50,24 +39,18 @@ class MainActivity : AppCompatActivity(), StateChanger {
         setContentView(R.layout.activity_main)
 
         this.fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+
+        val backstack = Navigator.configure()
+            .setScopedServices(ServiceProvider())
+            .setStateChanger(this)
+            .setDeferredInitialization(true)
+            .install(this, root, History.of(TasksKey()))
+
+        backstackHolder.backstack = backstack
+
         mainView.onCreate()
 
-        backstackDelegate.setStateChanger(this)
-        /*
-         * IMPORTANT!
-         *
-         * The order of lifecycle after process death is the following:
-         * - Activity onCreate
-         * - Activity.onStart
-         * - Fragment.onActivityCreated
-         * - Fragment.onCreateView
-         * - Fragment.onViewCreated
-         * - Activity.onPostCreate
-         *
-         * Therefore if ScopedServices is used with Fragments, the scopes must be built in onCreate,
-         * meaning the StateChanger must be set in onCreate, and onPostCreate runs too late,
-         * otherwise the scopes won't exist in onViewCreated after process death.
-         */
+        Navigator.executeDeferredInitialization(this)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -80,21 +63,17 @@ class MainActivity : AppCompatActivity(), StateChanger {
         mainView.onConfigChanged(newConfig)
     }
 
-    override fun onRetainCustomNonConfigurationInstance(): Any =
-        backstackDelegate.onRetainCustomNonConfigurationInstance()
-
     override fun onBackPressed() {
         if (mainView.onBackPressed()) {
             return
         }
-        if (!backstackDelegate.onBackPressed()) {
+        if (!Navigator.onBackPressed(this)) {
             super.onBackPressed()
         }
     }
 
     override fun getSystemService(name: String): Any? = when {
         TAG == name -> this
-        BACKSTACK_DELEGATE_TAG == name -> backstackDelegate
         else -> super.getSystemService(name)
     }
 
@@ -111,15 +90,9 @@ class MainActivity : AppCompatActivity(), StateChanger {
     }
 
     companion object {
-        private const val BACKSTACK_DELEGATE_TAG = "BackstackDelegate"
-
         @SuppressLint("WrongConstant")
         operator fun get(context: Context): MainActivity =
             context.getSystemService(TAG) as MainActivity
-
-        @SuppressLint("WrongConstant")
-        fun getBackstackDelegate(context: Context): BackstackDelegate =
-            context.getSystemService(BACKSTACK_DELEGATE_TAG) as BackstackDelegate
 
         const val TAG = "MainActivity"
     }

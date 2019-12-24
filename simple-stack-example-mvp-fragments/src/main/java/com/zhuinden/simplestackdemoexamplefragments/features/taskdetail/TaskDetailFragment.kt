@@ -6,8 +6,8 @@ import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
 import com.zhuinden.simplestackdemoexamplefragments.domain.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.Strings
-import com.zhuinden.simplestackdemoexamplefragments.util.backstackDelegate
 import com.zhuinden.simplestackdemoexamplefragments.util.hide
+import com.zhuinden.simplestackdemoexamplefragments.util.lookup
 import com.zhuinden.simplestackdemoexamplefragments.util.show
 import kotlinx.android.synthetic.main.path_taskdetail.*
 
@@ -29,7 +29,7 @@ class TaskDetailFragment : BaseFragment<TaskDetailFragment, TaskDetailFragment.P
     }
 
     override val presenter: Presenter by lazy {
-        backstackDelegate.lookupService<TaskDetailFragment.Presenter>(CONTROLLER_TAG)
+        lookup<Presenter>(CONTROLLER_TAG)
     }
 
     override fun getThis(): TaskDetailFragment = this

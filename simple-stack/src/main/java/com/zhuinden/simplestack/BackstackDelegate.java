@@ -34,6 +34,7 @@ import java.util.List;
  *
  * This should be used in Activities to make sure that the {@link Backstack} survives both configuration changes and process death.
  */
+@Deprecated
 public class BackstackDelegate {
     private Backstack backstack;
 

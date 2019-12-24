@@ -6,7 +6,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
-import com.zhuinden.simplestackdemoexamplefragments.util.backstackDelegate
+import com.zhuinden.simplestackdemoexamplefragments.util.lookup
 import com.zhuinden.simplestackdemoexamplefragments.util.onTextChanged
 import kotlinx.android.synthetic.main.path_addoredittask.*
 
@@ -29,7 +29,7 @@ class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskF
     }
     
     override val presenter: Presenter by lazy {
-        backstackDelegate.lookupService<AddOrEditTaskFragment.Presenter>(CONTROLLER_TAG)
+        lookup<Presenter>(CONTROLLER_TAG)
     }
 
     override fun getThis(): AddOrEditTaskFragment = this

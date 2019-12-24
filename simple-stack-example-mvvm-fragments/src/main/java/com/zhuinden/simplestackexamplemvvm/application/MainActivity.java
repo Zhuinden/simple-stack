@@ -15,11 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
-import com.zhuinden.simplestack.BackstackDelegate;
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
+import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.application.injection.Injector;
 import com.zhuinden.simplestackexamplemvvm.features.statistics.StatisticsKey;
@@ -51,17 +53,19 @@ public class MainActivity
     @BindView(R.id.nav_view)
     NavigationView navigationView;
 
-    BackstackDelegate backstackDelegate;
+    @BindView(R.id.contentFrame)
+    ViewGroup contentFrame;
+
     private FragmentStateChanger fragmentStateChanger;
     private ActionBarDrawerToggle drawerToggle;
 
     private final NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) item -> {
         switch(item.getItemId()) {
             case R.id.list_navigation_menu_item:
-                backstackDelegate.getBackstack().goTo(TasksKey.create());
+                Navigator.getBackstack(this).goTo(TasksKey.create());
                 break;
             case R.id.statistics_navigation_menu_item:
-                backstackDelegate.getBackstack().goTo(StatisticsKey.create());
+                Navigator.getBackstack(this).goTo(StatisticsKey.create());
             default:
                 break;
         }
@@ -73,30 +77,31 @@ public class MainActivity
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        backstackDelegate = new BackstackDelegate();
-        backstackDelegate.setScopedServices(this, new ServiceProvider());
-        backstackDelegate.onCreate(savedInstanceState, getLastCustomNonConfigurationInstance(), History.single(TasksKey.create()));
-        backstackDelegate.registerForLifecycleCallbacks(this);
-        BackstackHolder backstackHolder = Injector.get().backstackHolder();
-        backstackHolder.setBackstack(backstackDelegate.getBackstack()); // <-- make Backstack globally available through Dagger
-
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.main_activity);
+
         ButterKnife.bind(this);
+
         setupDrawer();
 
         fragmentStateChanger = new FragmentStateChanger(this, getSupportFragmentManager(), R.id.contentFrame);
-        backstackDelegate.setStateChanger(this);
-    }
 
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return backstackDelegate.onRetainCustomNonConfigurationInstance();
+        Backstack backstack = Navigator.configure()
+                .setStateChanger(this)
+                .setScopedServices(new ServiceProvider())
+                .setDeferredInitialization(true)
+                .install(this, contentFrame, History.of(TasksKey.create()));
+
+        BackstackHolder backstackHolder = Injector.get().backstackHolder();
+        backstackHolder.setBackstack(backstack); // <-- make Backstack globally available through Dagger, singleInstance only!
+
+        Navigator.executeDeferredInitialization(this);
     }
 
     @Override
     public void onBackPressed() {
-        if(!backstackDelegate.getBackstack().goBack()) {
+        if(!Navigator.onBackPressed(this)) {
             super.onBackPressed();
         }
     }
@@ -123,7 +128,7 @@ public class MainActivity
         // noinspection deprecation
         drawerLayout.setDrawerListener(drawerToggle);
 
-        drawerToggle.setToolbarNavigationClickListener(v -> backstackDelegate.getBackstack().goBack());
+        drawerToggle.setToolbarNavigationClickListener(v -> Navigator.onBackPressed(this));
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setHomeButtonEnabled(true);
     }

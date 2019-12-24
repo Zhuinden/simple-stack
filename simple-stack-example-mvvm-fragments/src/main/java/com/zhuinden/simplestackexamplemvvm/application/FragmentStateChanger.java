@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.zhuinden.simplestack.StateChange;
+import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestackexamplemvvm.R;
 
 import java.util.List;
@@ -70,7 +71,7 @@ public class FragmentStateChanger {
             }
             if(fragment != null) {
                 //noinspection unchecked
-                fragment.bindViewModel(activity.backstackDelegate.getService(newKey, newKey.getViewModelTag()));
+                fragment.bindViewModel(Navigator.getService(activity, newKey, newKey.getViewModelTag()));
             }
         }
         fragmentTransaction.commitNow();

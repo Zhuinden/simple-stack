@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.zhuinden.simplestack.navigator.Navigator;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -59,7 +61,7 @@ public class KittenViewHolder
             ViewCompat.setTransitionName(image, position + "_image");
 
             DetailsKey detailsKey = DetailsKey.create(SharedElement.create(ViewCompat.getTransitionName(image), "kittenImage"), kittenNumber);
-            MainActivity.get(v.getContext()).getBackstack().goTo(detailsKey);
+            Navigator.getBackstack(v.getContext()).goTo(detailsKey);
         });
     }
 }

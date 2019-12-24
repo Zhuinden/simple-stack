@@ -4,7 +4,7 @@ import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
-import com.zhuinden.simplestackdemoexamplefragments.util.backstackDelegate
+import com.zhuinden.simplestackdemoexamplefragments.util.lookup
 import kotlinx.android.synthetic.main.path_statistics.*
 
 /**
@@ -22,7 +22,7 @@ class StatisticsFragment : BaseFragment<StatisticsFragment, StatisticsFragment.P
     }
 
     override val presenter: Presenter by lazy {
-        backstackDelegate.lookupService<StatisticsFragment.Presenter>(CONTROLLER_TAG)
+        lookup<Presenter>(CONTROLLER_TAG)
     }
 
     override fun getThis(): StatisticsFragment = this
