@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.path_addoredittask.*
  */
 
 // UNSCOPED!
-class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskFragment.Presenter>() {
+class AddOrEditTaskFragment : BaseFragment() {
     companion object {
         const val CONTROLLER_TAG = "AddOrEditTaskPresenter"
     }
@@ -27,15 +27,15 @@ class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskF
 
         fun onSaveButtonClicked()
     }
-    
-    override val presenter: Presenter by lazy {
+
+    val presenter: Presenter by lazy {
         lookup<Presenter>(CONTROLLER_TAG)
     }
 
-    override fun getThis(): AddOrEditTaskFragment = this
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        presenter.attachView(this)
 
         textAddTaskTitle.onTextChanged { title ->
             presenter.onTitleChanged(title)
@@ -44,6 +44,12 @@ class AddOrEditTaskFragment : BaseFragment<AddOrEditTaskFragment, AddOrEditTaskF
         textAddTaskDescription.onTextChanged { description ->
             presenter.onDescriptionChanged(description)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        presenter.detachView(this)
     }
 
     fun setTitle(title: String) {

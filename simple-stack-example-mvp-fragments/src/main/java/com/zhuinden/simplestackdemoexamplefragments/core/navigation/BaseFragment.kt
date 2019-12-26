@@ -4,19 +4,14 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
 import com.zhuinden.simplestack.KeyContextWrapper
-import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.util.requireArguments
 
 /**
  * Created by Zhuinden on 2017.01.26..
  */
 
-abstract class BaseFragment<V, P : MvpPresenter<V>> : Fragment() {
+abstract class BaseFragment : Fragment() {
     private lateinit var key: FragmentKey
-
-    protected abstract val presenter: P
-
-    protected abstract fun getThis(): V
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,18 +22,17 @@ abstract class BaseFragment<V, P : MvpPresenter<V>> : Fragment() {
         inflater.inflate(getKey<FragmentKey>().menu(), menu)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = requireArguments.getParcelable<FragmentKey>(KEY_TAG).let { key ->
-        this.key = key
-        LayoutInflater.from(KeyContextWrapper(inflater.context, key)).inflate(key.layout(), container, false)
-    } 
-        
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        requireArguments.getParcelable<FragmentKey>(KEY_TAG).let { key ->
+            this.key = key!!
+            LayoutInflater.from(KeyContextWrapper(inflater.context, key)).inflate(key.layout(), container, false)
+        }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.attachView(getThis())
     }
 
     override fun onDestroyView() {
-        presenter.detachView(getThis())
         super.onDestroyView()
     }
 

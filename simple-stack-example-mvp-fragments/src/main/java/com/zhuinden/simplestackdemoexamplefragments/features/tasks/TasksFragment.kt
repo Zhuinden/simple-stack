@@ -25,7 +25,7 @@ import java.util.*
  * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class TasksFragment : BaseFragment<TasksFragment, TasksFragment.Presenter>(), MessageQueue.Receiver {
+class TasksFragment : BaseFragment(), MessageQueue.Receiver {
     companion object {
         const val CONTROLLER_TAG = "TasksView.Presenter"
     }
@@ -65,11 +65,9 @@ class TasksFragment : BaseFragment<TasksFragment, TasksFragment.Presenter>(), Me
 
     class SavedSuccessfullyMessage
 
-    override val presenter: Presenter by lazy {
+    val presenter: Presenter by lazy {
         lookup<Presenter>(CONTROLLER_TAG)
     }
-
-    override fun getThis(): TasksFragment = this
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         super.onCreateView(inflater, container, savedInstanceState).also {
@@ -78,6 +76,9 @@ class TasksFragment : BaseFragment<TasksFragment, TasksFragment.Presenter>(), Me
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        presenter.attachView(this)
+
         recyclerTasks.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         recyclerTasks.adapter = tasksAdapter
 
@@ -103,6 +104,8 @@ class TasksFragment : BaseFragment<TasksFragment, TasksFragment.Presenter>(), Me
     }
 
     override fun onDestroyView() {
+        presenter.detachView(this)
+
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(null)
         }

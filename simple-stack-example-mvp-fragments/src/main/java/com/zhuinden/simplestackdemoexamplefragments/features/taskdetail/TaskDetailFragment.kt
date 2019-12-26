@@ -1,6 +1,8 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.taskdetail
 
+import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
@@ -15,7 +17,7 @@ import kotlinx.android.synthetic.main.path_taskdetail.*
  * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class TaskDetailFragment : BaseFragment<TaskDetailFragment, TaskDetailFragment.Presenter>() {
+class TaskDetailFragment : BaseFragment() {
     companion object {
         const val CONTROLLER_TAG = "TaskDetailView.Presenter"
     }
@@ -28,11 +30,21 @@ class TaskDetailFragment : BaseFragment<TaskDetailFragment, TaskDetailFragment.P
         fun onTaskDeleteButtonClicked()
     }
 
-    override val presenter: Presenter by lazy {
+    val presenter: Presenter by lazy {
         lookup<Presenter>(CONTROLLER_TAG)
     }
 
-    override fun getThis(): TaskDetailFragment = this
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        presenter.attachView(this)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        presenter.detachView(this)
+    }
 
     fun editTask() {
         presenter.onTaskEditButtonClicked()

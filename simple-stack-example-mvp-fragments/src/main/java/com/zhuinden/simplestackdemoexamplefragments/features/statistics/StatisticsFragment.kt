@@ -1,5 +1,7 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.statistics
 
+import android.os.Bundle
+import android.view.View
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
@@ -11,7 +13,7 @@ import kotlinx.android.synthetic.main.path_statistics.*
  * Created by Zhuinden on 2018. 08. 20.
  */
 // UNSCOPED!
-class StatisticsFragment : BaseFragment<StatisticsFragment, StatisticsFragment.Presenter>() {
+class StatisticsFragment : BaseFragment() {
     private val myResources = Injector.get().resources()
 
     companion object {
@@ -21,11 +23,21 @@ class StatisticsFragment : BaseFragment<StatisticsFragment, StatisticsFragment.P
     interface Presenter: MvpPresenter<StatisticsFragment> {
     }
 
-    override val presenter: Presenter by lazy {
+    val presenter: Presenter by lazy {
         lookup<Presenter>(CONTROLLER_TAG)
     }
 
-    override fun getThis(): StatisticsFragment = this
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        presenter.attachView(this)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        presenter.detachView(this)
+    }
 
     fun setProgressIndicator(active: Boolean) {
         textStatistics.text = when {
