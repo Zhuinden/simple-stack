@@ -6,6 +6,7 @@ import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
+import com.zhuinden.simplestackdemoexamplemvp.core.navigation.getKey
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplemvp.domain.Task
 import com.zhuinden.simplestackdemoexamplemvp.features.addoredittask.AddOrEditTaskKey
@@ -93,7 +94,7 @@ class TasksPresenter @Inject constructor(
     }
 
     private fun openAddNewTask() {
-        backstackHolder.backstack.goTo(AddOrEditTaskKey.AddTaskKey(Backstack.getKey<ViewKey>(view!!.context)))
+        backstackHolder.backstack.goTo(AddOrEditTaskKey.AddTaskKey(view!!.getKey()))
     }
 
     private fun completeTask(task: Task) {

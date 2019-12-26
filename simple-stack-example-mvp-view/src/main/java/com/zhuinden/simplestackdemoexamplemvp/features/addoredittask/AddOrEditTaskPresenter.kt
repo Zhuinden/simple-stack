@@ -52,7 +52,7 @@ class AddOrEditTaskPresenter @Inject constructor(
 
         taskRepository.insertTask(when {
             taskId.isEmpty() -> {
-                Task.createNewActiveTask(title!!, description!!)
+                Task.createNewActiveTask(title, description)
             }
             else -> {
                 task?.copy(title = title, description = description) ?: return false

@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemoexamplemvp.features.taskdetail
 
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.BasePresenter
-import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
+import com.zhuinden.simplestackdemoexamplemvp.core.navigation.getKey
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplemvp.domain.Task
 import com.zhuinden.simplestackdemoexamplemvp.features.addoredittask.AddOrEditTaskKey
@@ -49,7 +49,7 @@ class TaskDetailPresenter @Inject constructor(
             view!!.showMissingTask()
             return
         }
-        backstackHolder.backstack.goTo(AddOrEditTaskKey.EditTaskKey(Backstack.getKey<ViewKey>(view!!.context), taskId))
+        backstackHolder.backstack.goTo(AddOrEditTaskKey.EditTaskKey(view!!.getKey(), taskId))
     }
 
     fun completeTask(task: Task) {

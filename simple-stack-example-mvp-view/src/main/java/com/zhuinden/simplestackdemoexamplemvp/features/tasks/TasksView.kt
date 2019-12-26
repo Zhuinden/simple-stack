@@ -130,7 +130,7 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
     }
 
     override fun receiveMessage(message: Any) {
-        if (message is TasksView.SavedSuccessfullyMessage) {
+        if (message is SavedSuccessfullyMessage) {
             showSuccessfullySavedMessage()
         }
     }
