@@ -47,6 +47,18 @@ public interface ScopedServices {
     }
 
     /**
+     * When a service implements {@link HandlesBack}, then it will receive a callback when back is being dispatched across the active scope chain.
+     */
+    public static interface HandlesBack {
+        /**
+         * Called when back is being dispatched.
+         *
+         * @return whether the service handled back.
+         */
+        boolean onBackEvent();
+    }
+
+    /**
      * Used to configure the services that belong to given scopes.
      *
      * @param serviceBinder the binder that allows binding services to scopes.

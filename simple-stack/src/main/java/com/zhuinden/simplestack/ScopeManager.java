@@ -366,6 +366,29 @@ class ScopeManager {
         }
     }
 
+    public boolean dispatchBack(@NonNull Object currentTop) {
+        List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(currentTop, true));
+
+        for(int tagIndex = scopeTags.size() - 1; tagIndex >= 0; tagIndex--) {
+            String scopeTag = scopeTags.get(tagIndex);
+            ScopeNode scopeNode = scopes.get(scopeTag);
+            //noinspection ConstantConditions
+            List<Map.Entry<String, Object>> services = new ArrayList<>(scopeNode.services());
+            for(int i = services.size() - 1; i >= 0; i--) {
+                Object service = services.get(i).getValue();
+                if(service instanceof ScopedServices.HandlesBack) {
+                    ScopedServices.HandlesBack handlesBack = (ScopedServices.HandlesBack) service;
+                    boolean handled = handlesBack.onBackEvent();
+                    if(handled) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     private boolean isServiceNotRegistered(Object service) {
         return !scopeEnteredServices.containsKey(service) || scopeEnteredServices.get(service).isEmpty();
     }

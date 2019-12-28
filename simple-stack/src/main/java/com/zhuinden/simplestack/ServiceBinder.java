@@ -84,7 +84,6 @@ public class ServiceBinder {
      * @param service the service
      */
     public void addAlias(@NonNull String alias, @NonNull Object service) {
-        // TODO (ALIAS): add restriction that `addAlias` can only be called if the `Object service` is added to this scope or any of its parent scopes
         scope.addAlias(alias, service);
     }
 

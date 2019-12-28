@@ -727,8 +727,8 @@ public class Backstack
 
     /**
      * CompletionListener allows you to listen to when a {@link StateChange} has been completed.
-     * They are registered to the {@link Backstack} with {@link NavigationCore#addCompletionListener(CompletionListener)}.
-     * They are unregistered from the {@link Backstack} with {@link NavigationCore#removeCompletionListener(CompletionListener)} methods.
+     * They are registered to the {@link Backstack} with {@link Backstack#addCompletionListener(CompletionListener)}.
+     * They are unregistered from the {@link Backstack} with {@link Backstack#removeCompletionListener(CompletionListener)} methods.
      */
     public interface CompletionListener {
         /**
@@ -748,6 +748,7 @@ public class Backstack
      */
     @MainThread
     public boolean hasStateChanger() {
+        checkBackstack("A backstack must be set up before checking state changer.");
         return core.hasStateChanger();
     }
 
@@ -756,6 +757,7 @@ public class Backstack
      */
     @MainThread
     public void removeStateChanger() {
+        checkBackstack("A backstack must be set up before removing state changer.");
         core.removeStateChanger();
     }
 
@@ -768,6 +770,7 @@ public class Backstack
      */
     @MainThread
     public void goTo(@NonNull Object newKey) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.goTo(newKey);
     }
 
@@ -780,6 +783,7 @@ public class Backstack
      */
     @MainThread
     public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.replaceTop(newTop, direction);
     }
 
@@ -794,6 +798,7 @@ public class Backstack
      */
     @MainThread
     public void goUp(@NonNull Object newKey) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.goUp(newKey);
     }
 
@@ -805,15 +810,16 @@ public class Backstack
      * Going up occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param newKey the new key to go up to
-     * @param fallbackToBack specifies that if the key is found in the NavigationCore, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
+     * @param fallbackToBack specifies that if the key is found in the backstack, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
      */
     @MainThread
     public void goUp(@NonNull Object newKey, boolean fallbackToBack) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.goUp(newKey, fallbackToBack);
     }
 
     /**
-     * Moves the provided new key to the top of the NavigationCore.
+     * Moves the provided new key to the top of the backstack.
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
      *
@@ -827,7 +833,7 @@ public class Backstack
     }
 
     /**
-     * Moves the provided new key to the top of the NavigationCore.
+     * Moves the provided new key to the top of the backstack.
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
      *
@@ -840,7 +846,7 @@ public class Backstack
     }
 
     /**
-     * Jumps to the root of the NavigationCore.
+     * Jumps to the root of the backstack.
      *
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
@@ -850,7 +856,7 @@ public class Backstack
     }
 
     /**
-     * Jumps to the root of the NavigationCore.
+     * Jumps to the root of the backstack.
      *
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
@@ -883,7 +889,7 @@ public class Backstack
      * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param parentChain the chain of parents, from oldest to newest.
-     * @param fallbackToBack determines that if the chain is fully found in the NavigationCore, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
+     * @param fallbackToBack determines that if the chain is fully found in the backstack, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
      */
     @MainThread
     public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
@@ -899,17 +905,29 @@ public class Backstack
      */
     @MainThread
     public boolean goBack() {
+        if(core.isStateChangePending()) {
+            return true;
+        }
+
+        //noinspection ConstantConditions
+        boolean handled = scopeManager.dispatchBack(getHistory().top());
+
+        if(handled) {
+            return true;
+        }
+
         return core.goBack();
     }
 
     /**
-     * Immediately clears the NavigationCore, it is NOT enqueued as a state change.
+     * Immediately clears the backstack, it is NOT enqueued as a state change.
      *
      * If there are pending state changes, then it throws an exception.
      *
-     * You generally don't need to use this method.
+     * You should not use this method.
      */
     @MainThread
+    @Deprecated
     public void forceClear() {
         core.forceClear();
     }
@@ -948,13 +966,14 @@ public class Backstack
      */
     @NonNull
     public <K> K top() {
+        checkBackstack("A backstack must be set up before getting keys from it.");
         return core.top();
     }
 
     /**
      * Returns the element indexed from the top.
      *
-     * Offset value `0` behaves the same as {@link NavigationCore#top()}, while `1` returns the one before it.
+     * Offset value `0` behaves the same as {@link History#top()}, while `1` returns the one before it.
      * Negative indices are wrapped around, for example `-1` is the first element of the stack, `-2` the second, and so on.
      *
      * Accepted values are in range of [-size, size).
@@ -968,6 +987,7 @@ public class Backstack
      */
     @NonNull
     public <K> K fromTop(int offset) {
+        checkBackstack("A backstack must be set up before getting keys from it.");
         return core.fromTop(offset);
     }
 
@@ -978,16 +998,18 @@ public class Backstack
      */
     @NonNull
     public <K> History<K> getHistory() {
+        checkBackstack("A backstack must be set up before getting keys from it.");
         return core.getHistory();
     }
 
     /**
-     * Returns an unmodifiable list that contains the keys this NavigationCore is initialized with.
+     * Returns an unmodifiable list that contains the keys this backstack is initialized with.
      *
      * @return the list of keys used at first initialization
      */
     @NonNull
     public <K> History<K> getInitialKeys() {
+        checkBackstack("A backstack must be set up before getting keys from it.");
         return core.getInitialKeys();
     }
 
