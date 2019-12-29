@@ -924,7 +924,7 @@ public class Backstack
      *
      * Before navigating back in the history, it attempts to dispatch {@link ScopedServices.HandlesBack#onBackEvent()} to scoped services in the active scope chain.
      *
-     * When there is no state changer available, the back event will be consumed for safety purpose.
+     * When there is no state changer available, one back event will be enqueued for safety purpose.
      *
      * @return true if the back event was consumed, false if there is only one state left.
      */
