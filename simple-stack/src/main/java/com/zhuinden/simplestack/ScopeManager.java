@@ -255,6 +255,9 @@ class ScopeManager {
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
     private final ScopeRegistrations scopes = new ScopeRegistrations();
+
+    private final IdentityHashMap<ScopedServices.HandlesBack, Boolean> backDispatchedServices = new IdentityHashMap<>();
+
     private final LinkedHashSet<Object> trackedKeys = new LinkedHashSet<>();
 
     private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
@@ -367,6 +370,8 @@ class ScopeManager {
     }
 
     public boolean dispatchBack(@NonNull Object currentTop) {
+        backDispatchedServices.clear();
+
         List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(currentTop, true));
 
         for(int tagIndex = scopeTags.size() - 1; tagIndex >= 0; tagIndex--) {
@@ -378,6 +383,12 @@ class ScopeManager {
                 Object service = services.get(i).getValue();
                 if(service instanceof ScopedServices.HandlesBack) {
                     ScopedServices.HandlesBack handlesBack = (ScopedServices.HandlesBack) service;
+                    if(backDispatchedServices.containsKey(handlesBack)) {
+                        continue; // skip if already attempted to dispatch back
+                    }
+
+                    backDispatchedServices.put(handlesBack, true);
+
                     boolean handled = handlesBack.onBackEvent();
                     if(handled) {
                         return true;

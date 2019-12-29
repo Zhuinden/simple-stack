@@ -43,6 +43,9 @@ import java.util.Set;
  */
 public class Backstack
         implements Bundleable {
+    // used to overcome the limitation that back dispatch is not a state change
+    private boolean isBackDispatchPending;
+
     /**
      * Retrieves the key from the provided Context. This relies on that within the base context chain, there is at least one {@link KeyContextWrapper}.
      *
@@ -288,6 +291,7 @@ public class Backstack
     private void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
             core.setStateChanger(managedStateChanger);
+            executePendingBackDispatch();
         }
     }
 
@@ -322,6 +326,9 @@ public class Backstack
         checkBackstack("You must call `setup()` before calling `reattachStateChanger()`.");
         if(!core.hasStateChanger()) {
             core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
+
+            // used to overcome the limitation that back dispatch is not a state change
+            executePendingBackDispatch();
         }
     }
 
@@ -829,6 +836,7 @@ public class Backstack
      */
     @MainThread
     public void moveToTop(@NonNull Object newKey) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.moveToTop(newKey);
     }
 
@@ -842,6 +850,7 @@ public class Backstack
      */
     @MainThread
     public void moveToTop(@NonNull Object newKey, boolean asReplace) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.moveToTop(newKey, asReplace);
     }
 
@@ -852,6 +861,7 @@ public class Backstack
      */
     @MainThread
     public void jumpToRoot() {
+        checkBackstack("A backstack must be set up before navigation.");
         core.jumpToRoot();
     }
 
@@ -862,6 +872,7 @@ public class Backstack
      */
     @MainThread
     public void jumpToRoot(@StateChange.StateChangeDirection int direction) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.jumpToRoot(direction);
     }
 
@@ -877,6 +888,7 @@ public class Backstack
      */
     @MainThread
     public void goUpChain(@NonNull List<?> parentChain) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.goUpChain(parentChain);
     }
 
@@ -893,7 +905,16 @@ public class Backstack
      */
     @MainThread
     public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
+        checkBackstack("A backstack must be set up before navigation.");
         core.goUpChain(parentChain, fallbackToBack);
+    }
+
+    // used to overcome the limitation that back dispatch is not a state change
+    private void executePendingBackDispatch() {
+        if(isBackDispatchPending) {
+            isBackDispatchPending = false;
+            goBack();
+        }
     }
 
     /**
@@ -901,11 +922,26 @@ public class Backstack
      * If the key is found, then it goes backward to the existing key.
      * If the key is not found, then it goes forward to the newly added key.
      *
-     * @return true if a state change is pending or is handled with a state change, false if there is only one state left.
+     * Before navigating back in the history, it attempts to dispatch {@link ScopedServices.HandlesBack#onBackEvent()} to scoped services in the active scope chain.
+     *
+     * When there is no state changer available, the back event will be consumed for safety purpose.
+     *
+     * @return true if the back event was consumed, false if there is only one state left.
      */
     @MainThread
     public boolean goBack() {
-        if(core.isStateChangePending()) {
+        checkBackstack("A backstack must be set up before navigation.");
+
+        if(isStateChangePending()) {
+            return true;
+        }
+
+        if(!hasStateChanger()) {
+            // we don't want to dispatch back across the scope manager when there is no state changer.
+            // however, we cannot rely on the PendingStateChange mechanism to enqueue this back operation.
+            // therefore, we have to fake it here ourselves for now.
+            this.isBackDispatchPending = true;
+
             return true;
         }
 
@@ -924,11 +960,14 @@ public class Backstack
      *
      * If there are pending state changes, then it throws an exception.
      *
-     * You should not use this method.
+     * You should generally not need to use this method.
      */
     @MainThread
-    @Deprecated
     public void forceClear() {
+        checkBackstack("A backstack must be set up before navigation.");
+
+        finalizeScopes();
+
         core.forceClear();
     }
 
@@ -940,6 +979,8 @@ public class Backstack
      */
     @MainThread
     public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
+        checkBackstack("A backstack must be set up before navigation.");
+
         core.setHistory(newHistory, direction);
     }
 
@@ -953,6 +994,7 @@ public class Backstack
      */
     @NonNull
     public <K> K root() {
+        checkBackstack("A backstack must be set up before getting keys from it.");
         return core.root();
     }
 
@@ -1019,6 +1061,7 @@ public class Backstack
      * @return true if there is at least one enqueued {@link StateChange}.
      */
     public boolean isStateChangePending() {
+        checkBackstack("A backstack must be set up before navigation.");
         return core.isStateChangePending();
     }
 
@@ -1028,6 +1071,7 @@ public class Backstack
      * @param completionListener The non-null completion listener to be registered.
      */
     public void addCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+        checkBackstack("A backstack must be set up before adding listeners.");
         core.addCompletionListener(completionListener);
     }
 
@@ -1037,6 +1081,7 @@ public class Backstack
      * @param completionListener The non-null completion listener to be unregistered.
      */
     public void removeCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+        checkBackstack("A backstack must be set up before removing listeners.");
         core.removeCompletionListener(completionListener);
     }
 
@@ -1044,6 +1089,7 @@ public class Backstack
      * Unregisters all {@link Backstack.CompletionListener}s.
      */
     public void removeCompletionListeners() {
+        checkBackstack("A backstack must be set up before removing listeners.");
         core.removeCompletionListeners();
     }
 
@@ -1053,6 +1099,7 @@ public class Backstack
      */
     @MainThread
     public void executePendingStateChange() {
+        checkBackstack("A backstack must be set up before navigation.");
         core.executePendingStateChange();
     }
 }

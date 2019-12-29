@@ -11,12 +11,7 @@ Also, using `Navigator` with Fragments seems to have no side-effects, therefore 
 
 Therefore, using `Navigator` is now preferred over `BackstackDelegate`.
 
-- DEPRECATED: `backstack.forceClear()`.
-
-This method has not been updated to clear scopes when called, and can therefore cause unexpected behavior.
-
-There are also no plans to support this method anymore. It's a surprise it wasn't marked `@Deprecated` earlier.
-
+- FIX: `Backstack.forceClear()` now calls `finalizeScopes()` first to ensure that scoped services are also properly reset.
 
 -Simple Stack 2.1.2 (2019-10-10)
 --------------------------------
