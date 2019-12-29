@@ -731,4 +731,9 @@ public class ScopingGlobalScopeTest {
                 Pair.of((Object)currentScopeService, ServiceEvent.DESTROY)
         );
     }
+
+    @Test
+    public void globalServicesFactoryWorks() {
+        throw new RuntimeException("blah");
+    }
 }

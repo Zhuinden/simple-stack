@@ -255,6 +255,22 @@ public class Backstack
         this.scopeManager.setGlobalServices(globalServices);
     }
 
+    /**
+     * Specifies a {@link GlobalServices.Factory} that describes the services of the global scope that are deferred until first creation.
+     *
+     * @param globalServices the {@link GlobalServices.Factory}.
+     */
+    public void setGlobalServices(@NonNull GlobalServices.Factory globalServiceFactory) {
+        if(core != null) {
+            throw new IllegalStateException("Global scope services should be set before calling `setup()`");
+        }
+        if(globalServiceFactory == null) {
+            throw new IllegalArgumentException("The global service factory cannot be null!");
+        }
+        this.scopeManager.setGlobalServices(globalServiceFactory);
+    }
+
+
     NavigationCore core;
 
     Map<Object, SavedState> keyStateMap = new HashMap<>();

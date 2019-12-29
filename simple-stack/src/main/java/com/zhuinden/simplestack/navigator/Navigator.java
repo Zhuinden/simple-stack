@@ -63,6 +63,7 @@ public class Navigator {
         Backstack.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
         ScopedServices scopedServices = null;
         GlobalServices globalServices = null;
+        GlobalServices.Factory globalServiceFactory = null;
         boolean isInitializeDeferred = false;
         boolean shouldPersistContainerChild = false;
         List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
@@ -156,6 +157,21 @@ public class Navigator {
                 throw new IllegalArgumentException("If set, global services cannot be null!");
             }
             this.globalServices = globalServices;
+            return this;
+        }
+
+        /**
+         * Sets a global service factory.
+         *
+         * @param globalServiceFactory the global service factory
+         * @return the installer
+         */
+        @NonNull
+        public Installer setGlobalServices(@NonNull GlobalServices.Factory globalServiceFactory) {
+            if(globalServiceFactory == null) {
+                throw new IllegalArgumentException("If set, global service factory cannot be null!");
+            }
+            this.globalServiceFactory = globalServiceFactory;
             return this;
         }
 
@@ -264,6 +280,7 @@ public class Navigator {
         backstackHost.stateClearStrategy = installer.stateClearStrategy;
         backstackHost.scopedServices = installer.scopedServices;
         backstackHost.globalServices = installer.globalServices;
+        backstackHost.globalServiceFactory = installer.globalServiceFactory;
         backstackHost.stateChangeCompletionListeners = installer.stateChangeCompletionListeners;
         backstackHost.shouldPersistContainerChild = installer.shouldPersistContainerChild;
         backstackHost.container = container;
