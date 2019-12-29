@@ -205,6 +205,24 @@ class ScopeManager {
 
             return scopeTags;
         }
+
+        public ScopeRegistration findScopeRegistrationForScopeTag(@NonNull String scopeTag) {
+            for(ScopeRegistration scopeRegistration : scopes.keySet()) {
+                if(scopeTag.equals(scopeRegistration.scopeTag)) {
+                    return scopeRegistration;
+                }
+            }
+            return null;
+        }
+
+        void reorderToEnd(@NonNull String scopeTag) {
+            ScopeRegistration scopeRegistration = findScopeRegistrationForScopeTag(scopeTag);
+            if(scopeRegistration != null) {
+                ScopeNode scopeNode = scopes.remove(scopeRegistration);
+                //noinspection ConstantConditions
+                scopes.put(scopeRegistration, scopeNode);
+            }
+        }
     }
 
     private static class ScopeRegistration {
@@ -304,12 +322,6 @@ class ScopeManager {
 
     private final StateBundle rootBundle = new StateBundle();
 
-    private List<String> getScopeTagsForRemoval() {
-        List<String> activeScopes = new ArrayList<>(scopes.keySet());
-        Collections.reverse(activeScopes);
-        return activeScopes;
-    }
-
     void setScopedServices(ScopedServices scopedServices) {
         this.scopedServices = scopedServices;
     }
@@ -374,8 +386,7 @@ class ScopeManager {
 
         List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(currentTop, true));
 
-        for(int tagIndex = scopeTags.size() - 1; tagIndex >= 0; tagIndex--) {
-            String scopeTag = scopeTags.get(tagIndex);
+        for(String scopeTag : scopeTags) {
             ScopeNode scopeNode = scopes.get(scopeTag);
             //noinspection ConstantConditions
             List<Map.Entry<String, Object>> services = new ArrayList<>(scopeNode.services());
@@ -475,7 +486,7 @@ class ScopeManager {
         }
     }
 
-    void clearScopesNotIn(List<Object> newKeys) {
+    void cleanupScopesBy(List<Object> newKeys) {
         Set<String> currentScopes = new LinkedHashSet<>();
         currentScopes.add(GLOBAL_SCOPE_TAG); // prevent global scope from being destroyed
 
@@ -491,14 +502,21 @@ class ScopeManager {
             }
         }
 
-        List<String> scopeSet = getScopeTagsForRemoval();
-        for(String activeScope : scopeSet) {
+        List<String> activeScopes = new ArrayList<>(scopes.keySet());
+        Collections.reverse(activeScopes);
+        for(String activeScope : activeScopes) {
             if(!currentScopes.contains(activeScope)) {
                 destroyScope(activeScope);
             }
         }
 
         trackedKeys.retainAll(newKeys);
+
+        for(String currentScope : currentScopes) {
+            if(activeScopes.contains(currentScope)) {
+                scopes.reorderToEnd(currentScope);
+            }
+        }
     }
 
     void destroyScope(String scopeTag) {

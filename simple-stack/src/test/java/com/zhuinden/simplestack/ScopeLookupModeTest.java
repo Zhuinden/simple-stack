@@ -433,12 +433,14 @@ public class ScopeLookupModeTest {
             }
         }
 
-        backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
+        Object key1 = new Key1("beep");
+        Object key2 = new Key2("boop");
+        backstack.setup(History.of(key1, key2));
 
-        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).isEmpty();
-        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).isEmpty();
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.EXPLICIT)).isEmpty();
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.ALL)).isEmpty();
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.ALL)).isEmpty();
 
         backstack.setStateChanger(new StateChanger() {
             @Override
@@ -447,10 +449,24 @@ public class ScopeLookupModeTest {
             }
         });
 
-        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent3", "parent2");
-        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1");
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent3", "parent2", "beep", "parent1");
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent3", "parent2");
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.ALL)).containsExactly("beep", "parent1");
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.ALL)).containsExactly("boop", "parent3", "parent2", "beep", "parent1");
+
+        backstack.moveToTop(key1);
+
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent3", "parent2");
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.ALL)).containsExactly("beep", "parent1", "boop", "parent3", "parent2");
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.ALL)).containsExactly("boop", "parent3", "parent2");
+
+        backstack.moveToTop(key2);
+
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1");
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent3", "parent2");
+        assertThat(backstack.findScopesForKey(key1, ScopeLookupMode.ALL)).containsExactly("beep", "parent1");
+        assertThat(backstack.findScopesForKey(key2, ScopeLookupMode.ALL)).containsExactly("boop", "parent3", "parent2", "beep", "parent1");
     }
 
     @Test

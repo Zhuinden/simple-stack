@@ -161,8 +161,8 @@ public class Backstack
                             scopeManager.dispatchActivation(scopesToDeactivate, scopesToActivate);
                         }
 
-                        // scope eviction + scoped
-                        scopeManager.clearScopesNotIn(newState);
+                        // scope eviction + scoped + re-order scope hierarchy
+                        scopeManager.cleanupScopesBy(newState);
                     }
                 }
             });

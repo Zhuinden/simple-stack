@@ -396,9 +396,13 @@ public class ScopingBackEventDispatchTest {
 
         assertThat(previousService.handledBackOnce).isFalse();
 
+        assertThat(backstack.getHistory()).containsExactly(previousKey, key);
         handled = backstack.goBack();
         assertThat(handled).isTrue();
+        assertThat(backstack.getHistory()).containsExactly(previousKey);
 
+        handled = backstack.goBack();
+        assertThat(handled).isTrue();
         assertThat(previousService.handledBackOnce).isTrue();
 
         handled = backstack.goBack();
@@ -441,6 +445,61 @@ public class ScopingBackEventDispatchTest {
 
     @Test
     public void onBackDispatchHandlesBackDispatchesToCorrectActiveChainAfterMoveToTop() {
-        throw new RuntimeException("blah");
+        final HandlesBackOnce previousService = new HandlesBackOnce();
+        final HandlesBackOnce nextService = new HandlesBackOnce();
+
+        Object previousKey = new TestKeyWithScope("previous") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service", previousService);
+            }
+        };
+
+        Object nextKey = new TestKeyWithScope("next") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service", nextService);
+            }
+        };
+
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(previousKey, nextKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.lookupService("service")).isSameAs(nextService);
+
+        backstack.moveToTop(previousKey);
+
+        assertThat(backstack.getHistory()).containsExactly(nextKey, previousKey);
+
+        assertThat(backstack.lookupService("service")).isSameAs(previousService);
+
+        boolean handled;
+
+        assertThat(previousService.handledBackOnce).isFalse();
+        handled = backstack.goBack();
+
+        assertThat(handled).isTrue();
+        assertThat(previousService.handledBackOnce).isTrue();
+
+        handled = backstack.goBack();
+
+        assertThat(handled).isTrue();
+        assertThat(backstack.getHistory()).containsExactly(nextKey);
+
+        assertThat(nextService.handledBackOnce).isFalse();
+        handled = backstack.goBack();
+
+        assertThat(handled).isTrue();
+        assertThat(nextService.handledBackOnce).isTrue();
+
+        handled = backstack.goBack();
+        assertThat(handled).isFalse();
     }
 }
