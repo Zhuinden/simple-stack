@@ -43,9 +43,6 @@ import java.util.Set;
  */
 public class Backstack
         implements Bundleable {
-    // used to overcome the limitation that back dispatch is not a state change
-    private boolean isBackDispatchPending;
-
     /**
      * Retrieves the key from the provided Context. This relies on that within the base context chain, there is at least one {@link KeyContextWrapper}.
      *
@@ -291,7 +288,6 @@ public class Backstack
     private void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
             core.setStateChanger(managedStateChanger);
-            executePendingBackDispatch();
         }
     }
 
@@ -326,9 +322,6 @@ public class Backstack
         checkBackstack("You must call `setup()` before calling `reattachStateChanger()`.");
         if(!core.hasStateChanger()) {
             core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
-
-            // used to overcome the limitation that back dispatch is not a state change
-            executePendingBackDispatch();
         }
     }
 
@@ -909,14 +902,6 @@ public class Backstack
         core.goUpChain(parentChain, fallbackToBack);
     }
 
-    // used to overcome the limitation that back dispatch is not a state change
-    private void executePendingBackDispatch() {
-        if(isBackDispatchPending) {
-            isBackDispatchPending = false;
-            goBack();
-        }
-    }
-
     /**
      * Goes back in the history.
      * If the key is found, then it goes backward to the existing key.
@@ -924,24 +909,13 @@ public class Backstack
      *
      * Before navigating back in the history, it attempts to dispatch {@link ScopedServices.HandlesBack#onBackEvent()} to scoped services in the active scope chain.
      *
-     * When there is no state changer available, one back event will be enqueued for safety purpose.
-     *
-     * @return true if the back event was consumed, false if there is only one state left.
+     * @return true if the back event was handled, false if there is only one key left.
      */
     @MainThread
     public boolean goBack() {
         checkBackstack("A backstack must be set up before navigation.");
 
         if(isStateChangePending()) {
-            return true;
-        }
-
-        if(!hasStateChanger()) {
-            // we don't want to dispatch back across the scope manager when there is no state changer.
-            // however, we cannot rely on the PendingStateChange mechanism to enqueue this back operation.
-            // therefore, we have to fake it here ourselves for now.
-            this.isBackDispatchPending = true;
-
             return true;
         }
 

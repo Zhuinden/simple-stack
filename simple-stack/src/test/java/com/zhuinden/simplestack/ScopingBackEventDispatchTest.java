@@ -264,7 +264,7 @@ public class ScopingBackEventDispatchTest {
     }
 
     @Test
-    public void onBackDispatchEnqueuedWhileNoStateChanger() {
+    public void onBackDispatchExecutesEvenIfNoStateChanger() {
         final HandlesBackOnce service = new HandlesBackOnce();
 
         Object key = new TestKeyWithScope("key") {
@@ -294,10 +294,10 @@ public class ScopingBackEventDispatchTest {
         boolean handled = backstack.goBack();
 
         assertThat(handled).isTrue();
-        assertThat(service.handledBackOnce).isFalse();
-
-        backstack.reattachStateChanger();
         assertThat(service.handledBackOnce).isTrue();
+
+        handled = backstack.goBack(); // returns `false` even if no state changer
+        assertThat(handled).isFalse();
     }
 
     @Test
