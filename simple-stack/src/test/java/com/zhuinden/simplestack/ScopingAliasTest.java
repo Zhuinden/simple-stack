@@ -1,12 +1,11 @@
 package com.zhuinden.simplestack;
 
-import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.helpers.Action;
-import com.zhuinden.simplestack.helpers.HasParentServices;
 import com.zhuinden.simplestack.helpers.ServiceProvider;
+import com.zhuinden.simplestack.helpers.TestKeyWithExplicitParent;
 import com.zhuinden.simplestack.helpers.TestKeyWithScope;
 import com.zhuinden.statebundle.StateBundle;
 
@@ -18,6 +17,8 @@ import static com.zhuinden.simplestack.helpers.AssertionHelper.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopingAliasTest {
+
+
     @Test
     public void aliasesWork() {
         Backstack backstack = new Backstack();
@@ -136,29 +137,6 @@ public class ScopingAliasTest {
             }
         };
 
-        abstract class TestKeyWithExplicitParent extends TestKeyWithScope implements HasParentServices {
-            TestKeyWithExplicitParent(String name) {
-                super(name);
-            }
-
-            protected TestKeyWithExplicitParent(Parcel in) {
-                super(in);
-            }
-
-            @Override
-            public final void bindServices(ServiceBinder serviceBinder) {
-                if(name.equals(serviceBinder.getScopeTag())) {
-                    bindOwnServices(serviceBinder);
-                } else {
-                    bindParentServices(serviceBinder);
-                }
-            }
-
-            abstract void bindParentServices(ServiceBinder serviceBinder);
-
-            abstract void bindOwnServices(ServiceBinder serviceBinder);
-        }
-
         TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
             @NonNull
             @Override
@@ -167,7 +145,7 @@ public class ScopingAliasTest {
             }
 
             @Override
-            void bindParentServices(ServiceBinder serviceBinder) {
+            protected void bindParentServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("serviceP1", serviceP1);
                     serviceBinder.addService("serviceShared1P1", serviceShared1P1);
@@ -197,7 +175,7 @@ public class ScopingAliasTest {
             }
 
             @Override
-            void bindOwnServices(ServiceBinder serviceBinder) {
+            protected void bindOwnServices(ServiceBinder serviceBinder) {
                 serviceBinder.addService("service2", service2);
 
                 serviceBinder.addService("serviceShared12", serviceShared12);
@@ -218,7 +196,7 @@ public class ScopingAliasTest {
             }
 
             @Override
-            void bindParentServices(ServiceBinder serviceBinder) {
+            protected void bindParentServices(ServiceBinder serviceBinder) {
                 if("parent1".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("serviceP1", serviceP1);
                     serviceBinder.addService("serviceShared1P1", serviceShared1P1);
@@ -236,7 +214,7 @@ public class ScopingAliasTest {
             }
 
             @Override
-            void bindOwnServices(ServiceBinder serviceBinder) {
+            protected void bindOwnServices(ServiceBinder serviceBinder) {
                 serviceBinder.addService("service3", service3);
 
                 serviceBinder.addService("serviceShared13", serviceShared13);

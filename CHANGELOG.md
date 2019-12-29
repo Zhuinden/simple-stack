@@ -3,6 +3,16 @@
 -Simple Stack X.X.X (XXXX-XX-XX)
 --------------------------------
 
+- ADDED: `ScopedService.HandlesBack`.
+
+When a service implements `HandlesBack`, then when `Backstack.goBack()` is called, it is first dispatched across the current active explicit scope chain.
+
+This allows handling "back", without having to dispatch it through the active view hierarchy (in order to get access to it in scoped services).
+
+- MAJOR FIX: `Backstack.moveToTop()` did not re-order the scope hierarchy according to the new active keys (as the scope order depended on construction order, but existing scopes were not recreated).
+
+This could have been a problem if services used the same name across multiple scopes, and the keys were re-ordered in place (not add/remove).
+
 - DEPRECATED: `BackstackDelegate`.
 
 With the renaming of `BackstackManager` to `Backstack` in 2.0.x, it's become easier to use `Backstack` directly than juggling the `BackstackDelegate`.
@@ -11,6 +21,7 @@ Also, using `Navigator` with Fragments seems to have no side-effects, therefore 
 
 Therefore, using `Navigator` is now preferred over `BackstackDelegate`.
 
+- FIX: `Backstack.forceClear()` now calls `finalizeScopes()` first to ensure that scoped services are also properly reset.
 
 -Simple Stack 2.1.2 (2019-10-10)
 --------------------------------

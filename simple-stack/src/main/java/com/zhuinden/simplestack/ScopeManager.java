@@ -205,6 +205,24 @@ class ScopeManager {
 
             return scopeTags;
         }
+
+        public ScopeRegistration findScopeRegistrationForScopeTag(@NonNull String scopeTag) {
+            for(ScopeRegistration scopeRegistration : scopes.keySet()) {
+                if(scopeTag.equals(scopeRegistration.scopeTag)) {
+                    return scopeRegistration;
+                }
+            }
+            return null;
+        }
+
+        void reorderToEnd(@NonNull String scopeTag) {
+            ScopeRegistration scopeRegistration = findScopeRegistrationForScopeTag(scopeTag);
+            if(scopeRegistration != null) {
+                ScopeNode scopeNode = scopes.remove(scopeRegistration);
+                //noinspection ConstantConditions
+                scopes.put(scopeRegistration, scopeNode);
+            }
+        }
     }
 
     private static class ScopeRegistration {
@@ -255,6 +273,9 @@ class ScopeManager {
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
     private final ScopeRegistrations scopes = new ScopeRegistrations();
+
+    private final IdentityHashMap<ScopedServices.HandlesBack, Boolean> backDispatchedServices = new IdentityHashMap<>();
+
     private final LinkedHashSet<Object> trackedKeys = new LinkedHashSet<>();
 
     private final IdentityHashMap<Object, Set<String>> scopeEnteredServices = new IdentityHashMap<>();
@@ -300,12 +321,6 @@ class ScopeManager {
     }
 
     private final StateBundle rootBundle = new StateBundle();
-
-    private List<String> getScopeTagsForRemoval() {
-        List<String> activeScopes = new ArrayList<>(scopes.keySet());
-        Collections.reverse(activeScopes);
-        return activeScopes;
-    }
 
     void setScopedServices(ScopedServices scopedServices) {
         this.scopedServices = scopedServices;
@@ -364,6 +379,36 @@ class ScopeManager {
                 trackServiceInScope(scopeEnteredServices, service, scopeTag);
             }
         }
+    }
+
+    public boolean dispatchBack(@NonNull Object currentTop) {
+        backDispatchedServices.clear();
+
+        List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(currentTop, true));
+
+        for(String scopeTag : scopeTags) {
+            ScopeNode scopeNode = scopes.get(scopeTag);
+            //noinspection ConstantConditions
+            List<Map.Entry<String, Object>> services = new ArrayList<>(scopeNode.services());
+            for(int i = services.size() - 1; i >= 0; i--) {
+                Object service = services.get(i).getValue();
+                if(service instanceof ScopedServices.HandlesBack) {
+                    ScopedServices.HandlesBack handlesBack = (ScopedServices.HandlesBack) service;
+                    if(backDispatchedServices.containsKey(handlesBack)) {
+                        continue; // skip if already attempted to dispatch back
+                    }
+
+                    backDispatchedServices.put(handlesBack, true);
+
+                    boolean handled = handlesBack.onBackEvent();
+                    if(handled) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private boolean isServiceNotRegistered(Object service) {
@@ -441,7 +486,7 @@ class ScopeManager {
         }
     }
 
-    void clearScopesNotIn(List<Object> newKeys) {
+    void cleanupScopesBy(List<Object> newKeys) {
         Set<String> currentScopes = new LinkedHashSet<>();
         currentScopes.add(GLOBAL_SCOPE_TAG); // prevent global scope from being destroyed
 
@@ -457,14 +502,21 @@ class ScopeManager {
             }
         }
 
-        List<String> scopeSet = getScopeTagsForRemoval();
-        for(String activeScope : scopeSet) {
+        List<String> activeScopes = new ArrayList<>(scopes.keySet());
+        Collections.reverse(activeScopes);
+        for(String activeScope : activeScopes) {
             if(!currentScopes.contains(activeScope)) {
                 destroyScope(activeScope);
             }
         }
 
         trackedKeys.retainAll(newKeys);
+
+        for(String currentScope : currentScopes) {
+            if(activeScopes.contains(currentScope)) {
+                scopes.reorderToEnd(currentScope);
+            }
+        }
     }
 
     void destroyScope(String scopeTag) {
