@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack X.X.X (XXXX-XX-XX)
+-Simple Stack 2.2.0 (2019-12-30)
 --------------------------------
 
 - ADDED: `ScopedService.HandlesBack`.

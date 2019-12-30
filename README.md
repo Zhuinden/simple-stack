@@ -128,14 +128,14 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.1.2")
+implementation("com.github.Zhuinden:simple-stack:2.2.0")
 ```
 
 or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.1.2'
+implementation 'com.github.Zhuinden:simple-stack:2.2.0'
 ```
 
 ## How does it work?
@@ -151,6 +151,10 @@ This allows you to initialize your views according to your current state.
 Afterwards, the Backstack operators allow changing between states.
 
 ## Example setup
+
+### Fragments
+
+See the `simple-stack-example-basic-kotlin-example`.
 
 ### Compound ViewGroups
 
@@ -176,7 +180,34 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-- **DefaultViewKey**
+Now you can do:
+
+- **Custom ViewGroup**
+
+``` kotlin
+import kotlinx.android.synthetic.main.first_view.view.*
+
+val View.backstack
+    get() = Navigator.getBackstack(context)
+
+class FirstView : FrameLayout {
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    @TargetApi(21)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+
+    override fun onFinishInflate() {
+         super.onFinishInflate()
+
+         buttonFirst.onClick {
+             backstack.goTo(SecondKey())
+         }
+    }
+}
+```
+
+- By using the **DefaultViewKey**
 
 ``` kotlin
 @Parcelize
@@ -186,7 +217,7 @@ data class FirstKey(val placeholder: String = "") : DefaultViewKey {
 }
 ```
 
-- **Layout XML**
+- and **Layout XML**
 
 ``` xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -210,31 +241,6 @@ data class FirstKey(val placeholder: String = "") : DefaultViewKey {
         android:text="Go to second!"/>
 
 </com.zhuinden.simplestackdemoexample.FirstView>
-```
-
-- **Custom ViewGroup**
-
-``` kotlin
-import kotlinx.android.synthetic.main.first_view.view.*
-
-val View.backstack
-    get() = Navigator.getBackstack(context)
-
-class FirstView : FrameLayout {
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    @TargetApi(21)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
-    
-    override fun onFinishInflate() {
-         super.onFinishInflate()
-
-         buttonFirst.onClick {
-             backstack.goTo(SecondKey())
-         }
-    }
-}
 ```
 
 ## Scopes
