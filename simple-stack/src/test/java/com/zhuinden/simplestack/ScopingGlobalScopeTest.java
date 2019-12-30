@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -734,6 +735,99 @@ public class ScopingGlobalScopeTest {
 
     @Test
     public void globalServicesFactoryWorks() {
-        throw new RuntimeException("blah");
+        final Object service = new Object();
+
+        Backstack backstack = new Backstack();
+        backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Override
+            public GlobalServices create() {
+                return GlobalServices.builder()
+                        .addService("service", service)
+                        .build();
+            }
+        });
+        backstack.setup(History.of(new TestKey("hello!")));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.canFindService("service")).isTrue();
+        assertThat(backstack.lookupService("service")).isSameAs(service);
+    }
+
+    @Test
+    public void globalServicesFactoryOverridesGlobalServices() {
+        final Object service1 = new Object();
+        final Object service2 = new Object();
+
+        Backstack backstack = new Backstack();
+
+        backstack.setGlobalServices(GlobalServices.builder()
+                .addService("service1", service1)
+                .build());
+
+        backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Override
+            public GlobalServices create() {
+                return GlobalServices.builder()
+                        .addService("service2", service2)
+                        .build();
+            }
+        });
+
+        backstack.setup(History.of(new TestKey("hello!")));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.canFindService("service1")).isFalse();
+        assertThat(backstack.canFindService("service2")).isTrue();
+        assertThat(backstack.lookupService("service2")).isSameAs(service2);
+    }
+
+    @Test
+    public void globalServicesFactoryRunsAgainAfterFinalization() {
+        Backstack backstack = new Backstack();
+
+        final AtomicReference<Object> serviceRef = new AtomicReference<>();
+        backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Override
+            public GlobalServices create() {
+                Object service = new Object();
+                serviceRef.set(service);
+                return GlobalServices.builder()
+                        .addService("service", service)
+                        .build();
+            }
+        });
+        backstack.setup(History.of(new TestKey("hello!")));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.canFindService("service")).isTrue();
+
+        Object service1 = serviceRef.get();
+
+        backstack.finalizeScopes();
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        Object service2 = serviceRef.get();
+
+        assertThat(service1).isNotSameAs(service2);
     }
 }

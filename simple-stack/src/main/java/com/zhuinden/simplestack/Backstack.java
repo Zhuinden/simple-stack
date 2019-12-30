@@ -243,11 +243,13 @@ public class Backstack
     /**
      * Specifies a {@link GlobalServices} that describes the services of the global scope.
      *
+     * Please note that setting a {@link GlobalServices.Factory} overrides this configuration option.
+     *
      * @param globalServices the {@link GlobalServices}.
      */
     public void setGlobalServices(@NonNull GlobalServices globalServices) {
         if(core != null) {
-            throw new IllegalStateException("Global scope should be set before calling `setup()`");
+            throw new IllegalStateException("Global scope services should be set before calling `setup()`");
         }
         if(globalServices == null) {
             throw new IllegalArgumentException("The global services cannot be null!");
@@ -258,11 +260,17 @@ public class Backstack
     /**
      * Specifies a {@link GlobalServices.Factory} that describes the services of the global scope that are deferred until first creation.
      *
-     * @param globalServices the {@link GlobalServices.Factory}.
+     * Please note that a strong reference is kept to the factory, and the {@link Backstack} is typically preserved across configuration change.
+     * It is recommended that it is NOT an anonymous inner class or normal inner class in an Activity,
+     * because that could cause memory leaks.
+     *
+     * Instead, it should be a class, or a static inner class.
+     *
+     * @param globalServicesFactory the {@link GlobalServices.Factory}.
      */
     public void setGlobalServices(@NonNull GlobalServices.Factory globalServiceFactory) {
         if(core != null) {
-            throw new IllegalStateException("Global scope services should be set before calling `setup()`");
+            throw new IllegalStateException("Global scope service factory should be set before calling `setup()`");
         }
         if(globalServiceFactory == null) {
             throw new IllegalArgumentException("The global service factory cannot be null!");
