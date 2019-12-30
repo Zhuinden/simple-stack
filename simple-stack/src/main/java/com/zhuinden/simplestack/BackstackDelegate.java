@@ -138,6 +138,27 @@ public class BackstackDelegate {
     }
 
     /**
+     * Specifies {@link GlobalServices.Factory}, allowing the configuration and deferred creation of global services.
+     *
+     * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
+     *
+     * @param activity             the Activity to track whether it is finalized. If null, {@link BackstackDelegate#onDestroy()} will finalize scopes. Otherwise, only if the Activity is finishing.
+     * @param globalServiceFactory The {@link GlobalServices.Factory}.
+     */
+    public void setGlobalServices(@Nullable Activity activity, @NonNull GlobalServices.Factory globalServiceFactory) {
+        this.activity = activity;
+
+        if(globalServiceFactory == null) {
+            throw new IllegalArgumentException("Specified global service factory should not be null!");
+        }
+        if(!activityWasDestroyed && (backstack != null && backstack.isInitialized())) {
+            throw new IllegalStateException("If set, global service factory must set before calling `onCreate()`");
+        }
+        activityWasDestroyed = false;
+        this.globalServiceFactory = globalServiceFactory;
+    }
+
+    /**
      * Adds a {@link Backstack.CompletionListener}, which will be added to the {@link Backstack} when it is initialized.
      * As it is added only on initialization, these are added to the Backstack only once.
      *
@@ -167,6 +188,7 @@ public class BackstackDelegate {
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private ScopedServices scopedServices = null;
     private GlobalServices globalServices = null;
+    private GlobalServices.Factory globalServiceFactory = null;
     private Backstack.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
     private List<Backstack.CompletionListener> stateChangeCompletionListeners = new LinkedList<>();
 
@@ -317,6 +339,9 @@ public class BackstackDelegate {
             }
             if(globalServices != null) {
                 backstack.setGlobalServices(globalServices);
+            }
+            if(globalServiceFactory != null) {
+                backstack.setGlobalServices(globalServiceFactory);
             }
             backstack.setup(initialKeys);
             for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {

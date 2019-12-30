@@ -9,9 +9,17 @@ When a service implements `HandlesBack`, then when `Backstack.goBack()` is calle
 
 This allows handling "back", without having to dispatch it through the active view hierarchy (in order to get access to it in scoped services).
 
-- MAJOR FIX: `Backstack.moveToTop()` did not re-order the scope hierarchy according to the new active keys (as the scope order depended on construction order, but existing scopes were not recreated).
+- FIX: `Backstack.moveToTop()` did not re-order the scope hierarchy according to the new active keys (as the scope order depended on construction order, but existing scopes were not recreated).
 
 This could have been a problem if services used the same name across multiple scopes, and the keys were re-ordered in place (not add/remove).
+
+- ADDED: `Backstack.setGlobalServices(GlobalServices.Factory)` and its `BackstackDelegate`/`Navigator` equivalent.
+
+This allows delaying the instantiation of services when the global scope is actually being created, rather than providing them immediately.
+
+Please note that providing a `GlobalServices.Factory` will override whatever `GlobalServices` was previously set.
+
+Also note that the `GlobalServices.Factory` should not be an anonymous inner class / lambda / inner class, as it is kept for configuration changes.
 
 - DEPRECATED: `BackstackDelegate`.
 

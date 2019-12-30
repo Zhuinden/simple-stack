@@ -48,6 +48,7 @@ public final class BackstackHost
     Backstack.StateClearStrategy stateClearStrategy;
     ScopedServices scopedServices;
     GlobalServices globalServices;
+    GlobalServices.Factory globalServiceFactory;
     List<Backstack.CompletionListener> stateChangeCompletionListeners;
 
     boolean shouldPersistContainerChild;
@@ -76,6 +77,9 @@ public final class BackstackHost
             }
             if(globalServices != null) {
                 backstack.setGlobalServices(globalServices);
+            }
+            if(globalServiceFactory != null) {
+                backstack.setGlobalServices(globalServiceFactory);
             }
             backstack.setup(initialKeys);
             for(Backstack.CompletionListener completionListener : stateChangeCompletionListeners) {

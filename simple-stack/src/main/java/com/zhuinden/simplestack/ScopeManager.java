@@ -305,6 +305,7 @@ class ScopeManager {
     }
 
     private GlobalServices globalServices = EMPTY_GLOBAL_SERVICES;
+    private GlobalServices.Factory globalServiceFactory = null;
     private ScopedServices scopedServices = new AssertingScopedServices();
 
     ScopeManager() {
@@ -330,9 +331,17 @@ class ScopeManager {
         this.globalServices = globalServices;
     }
 
+    void setGlobalServices(GlobalServices.Factory globalServiceFactory) {
+        this.globalServiceFactory = globalServiceFactory;
+    }
+
 
     private void buildGlobalScope() {
         if(!scopes.containsKey(GLOBAL_SCOPE_TAG)) {
+            if(globalServiceFactory != null) {
+                globalServices = globalServiceFactory.create();
+            }
+
             ScopeNode scope = globalServices.getScope();
             scopes.put(globalScopeRegistration, scope);
 

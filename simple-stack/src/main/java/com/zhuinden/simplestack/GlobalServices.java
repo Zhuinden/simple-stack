@@ -113,7 +113,6 @@ public class GlobalServices {
          */
         @NonNull
         public Builder addAlias(@NonNull String alias, @NonNull Object service) {
-            // TODO (ALIAS): add restriction that `addAlias` can only be called if the `Object service` is added to the global scope
             scope.addAlias(alias, service);
             return this;
         }
@@ -127,5 +126,17 @@ public class GlobalServices {
         public GlobalServices build() {
             return new GlobalServices(new ScopeNode(scope));
         }
+    }
+
+    /**
+     * The {@link GlobalServices.Factory} enables deferring the creation of globally scoped services to execute only when they have to be created.
+     */
+    public interface Factory {
+        /**
+         * Invoked when the global scope is created.
+         *
+         * @return the global services
+         */
+        GlobalServices create();
     }
 }
