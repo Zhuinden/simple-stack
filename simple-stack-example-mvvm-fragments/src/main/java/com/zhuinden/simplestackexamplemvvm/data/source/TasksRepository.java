@@ -66,9 +66,9 @@ public class TasksRepository
         return taskDao.findAllWithChanges((database, table) -> {
             QueryBuilder queryBuilder = QueryBuilder.of(table);
             if(taskId == null) {
-                queryBuilder.select("1 = 0"); // empty results
+                queryBuilder.where("1 = 0"); // empty results
             } else {
-                queryBuilder.select(TaskTable.$ENTRY_ID + " = ? ", taskId);
+                queryBuilder.where(TaskTable.$ENTRY_ID + " = ? ", taskId);
             }
             return queryBuilder.executeQuery(database);
         });
@@ -109,7 +109,7 @@ public class TasksRepository
     public void clearCompletedTasks() {
         backgroundScheduler.execute(() -> {
             List<Task> list = taskDao.findAll(
-                    (database, table) -> QueryBuilder.of(table).select(TaskTable.$COMPLETED + " LIKE ?",1).executeQuery(database));
+                    (database, table) -> QueryBuilder.of(table).where(TaskTable.$COMPLETED + " LIKE ?", 1).executeQuery(database));
             taskDao.delete(list);
         });
     }
@@ -137,7 +137,7 @@ public class TasksRepository
     @Override
     public LiveResults<Task> getActiveTasksWithChanges() {
         return taskDao.findAllWithChanges((database, table) -> QueryBuilder.of(table)
-                .select(TaskTable.$COMPLETED + " = ?", 0)
+                .where(TaskTable.$COMPLETED + " = ?", 0)
                 .orderBy(TaskTable.$ENTRY_ID, QueryBuilder.Sort.ASC)
                 .executeQuery(database));
     }
@@ -145,7 +145,7 @@ public class TasksRepository
     @Override
     public LiveResults<Task> getCompletedTasksWithChanges() {
         return taskDao.findAllWithChanges((database, table) -> QueryBuilder.of(table)
-                .select(TaskTable.$COMPLETED + " = ?", 1)
+                .where(TaskTable.$COMPLETED + " = ?", 1)
                 .orderBy(TaskTable.$ENTRY_ID, QueryBuilder.Sort.ASC)
                 .executeQuery(database));
     }

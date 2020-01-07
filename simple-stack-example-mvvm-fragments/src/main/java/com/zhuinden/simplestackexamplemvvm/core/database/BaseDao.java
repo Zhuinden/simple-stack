@@ -30,11 +30,11 @@ public abstract class BaseDao<T> implements Dao<T> {
     public final T findOne(@Nullable String id) {
         if(id == null) {
             return databaseManager.findOne(table, mapper, QueryBuilder.of(table)
-                    .select("1 = 0")
+                    .where("1 = 0")
                     .buildDefinition());
         } else {
             return databaseManager.findOne(table, mapper, QueryBuilder.of(table)
-                    .select(getTable().getIdFieldName() + " = ?", id)
+                    .where(getTable().getIdFieldName() + " = ?", id)
                     .limit(1)
                     .buildDefinition());
         }

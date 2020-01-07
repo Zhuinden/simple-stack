@@ -25,9 +25,9 @@ public class QueryBuilder {
 
     private String[] columns;
 
-    private String selection;
+    private String whereCondition;
 
-    private String[] selectionArgs;
+    private String[] whereArgs;
 
     private String groupBy;
 
@@ -54,8 +54,8 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder select(String selection, Object... args) {
-        this.selection = selection;
+    public QueryBuilder where(String condition, Object... args) {
+        this.whereCondition = condition;
         int length = args == null ? 0 : args.length;
         String[] selectionArgs = new String[length];
         for(int i = 0; i < length; i++) {
@@ -66,7 +66,7 @@ public class QueryBuilder {
                 selectionArgs[i] = arg.toString();
             }
         }
-        this.selectionArgs = selectionArgs;
+        this.whereArgs = selectionArgs;
         return this;
     }
 
@@ -111,8 +111,8 @@ public class QueryBuilder {
                 distinct,
                 tableName,
                 columns,
-                selection,
-                selectionArgs,
+                whereCondition,
+                whereArgs,
                 groupBy,
                 having,
                 orderBy == null ? null : orderBy + " " + sortOrder.value,
