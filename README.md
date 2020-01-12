@@ -128,14 +128,14 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.2.0")
+implementation("com.github.Zhuinden:simple-stack:2.2.1")
 ```
 
 or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.2.0'
+implementation 'com.github.Zhuinden:simple-stack:2.2.1'
 ```
 
 ## How does it work?
@@ -153,6 +153,10 @@ Afterwards, the Backstack operators allow changing between states.
 ## Example setup
 
 ### Fragments
+
+You can use a `FragmentStateChanger` to change the current active fragments' state to be inline with the current navigation state.
+
+This allows defining 1 FragmentTransaction for the whole app, and anywhere else, navigation can be as simple as `backstack.goTo(OtherKey.create())`.
 
 See the `simple-stack-example-basic-kotlin-example`.
 
@@ -286,7 +290,7 @@ For more information, check the [wiki page](https://github.com/Zhuinden/simple-s
 
 ## License
 
-    Copyright 2017-2019 Gabor Varadi
+    Copyright 2017-2020 Gabor Varadi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

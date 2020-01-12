@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stack 2.2.1 (2020-01-12)
+--------------------------------
+
+- FIX: The explicit parent scope chain was not always resolved correctly if a key is only a ScopeKey.Child, but not a ScopeKey, and the key did not register any new scopes (as all scopes defined by the ScopeKey.Child had already been registered by previous keys).
+
+This could provide incorrect results in `findScopesForKey(key, EXPLICIT)`, and could skip a `HandlesBack` service in the current top key's explicit parent chain.
+
 -Simple Stack 2.2.0 (2019-12-30)
 --------------------------------
 

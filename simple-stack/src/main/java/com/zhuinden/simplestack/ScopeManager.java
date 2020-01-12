@@ -31,13 +31,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 class ScopeManager {
     private class ScopeRegistrations {
-        private final Map<ScopeRegistration, ScopeNode> scopes = new LinkedHashMap<>();
+        private final Map<ScopeRegistration, ScopeNode> scopeRegistrations = new LinkedHashMap<>();
 
         public boolean containsKey(String scopeTag) {
-            for(ScopeRegistration registration : scopes.keySet()) {
+            for(ScopeRegistration registration : scopeRegistrations.keySet()) {
                 if(registration.scopeTag.equals(scopeTag)) {
                     return true;
                 }
@@ -47,7 +48,7 @@ class ScopeManager {
 
         public Set<String> keySet() {
             LinkedHashSet<String> scopes = new LinkedHashSet<>();
-            for(ScopeRegistration registration : this.scopes.keySet()) {
+            for(ScopeRegistration registration : this.scopeRegistrations.keySet()) {
                 scopes.add(registration.scopeTag);
                 scopes.addAll(registration.explicitParentScopes);
             }
@@ -56,41 +57,41 @@ class ScopeManager {
 
         public Set<Map.Entry<String, ScopeNode>> entrySet() {
             LinkedHashSet<Map.Entry<String, ScopeNode>> set = new LinkedHashSet<>();
-            for(Map.Entry<ScopeRegistration, ScopeNode> entry : scopes.entrySet()) {
+            for(Map.Entry<ScopeRegistration, ScopeNode> entry : scopeRegistrations.entrySet()) {
                 Map.Entry<String, ScopeNode> mappedEntry = new AbstractMap.SimpleEntry<>(entry.getKey().scopeTag, entry.getValue());
                 set.add(mappedEntry);
             }
             return Collections.unmodifiableSet(set);
         }
 
-        public void putKey(Object key, String scopeTag, ScopeNode scopeNode, boolean isExplicitParent, boolean isGlobalScope) {
+        public void putKey(Object key, String scopeTag, ScopeNode scopeNode, boolean isExplicitParent, boolean isGlobalScope, boolean isDummyScope) {
             final List<String> explicitParentScopes;
             if(key instanceof ScopeKey.Child) {
                 explicitParentScopes = ((ScopeKey.Child) key).getParentScopes();
             } else {
                 explicitParentScopes = Collections.emptyList();
             }
-            ScopeRegistration scopeRegistration = new ScopeRegistration(key, scopeTag, explicitParentScopes, isExplicitParent, isGlobalScope);
+            ScopeRegistration scopeRegistration = new ScopeRegistration(key, scopeTag, explicitParentScopes, isExplicitParent, isGlobalScope, isDummyScope);
             put(scopeRegistration, scopeNode);
         }
 
         @Nullable
         public ScopeNode get(String scopeTag) {
-            for(ScopeRegistration registration : scopes.keySet()) {
+            for(ScopeRegistration registration : scopeRegistrations.keySet()) {
                 if(registration.scopeTag.equals(scopeTag)) {
-                    return scopes.get(registration);
+                    return scopeRegistrations.get(registration);
                 }
             }
             return null;
         }
 
         public void put(ScopeRegistration scopeRegistration, ScopeNode scopeNode) {
-            scopes.put(scopeRegistration, scopeNode);
+            scopeRegistrations.put(scopeRegistration, scopeNode);
         }
 
         @Nullable
         public ScopeNode remove(String scopeTag) {
-            Iterator<Map.Entry<ScopeRegistration, ScopeNode>> iterator = scopes.entrySet().iterator();
+            Iterator<Map.Entry<ScopeRegistration, ScopeNode>> iterator = scopeRegistrations.entrySet().iterator();
             while(iterator.hasNext()) {
                 Map.Entry<ScopeRegistration, ScopeNode> entry = iterator.next();
                 String currentScopeTag = entry.getKey().scopeTag;
@@ -105,23 +106,25 @@ class ScopeManager {
 
         public List<String> getScopeTagsInTraversalOrder() {
             LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
-            List<ScopeRegistration> registrations = new ArrayList<>(scopes.keySet());
+            List<ScopeRegistration> registrations = new ArrayList<>(scopeRegistrations.keySet());
             for(int i = registrations.size() - 1; i >= 0; i--) {
                 ScopeRegistration registration = registrations.get(i);
-                scopeTags.add(registration.scopeTag);
+                if(!registration.isDummyScope) {
+                    scopeTags.add(registration.scopeTag);
+                }
                 for(int j = registration.explicitParentScopes.size() - 1; j >= 0; j--) {
                     scopeTags.add(registration.explicitParentScopes.get(j));
                 }
             }
-            List<String> scopeTagList = new ArrayList<>(scopeTags);
-            return Collections.unmodifiableList(scopeTagList);
+
+            return Collections.unmodifiableList(new ArrayList<>(scopeTags));
         }
 
         public LinkedHashSet<String> findScopesForKey(@NonNull Object targetKey, boolean explicitOnly) {
             LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
 
             int indexInRegistrations = -1;
-            List<ScopeRegistration> registrations = new ArrayList<>(scopes.keySet());
+            List<ScopeRegistration> registrations = new ArrayList<>(scopeRegistrations.keySet());
             for(int i = registrations.size() - 1; i >= 0; i--) {
                 ScopeRegistration registration = registrations.get(i);
                 if(registration.key != null && registration.key.equals(targetKey)) {
@@ -159,7 +162,9 @@ class ScopeManager {
                 for(int i = indexInRegistrations; i >= initialIndex; i--) {
                     ScopeRegistration currentRegistration = registrations.get(i);
                     if(!currentRegistration.isGlobalScope) {
-                        scopeTags.add(currentRegistration.scopeTag);
+                        if(!currentRegistration.isDummyScope) {
+                            scopeTags.add(currentRegistration.scopeTag);
+                        }
 
                         List<String> explicitParents = new ArrayList<>(currentRegistration.explicitParentScopes);
                         Collections.reverse(explicitParents);
@@ -175,7 +180,7 @@ class ScopeManager {
             LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
 
             int indexInRegistrations = -1;
-            List<ScopeRegistration> registrations = new ArrayList<>(scopes.keySet());
+            List<ScopeRegistration> registrations = new ArrayList<>(scopeRegistrations.keySet());
             for(int i = registrations.size() - 1; i >= 0; i--) {
                 ScopeRegistration registration = registrations.get(i);
                 if(scopeTag.equals(registration.scopeTag)) {
@@ -194,7 +199,9 @@ class ScopeManager {
                             scopeTags.add(registration.explicitParentScopes.get(i));
                         }
                     } else {
-                        scopeTags.add(registration.scopeTag);
+                        if(!registration.isDummyScope) {
+                            scopeTags.add(registration.scopeTag);
+                        }
 
                         List<String> explicitParents = new ArrayList<>(registration.explicitParentScopes);
                         Collections.reverse(explicitParents);
@@ -207,7 +214,7 @@ class ScopeManager {
         }
 
         public ScopeRegistration findScopeRegistrationForScopeTag(@NonNull String scopeTag) {
-            for(ScopeRegistration scopeRegistration : scopes.keySet()) {
+            for(ScopeRegistration scopeRegistration : scopeRegistrations.keySet()) {
                 if(scopeTag.equals(scopeRegistration.scopeTag)) {
                     return scopeRegistration;
                 }
@@ -218,9 +225,9 @@ class ScopeManager {
         void reorderToEnd(@NonNull String scopeTag) {
             ScopeRegistration scopeRegistration = findScopeRegistrationForScopeTag(scopeTag);
             if(scopeRegistration != null) {
-                ScopeNode scopeNode = scopes.remove(scopeRegistration);
+                ScopeNode scopeNode = scopeRegistrations.remove(scopeRegistration);
                 //noinspection ConstantConditions
-                scopes.put(scopeRegistration, scopeNode);
+                scopeRegistrations.put(scopeRegistration, scopeNode);
             }
         }
     }
@@ -231,9 +238,16 @@ class ScopeManager {
         private List<String> explicitParentScopes;
         private boolean isExplicitParent;
         private boolean isGlobalScope;
+        private boolean isDummyScope;
 
-        public ScopeRegistration(@Nullable Object key, @NonNull String scopeTag, @NonNull List<String> explicitParentScopes, boolean isExplicitParent, boolean isGlobalScope) {
-            // key is null if global scope
+        public ScopeRegistration(
+                @Nullable Object key, // key is null if global scope
+                @NonNull String scopeTag,
+                @NonNull List<String> explicitParentScopes,
+                boolean isExplicitParent,
+                boolean isGlobalScope,
+                boolean isDummyScope // no ScopeKey internal scope registrations
+        ) {
 
             //noinspection ConstantConditions
             if(scopeTag == null) {
@@ -248,6 +262,7 @@ class ScopeManager {
             this.explicitParentScopes = explicitParentScopes;
             this.isExplicitParent = isExplicitParent;
             this.isGlobalScope = isGlobalScope;
+            this.isDummyScope = isDummyScope;
         }
 
         @Override
@@ -268,7 +283,7 @@ class ScopeManager {
     }
 
     static final String GLOBAL_SCOPE_TAG = "__SIMPLE_STACK_INTERNAL_GLOBAL_SCOPE__";
-    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null, GLOBAL_SCOPE_TAG, Collections.<String>emptyList(), true, true);
+    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null, GLOBAL_SCOPE_TAG, Collections.<String>emptyList(), true, true, false);
 
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
@@ -349,18 +364,20 @@ class ScopeManager {
         }
     }
 
-    private void buildScope(Object key, String scopeTag, boolean isExplicitParent) {
+    private void buildScope(Object key, String scopeTag, boolean isExplicitParent, boolean isDummyScope) {
         //noinspection ConstantConditions
         if(scopeTag == null) {
             throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
         }
         if(!scopes.containsKey(scopeTag)) {
             ScopeNode scope = new ScopeNode();
-            scopes.putKey(key, scopeTag, scope, isExplicitParent, false);
+            scopes.putKey(key, scopeTag, scope, isExplicitParent, false, isDummyScope);
 
-            scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
+            if(!isDummyScope) {
+                scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
 
-            restoreAndNotifyServices(scopeTag, scope);
+                restoreAndNotifyServices(scopeTag, scope);
+            }
         }
     }
 
@@ -466,10 +483,12 @@ class ScopeManager {
         this.isInitialized = false;
     }
 
+    private IdentityHashMap<Object, String> dummyScopeTags = new IdentityHashMap<>();
+
     void buildScopes(List<Object> newKeys) {
         if(isFinalized) {
             this.isFinalized = false; // reset this for future travellers, I guess.
-            this.isGlobalScopePendingActivation = true; // if we allow scopes to be rebuilt once finalized, we need to enable activation of globals.
+            this.isGlobalScopePendingActivation = true; // if we allow scopeRegistrations to be rebuilt once finalized, we need to enable activation of globals.
         }
 
         if(!isInitialized) { // this seems to be the best way to track that we can safely register and initialize the global scope.
@@ -484,13 +503,22 @@ class ScopeManager {
                 ScopeKey.Child child = (ScopeKey.Child) key;
                 checkParentScopes(child);
                 for(String parent : child.getParentScopes()) {
-                    buildScope(key, parent, true);
+                    buildScope(key, parent, true, false);
                 }
             }
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 String scopeTag = scopeKey.getScopeTag();
-                buildScope(key, scopeTag, false);
+                buildScope(key, scopeTag, false, false);
+            } else {
+                String dummyScope;
+                if(dummyScopeTags.containsKey(key)) {
+                    dummyScope = dummyScopeTags.get(key);
+                } else {
+                    dummyScope = UUID.randomUUID().toString();
+                }
+                dummyScopeTags.put(key, dummyScope);
+                buildScope(key, dummyScope, false, true);
             }
         }
     }
@@ -508,6 +536,8 @@ class ScopeManager {
             if(key instanceof ScopeKey) {
                 ScopeKey scopeKey = (ScopeKey) key;
                 currentScopes.add(scopeKey.getScopeTag());
+            } else if(dummyScopeTags.containsKey(key)) {
+                currentScopes.add(dummyScopeTags.get(key));
             }
         }
 
@@ -520,6 +550,7 @@ class ScopeManager {
         }
 
         trackedKeys.retainAll(newKeys);
+        dummyScopeTags.keySet().retainAll(newKeys);
 
         for(String currentScope : currentScopes) {
             if(activeScopes.contains(currentScope)) {
@@ -826,7 +857,7 @@ class ScopeManager {
 
     boolean canFindService(@NonNull String identifier) {
         checkServiceTag(identifier);
-        List<String> activeScopes = getScopeTagsInTraversalOrder();
+        List<String> activeScopes = scopes.getScopeTagsInTraversalOrder();
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);
             if(scopeNode != null && scopeNode.hasService(identifier)) {
@@ -837,17 +868,13 @@ class ScopeManager {
         return false;
     }
 
-    private List<String> getScopeTagsInTraversalOrder() {
-        return scopes.getScopeTagsInTraversalOrder();
-    }
-
     @NonNull
     <T> T lookupService(@NonNull String identifier) {
         checkServiceTag(identifier);
 
         verifyStackIsInitialized();
 
-        List<String> activeScopes = getScopeTagsInTraversalOrder();
+        List<String> activeScopes = scopes.getScopeTagsInTraversalOrder();
 
         for(String scope : activeScopes) {
             ScopeNode scopeNode = scopes.get(scope);

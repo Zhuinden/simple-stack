@@ -502,4 +502,53 @@ public class ScopingBackEventDispatchTest {
         handled = backstack.goBack();
         assertThat(handled).isFalse();
     }
+
+    @Test
+    public void onBackDispatchHandlesBackHandlesInActiveParentScopeEvenIfTopIsNotScopeKeyAndExplicitParentIsSharedFromPreviousKey() {
+        final HandlesBackOnce parentService = new HandlesBackOnce();
+
+        Object key1 = new TestKeyWithOnlyParentServices("key1", History.of(HandlesBackOnce.class.getName())) {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                if(HandlesBackOnce.class.getName().equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService(HandlesBackOnce.class.getName(), parentService);
+                }
+            }
+        };
+
+        Object key2 = new TestKeyWithOnlyParentServices("key2", History.of(HandlesBackOnce.class.getName())) {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                if(HandlesBackOnce.class.getName().equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService(HandlesBackOnce.class.getName(), parentService);
+                }
+            }
+        };
+
+        Backstack backstack = new Backstack();
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(key1, key2));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.lookupService(HandlesBackOnce.class.getName())).isSameAs(parentService);
+        assertThat(backstack.getHistory()).containsExactly(key1, key2);
+
+        assertThat(parentService.handledBackOnce).isFalse();
+        boolean handled = backstack.goBack();
+        assertThat(handled).isTrue();
+        assertThat(parentService.handledBackOnce).isTrue();
+        assertThat(backstack.getHistory()).containsExactly(key1, key2);
+
+        handled = backstack.goBack();
+        assertThat(handled).isTrue();
+        assertThat(backstack.getHistory()).containsExactly(key1);
+
+        handled = backstack.goBack();
+        assertThat(handled).isFalse();
+    }
 }

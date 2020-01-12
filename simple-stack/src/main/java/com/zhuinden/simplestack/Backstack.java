@@ -943,8 +943,9 @@ public class Backstack
             return true;
         }
 
+        Object topKey = getHistory().top();
         //noinspection ConstantConditions
-        boolean handled = scopeManager.dispatchBack(getHistory().top());
+        boolean handled = scopeManager.dispatchBack(topKey);
 
         if(handled) {
             return true;
