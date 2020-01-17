@@ -589,6 +589,8 @@ class ScopeManager {
             }
         }
 
+        untrackEventInvocationTracker.clear(); // #213
+
         rootBundle.remove(scopeTag);
     }
 
@@ -656,6 +658,8 @@ class ScopeManager {
                 ((ScopedServices.Activated) service).onServiceInactive();
             }
         }
+
+        untrackEventInvocationTracker.clear(); // #213
     }
 
     StateBundle saveStates() {

@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack 2.2.2 (2020-01-17)
+--------------------------------
+
+- FIX: Ensure that unused keys can be GCed inside ScopeManager (previously they could be kept alive in a map, #213).
+
 -Simple Stack 2.2.1 (2020-01-12)
 --------------------------------
 
