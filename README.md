@@ -283,6 +283,10 @@ class NewWordFragment : BaseFragment() {
 }
 ```
 
+## Tutorials
+
+You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack-tutorials/) which contain simple step-by-step code examples.
+
 ## More information
 
 For more information, check the [wiki page](https://github.com/Zhuinden/simple-stack/wiki).
