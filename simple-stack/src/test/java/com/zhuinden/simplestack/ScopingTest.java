@@ -1927,6 +1927,7 @@ public class ScopingTest {
         TestKeyWithScope scopeKey1 = new TestKeyWithScope("hello");
         TestKeyWithScope scopeKey2 = new TestKeyWithExplicitParent("world", "parent");
         TestKeyWithScope scopeKey3 = new TestKeyWithScope("kappa");
+        TestKey scopeKey4 = new TestKey("aaaaaa");
 
         backstack.setup(History.of(scopeKey1, scopeKey2));
 
@@ -1941,7 +1942,7 @@ public class ScopingTest {
 
         callbackRef.get().stateChangeComplete();
 
-        backstack.setHistory(History.of(scopeKey1, scopeKey3), StateChange.REPLACE);
+        backstack.setHistory(History.of(scopeKey1, scopeKey4, scopeKey3), StateChange.REPLACE);
 
         assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.ALL)).containsExactly("hello");
         assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.ALL)).containsExactly("world", "parent", "hello");
@@ -1956,6 +1957,8 @@ public class ScopingTest {
         assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.ALL)).containsExactly("hello");
         assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.ALL)).isEmpty();
         assertThat(backstack.findScopesForKey(scopeKey3, ScopeLookupMode.ALL)).containsExactly("kappa", "hello");
+        assertThat(backstack.findScopesForKey(scopeKey4, ScopeLookupMode.ALL)).containsExactly(
+                "hello");
 
         assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.EXPLICIT)).containsExactly("hello");
         assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.EXPLICIT)).isEmpty();

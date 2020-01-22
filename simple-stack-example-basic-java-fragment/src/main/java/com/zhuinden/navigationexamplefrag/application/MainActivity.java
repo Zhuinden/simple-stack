@@ -13,8 +13,8 @@ import com.zhuinden.navigationexamplefrag.screens.HomeKey;
 import com.zhuinden.navigationexamplefrag.screens.NotificationKey;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.History;
+import com.zhuinden.simplestack.SimpleStateChanger;
 import com.zhuinden.simplestack.StateChange;
-import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
 
 import butterknife.BindView;
@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements SimpleStateChanger.NavigationHandler {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.navigation)
@@ -59,7 +59,7 @@ public class MainActivity
         fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.root);
 
         Navigator.configure()
-                .setStateChanger(this)
+                .setStateChanger(new SimpleStateChanger(this))
                 .install(this, root, History.single(HomeKey.create()));
     }
 
@@ -71,12 +71,7 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(stateChange.isTopNewKeyEqualToPrevious()) {
-            completionCallback.stateChangeComplete();
-            return;
-        }
+    public void onNavigationEvent(@NonNull StateChange stateChange) {
         fragmentStateChanger.handleStateChange(stateChange);
-        completionCallback.stateChangeComplete();
     }
 }

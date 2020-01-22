@@ -3,8 +3,8 @@ package com.zhuinden.simplestackexamplekotlinfragment.application
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.zhuinden.simplestack.History
+import com.zhuinden.simplestack.SimpleStateChanger
 import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackexamplekotlinfragment.R
 import com.zhuinden.simplestackexamplekotlinfragment.core.navigation.FragmentStateChanger
@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 /**
  * Created by Owner on 2017.11.13.
  */
-class MainActivity : AppCompatActivity(), StateChanger {
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: FragmentStateChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
 
         Navigator.configure()
-            .setStateChanger(this)
+            .setStateChanger(SimpleStateChanger(this))
             .install(this, root, History.single(HomeKey()))
     }
 
@@ -53,12 +53,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
     }
 
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewKeyEqualToPrevious) {
-            completionCallback.stateChangeComplete()
-            return
-        }
+    override fun onNavigationEvent(stateChange: StateChange) {
         fragmentStateChanger.handleStateChange(stateChange)
-        completionCallback.stateChangeComplete()
     }
 }

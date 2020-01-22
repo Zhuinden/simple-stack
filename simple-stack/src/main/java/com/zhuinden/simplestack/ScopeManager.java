@@ -133,6 +133,7 @@ class ScopeManager {
                 }
             }
 
+            // NOTE: this block doesn't seem to be in coverage. I think dummy scopes ate it (as all keys have a registration now).
             if(!explicitOnly && indexInRegistrations < 0 && trackedKeys.contains(targetKey)) { // handle when the key has no scope but is part of history
                 List<Object> trackedKeyList = new ArrayList<>(trackedKeys);
                 int indexOfTarget = trackedKeyList.indexOf(targetKey);

@@ -3,7 +3,9 @@
 -Simple Stack X.X.X (XXXX-XX-XX)
 --------------------------------
 
-- FIX: `ScopedService.Activated` callback could immediately execute a navigation action, which if destroyed the current scope, then it could result in an `AssertionError` (#215). 
+- FIX: `ScopedService.Activated` callback could immediately execute a navigation action, which if destroyed the current scope, then it could result in an `AssertionError` (#215).
+
+- ADD: `SimpleStateChanger` for convenience when a `StateChanger` is not intended to take asynchronous execution into account. 
 
 -Simple Stack 2.2.2 (2020-01-17)
 --------------------------------

@@ -456,4 +456,53 @@ public class StateChangerTest {
 
         assertThat(backstack.getHistory()).containsExactly(new D());
     }
+
+    @Test
+    public void simpleStateChangerWorks() {
+        Backstack backstack = new Backstack();
+        A a = new A();
+        B b = new B();
+        C c = new C();
+
+        final List<Object> history = new ArrayList<>();
+
+        final SimpleStateChanger.NavigationHandler navigationHandler = new SimpleStateChanger.NavigationHandler() {
+            @Override
+            public void onNavigationEvent(@NonNull StateChange stateChange) {
+                history.add(stateChange.topNewKey());
+            }
+        };
+
+        backstack.setup(History.of(a));
+        backstack.setStateChanger(new SimpleStateChanger(navigationHandler));
+
+        assertThat(history).containsExactly(a);
+
+        backstack.setHistory(History.of(b), StateChange.REPLACE);
+
+        assertThat(history).containsExactly(a, b);
+
+        backstack.goTo(c);
+
+        assertThat(history).containsExactly(a, b, c);
+
+        backstack.goTo(c);
+
+        assertThat(history).containsExactly(a, b, c);
+
+        backstack.goBack();
+
+        assertThat(history).containsExactly(a, b, c, b);
+
+        backstack.setHistory(History.of(a), StateChange.REPLACE);
+
+        assertThat(history).containsExactly(a, b, c, b, a);
+
+        try {
+            new SimpleStateChanger(null);
+            Assert.fail();
+        } catch(NullPointerException e) {
+            // OK
+        }
+    }
 }
