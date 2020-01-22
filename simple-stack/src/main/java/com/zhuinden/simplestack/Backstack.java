@@ -97,6 +97,10 @@ public class Backstack
                 public void stateChangeComplete() {
                     completionCallback.stateChangeComplete();
                     if(!isStateChangePending()) {
+                        if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
+                            core.removeStateChanger();
+                        }
+
                         stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
 
                         History<Object> newState = stateChange.getNewKeys();
@@ -163,6 +167,10 @@ public class Backstack
 
                         // scope eviction + scoped + re-order scope hierarchy
                         scopeManager.cleanupScopesBy(newState);
+
+                        if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
+                            core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
+                        }
                     }
                 }
             });
@@ -266,7 +274,7 @@ public class Backstack
      *
      * Instead, it should be a class, or a static inner class.
      *
-     * @param globalServicesFactory the {@link GlobalServices.Factory}.
+     * @param globalServiceFactory the {@link GlobalServices.Factory}.
      */
     public void setGlobalServices(@NonNull GlobalServices.Factory globalServiceFactory) {
         if(core != null) {
@@ -290,6 +298,8 @@ public class Backstack
 
     StateChanger stateChanger;
 
+    private boolean isStateChangerAttached = false; // tracked to ensure enqueue behavior during activation dispatch.
+
     /**
      * Setup creates the {@link Backstack} with the specified initial keys.
      *
@@ -311,6 +321,7 @@ public class Backstack
 
     private void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
+            isStateChangerAttached = true;
             core.setStateChanger(managedStateChanger);
         }
     }
@@ -336,6 +347,7 @@ public class Backstack
         checkBackstack("You must call `setup()` before calling `detachStateChanger()`.");
         if(core.hasStateChanger()) {
             core.removeStateChanger();
+            isStateChangerAttached = false;
         }
     }
 
@@ -345,6 +357,7 @@ public class Backstack
     public void reattachStateChanger() {
         checkBackstack("You must call `setup()` before calling `reattachStateChanger()`.");
         if(!core.hasStateChanger()) {
+            isStateChangerAttached = true;
             core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
         }
     }

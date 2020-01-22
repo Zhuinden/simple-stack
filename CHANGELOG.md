@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack X.X.X (XXXX-XX-XX)
+--------------------------------
+
+- FIX: `ScopedService.Activated` callback could immediately execute a navigation action, which if destroyed the current scope, then it could result in an `AssertionError` (#215). 
+
 -Simple Stack 2.2.2 (2020-01-17)
 --------------------------------
 
