@@ -263,7 +263,7 @@ public class Navigator {
             throw new IllegalArgumentException("Activity cannot be null!");
         }
         if(container == null) {
-            throw new IllegalArgumentException("State changer cannot be null!");
+            throw new IllegalArgumentException("Container cannot be null!");
         }
         if(initialKeys == null || initialKeys.isEmpty()) {
             throw new IllegalArgumentException("Initial keys cannot be null!");
