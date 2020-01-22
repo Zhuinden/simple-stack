@@ -25,6 +25,8 @@ public class FragmentStateChanger {
     }
 
     public void handleStateChange(StateChange stateChange) {
+        fragmentManager.executePendingTransactions();
+
         List<BaseKey> previousState = stateChange.getPreviousKeys();
         List<BaseKey> newState = stateChange.getNewKeys();
         BaseKey topPreviousKey = stateChange.topPreviousKey();

@@ -23,6 +23,8 @@ public class FragmentStateChanger {
     }
 
     public void handleStateChange(StateChange stateChange) {
+        fragmentManager.executePendingTransactions();
+
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().disallowAddToBackStack();
         if(stateChange.getDirection() == StateChange.FORWARD) {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_right, R.anim.slide_out_to_left);

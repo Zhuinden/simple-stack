@@ -10,6 +10,8 @@ class FragmentStateChanger(
     private val containerId: Int
 ) {
     fun handleStateChange(stateChange: StateChange) {
+        fragmentManager.executePendingTransactions()
+
         val fragmentTransaction = fragmentManager.beginTransaction().apply {
             when (stateChange.direction) {
                 StateChange.FORWARD -> {
