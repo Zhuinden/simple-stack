@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack 2.2.4 (2020-01-30)
+--------------------------------
+
+- UPDATE: `state-bundle` is updated to 1.2.2.
+
 -Simple Stack 2.2.3 (2020-01-23)
 --------------------------------
 
