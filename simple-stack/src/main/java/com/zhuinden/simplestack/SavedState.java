@@ -24,9 +24,8 @@ import com.zhuinden.statebundle.StateBundle;
 
 /**
  * A container for the view hierarchy state and an optional Bundle.
- * Made to be used with {@link BackstackDelegate}'s view state persistence.
  *
- * A {@link SavedState} represents the state of the view that is bound to a given key.
+ * A {@link SavedState} represents the state of the screen that is bound to a given key.
  */
 public class SavedState {
     private Object key;
@@ -61,7 +60,7 @@ public class SavedState {
         return viewBundle;
     }
 
-    public void setBundle(@Nullable StateBundle bundle) {
+    public void setBundle(@Nullable StateBundle bundle) { // should be non-null
         this.bundle = bundle;
     }
 
@@ -81,7 +80,7 @@ public class SavedState {
     public static class Builder {
         private Object key;
         private SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
-        private StateBundle bundle;
+        private StateBundle bundle = new StateBundle();
         private StateBundle viewBundle;
 
         Builder() {
@@ -103,7 +102,7 @@ public class SavedState {
             return this;
         }
 
-        public Builder setBundle(@Nullable StateBundle bundle) {
+        public Builder setBundle(@Nullable StateBundle bundle) {  // should be non-null
             this.bundle = bundle;
             return this;
         }

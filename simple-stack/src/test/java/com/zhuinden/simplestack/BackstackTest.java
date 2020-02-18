@@ -15,8 +15,10 @@
  */
 package com.zhuinden.simplestack;
 
+import android.content.Context;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.zhuinden.simplestack.helpers.TestKey;
 import com.zhuinden.statebundle.StateBundle;
@@ -24,6 +26,7 @@ import com.zhuinden.statebundle.StateBundle;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +79,7 @@ public class BackstackTest {
         history.add(restored);
         StateBundle stateBundle = new StateBundle();
         stateBundle.putParcelableArrayList(Backstack.getHistoryTag(),
-                history);
+                                           history);
 
         Backstack backstack = new Backstack();
         backstack.setup(History.single(initial));
@@ -223,7 +226,8 @@ public class BackstackTest {
         backstack.setHistory(History.single(initial), StateChange.REPLACE);
         backstack.goTo(other);
         backstack.reattachStateChanger();
-        assertThat(integers).containsExactly(initial, other, initial, other, initial, initial, other);
+        assertThat(integers).containsExactly(
+                initial, other, initial, other, initial, initial, other);
     }
 
     @Test
@@ -245,5 +249,58 @@ public class BackstackTest {
         backstack.setStateChanger(stateChanger);
 
         assertThat(backstack.getInitialKeys()).containsExactly(initial);
+    }
+
+    @Test
+    public void savedStateWorksForResultPassing() {
+        TestKey first = new TestKey("first");
+
+        View view = Mockito.mock(View.class);
+        Context context = Mockito.mock(Context.class);
+        Mockito.when(view.getContext()).thenReturn(context);
+        Mockito.when(context.getSystemService(KeyContextWrapper.TAG)).thenReturn(first);
+
+        TestKey second = new TestKey("second");
+
+        Backstack backstack = new Backstack();
+        backstack.setup(History.of(first));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.goTo(second);
+
+        StateBundle firstBundle = backstack.getSavedState(first).getBundle();
+        firstBundle.putString("result", "Success!");
+
+        backstack.persistViewToState(view);
+
+        StateBundle persistedBundle = backstack.toBundle();
+
+        Backstack backstack2 = new Backstack();
+        backstack2.setup(History.of(second));
+        backstack2.fromBundle(persistedBundle);
+        backstack2.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack2.getSavedState(first).getBundle().getString("result")).isEqualTo(
+                "Success!");
+    }
+
+    @Test
+    public void uninitializedStackGoBackWorks() {
+        TestKey first = new TestKey("first");
+
+        Backstack backstack = new Backstack();
+        backstack.setup(History.of(first));
+
+        assertThat(backstack.goBack()).isFalse();
     }
 }

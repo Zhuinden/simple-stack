@@ -1,5 +1,14 @@
 # Change log
 
+-Simple Stack 2.2.5 (2020-02-18)
+--------------------------------
+
+- CHANGE: `Backstack.getSavedState(Object key).getBundle()` is now initialized to an empty `StateBundle` instead of `null` (but is still nullable because of `setBundle()`).
+
+- FIX: `Backstack.persistViewToState(Object key)` no longer creates a new `SavedState` instance, and uses `getSavedState` to re-use (or create) the existing one.
+
+- FIX: Ensure that `backDispatchedServices` is also cleared after execution of `dispatchBack`. 
+
 -Simple Stack 2.2.4 (2020-01-30)
 --------------------------------
 
@@ -15,7 +24,7 @@
 -Simple Stack 2.2.2 (2020-01-17)
 --------------------------------
 
-- FIX: Ensure that unused keys can be GCed inside ScopeManager (previously they could be kept alive in a map, #213).
+- FIX: Ensure that unused services can be GCed inside ScopeManager (previously they could be kept alive in a map, #213).
 
 -Simple Stack 2.2.1 (2020-01-12)
 --------------------------------

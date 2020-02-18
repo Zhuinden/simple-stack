@@ -413,29 +413,33 @@ class ScopeManager {
 
         List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(currentTop, true));
 
-        for(String scopeTag : scopeTags) {
-            ScopeNode scopeNode = scopes.get(scopeTag);
-            //noinspection ConstantConditions
-            List<Map.Entry<String, Object>> services = new ArrayList<>(scopeNode.services());
-            for(int i = services.size() - 1; i >= 0; i--) {
-                Object service = services.get(i).getValue();
-                if(service instanceof ScopedServices.HandlesBack) {
-                    ScopedServices.HandlesBack handlesBack = (ScopedServices.HandlesBack) service;
-                    if(backDispatchedServices.containsKey(handlesBack)) {
-                        continue; // skip if already attempted to dispatch back
-                    }
+        try {
+            for(String scopeTag : scopeTags) {
+                ScopeNode scopeNode = scopes.get(scopeTag);
+                //noinspection ConstantConditions
+                List<Map.Entry<String, Object>> services = new ArrayList<>(scopeNode.services());
+                for(int i = services.size() - 1; i >= 0; i--) {
+                    Object service = services.get(i).getValue();
+                    if(service instanceof ScopedServices.HandlesBack) {
+                        ScopedServices.HandlesBack handlesBack = (ScopedServices.HandlesBack) service;
+                        if(backDispatchedServices.containsKey(handlesBack)) {
+                            continue; // skip if already attempted to dispatch back
+                        }
 
-                    backDispatchedServices.put(handlesBack, true);
+                        backDispatchedServices.put(handlesBack, true);
 
-                    boolean handled = handlesBack.onBackEvent();
-                    if(handled) {
-                        return true;
+                        boolean handled = handlesBack.onBackEvent();
+                        if(handled) {
+                            return true;
+                        }
                     }
                 }
             }
-        }
 
-        return false;
+            return false;
+        } finally {
+            backDispatchedServices.clear();
+        }
     }
 
     private boolean isServiceNotRegistered(Object service) {

@@ -615,12 +615,9 @@ public class Backstack
             if(view instanceof Bundleable) {
                 bundle = ((Bundleable) view).toBundle();
             }
-            SavedState previousSavedState = SavedState.builder() //
-                    .setKey(key) //
-                    .setViewHierarchyState(viewHierarchyState) //
-                    .setViewBundle(bundle) //
-                    .build();
-            keyStateMap.put(key, previousSavedState);
+            SavedState previousSavedState = getSavedState(key);
+            previousSavedState.setViewHierarchyState(viewHierarchyState);
+            previousSavedState.setViewBundle(bundle);
         }
     }
 
@@ -957,7 +954,11 @@ public class Backstack
         }
 
         Object topKey = getHistory().top();
-        //noinspection ConstantConditions
+
+        if(topKey == null) {
+            return false;
+        }
+
         boolean handled = scopeManager.dispatchBack(topKey);
 
         if(handled) {

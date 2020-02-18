@@ -46,18 +46,12 @@ And most importantly, navigation (swapping screens) happens in one place, and yo
 Write once, works in all cases.
 
 ``` java
-public void handleStateChange(StateChange stateChange, StateChanger.Callback callback) {
-    if (stateChange.isTopNewEqualToPrevious()) { // check if navigating to the same screen first!
-        callback.stateChangeComplete();
-        return;
-    }
-
-    Key key = stateChange.topNewKey(); // use your new navigation state
-    setTitle(key.title);
+public void onNavigationEvent(StateChange stateChange) { // using SimpleStateChanger
+    Screen newScreen = stateChange.topNewKey(); // use your new navigation state
+    
+    setTitle(newScreen.title);
     
     ... // set up fragments, set up views, whatever you want
-    
-    callback.stateChangeComplete();
 }
 ```
 
@@ -128,14 +122,14 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.2.4")
+implementation("com.github.Zhuinden:simple-stack:2.2.5")
 ```
 
 or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.2.4'
+implementation 'com.github.Zhuinden:simple-stack:2.2.5'
 ```
 
 ## How does it work?
@@ -198,8 +192,6 @@ class FirstView : FrameLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    @TargetApi(21)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun onFinishInflate() {
          super.onFinishInflate()
@@ -232,12 +224,6 @@ data class FirstKey(val placeholder: String = "") : DefaultViewKey {
               android:gravity="center"
               android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/textFirst"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="Enter text here"/>
-
     <Button
         android:id="@+id/buttonFirst"
         android:layout_width="wrap_content"
@@ -260,11 +246,14 @@ This lets you easily share a class between screens, while still letting you hand
 ``` kotlin
 inline fun <reified T> Fragment.lookup(serviceTag: String = T::class.java.name) =
     Navigator.lookupService<T>(requireContext(), serviceTag)
+    
+inline fun <reified T> ServiceBinder.add(service: Any, serviceTag: String = T::class.java.name) {
+    this.addService(serviceTag, service as T)
+}
 
-Navigator.configure()
-    .setStateChanger(this)
-    .setScopedServices(ScopeConfiguration())
-    .install(this, root, History.of(WordListKey()))
+override fun bindServices(serviceBinder: ServiceBinder) {
+    serviceBinder.add(WordController())
+}
 
 class WordController : Bundleable, ScopedServices.Registered {
     ...
@@ -282,6 +271,9 @@ class NewWordFragment : BaseFragment() {
     ...
 }
 ```
+
+See the `simple-stack-example-scoping`, or `Simple-Stack Tutorial Step-7`.
+
 
 ## Tutorials
 
