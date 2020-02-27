@@ -1,5 +1,16 @@
 # Change log
 
+-Simple Stack 2.3.0 (2020-02-27)
+--------------------------------
+
+- CHANGE: Remove dependency on `android.support.annotation.*`. With that, there should be no dependency from the library on either `android.support.*` or `androidx.*`.
+
+Replaced it using `javax.annotation.Nullable` and `javax.annotation.Nonnull` provided by `api("com.google.code.findbugs:jsr305:3.0.2")`.
+
+- UPDATE: `state-bundle` is updated to `1.3.0` (Remove dependency on `android.support.annotation.*`, replace with `javax.annotation.*`).
+
+With these changes, Jetifier should no longer be needed when using Simple-Stack.
+
 -Simple Stack 2.2.5 (2020-02-18)
 --------------------------------
 
@@ -12,7 +23,7 @@
 -Simple Stack 2.2.4 (2020-01-30)
 --------------------------------
 
-- UPDATE: `state-bundle` is updated to 1.2.2.
+- UPDATE: `state-bundle` is updated to `1.2.2` (Fix a bug in `StateBundle.equals()`).
 
 -Simple Stack 2.2.3 (2020-01-23)
 --------------------------------

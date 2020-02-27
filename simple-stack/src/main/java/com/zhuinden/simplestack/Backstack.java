@@ -17,9 +17,6 @@ package com.zhuinden.simplestack;
 
 import android.content.Context;
 import android.os.Parcelable;
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -33,6 +30,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * The backstack manages the navigation history internally, and wraps it with the ability of persisting view state.
@@ -52,8 +52,8 @@ public class Backstack
      * @param <K>     the type of the key
      * @return the key
      */
-    @NonNull
-    public static <K> K getKey(@NonNull Context context) {
+    @Nonnull
+    public static <K> K getKey(@Nonnull Context context) {
         return KeyContextWrapper.getKey(context);
     }
 
@@ -67,7 +67,7 @@ public class Backstack
          * @param keyStateMap the map that contains the keys and their corresponding retained saved state.
          * @param stateChange the last state change
          */
-        void clearStatesNotIn(@NonNull Map<Object, SavedState> keyStateMap, @NonNull StateChange stateChange);
+        void clearStatesNotIn(@Nonnull Map<Object, SavedState> keyStateMap, @Nonnull StateChange stateChange);
     }
 
     private static final String HISTORY_TAG = "HISTORY";
@@ -90,7 +90,7 @@ public class Backstack
 
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
-        public void handleStateChange(@NonNull final StateChange stateChange, @NonNull final Callback completionCallback) {
+        public void handleStateChange(@Nonnull final StateChange stateChange, @Nonnull final Callback completionCallback) {
             scopeManager.buildScopes(stateChange.getNewKeys());
             stateChanger.handleStateChange(stateChange, new Callback() {
                 @Override
@@ -188,7 +188,7 @@ public class Backstack
      *
      * @param keyFilter The custom {@link KeyFilter}.
      */
-    public void setKeyFilter(@NonNull KeyFilter keyFilter) {
+    public void setKeyFilter(@Nonnull KeyFilter keyFilter) {
         if(core != null) {
             throw new IllegalStateException("Custom key filter should be set before calling `setup()`");
         }
@@ -205,7 +205,7 @@ public class Backstack
      *
      * @param keyParceler The custom {@link KeyParceler}.
      */
-    public void setKeyParceler(@NonNull KeyParceler keyParceler) {
+    public void setKeyParceler(@Nonnull KeyParceler keyParceler) {
         if(core != null) {
             throw new IllegalStateException("Custom key parceler should be set before calling `setup()`");
         }
@@ -223,7 +223,7 @@ public class Backstack
      *
      * @param stateClearStrategy The custom {@link StateClearStrategy}.
      */
-    public void setStateClearStrategy(@NonNull StateClearStrategy stateClearStrategy) {
+    public void setStateClearStrategy(@Nonnull StateClearStrategy stateClearStrategy) {
         if(core != null) {
             throw new IllegalStateException("Custom state clear strategy should be set before calling `setup()`");
         }
@@ -238,7 +238,7 @@ public class Backstack
      *
      * @param scopedServices the {@link ScopedServices}.
      */
-    public void setScopedServices(@NonNull ScopedServices scopedServices) {
+    public void setScopedServices(@Nonnull ScopedServices scopedServices) {
         if(core != null) {
             throw new IllegalStateException("Scope provider should be set before calling `setup()`");
         }
@@ -255,7 +255,7 @@ public class Backstack
      *
      * @param globalServices the {@link GlobalServices}.
      */
-    public void setGlobalServices(@NonNull GlobalServices globalServices) {
+    public void setGlobalServices(@Nonnull GlobalServices globalServices) {
         if(core != null) {
             throw new IllegalStateException("Global scope services should be set before calling `setup()`");
         }
@@ -276,7 +276,7 @@ public class Backstack
      *
      * @param globalServiceFactory the {@link GlobalServices.Factory}.
      */
-    public void setGlobalServices(@NonNull GlobalServices.Factory globalServiceFactory) {
+    public void setGlobalServices(@Nonnull GlobalServices.Factory globalServiceFactory) {
         if(core != null) {
             throw new IllegalStateException("Global scope service factory should be set before calling `setup()`");
         }
@@ -305,7 +305,7 @@ public class Backstack
      *
      * @param initialKeys the initial keys of the backstack
      */
-    public void setup(@NonNull List<?> initialKeys) {
+    public void setup(@Nonnull List<?> initialKeys) {
         core = new NavigationCore(initialKeys);
         core.setBackstack(this);
     }
@@ -432,7 +432,7 @@ public class Backstack
      * @param serviceTag the service tag
      * @return whether the service is bound in the given scope
      */
-    public boolean hasService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+    public boolean hasService(@Nonnull ScopeKey scopeKey, @Nonnull String serviceTag) {
         return hasService(scopeKey.getScopeTag(), serviceTag);
     }
 
@@ -444,8 +444,8 @@ public class Backstack
      * @param <T>        the type of the service
      * @return the service
      */
-    @NonNull
-    public <T> T getService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+    @Nonnull
+    public <T> T getService(@Nonnull ScopeKey scopeKey, @Nonnull String serviceTag) {
         return getService(scopeKey.getScopeTag(), serviceTag);
     }
 
@@ -456,7 +456,7 @@ public class Backstack
      * @param serviceTag the service tag
      * @return whether the service is bound in the given scope
      */
-    public boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
+    public boolean hasService(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         return scopeManager.hasService(scopeTag, serviceTag);
     }
 
@@ -468,8 +468,8 @@ public class Backstack
      * @param <T>        the type of the service
      * @return the service
      */
-    @NonNull
-    public <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
+    @Nonnull
+    public <T> T getService(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         return scopeManager.getService(scopeTag, serviceTag);
     }
 
@@ -479,7 +479,7 @@ public class Backstack
      * @param scopeTag the scope tag
      * @return whether the scope exists
      */
-    public boolean hasScope(@NonNull String scopeTag) {
+    public boolean hasScope(@Nonnull String scopeTag) {
         return scopeManager.hasScope(scopeTag);
     }
 
@@ -490,7 +490,7 @@ public class Backstack
      * @param serviceTag the tag of the service
      * @return whether the service exists in any active scopes
      */
-    public boolean canFindService(@NonNull String serviceTag) {
+    public boolean canFindService(@Nonnull String serviceTag) {
         return scopeManager.canFindService(serviceTag);
     }
 
@@ -502,7 +502,7 @@ public class Backstack
      * @param serviceTag the tag of the service
      * @return whether the service exists in any scopes from the current scope or its parents
      */
-    public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
+    public boolean canFindFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         return scopeManager.canFindFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
     }
 
@@ -515,7 +515,7 @@ public class Backstack
      * @param lookupMode determine what type of parents are checked during the lookup
      * @return whether the service exists in any scopes from the current scope or its parents
      */
-    public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+    public boolean canFindFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag, @Nonnull ScopeLookupMode lookupMode) {
         return scopeManager.canFindFromScope(scopeTag, serviceTag, lookupMode);
     }
 
@@ -528,8 +528,8 @@ public class Backstack
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any scope
      */
-    @NonNull
-    public <T> T lookupService(@NonNull String serviceTag) {
+    @Nonnull
+    public <T> T lookupService(@Nonnull String serviceTag) {
         return scopeManager.lookupService(serviceTag);
     }
 
@@ -542,8 +542,8 @@ public class Backstack
      * @param lookupMode determine what type of parents are checked during the lookup
      * @return the list of scope tags
      */
-    @NonNull
-    public List<String> findScopesForKey(@NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
+    @Nonnull
+    public List<String> findScopesForKey(@Nonnull Object key, @Nonnull ScopeLookupMode lookupMode) {
         Set<String> scopes = scopeManager.findScopesForKey(key, lookupMode);
         return Collections.unmodifiableList(new ArrayList<>(scopes));
     }
@@ -557,7 +557,7 @@ public class Backstack
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any of the scopes
      */
-    @NonNull
+    @Nonnull
     public <T> T lookupFromScope(String scopeTag, String serviceTag) {
         return scopeManager.lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
     }
@@ -572,7 +572,7 @@ public class Backstack
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any of the scopes
      */
-    @NonNull
+    @Nonnull
     public <T> T lookupFromScope(String scopeTag, String serviceTag, ScopeLookupMode lookupMode) {
         return scopeManager.lookupFromScope(scopeTag, serviceTag, lookupMode);
     }
@@ -584,8 +584,8 @@ public class Backstack
      * @param key The key to which the {@link SavedState} belongs.
      * @return the saved state that belongs to the given key.
      */
-    @NonNull
-    public SavedState getSavedState(@NonNull Object key) {
+    @Nonnull
+    public SavedState getSavedState(@Nonnull Object key) {
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
         }
@@ -626,7 +626,7 @@ public class Backstack
      *
      * @param view the view that belongs to a certain key
      */
-    public void restoreViewFromState(@NonNull View view) {
+    public void restoreViewFromState(@Nonnull View view) {
         if(view == null) {
             throw new IllegalArgumentException("You cannot restore state into null view!");
         }
@@ -649,7 +649,7 @@ public class Backstack
      *
      * @param stateChangeCompletionListener the state change completion listener.
      */
-    public void addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
+    public void addStateChangeCompletionListener(@Nonnull Backstack.CompletionListener stateChangeCompletionListener) {
         checkBackstack("A backstack must be set up before a state change completion listener is added to it.");
         if(stateChangeCompletionListener == null) {
             throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
@@ -662,7 +662,7 @@ public class Backstack
      *
      * @param stateChangeCompletionListener the state change completion listener.
      */
-    public void removeStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
+    public void removeStateChangeCompletionListener(@Nonnull Backstack.CompletionListener stateChangeCompletionListener) {
         checkBackstack("A backstack must be set up before a state change completion listener is removed from it.");
         if(stateChangeCompletionListener == null) {
             throw new IllegalArgumentException("StateChangeCompletionListener cannot be null!");
@@ -734,7 +734,7 @@ public class Backstack
      *
      * @return the state bundle
      */
-    @NonNull
+    @Nonnull
     @Override
     public StateBundle toBundle() {
         StateBundle stateBundle = new StateBundle();
@@ -770,7 +770,7 @@ public class Backstack
          *
          * @param stateChange the state change that has been completed.
          */
-        void stateChangeCompleted(@NonNull StateChange stateChange);
+        void stateChangeCompleted(@Nonnull StateChange stateChange);
     }
 
     // Navigation Core wrappers
@@ -780,7 +780,7 @@ public class Backstack
      *
      * @return true if a {@link StateChanger} is set, false otherwise.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public boolean hasStateChanger() {
         checkBackstack("A backstack must be set up before checking state changer.");
         return core.hasStateChanger();
@@ -789,7 +789,7 @@ public class Backstack
     /**
      * Removes the {@link StateChanger}.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void removeStateChanger() {
         checkBackstack("A backstack must be set up before removing state changer.");
         core.removeStateChanger();
@@ -802,8 +802,8 @@ public class Backstack
      *
      * @param newKey the target state.
      */
-    @MainThread
-    public void goTo(@NonNull Object newKey) {
+    // @MainThread // removed android.support.annotation
+    public void goTo(@Nonnull Object newKey) {
         checkBackstack("A backstack must be set up before navigation.");
         core.goTo(newKey);
     }
@@ -815,8 +815,8 @@ public class Backstack
      * @param newTop the new top key
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    @MainThread
-    public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
+    // @MainThread // removed android.support.annotation
+    public void replaceTop(@Nonnull Object newTop, @StateChange.StateChangeDirection int direction) {
         checkBackstack("A backstack must be set up before navigation.");
         core.replaceTop(newTop, direction);
     }
@@ -830,8 +830,8 @@ public class Backstack
      *
      * @param newKey the new key to go up to
      */
-    @MainThread
-    public void goUp(@NonNull Object newKey) {
+    // @MainThread // removed android.support.annotation
+    public void goUp(@Nonnull Object newKey) {
         checkBackstack("A backstack must be set up before navigation.");
         core.goUp(newKey);
     }
@@ -846,8 +846,8 @@ public class Backstack
      * @param newKey the new key to go up to
      * @param fallbackToBack specifies that if the key is found in the backstack, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
      */
-    @MainThread
-    public void goUp(@NonNull Object newKey, boolean fallbackToBack) {
+    // @MainThread // removed android.support.annotation
+    public void goUp(@Nonnull Object newKey, boolean fallbackToBack) {
         checkBackstack("A backstack must be set up before navigation.");
         core.goUp(newKey, fallbackToBack);
     }
@@ -861,8 +861,8 @@ public class Backstack
      *
      * @param newKey the new key
      */
-    @MainThread
-    public void moveToTop(@NonNull Object newKey) {
+    // @MainThread // removed android.support.annotation
+    public void moveToTop(@Nonnull Object newKey) {
         checkBackstack("A backstack must be set up before navigation.");
         core.moveToTop(newKey);
     }
@@ -875,8 +875,8 @@ public class Backstack
      * @param newKey the new key
      * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
      */
-    @MainThread
-    public void moveToTop(@NonNull Object newKey, boolean asReplace) {
+    // @MainThread // removed android.support.annotation
+    public void moveToTop(@Nonnull Object newKey, boolean asReplace) {
         checkBackstack("A backstack must be set up before navigation.");
         core.moveToTop(newKey, asReplace);
     }
@@ -886,7 +886,7 @@ public class Backstack
      *
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void jumpToRoot() {
         checkBackstack("A backstack must be set up before navigation.");
         core.jumpToRoot();
@@ -897,7 +897,7 @@ public class Backstack
      *
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void jumpToRoot(@StateChange.StateChangeDirection int direction) {
         checkBackstack("A backstack must be set up before navigation.");
         core.jumpToRoot(direction);
@@ -913,8 +913,8 @@ public class Backstack
      *
      * @param parentChain the chain of parents, from oldest to newest.
      */
-    @MainThread
-    public void goUpChain(@NonNull List<?> parentChain) {
+    // @MainThread // removed android.support.annotation
+    public void goUpChain(@Nonnull List<?> parentChain) {
         checkBackstack("A backstack must be set up before navigation.");
         core.goUpChain(parentChain);
     }
@@ -930,8 +930,8 @@ public class Backstack
      * @param parentChain the chain of parents, from oldest to newest.
      * @param fallbackToBack determines that if the chain is fully found in the backstack, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
      */
-    @MainThread
-    public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
+    // @MainThread // removed android.support.annotation
+    public void goUpChain(@Nonnull List<?> parentChain, boolean fallbackToBack) {
         checkBackstack("A backstack must be set up before navigation.");
         core.goUpChain(parentChain, fallbackToBack);
     }
@@ -945,7 +945,7 @@ public class Backstack
      *
      * @return true if the back event was handled, false if there is only one key left.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public boolean goBack() {
         checkBackstack("A backstack must be set up before navigation.");
 
@@ -975,7 +975,7 @@ public class Backstack
      *
      * You should generally not need to use this method.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void forceClear() {
         checkBackstack("A backstack must be set up before navigation.");
 
@@ -990,8 +990,8 @@ public class Backstack
      * @param newHistory the new active history.
      * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    @MainThread
-    public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
+    // @MainThread // removed android.support.annotation
+    public void setHistory(@Nonnull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
         checkBackstack("A backstack must be set up before navigation.");
 
         core.setHistory(newHistory, direction);
@@ -1005,7 +1005,7 @@ public class Backstack
      * @param <K> the type of the key
      * @return the root (first) key
      */
-    @NonNull
+    @Nonnull
     public <K> K root() {
         checkBackstack("A backstack must be set up before getting keys from it.");
         return core.root();
@@ -1019,7 +1019,7 @@ public class Backstack
      * @param <K> the type of the key
      * @return the top key
      */
-    @NonNull
+    @Nonnull
     public <K> K top() {
         checkBackstack("A backstack must be set up before getting keys from it.");
         return core.top();
@@ -1040,7 +1040,7 @@ public class Backstack
      * @param <K> the type of the key
      * @return the key from the top with offset
      */
-    @NonNull
+    @Nonnull
     public <K> K fromTop(int offset) {
         checkBackstack("A backstack must be set up before getting keys from it.");
         return core.fromTop(offset);
@@ -1051,7 +1051,7 @@ public class Backstack
      *
      * @return the unmodifiable copy of history.
      */
-    @NonNull
+    @Nonnull
     public <K> History<K> getHistory() {
         checkBackstack("A backstack must be set up before getting keys from it.");
         return core.getHistory();
@@ -1062,7 +1062,7 @@ public class Backstack
      *
      * @return the list of keys used at first initialization
      */
-    @NonNull
+    @Nonnull
     public <K> History<K> getInitialKeys() {
         checkBackstack("A backstack must be set up before getting keys from it.");
         return core.getInitialKeys();
@@ -1083,7 +1083,7 @@ public class Backstack
      *
      * @param completionListener The non-null completion listener to be registered.
      */
-    public void addCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+    public void addCompletionListener(@Nonnull Backstack.CompletionListener completionListener) {
         checkBackstack("A backstack must be set up before adding listeners.");
         core.addCompletionListener(completionListener);
     }
@@ -1093,7 +1093,7 @@ public class Backstack
      *
      * @param completionListener The non-null completion listener to be unregistered.
      */
-    public void removeCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+    public void removeCompletionListener(@Nonnull Backstack.CompletionListener completionListener) {
         checkBackstack("A backstack must be set up before removing listeners.");
         core.removeCompletionListener(completionListener);
     }
@@ -1110,7 +1110,7 @@ public class Backstack
      * If there is a state change in progress, then calling this method will force it to be completed immediately.
      * Any future calls to {@link StateChanger.Callback#stateChangeComplete()} for that given state change are ignored.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void executePendingStateChange() {
         checkBackstack("A backstack must be set up before navigation.");
         core.executePendingStateChange();

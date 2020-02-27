@@ -1,7 +1,5 @@
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-
 import com.zhuinden.simplestack.helpers.ServiceProvider;
 import com.zhuinden.simplestack.helpers.TestKeyWithExplicitParent;
 import com.zhuinden.simplestack.helpers.TestKeyWithOnlyParentServices;
@@ -11,6 +9,8 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,7 +52,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(key1, key2));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -105,7 +105,7 @@ public class ScopingBackEventDispatchTest {
         final AtomicReference<StateChanger.Callback> callbackRef = new AtomicReference<>();
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         });
@@ -172,7 +172,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(key));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -214,7 +214,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(key));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -255,7 +255,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(key));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -283,7 +283,7 @@ public class ScopingBackEventDispatchTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -333,7 +333,7 @@ public class ScopingBackEventDispatchTest {
                 serviceBinder.addService("service2", service2);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parentScope");
@@ -345,7 +345,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(previousKey, key));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -427,7 +427,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(key));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -467,7 +467,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(previousKey, nextKey));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -530,7 +530,7 @@ public class ScopingBackEventDispatchTest {
         backstack.setup(History.of(key1, key2));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });

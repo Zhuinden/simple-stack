@@ -15,10 +15,10 @@
  */
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.zhuinden.statebundle.StateBundle;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Specifies the ability to persist the state of the object to a StateBundle.
@@ -28,7 +28,7 @@ import com.zhuinden.statebundle.StateBundle;
  * The {@link Backstack} is also marked as {@link Bundleable}.
  */
 public interface Bundleable {
-    @NonNull
+    @Nonnull
     StateBundle toBundle();
 
     void fromBundle(@Nullable StateBundle bundle);

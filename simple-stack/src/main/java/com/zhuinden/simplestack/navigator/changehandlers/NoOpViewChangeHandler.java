@@ -15,11 +15,12 @@
  */
 package com.zhuinden.simplestack.navigator.changehandlers;
 
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+
+import javax.annotation.Nonnull;
 
 /**
  * A view swap with no animation.
@@ -27,7 +28,7 @@ import com.zhuinden.simplestack.navigator.ViewChangeHandler;
 public final class NoOpViewChangeHandler
         implements ViewChangeHandler {
     @Override
-    public void performViewChange(@NonNull ViewGroup container, @NonNull View previousView, @NonNull View newView, int direction, @NonNull ViewChangeCallback viewChangeCallback) {
+    public void performViewChange(@Nonnull ViewGroup container, @Nonnull View previousView, @Nonnull View newView, int direction, @Nonnull ViewChangeCallback viewChangeCallback) {
         container.removeView(previousView);
         container.addView(newView);
         viewChangeCallback.onCompleted();

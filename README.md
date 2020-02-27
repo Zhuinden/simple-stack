@@ -122,14 +122,14 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.2.5")
+implementation("com.github.Zhuinden:simple-stack:2.3.0")
 ```
 
 or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.2.5'
+implementation 'com.github.Zhuinden:simple-stack:2.3.0'
 ```
 
 ## How does it work?
@@ -143,6 +143,10 @@ Setting a StateChanger sends an initialization, which provides a StateChange in 
 This allows you to initialize your views according to your current state.
 
 Afterwards, the Backstack operators allow changing between states.
+
+## Tutorials, step-by-step examples, and best practices
+
+You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack-tutorials/) which contain simple step-by-step code examples.
 
 ## Example setup
 
@@ -250,34 +254,33 @@ inline fun <reified T> Fragment.lookup(serviceTag: String = T::class.java.name) 
 inline fun <reified T> ServiceBinder.add(service: Any, serviceTag: String = T::class.java.name) {
     this.addService(serviceTag, service as T)
 }
+```
 
+Then:
+
+``` kotlin
 override fun bindServices(serviceBinder: ServiceBinder) {
-    serviceBinder.add(WordController())
+    serviceBinder.add(WordViewModel())
 }
 
-class WordController : Bundleable, ScopedServices.Registered {
+class WordViewModel : Bundleable, ScopedServices.Registered { // not jetpack vm
     ...
 }
 
 class WordListFragment : BaseFragment() {
-    private val wordController by lazy { lookup<WordController>() }
+    private val viewModel by lazy { lookup<WordViewModel>() }
 
     ...
 }
 
 class NewWordFragment : BaseFragment() {
-    private val controller by lazy { lookup<WordController>() }
+    private val viewModel by lazy { lookup<WordViewModel>() }
 
     ...
 }
 ```
 
 See the `simple-stack-example-scoping`, or `Simple-Stack Tutorial Step-7`.
-
-
-## Tutorials
-
-You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack-tutorials/) which contain simple step-by-step code examples.
 
 ## More information
 

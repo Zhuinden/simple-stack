@@ -1,8 +1,8 @@
 package com.zhuinden.simplestack.helpers;
 
-import android.support.annotation.NonNull;
-
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 public abstract class TestKeyWithOnlyParentServices extends TestKey implements HasParentServices {
     private final List<String> parentScopes;
@@ -12,7 +12,7 @@ public abstract class TestKeyWithOnlyParentServices extends TestKey implements H
         this.parentScopes = parentScopes;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public List<String> getParentScopes() {
         return parentScopes;

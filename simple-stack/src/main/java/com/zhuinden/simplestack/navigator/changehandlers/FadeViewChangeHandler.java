@@ -19,8 +19,9 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
-import android.support.annotation.NonNull;
 import android.view.View;
+
+import javax.annotation.Nonnull;
 
 /**
  * A default fade animation.
@@ -29,7 +30,7 @@ import android.view.View;
 public final class FadeViewChangeHandler
         extends AnimatorViewChangeHandler {
     @Override
-    protected Animator createAnimator(@NonNull View previousView, @NonNull View newView, int direction) {
+    protected Animator createAnimator(@Nonnull View previousView, @Nonnull View newView, int direction) {
         AnimatorSet set = new AnimatorSet();
         set.play(ObjectAnimator.ofFloat(previousView, "alpha", 1, 0));
         set.play(ObjectAnimator.ofFloat(newView, "alpha", 0, 1));

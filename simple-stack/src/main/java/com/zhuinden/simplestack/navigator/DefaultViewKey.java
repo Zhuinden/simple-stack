@@ -15,8 +15,7 @@
  */
 package com.zhuinden.simplestack.navigator;
 
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * This must be implemented by the key to represent state using {@link DefaultStateChanger},
@@ -25,9 +24,8 @@ import android.support.annotation.NonNull;
  * It is assumed that equals() and hashCode() are properly implemented.
  */
 public interface DefaultViewKey {
-    @LayoutRes
     int layout();
 
-    @NonNull
+    @Nonnull
     ViewChangeHandler viewChangeHandler();
 }

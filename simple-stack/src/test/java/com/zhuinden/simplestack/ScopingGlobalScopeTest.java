@@ -16,8 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.os.Parcel;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.helpers.HasParentServices;
 import com.zhuinden.simplestack.helpers.HasServices;
@@ -33,6 +31,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopingGlobalScopeTest {
@@ -47,7 +48,7 @@ public class ScopingGlobalScopeTest {
         backstack.setup(History.of(new TestKey("hello!")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -93,13 +94,13 @@ public class ScopingGlobalScopeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1");
@@ -126,13 +127,13 @@ public class ScopingGlobalScopeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent2");
@@ -142,7 +143,7 @@ public class ScopingGlobalScopeTest {
         backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -203,13 +204,13 @@ public class ScopingGlobalScopeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1");
@@ -236,13 +237,13 @@ public class ScopingGlobalScopeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent2");
@@ -252,7 +253,7 @@ public class ScopingGlobalScopeTest {
         backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -421,7 +422,7 @@ public class ScopingGlobalScopeTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -486,7 +487,7 @@ public class ScopingGlobalScopeTest {
                 implements Bundleable {
             int blah = 2;
 
-            @NonNull
+            @Nonnull
             @Override
             public StateBundle toBundle() {
                 StateBundle stateBundle = new StateBundle();
@@ -511,7 +512,7 @@ public class ScopingGlobalScopeTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 scopeManager.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
@@ -532,7 +533,7 @@ public class ScopingGlobalScopeTest {
 
         StateChanger stateChanger2 = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 scopeManager2.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
@@ -608,7 +609,7 @@ public class ScopingGlobalScopeTest {
                 super(in);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("explicitParentScope");
@@ -652,7 +653,7 @@ public class ScopingGlobalScopeTest {
         backstack.setup(History.of(beep, boop));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -702,7 +703,7 @@ public class ScopingGlobalScopeTest {
                 Pair.of((Object)currentScopeService, ServiceEvent.ACTIVE)
         );
 
-        // this is just to check things, the test's important part is the one above
+        // this is just to check things, the test'simportant part is the one above
         backstack.goBack();
 
         assertThat(events).containsExactly(
@@ -749,7 +750,7 @@ public class ScopingGlobalScopeTest {
         backstack.setup(History.of(new TestKey("hello!")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -781,7 +782,7 @@ public class ScopingGlobalScopeTest {
         backstack.setup(History.of(new TestKey("hello!")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -809,7 +810,7 @@ public class ScopingGlobalScopeTest {
         backstack.setup(History.of(new TestKey("hello!")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -821,7 +822,7 @@ public class ScopingGlobalScopeTest {
         backstack.finalizeScopes();
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });

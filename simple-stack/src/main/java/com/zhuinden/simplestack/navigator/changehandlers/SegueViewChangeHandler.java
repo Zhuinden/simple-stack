@@ -19,8 +19,9 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
-import android.support.annotation.NonNull;
 import android.view.View;
+
+import javax.annotation.Nonnull;
 
 /**
  * A default segue animation.
@@ -29,7 +30,7 @@ import android.view.View;
 public final class SegueViewChangeHandler
         extends AnimatorViewChangeHandler {
     @Override
-    protected Animator createAnimator(@NonNull View from, @NonNull View to, int direction) {
+    protected Animator createAnimator(@Nonnull View from, @Nonnull View to, int direction) {
         int fromTranslation = (-1) * direction * from.getWidth();
         int toTranslation = direction * to.getWidth();
 

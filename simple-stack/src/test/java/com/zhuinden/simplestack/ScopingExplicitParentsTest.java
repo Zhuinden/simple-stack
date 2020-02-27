@@ -16,7 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestack.helpers.TestKey;
 
@@ -28,13 +27,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopingExplicitParentsTest {
     private static class DefaultScopedServices
             implements ScopedServices {
         @Override
-        public void bindServices(@NonNull ServiceBinder serviceBinder) {
+        public void bindServices(@Nonnull ServiceBinder serviceBinder) {
             // boop
         }
     }
@@ -48,7 +49,7 @@ public class ScopingExplicitParentsTest {
                 super(name);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return null;
@@ -61,7 +62,7 @@ public class ScopingExplicitParentsTest {
         try {
             backstack.setStateChanger(new StateChanger() {
                 @Override
-                public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                     completionCallback.stateChangeComplete();
                 }
             });
@@ -82,7 +83,7 @@ public class ScopingExplicitParentsTest {
                 super(name);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parentScope");
@@ -94,7 +95,7 @@ public class ScopingExplicitParentsTest {
         try {
             backstack.setStateChanger(new StateChanger() {
                 @Override
-                public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                     completionCallback.stateChangeComplete();
                 }
             });
@@ -115,7 +116,7 @@ public class ScopingExplicitParentsTest {
                 super(name);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parentScope");
@@ -126,7 +127,7 @@ public class ScopingExplicitParentsTest {
         backstack.setup(History.of(new ChildKey("hello")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -143,13 +144,13 @@ public class ScopingExplicitParentsTest {
                 super(name);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parentScope1", "parentScope2");
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
@@ -163,13 +164,13 @@ public class ScopingExplicitParentsTest {
                 super(name);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parentScope2", "parentScope3");
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
@@ -181,7 +182,7 @@ public class ScopingExplicitParentsTest {
         backstack.setup(History.of(new ChildKey1("hello"), new ChildKey2("world")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -218,13 +219,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -234,7 +235,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 String tag = serviceBinder.getScopeTag();
                 if("hello".equals(tag)) {
                     serviceBinder.addService("SERVICE", service1);
@@ -257,7 +258,7 @@ public class ScopingExplicitParentsTest {
         ));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -295,13 +296,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -311,7 +312,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 String tag = serviceBinder.getScopeTag();
                 if("hello".equals(tag)) {
                     serviceBinder.addService("SERVICE", service1);
@@ -328,7 +329,7 @@ public class ScopingExplicitParentsTest {
         ));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -361,13 +362,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -377,7 +378,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("parentScope1".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("service", service1);
                 }
@@ -390,7 +391,7 @@ public class ScopingExplicitParentsTest {
         ));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -457,13 +458,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -472,14 +473,14 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
         BackstackDelegate backstackDelegate = new BackstackDelegate();
         backstackDelegate.setScopedServices(activity, new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("parentScope2".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("service", service);
                 }
@@ -573,13 +574,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -588,14 +589,14 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("parentScope".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("service", service);
                 }
@@ -675,13 +676,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -690,14 +691,14 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("parentScope")) {
                     serviceBinder.addService("service", service1);
                 }
@@ -783,13 +784,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -798,7 +799,7 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -806,7 +807,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("parentScope1")) {
                     serviceBinder.addService("service1", service1);
                 }
@@ -917,13 +918,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -932,7 +933,7 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -940,7 +941,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
                     serviceBinder.addService("service", serviceP0);
                 }
@@ -1192,13 +1193,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -1207,7 +1208,7 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -1215,7 +1216,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
                     serviceBinder.addService("service", serviceP0);
                 }
@@ -1551,7 +1552,7 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -1560,7 +1561,7 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -1571,7 +1572,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("boop")) {
                     serviceBinder.addService("service", service1);
                 }
@@ -1614,13 +1615,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
@@ -1629,7 +1630,7 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -1642,7 +1643,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("boop")) {
                     serviceBinder.addService("service1", service1);
                     serviceBinder.addService("common", common1);
@@ -1769,13 +1770,13 @@ public class ScopingExplicitParentsTest {
                 this.parentScopes = parentScopes;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return parentScopes;
@@ -1784,7 +1785,7 @@ public class ScopingExplicitParentsTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -1792,7 +1793,7 @@ public class ScopingExplicitParentsTest {
         Backstack backstack = new Backstack();
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("P0")) {
                     serviceBinder.addService("service", serviceP0);
                 }

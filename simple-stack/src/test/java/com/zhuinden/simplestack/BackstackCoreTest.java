@@ -16,7 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestack.helpers.TestKey;
 
@@ -28,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -113,7 +114,7 @@ public class BackstackCoreTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callback = completionCallback;
             }
         });
@@ -133,7 +134,7 @@ public class BackstackCoreTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callback = completionCallback;
             }
         });
@@ -151,7 +152,7 @@ public class BackstackCoreTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 assertThat(stateChange.topPreviousKey()).isNull();
                 callback = completionCallback;
             }
@@ -169,7 +170,7 @@ public class BackstackCoreTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 if(!stateChange.getPreviousKeys().isEmpty()) {
                     assertThat(stateChange.topPreviousKey()).isEqualTo(bye);
                 }
@@ -195,7 +196,7 @@ public class BackstackCoreTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -211,7 +212,7 @@ public class BackstackCoreTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callback = completionCallback;
             }
         };
@@ -258,7 +259,7 @@ public class BackstackCoreTest {
         Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -281,7 +282,7 @@ public class BackstackCoreTest {
         Backstack.CompletionListener completionListener = Mockito.mock(Backstack.CompletionListener.class);
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -303,7 +304,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -325,7 +326,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -363,7 +364,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -389,7 +390,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -437,7 +438,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -459,7 +460,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -482,7 +483,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -531,7 +532,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -555,7 +556,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -578,7 +579,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -602,7 +603,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial3));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -625,7 +626,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -648,7 +649,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -672,7 +673,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -695,7 +696,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -718,7 +719,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -741,7 +742,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -765,7 +766,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -792,7 +793,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -820,7 +821,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -843,7 +844,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -879,7 +880,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial1, initial2, initial3, initial4));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -942,7 +943,7 @@ public class BackstackCoreTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 if(stateChange.getPreviousKeys().isEmpty()) {
                     assertThat(stateChange.getBackstack().top()).isSameAs(stateChange.topNewKey());
                 } else {
@@ -981,7 +982,7 @@ public class BackstackCoreTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 if(stateChange.getPreviousKeys().isEmpty()) {
                     assertThat(stateChange.getBackstack().root()).isSameAs(stateChange.getNewKeys().get(0));
                 } else {
@@ -1013,7 +1014,7 @@ public class BackstackCoreTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -1052,7 +1053,7 @@ public class BackstackCoreTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -1089,7 +1090,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial, other, another, boop));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -1112,7 +1113,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial, other, another, boop));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -1149,7 +1150,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(initial, other, another, boop));
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange _stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
                 stateChange = _stateChange;
                 callback = completionCallback;
             }
@@ -1181,7 +1182,7 @@ public class BackstackCoreTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 List<?> history = stateChange.getBackstack().getHistory();
                 if(stateChange.getPreviousKeys().isEmpty()) {
                     if(!history.isEmpty()) {
@@ -1212,7 +1213,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(testKey));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -1246,7 +1247,7 @@ public class BackstackCoreTest {
         backstack.setup(History.of(testKey));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 assertThat(stateChange.topNewKey().equals(stateChange.topPreviousKey())).isEqualTo(stateChange.isTopNewKeyEqualToPrevious());
 
                 completionCallback.stateChangeComplete();

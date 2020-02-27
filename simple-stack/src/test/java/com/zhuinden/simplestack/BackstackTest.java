@@ -17,7 +17,6 @@ package com.zhuinden.simplestack;
 
 import android.content.Context;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.zhuinden.simplestack.helpers.TestKey;
@@ -32,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nonnull;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -41,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BackstackTest {
     StateChanger stateChanger = new StateChanger() {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+        public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
             completionCallback.stateChangeComplete();
         }
     };
@@ -108,9 +109,9 @@ public class BackstackTest {
 
         Backstack backstack = new Backstack();
         backstack.setKeyFilter(new KeyFilter() {
-            @NonNull
+            @Nonnull
             @Override
-            public List<Object> filterHistory(@NonNull List<Object> restoredKeys) {
+            public List<Object> filterHistory(@Nonnull List<Object> restoredKeys) {
                 restoredKeys.remove(filtered);
                 return restoredKeys;
             }
@@ -134,9 +135,9 @@ public class BackstackTest {
         //// if both are filtered, restore initial
         backstack = new Backstack();
         backstack.setKeyFilter(new KeyFilter() {
-            @NonNull
+            @Nonnull
             @Override
-            public List<Object> filterHistory(@NonNull List<Object> restoredKeys) {
+            public List<Object> filterHistory(@Nonnull List<Object> restoredKeys) {
                 restoredKeys.remove(restored);
                 restoredKeys.remove(filtered);
                 return restoredKeys;
@@ -159,9 +160,9 @@ public class BackstackTest {
         backstack.setup(History.single(initial));
         try {
             backstack.setKeyFilter(new KeyFilter() {
-                @NonNull
+                @Nonnull
                 @Override
-                public List<Object> filterHistory(@NonNull List<Object> restoredKeys) {
+                public List<Object> filterHistory(@Nonnull List<Object> restoredKeys) {
                     return restoredKeys;
                 }
 
@@ -182,7 +183,7 @@ public class BackstackTest {
         backstack.setup(History.single(initial));
         Backstack.CompletionListener stateChangeCompletionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+            public void stateChangeCompleted(@Nonnull StateChange stateChange) {
                 integers.add(atomicInteger.getAndIncrement());
             }
         };
@@ -212,7 +213,7 @@ public class BackstackTest {
 
         Backstack.CompletionListener stateChangeCompletionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+            public void stateChangeCompleted(@Nonnull StateChange stateChange) {
                 integers.add(stateChange.<TestKey>topNewKey());
             }
         };
@@ -266,7 +267,7 @@ public class BackstackTest {
         backstack.setup(History.of(first));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -285,7 +286,7 @@ public class BackstackTest {
         backstack2.fromBundle(persistedBundle);
         backstack2.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });

@@ -18,8 +18,9 @@ package com.zhuinden.simplestack;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
+
+import javax.annotation.Nonnull;
 
 /**
  * ContextWrapper for inflating views, containing the key inside it.
@@ -33,7 +34,7 @@ public class KeyContextWrapper
 
     final Object key;
 
-    public KeyContextWrapper(Context base, @NonNull Object key) {
+    public KeyContextWrapper(Context base, @Nonnull Object key) {
         super(base);
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
@@ -60,7 +61,7 @@ public class KeyContextWrapper
      * @param context the key context wrapper in which the key can be found.
      * @return the key.
      */
-    @NonNull
+    @Nonnull
     @SuppressLint("WrongConstant")
     public static <T> T getKey(Context context) {
         // noinspection ResourceType

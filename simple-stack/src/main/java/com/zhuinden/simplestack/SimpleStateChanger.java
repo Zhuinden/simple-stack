@@ -1,6 +1,6 @@
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * The {@link SimpleStateChanger} is a {@link StateChanger} that consumes {@link StateChange#isTopNewKeyEqualToPrevious()} as a no-op,
@@ -12,7 +12,7 @@ public class SimpleStateChanger
         implements StateChanger {
     private final NavigationHandler navigationHandler;
 
-    public SimpleStateChanger(@NonNull NavigationHandler navigationHandler) {
+    public SimpleStateChanger(@Nonnull NavigationHandler navigationHandler) {
         //noinspection ConstantConditions
         if(navigationHandler == null) {
             throw new NullPointerException("navigationHandler should not be null!");
@@ -21,7 +21,7 @@ public class SimpleStateChanger
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+    public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
         if(stateChange.isTopNewKeyEqualToPrevious()) {
             completionCallback.stateChangeComplete();
             return;
@@ -39,6 +39,6 @@ public class SimpleStateChanger
          *
          * @param stateChange the state change
          */
-        void onNavigationEvent(@NonNull StateChange stateChange);
+        void onNavigationEvent(@Nonnull StateChange stateChange);
     }
 }

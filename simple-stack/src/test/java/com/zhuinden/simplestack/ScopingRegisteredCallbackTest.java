@@ -16,7 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.os.Parcel;
-import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestack.helpers.HasParentServices;
 import com.zhuinden.simplestack.helpers.ServiceProvider;
@@ -27,6 +26,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -240,7 +241,7 @@ public class ScopingRegisteredCallbackTest {
         }
 
         TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1", "parent2");
@@ -279,7 +280,7 @@ public class ScopingRegisteredCallbackTest {
         };
 
         TestKeyWithExplicitParent braap = new TestKeyWithExplicitParent("scope3") {
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1", "parent3");
@@ -326,7 +327,7 @@ public class ScopingRegisteredCallbackTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };

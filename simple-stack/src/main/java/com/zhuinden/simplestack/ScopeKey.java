@@ -15,9 +15,9 @@
  */
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * Inheriting from {@link ScopeKey} allows defining that our key belongs to a given scope, that a scope is associated with it.
@@ -28,7 +28,7 @@ public interface ScopeKey {
      *
      * @return the tag of the scope
      */
-    @NonNull
+    @Nonnull
     String getScopeTag();
 
     /**
@@ -48,7 +48,7 @@ public interface ScopeKey {
          *
          * @return the list of scope tags that ought to serve as the key's hierarchy of explicit parents
          */
-        @NonNull
+        @Nonnull
         List<String> getParentScopes();
     }
 }

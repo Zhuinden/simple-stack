@@ -1,11 +1,11 @@
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 class ScopeNode {
     private final Map<String, Object> services = new LinkedHashMap<>();
@@ -14,7 +14,7 @@ class ScopeNode {
     ScopeNode() {
     }
 
-    ScopeNode(@NonNull ScopeNode services) {
+    ScopeNode(@Nonnull ScopeNode services) {
         //noinspection ConstantConditions
         if(services == null) {
             throw new IllegalArgumentException("services cannot be null!");
@@ -27,14 +27,14 @@ class ScopeNode {
         return services.isEmpty();
     }
 
-    public void addService(@NonNull String serviceTag, @NonNull Object service) {
+    public void addService(@Nonnull String serviceTag, @Nonnull Object service) {
         checkServiceTag(serviceTag);
         checkService(service);
 
         this.services.put(serviceTag, service);
     }
 
-    public boolean hasService(@NonNull String serviceTag) {
+    public boolean hasService(@Nonnull String serviceTag) {
         checkServiceTag(serviceTag);
         if(this.services.containsKey(serviceTag)) {
             return true;
@@ -49,7 +49,7 @@ class ScopeNode {
         return false;
     }
 
-    public void addAlias(@NonNull String alias, @NonNull Object service) {
+    public void addAlias(@Nonnull String alias, @Nonnull Object service) {
         checkAlias(alias);
         checkService(service);
 
@@ -60,7 +60,7 @@ class ScopeNode {
         return Collections.unmodifiableSet(services.entrySet());
     }
 
-    public <T> T getService(@NonNull String serviceTag) {
+    public <T> T getService(@Nonnull String serviceTag) {
         checkServiceTag(serviceTag);
         if(services.containsKey(serviceTag)) {
             //noinspection unchecked
@@ -75,21 +75,21 @@ class ScopeNode {
         throw new IllegalArgumentException("Scope does not contain [" + serviceTag + "]");
     }
 
-    private static void checkServiceTag(@NonNull String serviceTag) {
+    private static void checkServiceTag(@Nonnull String serviceTag) {
         //noinspection ConstantConditions
         if(serviceTag == null) {
             throw new IllegalArgumentException("serviceTag cannot be null!");
         }
     }
 
-    private static void checkService(@NonNull Object service) {
+    private static void checkService(@Nonnull Object service) {
         //noinspection ConstantConditions
         if(service == null) {
             throw new IllegalArgumentException("service cannot be null!");
         }
     }
 
-    private static void checkAlias(@NonNull String alias) {
+    private static void checkAlias(@Nonnull String alias) {
         // noinspection ConstantConditions
         if(alias == null) {
             throw new IllegalArgumentException("alias cannot be null!");

@@ -1,6 +1,6 @@
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * The {@link ServiceBinder} allows binding services to a given scope, when that scope is created for the first time.
@@ -28,7 +28,7 @@ public class ServiceBinder {
      * @param <T> the type of the key
      * @return the key
      */
-    @NonNull
+    @Nonnull
     public <T> T getKey() {
         //noinspection unchecked
         return (T) key;
@@ -39,7 +39,7 @@ public class ServiceBinder {
      *
      * @return the scope tag
      */
-    @NonNull
+    @Nonnull
     public final String getScopeTag() {
         return scopeTag;
     }
@@ -50,7 +50,7 @@ public class ServiceBinder {
      * @param serviceTag the tag of the service
      * @param service    the service
      */
-    public void addService(@NonNull String serviceTag, @NonNull Object service) {
+    public void addService(@Nonnull String serviceTag, @Nonnull Object service) {
         scope.addService(serviceTag, service);
     }
 
@@ -60,7 +60,7 @@ public class ServiceBinder {
      * @param serviceTag the service tag
      * @return if the service is in the scope
      */
-    public boolean hasService(@NonNull String serviceTag) {
+    public boolean hasService(@Nonnull String serviceTag) {
         return scope.hasService(serviceTag);
     }
 
@@ -72,8 +72,8 @@ public class ServiceBinder {
      * @return the service
      * @throws IllegalArgumentException if the service is not in the scope
      */
-    @NonNull
-    public <T> T getService(@NonNull String serviceTag) {
+    @Nonnull
+    public <T> T getService(@Nonnull String serviceTag) {
         return scope.getService(serviceTag);
     }
 
@@ -83,7 +83,7 @@ public class ServiceBinder {
      * @param alias   the alias
      * @param service the service
      */
-    public void addAlias(@NonNull String alias, @NonNull Object service) {
+    public void addAlias(@Nonnull String alias, @Nonnull Object service) {
         scope.addAlias(alias, service);
     }
 
@@ -93,7 +93,7 @@ public class ServiceBinder {
      * @param serviceTag the service tag
      * @return if the service exists in active scopes
      */
-    public boolean canFindService(@NonNull String serviceTag) {
+    public boolean canFindService(@Nonnull String serviceTag) {
         return scopeManager.canFindService(serviceTag);
     }
 
@@ -105,8 +105,8 @@ public class ServiceBinder {
      * @return the service
      * @throws IllegalArgumentException if the service is not found in any active scopes
      */
-    @NonNull
-    public <T> T lookupService(@NonNull String serviceTag) {
+    @Nonnull
+    public <T> T lookupService(@Nonnull String serviceTag) {
         return scopeManager.lookupService(serviceTag);
     }
 
@@ -129,7 +129,7 @@ public class ServiceBinder {
      * @return the service
      * @throws IllegalArgumentException if the service is not found in the scope or any of its parents
      */
-    @NonNull
+    @Nonnull
     public <T> T lookupFromScope(String scopeTag, String serviceTag) {
         return scopeManager.lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
     }
@@ -139,7 +139,7 @@ public class ServiceBinder {
      *
      * @return the backstack
      */
-    @NonNull
+    @Nonnull
     public Backstack getBackstack() {
         return scopeManager.getBackstack();
     }

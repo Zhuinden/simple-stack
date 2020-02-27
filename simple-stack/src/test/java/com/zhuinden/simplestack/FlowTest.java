@@ -19,7 +19,6 @@ package com.zhuinden.simplestack;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestack.helpers.TestKey;
 
@@ -28,6 +27,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Iterator;
+
+import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -59,7 +60,7 @@ public class FlowTest {
     class FlowDispatcher
             implements StateChanger {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback callback) {
+        public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull StateChanger.Callback callback) {
             lastStack = stateChange.getNewKeys();
             lastDirection = stateChange.getDirection();
             callback.stateChangeComplete();
@@ -111,7 +112,7 @@ public class FlowTest {
             }
 
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull StateChanger.Callback onComplete) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull StateChanger.Callback onComplete) {
                 assertThat(firstHistory).hasSameSizeAs(flow.getHistory());
                 Iterator<?> original = firstHistory.iterator();
                 for(Object o : flow.getHistory()) {

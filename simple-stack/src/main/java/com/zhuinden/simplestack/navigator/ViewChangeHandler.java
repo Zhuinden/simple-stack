@@ -15,9 +15,10 @@
  */
 package com.zhuinden.simplestack.navigator;
 
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+
+import javax.annotation.Nonnull;
 
 /**
  * An interface that represents the view change when a state change occurs.
@@ -42,5 +43,5 @@ public interface ViewChangeHandler {
      * @param direction          the direction (from the StateChange)
      * @param viewChangeCallback the callback that must be called when the view change is complete.
      */
-    void performViewChange(@NonNull final ViewGroup container, @NonNull final View previousView, @NonNull final View newView, final int direction, @NonNull final ViewChangeCallback viewChangeCallback);
+    void performViewChange(@Nonnull final ViewGroup container, @Nonnull final View previousView, @Nonnull final View newView, final int direction, @Nonnull final ViewChangeCallback viewChangeCallback);
 }

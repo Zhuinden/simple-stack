@@ -18,13 +18,14 @@ package com.zhuinden.simplestack.navigator.changehandlers;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
 import com.zhuinden.simplestack.navigator.ViewChangeHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Convenience base class to support view animations using Animator.
@@ -33,7 +34,7 @@ import com.zhuinden.simplestack.navigator.ViewChangeHandler;
 public abstract class AnimatorViewChangeHandler
         implements ViewChangeHandler {
     @Override
-    public void performViewChange(@NonNull final ViewGroup container, @NonNull final View previousView, @NonNull final View newView, final int direction, @NonNull final ViewChangeCallback viewChangeCallback) {
+    public void performViewChange(@Nonnull final ViewGroup container, @Nonnull final View previousView, @Nonnull final View newView, final int direction, @Nonnull final ViewChangeCallback viewChangeCallback) {
         container.addView(newView);
         ViewUtils.waitForMeasure(newView, new ViewUtils.OnMeasuredCallback() {
             @Override
@@ -68,7 +69,7 @@ public abstract class AnimatorViewChangeHandler
         animator.start();
     }
 
-    protected abstract Animator createAnimator(@NonNull View previousView, @NonNull View newView, int direction);
+    protected abstract Animator createAnimator(@Nonnull View previousView, @Nonnull View newView, int direction);
 
     // stuff
     private Long startDelay = null;

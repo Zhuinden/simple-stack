@@ -33,8 +33,8 @@ android {
 
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
-    implementation("com.android.support:support-annotations:28.0.0")
-    api("com.github.Zhuinden:state-bundle:1.2.2")
+    api("com.google.code.findbugs:jsr305:3.0.2")
+    api("com.github.Zhuinden:state-bundle:1.3.0")
     testImplementation("junit:junit:4.12")
     testImplementation("org.assertj:assertj-core:3.9.1")
     testImplementation("org.mockito:mockito-core:2.15.0")

@@ -15,16 +15,14 @@
  */
 package com.zhuinden.simplestack;
 
-import android.support.annotation.IntDef;
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -41,7 +39,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 class NavigationCore {
     //
     @Retention(SOURCE)
-    @IntDef({INITIALIZE, REATTACH})
+    // @IntDef({INITIALIZE, REATTACH}) // removed android.support.annotation
     private @interface StateChangerRegisterMode {
     }
 
@@ -72,7 +70,7 @@ class NavigationCore {
      *
      * @param initialKeys
      */
-    public NavigationCore(@NonNull Object... initialKeys) {
+    public NavigationCore(@Nonnull Object... initialKeys) {
         if(initialKeys == null || initialKeys.length <= 0) {
             throw new IllegalArgumentException("At least one initial key must be defined");
         }
@@ -85,7 +83,7 @@ class NavigationCore {
      *
      * @param initialKeys
      */
-    public NavigationCore(@NonNull List<?> initialKeys) {
+    public NavigationCore(@Nonnull List<?> initialKeys) {
         if(initialKeys == null) {
             throw new NullPointerException("Initial key list should not be null");
         }
@@ -108,7 +106,7 @@ class NavigationCore {
      *
      * @return true if a {@link StateChanger} is set, false otherwise.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public boolean hasStateChanger() {
         assertCorrectThread();
 
@@ -120,8 +118,8 @@ class NavigationCore {
      *
      * @param stateChanger the new {@link StateChanger}, which cannot be null.
      */
-    @MainThread
-    public void setStateChanger(@NonNull StateChanger stateChanger) {
+    // @MainThread // removed android.support.annotation
+    public void setStateChanger(@Nonnull StateChanger stateChanger) {
         setStateChanger(stateChanger, INITIALIZE);
     }
 
@@ -131,8 +129,8 @@ class NavigationCore {
      * @param stateChanger the new {@link StateChanger}, which cannot be null.
      * @param registerMode indicates whether the {@link StateChanger} is to be initialized, or is just reattached.
      */
-    @MainThread
-    public void setStateChanger(@NonNull StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
+    // @MainThread // removed android.support.annotation
+    public void setStateChanger(@Nonnull StateChanger stateChanger, @StateChangerRegisterMode int registerMode) {
         if(stateChanger == null) {
             throw new NullPointerException("New state changer cannot be null");
         }
@@ -156,7 +154,7 @@ class NavigationCore {
     /**
      * Removes the {@link StateChanger}.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void removeStateChanger() {
         assertCorrectThread();
 
@@ -170,8 +168,8 @@ class NavigationCore {
      *
      * @param newKey the target state.
      */
-    @MainThread
-    public void goTo(@NonNull Object newKey) {
+    // @MainThread // removed android.support.annotation
+    public void goTo(@Nonnull Object newKey) {
         checkNewKey(newKey);
 
         assertCorrectThread();
@@ -200,8 +198,8 @@ class NavigationCore {
      * @param newTop the new top key
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    @MainThread
-    public void replaceTop(@NonNull Object newTop, @StateChange.StateChangeDirection int direction) {
+    // @MainThread // removed android.support.annotation
+    public void replaceTop(@Nonnull Object newTop, @StateChange.StateChangeDirection int direction) {
         checkNewKey(newTop);
 
         assertCorrectThread();
@@ -223,8 +221,8 @@ class NavigationCore {
      *
      * @param newKey the new key to go up to
      */
-    @MainThread
-    public void goUp(@NonNull Object newKey) {
+    // @MainThread // removed android.support.annotation
+    public void goUp(@Nonnull Object newKey) {
         goUp(newKey, false);
     }
 
@@ -238,8 +236,8 @@ class NavigationCore {
      * @param newKey the new key to go up to
      * @param fallbackToBack specifies that if the key is found in the NavigationCore, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
      */
-    @MainThread
-    public void goUp(@NonNull Object newKey, boolean fallbackToBack) {
+    // @MainThread // removed android.support.annotation
+    public void goUp(@Nonnull Object newKey, boolean fallbackToBack) {
         checkNewKey(newKey);
 
         assertCorrectThread();
@@ -270,8 +268,8 @@ class NavigationCore {
      * @param newKey the new key
      * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
      */
-    @MainThread
-    public void moveToTop(@NonNull Object newKey, boolean asReplace) {
+    // @MainThread // removed android.support.annotation
+    public void moveToTop(@Nonnull Object newKey, boolean asReplace) {
         checkNewKey(newKey);
 
         assertCorrectThread();
@@ -296,8 +294,8 @@ class NavigationCore {
      *
      * @param newKey the new key
      */
-    @MainThread
-    public void moveToTop(@NonNull Object newKey) {
+    // @MainThread // removed android.support.annotation
+    public void moveToTop(@Nonnull Object newKey) {
         moveToTop(newKey, false);
     }
 
@@ -306,7 +304,7 @@ class NavigationCore {
      *
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void jumpToRoot() {
         jumpToRoot(StateChange.BACKWARD);
     }
@@ -316,7 +314,7 @@ class NavigationCore {
      *
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void jumpToRoot(@StateChange.StateChangeDirection int direction) {
         assertCorrectThread();
 
@@ -335,8 +333,8 @@ class NavigationCore {
      *
      * @param parentChain the chain of parents, from oldest to newest.
      */
-    @MainThread
-    public void goUpChain(@NonNull List<?> parentChain) {
+    // @MainThread // removed android.support.annotation
+    public void goUpChain(@Nonnull List<?> parentChain) {
         goUpChain(parentChain, false);
     }
 
@@ -351,8 +349,8 @@ class NavigationCore {
      * @param parentChain the chain of parents, from oldest to newest.
      * @param fallbackToBack determines that if the chain is fully found in the NavigationCore, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
      */
-    @MainThread
-    public void goUpChain(@NonNull List<?> parentChain, boolean fallbackToBack) {
+    // @MainThread // removed android.support.annotation
+    public void goUpChain(@Nonnull List<?> parentChain, boolean fallbackToBack) {
         checkNewHistory(parentChain);
 
         assertCorrectThread();
@@ -422,7 +420,7 @@ class NavigationCore {
      *
      * @return true if a state change is pending or is handled with a state change, false if there is only one state left.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public boolean goBack() {
         assertCorrectThread();
 
@@ -452,7 +450,7 @@ class NavigationCore {
      *
      * You generally don't need to use this method.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void forceClear() {
         assertCorrectThread();
         assertNoStateChange();
@@ -465,8 +463,8 @@ class NavigationCore {
      * @param newHistory the new active history.
      * @param direction  The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
-    @MainThread
-    public void setHistory(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
+    // @MainThread // removed android.support.annotation
+    public void setHistory(@Nonnull List<?> newHistory, @StateChange.StateChangeDirection int direction) {
         checkNewHistory(newHistory);
         assertCorrectThread();
 
@@ -474,7 +472,7 @@ class NavigationCore {
     }
 
 
-    private void executeOrConsumeNavigationOp(@NonNull List<?> newHistory, @StateChange.StateChangeDirection int direction, boolean isTerminal, boolean isForceEnqueued) {
+    private void executeOrConsumeNavigationOp(@Nonnull List<?> newHistory, @StateChange.StateChangeDirection int direction, boolean isTerminal, boolean isForceEnqueued) {
         checkNewHistory(newHistory);
         assertCorrectThread();
 
@@ -492,7 +490,7 @@ class NavigationCore {
      * @param <K> the type of the key
      * @return the root (first) key
      */
-    @NonNull
+    @Nonnull
     public <K> K root() {
         if(stack.isEmpty()) {
             throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
@@ -509,7 +507,7 @@ class NavigationCore {
      * @param <K> the type of the key
      * @return the top key
      */
-    @NonNull
+    @Nonnull
     public <K> K top() {
         if(stack.isEmpty()) {
             throw new IllegalStateException("Cannot obtain elements from an uninitialized backstack.");
@@ -533,7 +531,7 @@ class NavigationCore {
      * @param <K> the type of the key
      * @return the key from the top with offset
      */
-    @NonNull
+    @Nonnull
     public <K> K fromTop(int offset) {
         int size = stack.size();
         if(size <= 0) {
@@ -556,7 +554,7 @@ class NavigationCore {
      *
      * @return the unmodifiable copy of history.
      */
-    @NonNull
+    @Nonnull
     public <K> History<K> getHistory() {
         List<K> copy = new ArrayList<>(stack.size());
         for(Object key : stack) {
@@ -571,7 +569,7 @@ class NavigationCore {
      *
      * @return the list of keys used at first initialization
      */
-    @NonNull
+    @Nonnull
     public <K> History<K> getInitialKeys() {
         List<K> copy = new ArrayList<>(initialKeys.size());
         for(Object key : initialKeys) {
@@ -674,7 +672,7 @@ class NavigationCore {
      *
      * @param completionListener The non-null completion listener to be registered.
      */
-    public void addCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+    public void addCompletionListener(@Nonnull Backstack.CompletionListener completionListener) {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be added!");
         }
@@ -689,7 +687,7 @@ class NavigationCore {
      *
      * @param completionListener The non-null completion listener to be unregistered.
      */
-    public void removeCompletionListener(@NonNull Backstack.CompletionListener completionListener) {
+    public void removeCompletionListener(@Nonnull Backstack.CompletionListener completionListener) {
         if(completionListener == null) {
             throw new IllegalArgumentException("Null completion listener cannot be removed!");
         }
@@ -718,7 +716,7 @@ class NavigationCore {
      * If there is a state change in progress, then calling this method will force it to be completed immediately.
      * Any future calls to {@link StateChanger.Callback#stateChangeComplete()} for that given state change are ignored.
      */
-    @MainThread
+    // @MainThread // removed android.support.annotation
     public void executePendingStateChange() {
         assertCorrectThread();
 

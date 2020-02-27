@@ -1,14 +1,14 @@
 package com.zhuinden.simplestack.helpers;
 
-import android.support.annotation.NonNull;
-
 import com.zhuinden.simplestack.ScopedServices;
 import com.zhuinden.simplestack.ServiceBinder;
+
+import javax.annotation.Nonnull;
 
 public class ServiceProvider
         implements ScopedServices {
     @Override
-    public void bindServices(@NonNull ServiceBinder serviceBinder) {
+    public void bindServices(@Nonnull ServiceBinder serviceBinder) {
         Object key = serviceBinder.getKey();
         if(key instanceof HasServices) {
             ((HasServices) key).bindServices(serviceBinder);

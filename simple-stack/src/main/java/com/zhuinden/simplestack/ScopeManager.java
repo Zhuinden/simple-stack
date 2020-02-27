@@ -15,9 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.AbstractMap;
@@ -32,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 class ScopeManager {
     private class ScopeRegistrations {
@@ -120,7 +120,7 @@ class ScopeManager {
             return Collections.unmodifiableList(new ArrayList<>(scopeTags));
         }
 
-        public LinkedHashSet<String> findScopesForKey(@NonNull Object targetKey, boolean explicitOnly) {
+        public LinkedHashSet<String> findScopesForKey(@Nonnull Object targetKey, boolean explicitOnly) {
             LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
 
             int indexInRegistrations = -1;
@@ -177,7 +177,7 @@ class ScopeManager {
             return scopeTags;
         }
 
-        public LinkedHashSet<String> findScopesForScopeTag(@NonNull String scopeTag, boolean explicitOnly) {
+        public LinkedHashSet<String> findScopesForScopeTag(@Nonnull String scopeTag, boolean explicitOnly) {
             LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
 
             int indexInRegistrations = -1;
@@ -214,7 +214,7 @@ class ScopeManager {
             return scopeTags;
         }
 
-        public ScopeRegistration findScopeRegistrationForScopeTag(@NonNull String scopeTag) {
+        public ScopeRegistration findScopeRegistrationForScopeTag(@Nonnull String scopeTag) {
             for(ScopeRegistration scopeRegistration : scopeRegistrations.keySet()) {
                 if(scopeTag.equals(scopeRegistration.scopeTag)) {
                     return scopeRegistration;
@@ -223,7 +223,7 @@ class ScopeManager {
             return null;
         }
 
-        void reorderToEnd(@NonNull String scopeTag) {
+        void reorderToEnd(@Nonnull String scopeTag) {
             ScopeRegistration scopeRegistration = findScopeRegistrationForScopeTag(scopeTag);
             if(scopeRegistration != null) {
                 ScopeNode scopeNode = scopeRegistrations.remove(scopeRegistration);
@@ -243,8 +243,8 @@ class ScopeManager {
 
         public ScopeRegistration(
                 @Nullable Object key, // key is null if global scope
-                @NonNull String scopeTag,
-                @NonNull List<String> explicitParentScopes,
+                @Nonnull String scopeTag,
+                @Nonnull List<String> explicitParentScopes,
                 boolean isExplicitParent,
                 boolean isGlobalScope,
                 boolean isDummyScope // no ScopeKey internal scope registrations
@@ -276,7 +276,7 @@ class ScopeManager {
             return obj instanceof ScopeRegistration && ((ScopeRegistration) obj).scopeTag.equals(scopeTag);
         }
 
-        @NonNull
+        @Nonnull
         @Override
         public String toString() {
             return "ScopeRegistration[scopeTag=[" + scopeTag + "], explicitParents=[" + Arrays.toString(explicitParentScopes.toArray()) + "]]";
@@ -313,7 +313,7 @@ class ScopeManager {
             implements ScopedServices {
 
         @Override
-        public void bindServices(@NonNull ServiceBinder serviceBinder) {
+        public void bindServices(@Nonnull ServiceBinder serviceBinder) {
             throw new IllegalStateException(
                     "No scoped services are defined. To create scoped services, an instance of ScopedServices must be provided to configure the services that are available in a given scope.");
         }
@@ -408,7 +408,7 @@ class ScopeManager {
         }
     }
 
-    public boolean dispatchBack(@NonNull Object currentTop) {
+    public boolean dispatchBack(@Nonnull Object currentTop) {
         backDispatchedServices.clear();
 
         List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(currentTop, true));
@@ -599,7 +599,7 @@ class ScopeManager {
         rootBundle.remove(scopeTag);
     }
 
-    void dispatchActivation(@NonNull Set<String> scopesToDeactivate, @NonNull Set<String> scopesToActivate) {
+    void dispatchActivation(@Nonnull Set<String> scopesToDeactivate, @Nonnull Set<String> scopesToActivate) {
         if(isGlobalScopePendingActivation) {
             isGlobalScopePendingActivation = false;
             activateGlobalScope();
@@ -692,7 +692,7 @@ class ScopeManager {
         }
     }
 
-    boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
+    boolean hasService(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         checkScopeTag(scopeTag);
         checkServiceTag(serviceTag);
 
@@ -704,8 +704,8 @@ class ScopeManager {
         return services.hasService(serviceTag);
     }
 
-    @NonNull
-    <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
+    @Nonnull
+    <T> T getService(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         checkScopeTag(scopeTag);
         checkServiceTag(serviceTag);
 
@@ -720,21 +720,21 @@ class ScopeManager {
         return services.getService(serviceTag);
     }
 
-    boolean hasScope(@NonNull String scopeTag) {
+    boolean hasScope(@Nonnull String scopeTag) {
         checkScopeTag(scopeTag);
 
         return scopes.containsKey(scopeTag);
     }
 
-    @NonNull
-    Set<String> findScopesForKey(@NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
+    @Nonnull
+    Set<String> findScopesForKey(@Nonnull Object key, @Nonnull ScopeLookupMode lookupMode) {
         checkKey(key);
         checkScopeLookupMode(lookupMode);
 
         return lookupMode.executeFindScopesForKey(this, key);
     }
 
-    @NonNull
+    @Nonnull
     Set<String> findScopesForKeyAll(Object targetKey) {
         if(!isInitialized) {
             return Collections.emptySet();
@@ -749,7 +749,7 @@ class ScopeManager {
         return Collections.unmodifiableSet(activeScopes);
     }
 
-    @NonNull
+    @Nonnull
     Set<String> findScopesForKeyExplicit(Object targetKey) {
         if(!isInitialized) {
             return Collections.emptySet();
@@ -864,7 +864,7 @@ class ScopeManager {
                 activeScopes.toArray()) + "]!");
     }
 
-    boolean canFindService(@NonNull String identifier) {
+    boolean canFindService(@Nonnull String identifier) {
         checkServiceTag(identifier);
         List<String> activeScopes = scopes.getScopeTagsInTraversalOrder();
         for(String scope : activeScopes) {
@@ -877,8 +877,8 @@ class ScopeManager {
         return false;
     }
 
-    @NonNull
-    <T> T lookupService(@NonNull String identifier) {
+    @Nonnull
+    <T> T lookupService(@Nonnull String identifier) {
         checkServiceTag(identifier);
 
         verifyStackIsInitialized();
@@ -910,21 +910,21 @@ class ScopeManager {
     }
 
 
-    static private void checkKey(@NonNull Object key) {
+    static private void checkKey(@Nonnull Object key) {
         //noinspection ConstantConditions
         if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
         }
     }
 
-    static private void checkScopeTag(@NonNull String scopeTag) {
+    static private void checkScopeTag(@Nonnull String scopeTag) {
         //noinspection ConstantConditions
         if(scopeTag == null) {
             throw new IllegalArgumentException("Scope tag cannot be null!");
         }
     }
 
-    static private void checkServiceTag(@NonNull String serviceTag) {
+    static private void checkServiceTag(@Nonnull String serviceTag) {
         //noinspection ConstantConditions
         if(serviceTag == null) {
             throw new IllegalArgumentException("Service tag cannot be null!");

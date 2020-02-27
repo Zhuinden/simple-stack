@@ -18,7 +18,6 @@ package com.zhuinden.simplestack;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,6 +27,8 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,7 +45,7 @@ public class StateChangerTest {
         private List<Object> newState;
 
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+        public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
             this.stateChange = stateChange;
             originalState = stateChange.getPreviousKeys();
             newState = stateChange.getNewKeys();
@@ -352,7 +353,7 @@ public class StateChangerTest {
 
         final StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         };
@@ -383,7 +384,7 @@ public class StateChangerTest {
 
         final StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         };
@@ -413,7 +414,7 @@ public class StateChangerTest {
 
         final StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         };
@@ -438,7 +439,7 @@ public class StateChangerTest {
 
         final StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         };
@@ -468,7 +469,7 @@ public class StateChangerTest {
 
         final SimpleStateChanger.NavigationHandler navigationHandler = new SimpleStateChanger.NavigationHandler() {
             @Override
-            public void onNavigationEvent(@NonNull StateChange stateChange) {
+            public void onNavigationEvent(@Nonnull StateChange stateChange) {
                 history.add(stateChange.topNewKey());
             }
         };

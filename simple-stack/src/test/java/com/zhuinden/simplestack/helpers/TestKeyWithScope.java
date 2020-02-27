@@ -1,7 +1,8 @@
 package com.zhuinden.simplestack.helpers;
 
 import android.os.Parcel;
-import android.support.annotation.NonNull;
+
+import javax.annotation.Nonnull;
 
 public abstract class TestKeyWithScope
         extends TestKey
@@ -14,7 +15,7 @@ public abstract class TestKeyWithScope
         super(in);
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public String getScopeTag() {
         return name;

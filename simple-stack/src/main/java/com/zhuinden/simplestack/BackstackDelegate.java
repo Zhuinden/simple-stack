@@ -19,14 +19,15 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A delegate class that manages the {@link Backstack}'s Activity lifecycle integration,
@@ -50,7 +51,7 @@ public class BackstackDelegate {
      *
      * @param keyFilter The custom {@link KeyFilter}.
      */
-    public void setKeyFilter(@NonNull KeyFilter keyFilter) {
+    public void setKeyFilter(@Nonnull KeyFilter keyFilter) {
         if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If set, key filter must be set before calling `onCreate()`");
         }
@@ -67,7 +68,7 @@ public class BackstackDelegate {
      *
      * @param keyParceler The custom {@link KeyParceler}.
      */
-    public void setKeyParceler(@NonNull KeyParceler keyParceler) {
+    public void setKeyParceler(@Nonnull KeyParceler keyParceler) {
         if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If set, key parceler must set before calling `onCreate()`");
         }
@@ -85,7 +86,7 @@ public class BackstackDelegate {
      *
      * @param stateClearStrategy The custom {@link Backstack.StateClearStrategy}.
      */
-    public void setStateClearStrategy(@NonNull Backstack.StateClearStrategy stateClearStrategy) {
+    public void setStateClearStrategy(@Nonnull Backstack.StateClearStrategy stateClearStrategy) {
         if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If set, state clear strategy must be set before calling `onCreate()`");
         }
@@ -103,7 +104,7 @@ public class BackstackDelegate {
      * @param activity the Activity to track whether it is finalized. If null, {@link BackstackDelegate#onDestroy()} will finalize scopes. Otherwise, only if the Activity is finishing.
      * @param scopedServices The {@link ScopedServices}.
      */
-    public void setScopedServices(@Nullable Activity activity, @NonNull ScopedServices scopedServices) {
+    public void setScopedServices(@Nullable Activity activity, @Nonnull ScopedServices scopedServices) {
         this.activity = activity;
 
         if(scopedServices == null) {
@@ -124,7 +125,7 @@ public class BackstackDelegate {
      * @param activity the Activity to track whether it is finalized. If null, {@link BackstackDelegate#onDestroy()} will finalize scopes. Otherwise, only if the Activity is finishing.
      * @param globalServices The {@link GlobalServices}.
      */
-    public void setGlobalServices(@Nullable Activity activity, @NonNull GlobalServices globalServices) {
+    public void setGlobalServices(@Nullable Activity activity, @Nonnull GlobalServices globalServices) {
         this.activity = activity;
 
         if(globalServices == null) {
@@ -145,7 +146,7 @@ public class BackstackDelegate {
      * @param activity             the Activity to track whether it is finalized. If null, {@link BackstackDelegate#onDestroy()} will finalize scopes. Otherwise, only if the Activity is finishing.
      * @param globalServiceFactory The {@link GlobalServices.Factory}.
      */
-    public void setGlobalServices(@Nullable Activity activity, @NonNull GlobalServices.Factory globalServiceFactory) {
+    public void setGlobalServices(@Nullable Activity activity, @Nonnull GlobalServices.Factory globalServiceFactory) {
         this.activity = activity;
 
         if(globalServiceFactory == null) {
@@ -168,7 +169,7 @@ public class BackstackDelegate {
      *
      * @param stateChangeCompletionListener the state change completion listener
      */
-    public void addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
+    public void addStateChangeCompletionListener(@Nonnull Backstack.CompletionListener stateChangeCompletionListener) {
         if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("If adding, completion listener must be added before calling `onCreate()`");
         }
@@ -201,7 +202,7 @@ public class BackstackDelegate {
      * @param persistenceTag a non-null persistence tag that uniquely identifies this {@link BackstackDelegate} inside the Activity.
      */
     @SuppressWarnings("StringEquality")
-    public void setPersistenceTag(@NonNull String persistenceTag) {
+    public void setPersistenceTag(@Nonnull String persistenceTag) {
         if(backstack != null && backstack.isInitialized()) {
             throw new IllegalStateException("Persistence tag should be set before calling `onCreate()`");
         }
@@ -253,7 +254,7 @@ public class BackstackDelegate {
      * @param activity the Activity whose callbacks we register for.
      */
     @TargetApi(14)
-    public void registerForLifecycleCallbacks(@NonNull final Activity activity) {
+    public void registerForLifecycleCallbacks(@Nonnull final Activity activity) {
         if(activity == null) {
             throw new NullPointerException("Activity is null");
         }
@@ -320,7 +321,7 @@ public class BackstackDelegate {
      * @param nonConfigurationInstance The {@link NonConfigurationInstance} that is typically obtained with getLastCustomNonConfigurationInstance().
      * @param initialKeys              A list of the keys that are used to set as initial history of the backstack.
      */
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @NonNull List<?> initialKeys) {
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable Object nonConfigurationInstance, @Nonnull List<?> initialKeys) {
         if(nonConfigurationInstance != null && !(nonConfigurationInstance instanceof NonConfigurationInstance)) {
             throw new IllegalArgumentException(
                     "The provided non configuration instance must be of type BackstackDelegate.NonConfigurationInstance!");
@@ -394,7 +395,7 @@ public class BackstackDelegate {
      *
      * @param outState the Bundle into which the backstack history and view states are saved.
      */
-    public void onSaveInstanceState(@NonNull Bundle outState) {
+    public void onSaveInstanceState(@Nonnull Bundle outState) {
         Backstack backstack = getBackstack(); // assertion!
         outState.putParcelable(getHistoryTag(), backstack.toBundle());
     }
@@ -454,7 +455,7 @@ public class BackstackDelegate {
      *
      * @param view the view that belongs to a certain key
      */
-    public void restoreViewFromState(@NonNull View view) {
+    public void restoreViewFromState(@Nonnull View view) {
         getBackstack().restoreViewFromState(view);
     }
 
@@ -465,8 +466,8 @@ public class BackstackDelegate {
      * @param key The key to which the {@link SavedState} belongs.
      * @return the saved state that belongs to the given key.
      */
-    @NonNull
-    public SavedState getSavedState(@NonNull Object key) {
+    @Nonnull
+    public SavedState getSavedState(@Nonnull Object key) {
         return getBackstack().getSavedState(key);
     }
 
@@ -477,7 +478,7 @@ public class BackstackDelegate {
      *
      * @return whether the scope exists
      */
-    public boolean hasScope(@NonNull String scopeTag) {
+    public boolean hasScope(@Nonnull String scopeTag) {
         return getBackstack().hasScope(scopeTag);
     }
 
@@ -488,7 +489,7 @@ public class BackstackDelegate {
      * @param serviceTag the service tag
      * @return whether the service is bound in the given scope
      */
-    public boolean hasService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+    public boolean hasService(@Nonnull ScopeKey scopeKey, @Nonnull String serviceTag) {
         return getBackstack().hasService(scopeKey, serviceTag);
     }
 
@@ -499,7 +500,7 @@ public class BackstackDelegate {
      * @param serviceTag the service tag
      * @return whether the service is bound in the given scope
      */
-    public boolean hasService(@NonNull String scopeTag, @NonNull String serviceTag) {
+    public boolean hasService(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack().hasService(scopeTag, serviceTag);
     }
 
@@ -511,8 +512,8 @@ public class BackstackDelegate {
      * @param <T>        the type of the service
      * @return the service
      */
-    @NonNull
-    public <T> T getService(@NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+    @Nonnull
+    public <T> T getService(@Nonnull ScopeKey scopeKey, @Nonnull String serviceTag) {
         return getBackstack().getService(scopeKey, serviceTag);
     }
 
@@ -524,8 +525,8 @@ public class BackstackDelegate {
      * @param <T>        the type of the service
      * @return the service
      */
-    @NonNull
-    public <T> T getService(@NonNull String scopeTag, @NonNull String serviceTag) {
+    @Nonnull
+    public <T> T getService(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack().getService(scopeTag, serviceTag);
     }
 
@@ -536,7 +537,7 @@ public class BackstackDelegate {
      * @param serviceTag the tag of the service
      * @return whether the service exists in any active scopes
      */
-    public boolean canFindService(@NonNull String serviceTag) {
+    public boolean canFindService(@Nonnull String serviceTag) {
         return getBackstack().canFindService(serviceTag);
     }
 
@@ -549,8 +550,8 @@ public class BackstackDelegate {
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any scope
      */
-    @NonNull
-    public <T> T lookupService(@NonNull String serviceTag) {
+    @Nonnull
+    public <T> T lookupService(@Nonnull String serviceTag) {
         return getBackstack().lookupService(serviceTag);
     }
 
@@ -563,8 +564,8 @@ public class BackstackDelegate {
      * @param lookupMode determine what type of parents are checked during the lookup
      * @return the list of scope tags
      */
-    @NonNull
-    public List<String> findScopesForKey(@NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
+    @Nonnull
+    public List<String> findScopesForKey(@Nonnull Object key, @Nonnull ScopeLookupMode lookupMode) {
         return getBackstack().findScopesForKey(key, lookupMode);
     }
 
@@ -576,7 +577,7 @@ public class BackstackDelegate {
      * @param serviceTag the tag of the service
      * @return whether the service exists in any of the accessed scopes
      */
-    public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
+    public boolean canFindFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack().canFindFromScope(scopeTag, serviceTag);
     }
 
@@ -590,7 +591,7 @@ public class BackstackDelegate {
      *
      * @return whether the service exists in any scopes from the current scope or its parents
      */
-    public boolean canFindFromScope(@NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+    public boolean canFindFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag, @Nonnull ScopeLookupMode lookupMode) {
         return getBackstack().canFindFromScope(scopeTag, serviceTag, lookupMode);
     }
 
@@ -604,8 +605,8 @@ public class BackstackDelegate {
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any accessed scopes
      */
-    @NonNull
-    public <T> T lookupFromScope(@NonNull String scopeTag, @NonNull String serviceTag) {
+    @Nonnull
+    public <T> T lookupFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack().lookupFromScope(scopeTag, serviceTag);
     }
 
@@ -619,8 +620,8 @@ public class BackstackDelegate {
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any of the scopes
      */
-    @NonNull
-    public <T> T lookupFromScope(@NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+    @Nonnull
+    public <T> T lookupFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag, @Nonnull ScopeLookupMode lookupMode) {
         return getBackstack().lookupFromScope(scopeTag, serviceTag, lookupMode);
     }
 
@@ -630,7 +631,7 @@ public class BackstackDelegate {
      *
      * @return the {@link Backstack} managed by this delegate.
      */
-    @NonNull
+    @Nonnull
     public Backstack getBackstack() {
         if(backstack == null) {
             throw new IllegalStateException("This method can only be called after calling `onCreate()`");

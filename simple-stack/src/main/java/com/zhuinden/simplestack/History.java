@@ -1,8 +1,6 @@
 package com.zhuinden.simplestack;
 
 import android.annotation.TargetApi;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -19,6 +17,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * An immutable wrapper over backstack history with some additional helper methods.
@@ -66,7 +67,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @param <K> the type of the key
      * @return the key from the top with offset
      */
-    @NonNull
+    @Nonnull
     public <K> K fromTop(int offset) {
         int size = this.size();
         if(size <= 0) {
@@ -106,7 +107,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      *
      * @return the history builder
      */
-    @NonNull
+    @Nonnull
     public Builder buildUpon() {
         return History.builderFrom(this);
     }
@@ -119,7 +120,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @return the history
      */
     @SuppressWarnings("unchecked") // @SafeVarargs is API 19+
-    @NonNull
+    @Nonnull
     public static <T> History<T> of(T... keys) {
         if(keys == null) {
             throw new IllegalArgumentException("Cannot provide `null` as a key!");
@@ -139,8 +140,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @param <T> possible base type of the keys
      * @return the history
      */
-    @NonNull
-    public static <T> History<T> from(@NonNull List<? extends T> keys) {
+    @Nonnull
+    public static <T> History<T> from(@Nonnull List<? extends T> keys) {
         return builderFrom(keys).build();
     }
 
@@ -150,8 +151,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @param backstack the {@link Backstack}.
      * @return the newly created {@link Builder}.
      */
-    @NonNull
-    public static Builder builderFrom(@NonNull Backstack backstack) {
+    @Nonnull
+    public static Builder builderFrom(@Nonnull Backstack backstack) {
         if(backstack == null) {
             throw new IllegalArgumentException("Backstack cannot be null!");
         }
@@ -164,8 +165,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @param backstackDelegate the {@link BackstackDelegate}.
      * @return the newly created {@link Builder}.
      */
-    @NonNull
-    public static Builder builderFrom(@NonNull BackstackDelegate backstackDelegate) {
+    @Nonnull
+    public static Builder builderFrom(@Nonnull BackstackDelegate backstackDelegate) {
         if(backstackDelegate == null) {
             throw new IllegalArgumentException("BackstackDelegate cannot be null!");
         }
@@ -179,7 +180,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @return the newly created {@link Builder}.
      */
     @SuppressWarnings("unchecked") // @SafeVarargs is API 19+
-    @NonNull
+    @Nonnull
     public static Builder builderOf(Object... keys) {
         return builderFrom(Arrays.asList(keys));
     }
@@ -190,8 +191,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @param keys
      * @return the newly created {@link Builder}.
      */
-    @NonNull
-    public static Builder builderFrom(@NonNull List<?> keys) {
+    @Nonnull
+    public static Builder builderFrom(@Nonnull List<?> keys) {
         for(Object key : keys) {
             if(key == null) {
                 throw new IllegalArgumentException("Cannot provide `null` as a key!");
@@ -205,7 +206,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
      *
      * @return the newly created {@link Builder}.
      */
-    @NonNull
+    @Nonnull
     public static Builder newBuilder() {
         return new Builder();
     }
@@ -216,8 +217,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
      * @param key
      * @return a history that contains the key.
      */
-    @NonNull
-    public static <T> History<T> single(@NonNull T key) {
+    @Nonnull
+    public static <T> History<T> single(@Nonnull T key) {
         return History.newBuilder()
                 .add(key)
                 .build();
@@ -264,25 +265,25 @@ public class History<T> extends AbstractList<T> implements List<T> {
         return elements.addAll(index, c);
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public Iterator<T> iterator() {
         return elements.iterator();
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public ListIterator<T> listIterator() {
         return elements.listIterator();
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public ListIterator<T> listIterator(int index) {
         return elements.listIterator(index);
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
         return elements.subList(fromIndex, toIndex);
@@ -316,15 +317,15 @@ public class History<T> extends AbstractList<T> implements List<T> {
         return elements.contains(o);
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public Object[] toArray() {
         return elements.toArray();
     }
 
-    @NonNull
+    @Nonnull
     @Override
-    public <T1> T1[] toArray(@NonNull T1[] a) {
+    public <T1> T1[] toArray(@Nonnull T1[] a) {
         return elements.toArray(a);
     }
 
@@ -334,22 +335,22 @@ public class History<T> extends AbstractList<T> implements List<T> {
     }
 
     @Override
-    public boolean containsAll(@NonNull Collection<?> c) {
+    public boolean containsAll(@Nonnull Collection<?> c) {
         return elements.containsAll(c);
     }
 
     @Override
-    public boolean addAll(@NonNull Collection<? extends T> c) {
+    public boolean addAll(@Nonnull Collection<? extends T> c) {
         return elements.addAll(c);
     }
 
     @Override
-    public boolean removeAll(@NonNull Collection<?> c) {
+    public boolean removeAll(@Nonnull Collection<?> c) {
         return elements.removeAll(c);
     }
 
     @Override
-    public boolean retainAll(@NonNull Collection<?> c) {
+    public boolean retainAll(@Nonnull Collection<?> c) {
         return elements.retainAll(c);
     }
 
@@ -426,8 +427,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param keys
          * @return the current builder.
          */
-        @NonNull
-        public Builder addAll(@NonNull List<?> keys) {
+        @Nonnull
+        public Builder addAll(@Nonnull List<?> keys) {
             if(keys == null) {
                 throw new IllegalArgumentException("Provided collection cannot be null");
             }
@@ -442,8 +443,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param index
          * @return the current builder.
          */
-        @NonNull
-        public Builder addAllAt(@NonNull List<?> keys, int index) {
+        @Nonnull
+        public Builder addAllAt(@Nonnull List<?> keys, int index) {
             if(keys == null) {
                 throw new IllegalArgumentException("Provided collection cannot be null");
             }
@@ -456,7 +457,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          *
          * @return the current builder.
          */
-        @NonNull
+        @Nonnull
         public Builder clear() {
             list.clear();
             return this;
@@ -468,7 +469,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param key
          * @return true if the builder contains the given key.
          */
-        public boolean contains(@NonNull Object key) {
+        public boolean contains(@Nonnull Object key) {
             checkKey(key);
             return list.contains(key);
         }
@@ -479,7 +480,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param keys
          * @return true if the builder contains all keys.
          */
-        public boolean containsAll(@NonNull Collection<?> keys) {
+        public boolean containsAll(@Nonnull Collection<?> keys) {
             if(keys == null) {
                 throw new IllegalArgumentException("Keys cannot be null!");
             }
@@ -501,8 +502,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param key
          * @return the current builder.
          */
-        @NonNull
-        public Builder remove(@NonNull Object key) {
+        @Nonnull
+        public Builder remove(@Nonnull Object key) {
             checkKey(key);
             list.remove(key);
             return this;
@@ -514,7 +515,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param index
          * @return the current builder.
          */
-        @NonNull
+        @Nonnull
         public Builder removeAt(int index) {
             list.remove(index);
             return this;
@@ -526,8 +527,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param keys
          * @return the current builder.
          */
-        @NonNull
-        public Builder retainAll(@NonNull Collection<?> keys) {
+        @Nonnull
+        public Builder retainAll(@Nonnull Collection<?> keys) {
             checkKeys(keys);
             list.retainAll(keys);
             return this;
@@ -548,7 +549,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          *
          * @return the current builder.
          */
-        @NonNull
+        @Nonnull
         public Builder removeLast() {
             if(list.isEmpty()) {
                 throw new IllegalStateException("Cannot remove element from empty builder");
@@ -564,8 +565,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param key
          * @return the current builder.
          */
-        @NonNull
-        public Builder removeUntil(@NonNull Object key) {
+        @Nonnull
+        public Builder removeUntil(@Nonnull Object key) {
             checkKey(key);
             while(!list.isEmpty() && !getLast().equals(key)) {
                 removeLast();
@@ -582,7 +583,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param key
          * @return the index, -1 if not found.
          */
-        public int indexOf(@NonNull Object key) {
+        public int indexOf(@Nonnull Object key) {
             checkKey(key);
             return list.indexOf(key);
         }
@@ -593,7 +594,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param index
          * @return the key at the given index
          */
-        @NonNull
+        @Nonnull
         public <T> T get(int index) {
             // noinspection unchecked
             return (T) list.get(index);
@@ -617,8 +618,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param key
          * @return the current builder.
          */
-        @NonNull
-        public Builder add(@NonNull Object key) {
+        @Nonnull
+        public Builder add(@Nonnull Object key) {
             checkKey(key);
             list.add(key);
             return this;
@@ -631,8 +632,8 @@ public class History<T> extends AbstractList<T> implements List<T> {
          * @param index
          * @return the current builder.
          */
-        @NonNull
-        public Builder add(@NonNull Object key, int index) {
+        @Nonnull
+        public Builder add(@Nonnull Object key, int index) {
             checkKey(key);
             list.add(index, key);
             return this;
@@ -643,7 +644,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          *
          * @return the iterator
          */
-        @NonNull
+        @Nonnull
         @Override
         public Iterator<Object> iterator() {
             return list.iterator();
@@ -654,7 +655,7 @@ public class History<T> extends AbstractList<T> implements List<T> {
          *
          * @return the built history.
          */
-        @NonNull
+        @Nonnull
         public <T> History<T> build() {
             List<T> list = new LinkedList<>();
             for(Object obj : this.list) {

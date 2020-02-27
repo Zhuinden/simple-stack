@@ -15,10 +15,10 @@
  */
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 /**
  * Used to describe the global services registered to the global scope.
@@ -46,7 +46,7 @@ public class GlobalServices {
      * @param serviceTag the service tag
      * @return if it contains the service
      */
-    public boolean hasService(@NonNull String serviceTag) {
+    public boolean hasService(@Nonnull String serviceTag) {
         return scope.hasService(serviceTag);
     }
 
@@ -57,8 +57,8 @@ public class GlobalServices {
      * @param <T>        the type of the service
      * @return the service
      */
-    @NonNull
-    public <T> T getService(@NonNull String serviceTag) {
+    @Nonnull
+    public <T> T getService(@Nonnull String serviceTag) {
         return scope.getService(serviceTag);
     }
 
@@ -67,7 +67,7 @@ public class GlobalServices {
      *
      * @return the entry set
      */
-    @NonNull
+    @Nonnull
     public Set<Map.Entry<String, Object>> services() {
         return scope.services();
     }
@@ -77,7 +77,7 @@ public class GlobalServices {
      *
      * @return the builder
      */
-    @NonNull
+    @Nonnull
     public static Builder builder() {
         return new Builder();
     }
@@ -98,8 +98,8 @@ public class GlobalServices {
          * @param service    the service
          * @return the builder
          */
-        @NonNull
-        public Builder addService(@NonNull String serviceTag, @NonNull Object service) {
+        @Nonnull
+        public Builder addService(@Nonnull String serviceTag, @Nonnull Object service) {
             scope.addService(serviceTag, service);
             return this;
         }
@@ -111,8 +111,8 @@ public class GlobalServices {
          * @param service the service
          * @return the builder
          */
-        @NonNull
-        public Builder addAlias(@NonNull String alias, @NonNull Object service) {
+        @Nonnull
+        public Builder addAlias(@Nonnull String alias, @Nonnull Object service) {
             scope.addAlias(alias, service);
             return this;
         }
@@ -122,7 +122,7 @@ public class GlobalServices {
          *
          * @return the global services
          */
-        @NonNull
+        @Nonnull
         public GlobalServices build() {
             return new GlobalServices(new ScopeNode(scope));
         }

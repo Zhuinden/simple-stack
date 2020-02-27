@@ -17,8 +17,6 @@ package com.zhuinden.simplestack;
 
 import android.app.Activity;
 import android.os.Parcel;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.zhuinden.simplestack.helpers.HasServices;
 import com.zhuinden.simplestack.helpers.ServiceProvider;
@@ -39,6 +37,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScopingTest {
@@ -57,7 +58,7 @@ public class ScopingTest {
         boolean didServiceRegister = false;
         boolean didServiceUnregister = false;
 
-        @NonNull
+        @Nonnull
         @Override
         public StateBundle toBundle() {
             StateBundle stateBundle = new StateBundle();
@@ -85,7 +86,7 @@ public class ScopingTest {
 
     StateChanger stateChanger = new StateChanger() {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+        public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
             completionCallback.stateChangeComplete();
         }
     };
@@ -101,7 +102,7 @@ public class ScopingTest {
             super(in);
         }
 
-        @NonNull
+        @Nonnull
         @Override
         public String getScopeTag() {
             return name;
@@ -206,7 +207,7 @@ public class ScopingTest {
                 serviceBinder.addService(nullTag, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -235,7 +236,7 @@ public class ScopingTest {
                 serviceBinder.addService(serviceTag, null);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -281,7 +282,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -291,7 +292,7 @@ public class ScopingTest {
         backstack.setup(History.of(testKeyWithScope));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -313,7 +314,7 @@ public class ScopingTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -329,7 +330,7 @@ public class ScopingTest {
 
         StateChanger stateChanger2 = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -367,7 +368,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -403,7 +404,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -412,7 +413,7 @@ public class ScopingTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -447,7 +448,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -459,7 +460,7 @@ public class ScopingTest {
             public void bindServices(ServiceBinder serviceBinder) {
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -500,7 +501,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -514,7 +515,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service2);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -565,7 +566,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -577,7 +578,7 @@ public class ScopingTest {
             public void bindServices(ServiceBinder serviceBinder) {
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -612,7 +613,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -626,7 +627,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service2);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -671,7 +672,7 @@ public class ScopingTest {
                 assertThat(serviceBinder.lookupService("SERVICE1")).isSameAs(service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -695,7 +696,7 @@ public class ScopingTest {
                 assertThat(serviceBinder.lookupService("SERVICE2")).isSameAs(service2);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -738,7 +739,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE1", service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -753,7 +754,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE2", service2);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -810,7 +811,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE2", service2);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -855,7 +856,7 @@ public class ScopingTest {
                 ref.set(serviceBinder.getBackstack());
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -899,7 +900,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE1", service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -914,7 +915,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE2", service2);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -982,7 +983,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE3", service3);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1000,7 +1001,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE6", service6);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -1056,7 +1057,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE3", service3);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1074,7 +1075,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE6", service6);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -1127,7 +1128,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE1", service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1179,7 +1180,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE1", service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1221,7 +1222,7 @@ public class ScopingTest {
         final AtomicReference<StateChanger.Callback> callback = new AtomicReference<>();
         StateChanger pendingStateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callback.set(completionCallback);
             }
         };
@@ -1257,7 +1258,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE3", service3);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1275,7 +1276,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE6", service6);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -1330,7 +1331,7 @@ public class ScopingTest {
                 serviceBinder.addService(SERVICE_TAG, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1339,7 +1340,7 @@ public class ScopingTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -1477,7 +1478,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE3", service3);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1494,7 +1495,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE6", service6);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -1511,7 +1512,7 @@ public class ScopingTest {
                 serviceBinder.addService("SERVICE9", service9);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "braap";
@@ -1601,8 +1602,8 @@ public class ScopingTest {
         final MyService service = new MyService(backstack);
 
         TestKeyWithOnlyParentServices beep = new TestKeyWithOnlyParentServices("beep",
-                                                                               History.of(
-                                                                                       "registration")) {
+                History.of(
+                        "registration")) {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("registration")) {
@@ -1664,7 +1665,7 @@ public class ScopingTest {
                 assertThat(serviceBinder.lookupFromScope(serviceBinder.getScopeTag(), "service")).isSameAs(service1);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1688,14 +1689,14 @@ public class ScopingTest {
                 assertThat(serviceBinder.canFindFromScope(serviceBinder.getScopeTag(), "service")).isTrue();
                 assertThat(serviceBinder.lookupService("service")).isSameAs(service1);
                 serviceBinder.addService("service", service2);
-                // the most important assertion here
+                // the mostimportant assertion here
                 assertThat(serviceBinder.lookupService("service")).isSameAs(service2);
                 assertThat(serviceBinder.lookupFromScope("beep", "service")).isSameAs(service1);
 
                 serviceBinder.addService("service3", service3);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "boop";
@@ -1705,7 +1706,7 @@ public class ScopingTest {
         backstack.setup(History.of(new Key1("beep"), new Key2("boop")));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -1770,7 +1771,7 @@ public class ScopingTest {
                 serviceBinder.addService(serviceTag2, service);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return "beep";
@@ -1813,7 +1814,7 @@ public class ScopingTest {
         backstack.setup(History.of(testKey2));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -1838,7 +1839,7 @@ public class ScopingTest {
 
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("hello".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("hello", helloService);
                 } else if("world".equals(serviceBinder.getScopeTag())) {
@@ -1859,7 +1860,7 @@ public class ScopingTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         });
@@ -1894,7 +1895,7 @@ public class ScopingTest {
 
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("hello".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("hello", helloService);
                 } else if("world".equals(serviceBinder.getScopeTag())) {
@@ -1917,7 +1918,7 @@ public class ScopingTest {
                 super(in);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.from(Arrays.asList(parentScopes));
@@ -1935,7 +1936,7 @@ public class ScopingTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         });
@@ -1977,7 +1978,7 @@ public class ScopingTest {
 
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("hello".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("hello", helloService);
                 } else if("world".equals(serviceBinder.getScopeTag())) {
@@ -2003,7 +2004,7 @@ public class ScopingTest {
                 super(in);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.from(Arrays.asList(parentScopes));
@@ -2020,7 +2021,7 @@ public class ScopingTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         });
@@ -2103,7 +2104,7 @@ public class ScopingTest {
 
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("hello".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("hello", helloService);
                 } else if("world".equals(serviceBinder.getScopeTag())) {
@@ -2129,7 +2130,7 @@ public class ScopingTest {
                 super(in);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.from(Arrays.asList(parentScopes));
@@ -2148,7 +2149,7 @@ public class ScopingTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         });
@@ -2187,7 +2188,7 @@ public class ScopingTest {
 
         backstack.setScopedServices(new ScopedServices() {
             @Override
-            public void bindServices(@NonNull ServiceBinder serviceBinder) {
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
                 if("hello".equals(serviceBinder.getScopeTag())) {
                     serviceBinder.addService("hello", helloService);
                 } else if("world".equals(serviceBinder.getScopeTag())) {
@@ -2215,7 +2216,7 @@ public class ScopingTest {
                 super(in);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.from(Arrays.asList(parentScopes));
@@ -2235,7 +2236,7 @@ public class ScopingTest {
                 super(in);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.from(Arrays.asList(parentScopes));
@@ -2253,7 +2254,7 @@ public class ScopingTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 callbackRef.set(completionCallback);
             }
         });

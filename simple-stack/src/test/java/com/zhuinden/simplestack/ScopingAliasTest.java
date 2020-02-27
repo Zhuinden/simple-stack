@@ -1,8 +1,5 @@
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.zhuinden.simplestack.helpers.Action;
 import com.zhuinden.simplestack.helpers.ServiceProvider;
 import com.zhuinden.simplestack.helpers.TestKeyWithExplicitParent;
@@ -12,6 +9,9 @@ import com.zhuinden.statebundle.StateBundle;
 import org.junit.Test;
 
 import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.zhuinden.simplestack.helpers.AssertionHelper.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ public class ScopingAliasTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -138,7 +138,7 @@ public class ScopingAliasTest {
         };
 
         TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1", "parent2");
@@ -189,7 +189,7 @@ public class ScopingAliasTest {
         };
 
         TestKeyWithExplicitParent braap = new TestKeyWithExplicitParent("scope3") {
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1", "parent3");
@@ -236,7 +236,7 @@ public class ScopingAliasTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };
@@ -337,7 +337,7 @@ public class ScopingAliasTest {
             private int saved = 0;
             private int restored = 0;
 
-            @NonNull
+            @Nonnull
             @Override
             public StateBundle toBundle() {
                 saved++;
@@ -364,7 +364,7 @@ public class ScopingAliasTest {
         backstack.setup(History.of(boop));
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -381,7 +381,7 @@ public class ScopingAliasTest {
 
         backstack2.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -409,7 +409,7 @@ public class ScopingAliasTest {
         try {
             backstack.setStateChanger(new StateChanger() {
                 @Override
-                public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+                public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                     completionCallback.stateChangeComplete();
                 }
             });

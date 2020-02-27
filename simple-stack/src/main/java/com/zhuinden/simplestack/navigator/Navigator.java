@@ -20,8 +20,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -40,6 +38,9 @@ import com.zhuinden.simplestack.StateChanger;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Convenience class to hide lifecycle integration using retained fragment.
@@ -76,8 +77,8 @@ public class Navigator {
          * @param stateChanger if set, cannot be null.
          * @return the installer
          */
-        @NonNull
-        public Installer setStateChanger(@NonNull StateChanger stateChanger) {
+        @Nonnull
+        public Installer setStateChanger(@Nonnull StateChanger stateChanger) {
             if(stateChanger == null) {
                 throw new IllegalArgumentException("If set, StateChanger cannot be null!");
             }
@@ -91,8 +92,8 @@ public class Navigator {
          * @param keyFilter cannot be null if set
          * @return the installer
          */
-        @NonNull
-        public Installer setKeyFilter(@NonNull KeyFilter keyFilter) {
+        @Nonnull
+        public Installer setKeyFilter(@Nonnull KeyFilter keyFilter) {
             if(keyFilter == null) {
                 throw new IllegalArgumentException("If set, KeyFilter cannot be null!");
             }
@@ -106,8 +107,8 @@ public class Navigator {
          * @param keyParceler cannot be null if set
          * @return the installer
          */
-        @NonNull
-        public Installer setKeyParceler(@NonNull KeyParceler keyParceler) {
+        @Nonnull
+        public Installer setKeyParceler(@Nonnull KeyParceler keyParceler) {
             if(keyParceler == null) {
                 throw new IllegalArgumentException("If set, KeyParceler cannot be null!");
             }
@@ -121,8 +122,8 @@ public class Navigator {
          * @param stateClearStrategy if set, it cannot be null
          * @return the installer
          */
-        @NonNull
-        public Installer setStateClearStrategy(@NonNull Backstack.StateClearStrategy stateClearStrategy) {
+        @Nonnull
+        public Installer setStateClearStrategy(@Nonnull Backstack.StateClearStrategy stateClearStrategy) {
             if(stateClearStrategy == null) {
                 throw new IllegalArgumentException("If set, StateClearStrategy cannot be null!");
             }
@@ -136,8 +137,8 @@ public class Navigator {
          * @param scopedServices the scoped services
          * @return the installer
          */
-        @NonNull
-        public Installer setScopedServices(@NonNull ScopedServices scopedServices) {
+        @Nonnull
+        public Installer setScopedServices(@Nonnull ScopedServices scopedServices) {
             if(scopedServices == null) {
                 throw new IllegalArgumentException("If set, scoped services cannot be null!");
             }
@@ -151,8 +152,8 @@ public class Navigator {
          * @param globalServices the global services
          * @return the installer
          */
-        @NonNull
-        public Installer setGlobalServices(@NonNull GlobalServices globalServices) {
+        @Nonnull
+        public Installer setGlobalServices(@Nonnull GlobalServices globalServices) {
             if(globalServices == null) {
                 throw new IllegalArgumentException("If set, global services cannot be null!");
             }
@@ -166,8 +167,8 @@ public class Navigator {
          * @param globalServiceFactory the global service factory
          * @return the installer
          */
-        @NonNull
-        public Installer setGlobalServices(@NonNull GlobalServices.Factory globalServiceFactory) {
+        @Nonnull
+        public Installer setGlobalServices(@Nonnull GlobalServices.Factory globalServiceFactory) {
             if(globalServiceFactory == null) {
                 throw new IllegalArgumentException("If set, global service factory cannot be null!");
             }
@@ -182,7 +183,7 @@ public class Navigator {
          * @param isInitializeDeferred if call to executing deferred initialization is needed
          * @return the installer
          */
-        @NonNull
+        @Nonnull
         public Installer setDeferredInitialization(boolean isInitializeDeferred) {
             this.isInitializeDeferred = isInitializeDeferred;
             return this;
@@ -194,7 +195,7 @@ public class Navigator {
          * @param shouldPersistContainerChild if the container's first child's state should be persisted
          * @return the installer
          */
-        @NonNull
+        @Nonnull
         public Installer setShouldPersistContainerChild(boolean shouldPersistContainerChild) {
             this.shouldPersistContainerChild = shouldPersistContainerChild;
             return this;
@@ -207,8 +208,8 @@ public class Navigator {
          * @param stateChangeCompletionListener the state change completion listener
          * @return the installer
          */
-        @NonNull
-        public Installer addStateChangeCompletionListener(@NonNull Backstack.CompletionListener stateChangeCompletionListener) {
+        @Nonnull
+        public Installer addStateChangeCompletionListener(@Nonnull Backstack.CompletionListener stateChangeCompletionListener) {
             if(stateChangeCompletionListener == null) {
                 throw new IllegalArgumentException("If added, state change completion listener cannot be null!");
             }
@@ -224,8 +225,8 @@ public class Navigator {
          * @param initialKeys the initial keys.
          * @return
          */
-        @NonNull
-        public Backstack install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
+        @Nonnull
+        public Backstack install(@Nonnull Activity activity, @Nonnull ViewGroup container, @Nonnull List<?> initialKeys) {
             if(stateChanger == null) {
                 shouldPersistContainerChild = true;
                 stateChanger = DefaultStateChanger.create(activity, container);
@@ -239,7 +240,7 @@ public class Navigator {
      *
      * @return the installer
      */
-    @NonNull
+    @Nonnull
     public static Installer configure() {
         return new Installer();
     }
@@ -253,12 +254,12 @@ public class Navigator {
      * @param container   the container in which custom viewgroups are hosted (to save its child's state in onSaveInstanceState())
      * @param initialKeys the keys used to initialize the backstack
      */
-    @NonNull
-    public static void install(@NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
+    @Nonnull
+    public static void install(@Nonnull Activity activity, @Nonnull ViewGroup container, @Nonnull List<?> initialKeys) {
         configure().install(activity, container, initialKeys);
     }
 
-    private static Backstack install(Installer installer, @NonNull Activity activity, @NonNull ViewGroup container, @NonNull List<?> initialKeys) {
+    private static Backstack install(Installer installer, @Nonnull Activity activity, @Nonnull ViewGroup container, @Nonnull List<?> initialKeys) {
         if(activity == null) {
             throw new IllegalArgumentException("Activity cannot be null!");
         }
@@ -293,7 +294,7 @@ public class Navigator {
      *
      * @param context the context to which an activity belongs that hosts the backstack
      */
-    public static void executeDeferredInitialization(@NonNull Context context) {
+    public static void executeDeferredInitialization(@Nonnull Context context) {
         Activity activity = findActivity(context);
         BackstackHost backstackHost = findBackstackHost(activity);
         backstackHost.initialize(false);
@@ -305,7 +306,7 @@ public class Navigator {
      * @param context the Context that belongs to an Activity which hosts the backstack.
      * @return true if a state change was handled or is in progress, false otherwise
      */
-    public static boolean onBackPressed(@NonNull Context context) {
+    public static boolean onBackPressed(@Nonnull Context context) {
         return getBackstack(context).goBack();
     }
 
@@ -316,7 +317,7 @@ public class Navigator {
      *
      * @return whether the scope exists
      */
-    public static boolean hasScope(@NonNull Context context, @NonNull String scopeTag) {
+    public static boolean hasScope(@Nonnull Context context, @Nonnull String scopeTag) {
         return getBackstack(context).hasScope(scopeTag);
     }
 
@@ -327,7 +328,7 @@ public class Navigator {
      * @param serviceTag the service tag
      * @return whether the service is bound in the given scope
      */
-    public static boolean hasService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+    public static boolean hasService(@Nonnull Context context, @Nonnull ScopeKey scopeKey, @Nonnull String serviceTag) {
         return getBackstack(context).hasService(scopeKey, serviceTag);
     }
 
@@ -338,7 +339,7 @@ public class Navigator {
      * @param serviceTag the service tag
      * @return whether the service is bound in the given scope
      */
-    public static boolean hasService(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+    public static boolean hasService(@Nonnull Context context, @Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack(context).hasService(scopeTag, serviceTag);
     }
 
@@ -350,8 +351,8 @@ public class Navigator {
      * @param <T>        the type of the service
      * @return the service
      */
-    @NonNull
-    public static <T> T getService(@NonNull Context context, @NonNull ScopeKey scopeKey, @NonNull String serviceTag) {
+    @Nonnull
+    public static <T> T getService(@Nonnull Context context, @Nonnull ScopeKey scopeKey, @Nonnull String serviceTag) {
         return getBackstack(context).getService(scopeKey, serviceTag);
     }
 
@@ -363,8 +364,8 @@ public class Navigator {
      * @param <T>        the type of the service
      * @return the service
      */
-    @NonNull
-    public static <T> T getService(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+    @Nonnull
+    public static <T> T getService(@Nonnull Context context, @Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack(context).getService(scopeTag, serviceTag);
     }
 
@@ -375,7 +376,7 @@ public class Navigator {
      * @param serviceTag the tag of the service
      * @return whether the service exists in any active scopes
      */
-    public static boolean canFindService(@NonNull Context context, @NonNull String serviceTag) {
+    public static boolean canFindService(@Nonnull Context context, @Nonnull String serviceTag) {
         return getBackstack(context).canFindService(serviceTag);
     }
 
@@ -388,8 +389,8 @@ public class Navigator {
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any scope
      */
-    @NonNull
-    public static <T> T lookupService(@NonNull Context context, @NonNull String serviceTag) {
+    @Nonnull
+    public static <T> T lookupService(@Nonnull Context context, @Nonnull String serviceTag) {
         return getBackstack(context).lookupService(serviceTag);
     }
 
@@ -402,8 +403,8 @@ public class Navigator {
      * @param lookupMode determine what type of parents are checked during the lookup
      * @return the list of scope tags
      */
-    @NonNull
-    public static List<String> findScopesForKey(@NonNull Context context, @NonNull Object key, @NonNull ScopeLookupMode lookupMode) {
+    @Nonnull
+    public static List<String> findScopesForKey(@Nonnull Context context, @Nonnull Object key, @Nonnull ScopeLookupMode lookupMode) {
         return getBackstack(context).findScopesForKey(key, lookupMode);
     }
 
@@ -415,7 +416,7 @@ public class Navigator {
      * @param serviceTag the tag of the service
      * @return whether the service exists in any of the accessed scopes
      */
-    public static boolean canFindFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+    public static boolean canFindFromScope(@Nonnull Context context, @Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack(context).canFindFromScope(scopeTag, serviceTag);
     }
 
@@ -429,7 +430,7 @@ public class Navigator {
      *
      * @return whether the service exists in any scopes from the current scope or its parents
      */
-    public static boolean canFindFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+    public static boolean canFindFromScope(@Nonnull Context context, @Nonnull String scopeTag, @Nonnull String serviceTag, @Nonnull ScopeLookupMode lookupMode) {
         return getBackstack(context).canFindFromScope(scopeTag, serviceTag, lookupMode);
     }
 
@@ -443,8 +444,8 @@ public class Navigator {
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any accessed scopes
      */
-    @NonNull
-    public static <T> T lookupFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag) {
+    @Nonnull
+    public static <T> T lookupFromScope(@Nonnull Context context, @Nonnull String scopeTag, @Nonnull String serviceTag) {
         return getBackstack(context).lookupFromScope(scopeTag, serviceTag);
     }
 
@@ -459,8 +460,8 @@ public class Navigator {
      * @return the service
      * @throws IllegalStateException if the service doesn't exist in any of the scopes
      */
-    @NonNull
-    public static <T> T lookupFromScope(@NonNull Context context, @NonNull String scopeTag, @NonNull String serviceTag, @NonNull ScopeLookupMode lookupMode) {
+    @Nonnull
+    public static <T> T lookupFromScope(@Nonnull Context context, @Nonnull String scopeTag, @Nonnull String serviceTag, @Nonnull ScopeLookupMode lookupMode) {
         return getBackstack(context).lookupFromScope(scopeTag, serviceTag, lookupMode);
     }
 
@@ -470,8 +471,8 @@ public class Navigator {
      * @param context the context
      * @return the backstack
      */
-    @NonNull
-    public static Backstack getBackstack(@NonNull Context context) {
+    @Nonnull
+    public static Backstack getBackstack(@Nonnull Context context) {
         BackstackHost backstackHost = getBackstackHost(context);
         return backstackHost.getBackstack();
     }
@@ -494,7 +495,7 @@ public class Navigator {
      *
      * @param view the view (can be Bundleable)
      */
-    public static void restoreViewFromState(@NonNull View view) {
+    public static void restoreViewFromState(@Nonnull View view) {
         if(view == null) {
             throw new NullPointerException("You cannot restore state into null view!");
         }
@@ -510,8 +511,8 @@ public class Navigator {
      * @param key     the key
      * @return the saved state
      */
-    @NonNull
-    public static SavedState getSavedState(@NonNull Context context, @NonNull Object key) {
+    @Nonnull
+    public static SavedState getSavedState(@Nonnull Context context, @Nonnull Object key) {
         if(context == null) {
             throw new NullPointerException("context cannot be null");
         }
@@ -528,7 +529,7 @@ public class Navigator {
      * @param activity  the activity
      * @return whether navigator is available
      */
-    public static boolean isNavigatorAvailable(@NonNull Activity activity) {
+    public static boolean isNavigatorAvailable(@Nonnull Activity activity) {
         return findBackstackHost(activity) != null;
     }
 
@@ -546,8 +547,8 @@ public class Navigator {
      * @param <T> the type of the Activity
      * @return the Activity
      */
-    @NonNull
-    public static <T extends Activity> T findActivity(@NonNull Context context) {
+    @Nonnull
+    public static <T extends Activity> T findActivity(@Nonnull Context context) {
         if(context == null) {
             throw new IllegalArgumentException("Context cannot be null!");
         }

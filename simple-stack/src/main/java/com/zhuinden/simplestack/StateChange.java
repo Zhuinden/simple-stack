@@ -16,13 +16,13 @@
 package com.zhuinden.simplestack;
 
 import android.content.Context;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -31,7 +31,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 public class StateChange {
     @Retention(SOURCE)
-    @IntDef({FORWARD, BACKWARD, REPLACE})
+            // @IntDef({FORWARD, BACKWARD, REPLACE}) // removed android.support.annotation
     @interface StateChangeDirection {
     }
 
@@ -56,7 +56,7 @@ public class StateChange {
      *
      * @return the backstack
      */
-    @NonNull
+    @Nonnull
     public Backstack getBackstack() {
         return backstack;
     }
@@ -88,7 +88,7 @@ public class StateChange {
      *
      * @return the previous state.
      */
-    @NonNull
+    @Nonnull
     public <T> History<T> getPreviousKeys() {
         return createParametricCopyList(previousKeys);
     }
@@ -100,7 +100,7 @@ public class StateChange {
      *
      * @return the new state.
      */
-    @NonNull
+    @Nonnull
     public <T> History<T> getNewKeys() {
         return createParametricCopyList(newKeys);
     }
@@ -135,7 +135,7 @@ public class StateChange {
      *
      * @return the last element in new state.
      */
-    @NonNull
+    @Nonnull
     public <T> T topNewKey() {
         // noinspection unchecked
         return (T) newKeys.get(newKeys.size() - 1);
@@ -148,8 +148,8 @@ public class StateChange {
      * @param key  the key this context is associated with.
      * @return the context to use used with LayoutInflater.from().
      */
-    @NonNull
-    public Context createContext(@NonNull Context base, @NonNull Object key) {
+    @Nonnull
+    public Context createContext(@Nonnull Context base, @Nonnull Object key) {
         return new KeyContextWrapper(base, key);
     }
 }

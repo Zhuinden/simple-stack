@@ -1,6 +1,6 @@
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * {@link ScopedServices} allow binding services to a given scope. Scopes are identified by a "scope tag" defined by a {@link ScopeKey}.
@@ -63,5 +63,5 @@ public interface ScopedServices {
      *
      * @param serviceBinder the binder that allows binding services to scopes.
      */
-    void bindServices(@NonNull ServiceBinder serviceBinder);
+    void bindServices(@Nonnull ServiceBinder serviceBinder);
 }

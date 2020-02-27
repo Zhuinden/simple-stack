@@ -15,8 +15,6 @@
  */
 package com.zhuinden.simplestack;
 
-import android.support.annotation.NonNull;
-
 import com.zhuinden.simplestack.helpers.TestKey;
 
 import org.junit.Test;
@@ -24,6 +22,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -138,7 +138,7 @@ public class HistoryTest {
         backstackDelegate.onCreate(null, null, History.of(testKey1, testKey2));
         backstackDelegate.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -154,7 +154,7 @@ public class HistoryTest {
         backstackDelegate.onCreate(null, null, History.of(testKey1, testKey2));
         backstackDelegate.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });

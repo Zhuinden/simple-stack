@@ -16,7 +16,6 @@
 package com.zhuinden.simplestack;
 
 import android.os.Parcel;
-import android.support.annotation.NonNull;
 
 import com.zhuinden.simplestack.helpers.Action;
 import com.zhuinden.simplestack.helpers.HasParentServices;
@@ -27,6 +26,8 @@ import com.zhuinden.simplestack.helpers.TestKey;
 import org.junit.Test;
 
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import static com.zhuinden.simplestack.helpers.AssertionHelper.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,13 +64,13 @@ public class ScopeLookupModeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1");
@@ -96,13 +97,13 @@ public class ScopeLookupModeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent2");
@@ -114,7 +115,7 @@ public class ScopeLookupModeTest {
         assertThat(backstack.canFindFromScope("boop", "service")).isFalse();
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -387,13 +388,13 @@ public class ScopeLookupModeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1");
@@ -420,13 +421,13 @@ public class ScopeLookupModeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent2", "parent3");
@@ -444,7 +445,7 @@ public class ScopeLookupModeTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -508,13 +509,13 @@ public class ScopeLookupModeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1");
@@ -541,13 +542,13 @@ public class ScopeLookupModeTest {
                 }
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent2");
@@ -563,7 +564,7 @@ public class ScopeLookupModeTest {
 
         backstack.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
@@ -587,7 +588,7 @@ public class ScopeLookupModeTest {
                 super(in);
             }
 
-            @NonNull
+            @Nonnull
             @Override
             public String getScopeTag() {
                 return name;
@@ -648,7 +649,7 @@ public class ScopeLookupModeTest {
         }
 
         TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1", "parent2");
@@ -664,7 +665,7 @@ public class ScopeLookupModeTest {
         };
 
         TestKeyWithExplicitParent braap = new TestKeyWithExplicitParent("scope3") {
-            @NonNull
+            @Nonnull
             @Override
             public List<String> getParentScopes() {
                 return History.of("parent1", "parent3");
@@ -688,7 +689,7 @@ public class ScopeLookupModeTest {
 
         StateChanger stateChanger = new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         };

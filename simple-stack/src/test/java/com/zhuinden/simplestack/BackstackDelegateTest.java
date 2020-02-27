@@ -20,7 +20,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.zhuinden.simplestack.helpers.TestKey;
@@ -37,6 +36,8 @@ import org.mockito.junit.MockitoRule;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -66,7 +67,7 @@ public class BackstackDelegateTest {
 
     StateChanger stateChanger = new StateChanger() {
         @Override
-        public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+        public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
             completionCallback.stateChangeComplete();
         }
     };
@@ -271,7 +272,7 @@ public class BackstackDelegateTest {
         final List<StateChange> called = new LinkedList<>();
         Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+            public void stateChangeCompleted(@Nonnull StateChange stateChange) {
                 called.add(stateChange);
             }
         };
@@ -288,7 +289,7 @@ public class BackstackDelegateTest {
         TestKey testKey = new TestKey("hello");
         Backstack.CompletionListener completionListener = new Backstack.CompletionListener() {
             @Override
-            public void stateChangeCompleted(@NonNull StateChange stateChange) {
+            public void stateChangeCompleted(@Nonnull StateChange stateChange) {
                 // do nothing
             }
         };
@@ -351,9 +352,9 @@ public class BackstackDelegateTest {
         backstackDelegate.onCreate(null, null, History.single(key));
         try {
             backstackDelegate.setKeyFilter(new KeyFilter() {
-                @NonNull
+                @Nonnull
                 @Override
-                public List<Object> filterHistory(@NonNull List<Object> restoredKeys) {
+                public List<Object> filterHistory(@Nonnull List<Object> restoredKeys) {
                     return restoredKeys;
                 }
             });
@@ -493,7 +494,7 @@ public class BackstackDelegateTest {
         backstackDelegate.onCreate(null, null, History.of(testKey));
         backstackDelegate.setStateChanger(new StateChanger() {
             @Override
-            public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
                 completionCallback.stateChangeComplete();
             }
         });
