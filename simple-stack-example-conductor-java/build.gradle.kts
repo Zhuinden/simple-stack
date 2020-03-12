@@ -40,6 +40,6 @@ dependencies {
     implementation("com.jakewharton:butterknife:8.8.1")
     annotationProcessor("com.jakewharton:butterknife-compiler:8.8.1")
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
-    implementation("com.bluelinelabs:conductor:2.1.5-SNAPSHOT")
+    implementation("com.bluelinelabs:conductor:2.1.5")
     testImplementation("junit:junit:4.12")
 }
