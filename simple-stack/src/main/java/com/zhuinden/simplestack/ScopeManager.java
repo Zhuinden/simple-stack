@@ -608,7 +608,7 @@ class ScopeManager {
         for(String newScopeTag : scopesToActivate) {
             if(!scopes.containsKey(newScopeTag)) {
                 throw new AssertionError(
-                        "The new scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
+                        "The new scope [" + newScopeTag + "] should exist, but it doesn't exist in [" + Arrays.toString(scopes.keySet().toArray()) + "]" +"! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
             ScopeNode newScope = scopes.get(newScopeTag);
@@ -618,7 +618,7 @@ class ScopeManager {
         for(String previousScopeTag : scopesToDeactivate) {
             if(!scopes.containsKey(previousScopeTag)) {
                 throw new AssertionError(
-                        "The previous scope should exist, but it doesn't! This shouldn't happen. If you see this error, this functionality is broken.");
+                        "The previous scope [" + previousScopeTag + "] should exist in [" + Arrays.toString(scopes.keySet().toArray()) + "]" +"! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
             ScopeNode previousScopeNode = scopes.get(previousScopeTag);

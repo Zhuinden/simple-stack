@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stack 2.3.1 (2020-03-31)
+--------------------------------
+
+- FIX: Ensure that if multiple navigation actions are enqueued, then scope activation dispatch only occurs for the final state change, instead of potentially running into an AssertionError. (#220, thanks @valeriyo)
+
+If you use either `ScopeKey` or `ScopeKey.Child`, it is advised to update, and get this bugfix.
+
 -Simple Stack 2.3.0 (2020-02-27)
 --------------------------------
 

@@ -2274,4 +2274,62 @@ public class ScopingTest {
         assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.EXPLICIT)).isEmpty();
         assertThat(backstack.findScopesForKey(key4, ScopeLookupMode.ALL)).isEmpty();
     }
+
+    @Test
+    public void reproduceCrashIssue220() {
+        Backstack backstack = new Backstack();
+        Object key1 = new Object();
+
+        ScopeKey key2 = new ScopeKey() {
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return "key2";
+            }
+
+            @Override
+            public String toString() {
+                return "KEY2";
+            }
+        };
+
+        ScopeKey key3 = new ScopeKey() {
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return "key3";
+            }
+
+            @Override
+            public String toString() {
+                return "KEY3";
+            }
+        };
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
+                // just be there
+            }
+        });
+
+        backstack.setup(History.of(key1));
+
+        final StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+
+        backstack.setStateChanger(stateChanger);
+
+        backstack.removeStateChanger();
+
+        backstack.setHistory(History.of(key2), StateChange.REPLACE);
+
+        backstack.setHistory(History.of(key3), StateChange.REPLACE);
+
+        backstack.setStateChanger(stateChanger); // <-- crash
+    }
 }

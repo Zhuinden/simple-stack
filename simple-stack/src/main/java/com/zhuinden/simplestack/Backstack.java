@@ -91,89 +91,90 @@ public class Backstack
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
         public void handleStateChange(@Nonnull final StateChange stateChange, @Nonnull final Callback completionCallback) {
-            scopeManager.buildScopes(stateChange.getNewKeys());
-            stateChanger.handleStateChange(stateChange, new Callback() {
-                @Override
-                public void stateChangeComplete() {
-                    completionCallback.stateChangeComplete();
-                    if(!isStateChangePending()) {
-                        if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
-                            core.removeStateChanger();
-                        }
+            scopeManager.buildScopes(stateChange.getNewKeys()); // always create scopes before a state change occurs
+            stateChanger.handleStateChange(stateChange, completionCallback);
+        }
+    };
 
-                        stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
+    // fix #220: this cannot be inside StateChanger.Callback, to ensure subsequent `stateChangeComplete()` call doesn't trigger recursive activation dispatch, only once
+    private final CompletionListener managedStateChangerCompletionListener = new CompletionListener() {
+        @Override
+        public void stateChangeCompleted(@Nonnull StateChange stateChange) {
+            if(!isStateChangePending()) {
+                if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
+                    core.removeStateChanger();
+                }
 
-                        History<Object> newState = stateChange.getNewKeys();
+                stateClearStrategy.clearStatesNotIn(keyStateMap, stateChange);
 
-                        // activation/deactivation
-                        Object newTopKeyWithAssociatedScope = null;
-                        for(int i = 0, size = newState.size(); i < size; i++) {
-                            Object key = newState.fromTop(i);
-                            if(key instanceof ScopeKey || key instanceof ScopeKey.Child) {
-                                newTopKeyWithAssociatedScope = key;
-                                break;
-                            }
-                        }
+                History<Object> newState = stateChange.getNewKeys();
 
-                        Set<String> scopesToDeactivate = new LinkedHashSet<>();
-                        Set<String> scopesToActivate = new LinkedHashSet<>();
+                // activation/deactivation
+                Object newTopKeyWithAssociatedScope = null;
+                for(int i = 0, size = newState.size(); i < size; i++) {
+                    Object key = newState.fromTop(i);
+                    if(key instanceof ScopeKey || key instanceof ScopeKey.Child) {
+                        newTopKeyWithAssociatedScope = key;
+                        break;
+                    }
+                }
 
-                        if(previousTopKeyWithAssociatedScope != null) {
-                            if(previousTopKeyWithAssociatedScope instanceof ScopeKey) {
-                                ScopeKey scopeKey = (ScopeKey) previousTopKeyWithAssociatedScope;
-                                scopesToDeactivate.add(scopeKey.getScopeTag());
-                            }
+                Set<String> scopesToDeactivate = new LinkedHashSet<>();
+                Set<String> scopesToActivate = new LinkedHashSet<>();
 
-                            if(previousTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
-                                ScopeKey.Child child = (ScopeKey.Child) previousTopKeyWithAssociatedScope;
-                                ScopeManager.checkParentScopes(child);
-                                List<String> parentScopes = child.getParentScopes();
+                if(previousTopKeyWithAssociatedScope != null) {
+                    if(previousTopKeyWithAssociatedScope instanceof ScopeKey) {
+                        ScopeKey scopeKey = (ScopeKey) previousTopKeyWithAssociatedScope;
+                        scopesToDeactivate.add(scopeKey.getScopeTag());
+                    }
 
-                                for(int i = parentScopes.size() - 1; i >= 0; i--) {
-                                    scopesToDeactivate.add(parentScopes.get(i));
-                                }
-                            }
-                        }
+                    if(previousTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
+                        ScopeKey.Child child = (ScopeKey.Child) previousTopKeyWithAssociatedScope;
+                        ScopeManager.checkParentScopes(child);
+                        List<String> parentScopes = child.getParentScopes();
 
-                        if(newTopKeyWithAssociatedScope != null) {
-                            if(newTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
-                                ScopeKey.Child child = (ScopeKey.Child) newTopKeyWithAssociatedScope;
-                                ScopeManager.checkParentScopes(child);
-                                scopesToActivate.addAll(child.getParentScopes());
-                            }
-                            if(newTopKeyWithAssociatedScope instanceof ScopeKey) {
-                                ScopeKey scopeKey = (ScopeKey) newTopKeyWithAssociatedScope;
-                                scopesToActivate.add(scopeKey.getScopeTag());
-                            }
-                        }
-
-                        previousTopKeyWithAssociatedScope = newTopKeyWithAssociatedScope;
-
-                        // do not deactivate scopes that exist at this time
-                        Iterator<String> scopeToActivate = scopesToActivate.iterator();
-                        while(scopeToActivate.hasNext()) {
-                            String activeScope = scopeToActivate.next();
-                            if(scopesToDeactivate.contains(activeScope)) {
-                                scopesToDeactivate.remove(activeScope); // do not deactivate an already active scope
-                                scopeToActivate.remove(); // if the previous already contains it, then it is already activated.
-                                // we should make sure we never activate the same service twice.
-                            }
-                        }
-
-
-                        if(!scopesToActivate.isEmpty() || !scopesToDeactivate.isEmpty()) { // de-morgan is an ass, but the unit tests don't lie
-                            scopeManager.dispatchActivation(scopesToDeactivate, scopesToActivate);
-                        }
-
-                        // scope eviction + scoped + re-order scope hierarchy
-                        scopeManager.cleanupScopesBy(newState);
-
-                        if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
-                            core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
+                        for(int i = parentScopes.size() - 1; i >= 0; i--) {
+                            scopesToDeactivate.add(parentScopes.get(i));
                         }
                     }
                 }
-            });
+
+                if(newTopKeyWithAssociatedScope != null) {
+                    if(newTopKeyWithAssociatedScope instanceof ScopeKey.Child) {
+                        ScopeKey.Child child = (ScopeKey.Child) newTopKeyWithAssociatedScope;
+                        ScopeManager.checkParentScopes(child);
+                        scopesToActivate.addAll(child.getParentScopes());
+                    }
+                    if(newTopKeyWithAssociatedScope instanceof ScopeKey) {
+                        ScopeKey scopeKey = (ScopeKey) newTopKeyWithAssociatedScope;
+                        scopesToActivate.add(scopeKey.getScopeTag());
+                    }
+                }
+
+                previousTopKeyWithAssociatedScope = newTopKeyWithAssociatedScope;
+
+                // do not deactivate scopes that exist at this time
+                Iterator<String> scopeToActivate = scopesToActivate.iterator();
+                while(scopeToActivate.hasNext()) {
+                    String activeScope = scopeToActivate.next();
+                    if(scopesToDeactivate.contains(activeScope)) {
+                        scopesToDeactivate.remove(activeScope); // do not deactivate an already active scope
+                        scopeToActivate.remove(); // if the previous already contains it, then it is already activated.
+                        // we should make sure we never activate the same service twice.
+                    }
+                }
+
+                if(!scopesToActivate.isEmpty() || !scopesToDeactivate.isEmpty()) { // de-morgan is an ass, but the unit tests don't lie
+                    scopeManager.dispatchActivation(scopesToDeactivate, scopesToActivate);
+                }
+
+                // scope eviction + scoped + re-order scope hierarchy
+                scopeManager.cleanupScopesBy(newState);
+
+                if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
+                    core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
+                }
+            }
         }
     };
 
@@ -308,6 +309,7 @@ public class Backstack
     public void setup(@Nonnull List<?> initialKeys) {
         core = new NavigationCore(initialKeys);
         core.setBackstack(this);
+        core.addCompletionListener(managedStateChangerCompletionListener); // fix #220
     }
 
     /**
