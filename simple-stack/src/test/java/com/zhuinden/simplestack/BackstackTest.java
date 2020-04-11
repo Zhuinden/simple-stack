@@ -304,4 +304,110 @@ public class BackstackTest {
 
         assertThat(backstack.goBack()).isFalse();
     }
+
+    @Test
+    public void removeStateChangerListenersDoesNotBreakScoping() {
+        Backstack backstack = new Backstack();
+
+        ScopeKey key1 = new ScopeKey() {
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return "key1";
+            }
+
+            @Override
+            public String toString() {
+                return "KEY1";
+            }
+        };
+
+        final ScopeKey key2 = new ScopeKey() {
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return "key2";
+            }
+
+            @Override
+            public String toString() {
+                return "KEY2";
+            }
+        };
+
+        final Object key3 = new Object();
+
+        class Service implements ScopedServices.Registered, ScopedServices.Activated {
+            private boolean isActivatedCalled;
+            private boolean isDeactivatedCalled;
+            private boolean isRegisteredCalled;
+            private boolean isUnregisteredCalled;
+
+            @Override
+            public void onServiceActive() {
+                isActivatedCalled = true;
+            }
+
+            @Override
+            public void onServiceInactive() {
+                isDeactivatedCalled = true;
+            }
+
+            @Override
+            public void onServiceRegistered() {
+                isRegisteredCalled = true;
+            }
+
+            @Override
+            public void onServiceUnregistered() {
+                isUnregisteredCalled = true;
+            }
+        }
+
+        final Service service1 = new Service();
+        final Service service2 = new Service();
+
+        backstack.setScopedServices(new ScopedServices() {
+            @Override
+            public void bindServices(@Nonnull ServiceBinder serviceBinder) {
+                if("key1".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("service1", service1);
+                }
+                if("key2".equals(serviceBinder.getScopeTag())) {
+                    serviceBinder.addService("service2", service2);
+                }
+            }
+        });
+
+        backstack.setup(History.of(key1));
+
+        final StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+
+        backstack.setStateChanger(stateChanger);
+
+        backstack.removeStateChanger();
+
+        backstack.setHistory(History.of(key2), StateChange.REPLACE);
+
+        backstack.removeAllStateChangeCompletionListeners();
+
+        backstack.setStateChanger(stateChanger);
+
+        backstack.setHistory(History.of(key3), StateChange.REPLACE);
+
+        assertThat(service1.isActivatedCalled).isTrue();
+        assertThat(service1.isDeactivatedCalled).isTrue();
+        assertThat(service1.isRegisteredCalled).isTrue();
+        assertThat(service1.isUnregisteredCalled).isTrue();
+
+        assertThat(service2.isRegisteredCalled).isTrue();
+        assertThat(service2.isUnregisteredCalled).isTrue();
+        assertThat(service2.isActivatedCalled).isTrue();
+        assertThat(service2.isDeactivatedCalled).isTrue();
+    }
 }

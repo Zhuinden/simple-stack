@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack 2.3.2 (2020-04-11)
+--------------------------------
+
+- FIX: Bug introduced in 2.3.1, using `backstack.removeAllStateChangeCompletionListeners()` would remove an internal completion listener and therefore scope activation callbacks would stop being dispatched. 
+
 -Simple Stack 2.3.1 (2020-03-31)
 --------------------------------
 

@@ -678,6 +678,7 @@ public class Backstack
     public void removeAllStateChangeCompletionListeners() {
         checkBackstack("A backstack must be set up before state change completion listeners are removed from it.");
         this.core.removeCompletionListeners();
+        this.core.addCompletionListener(managedStateChangerCompletionListener); // #221
     }
 
     /**
