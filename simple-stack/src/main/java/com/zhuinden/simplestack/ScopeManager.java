@@ -283,7 +283,7 @@ class ScopeManager {
         }
     }
 
-    static final String GLOBAL_SCOPE_TAG = "__SIMPLE_STACK_INTERNAL_GLOBAL_SCOPE__";
+    private static final String GLOBAL_SCOPE_TAG = GlobalServices.SCOPE_TAG;
     private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null, GLOBAL_SCOPE_TAG, Collections.<String>emptyList(), true, true, false);
 
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();

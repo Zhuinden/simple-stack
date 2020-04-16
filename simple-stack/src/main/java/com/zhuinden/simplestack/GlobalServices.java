@@ -26,6 +26,8 @@ import javax.annotation.Nonnull;
  * Should be created using {@link GlobalServices#builder()}.
  */
 public class GlobalServices {
+    public static final String SCOPE_TAG = "__SIMPLE_STACK_INTERNAL_GLOBAL_SCOPE__";
+
     private final ScopeNode scope;
 
     ScopeNode getScope() {

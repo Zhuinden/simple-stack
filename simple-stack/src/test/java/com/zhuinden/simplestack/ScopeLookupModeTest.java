@@ -569,10 +569,10 @@ public class ScopeLookupModeTest {
             }
         });
 
-        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.EXPLICIT)).containsExactly("beep", "parent1", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.EXPLICIT)).containsExactly("boop", "parent2", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key1("beep"), ScopeLookupMode.ALL)).containsExactly("beep", "parent1", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(new Key2("boop"), ScopeLookupMode.ALL)).containsExactly("boop", "parent2", "beep", "parent1", GlobalServices.SCOPE_TAG);
     }
 
     @Test
@@ -695,12 +695,12 @@ public class ScopeLookupModeTest {
         };
         backstack.setStateChanger(stateChanger);
 
-        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.ALL)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).containsExactly("scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.ALL)).containsExactly("scope2", "parent2", "parent1", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).containsExactly("scope2", "parent2", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.ALL)).containsExactly("scope3", "parent3", "parent1", "scope2", "parent2", "scope1", ScopeManager.GLOBAL_SCOPE_TAG);
-        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).containsExactly("scope3", "parent3", "parent1", ScopeManager.GLOBAL_SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.ALL)).containsExactly("scope1", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(beep, ScopeLookupMode.EXPLICIT)).containsExactly("scope1", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.ALL)).containsExactly("scope2", "parent2", "parent1", "scope1", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(boop, ScopeLookupMode.EXPLICIT)).containsExactly("scope2", "parent2", "parent1", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.ALL)).containsExactly("scope3", "parent3", "parent1", "scope2", "parent2", "scope1", GlobalServices.SCOPE_TAG);
+        assertThat(backstack.findScopesForKey(braap, ScopeLookupMode.EXPLICIT)).containsExactly("scope3", "parent3", "parent1", GlobalServices.SCOPE_TAG);
 
         backstack.finalizeScopes();
 

@@ -257,17 +257,17 @@ public class ScopingAliasTest {
         assertThat(backstack.lookupService("aliasP1")).isSameAs(serviceP1);
 
         // then
-        assertThat(backstack.hasService(ScopeManager.GLOBAL_SCOPE_TAG, "service0")).isTrue();
-        assertThat(backstack.hasService(ScopeManager.GLOBAL_SCOPE_TAG, "alias0")).isTrue();
+        assertThat(backstack.hasService(GlobalServices.SCOPE_TAG, "service0")).isTrue();
+        assertThat(backstack.hasService(GlobalServices.SCOPE_TAG, "alias0")).isTrue();
 
-        assertThat(backstack.canFindFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0")).isTrue();
-        assertThat(backstack.canFindFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0", ScopeLookupMode.ALL)).isTrue();
-        assertThat(backstack.canFindFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0", ScopeLookupMode.EXPLICIT)).isTrue();
+        assertThat(backstack.canFindFromScope(GlobalServices.SCOPE_TAG, "alias0")).isTrue();
+        assertThat(backstack.canFindFromScope(GlobalServices.SCOPE_TAG, "alias0", ScopeLookupMode.ALL)).isTrue();
+        assertThat(backstack.canFindFromScope(GlobalServices.SCOPE_TAG, "alias0", ScopeLookupMode.EXPLICIT)).isTrue();
         assertThat(backstack.canFindService("alias0")).isTrue();
 
-        assertThat(backstack.lookupFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0")).isSameAs(service0);
-        assertThat(backstack.lookupFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0", ScopeLookupMode.ALL)).isSameAs(service0);
-        assertThat(backstack.lookupFromScope(ScopeManager.GLOBAL_SCOPE_TAG, "alias0", ScopeLookupMode.EXPLICIT)).isSameAs(service0);
+        assertThat(backstack.lookupFromScope(GlobalServices.SCOPE_TAG, "alias0")).isSameAs(service0);
+        assertThat(backstack.lookupFromScope(GlobalServices.SCOPE_TAG, "alias0", ScopeLookupMode.ALL)).isSameAs(service0);
+        assertThat(backstack.lookupFromScope(GlobalServices.SCOPE_TAG, "alias0", ScopeLookupMode.EXPLICIT)).isSameAs(service0);
         assertThat(backstack.lookupService("alias0")).isSameAs(service0);
 
         // ALSO
@@ -388,34 +388,5 @@ public class ScopingAliasTest {
 
         assertThat(service.saved).isEqualTo(1);
         assertThat(service.restored).isEqualTo(1);
-    }
-
-    // @Test // TODO (ALIAS)
-    public void aliasCannotBeAddedForServicesNotYetAdded() {
-        Backstack backstack = new Backstack();
-        backstack.setScopedServices(new ServiceProvider());
-
-        final Object service = new Object();
-
-        TestKeyWithScope boop = new TestKeyWithScope("boop") {
-            @Override
-            public void bindServices(ServiceBinder serviceBinder) {
-                serviceBinder.addAlias("alias", service);
-            }
-        };
-
-        backstack.setup(History.of(boop));
-
-        try {
-            backstack.setStateChanger(new StateChanger() {
-                @Override
-                public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
-                    completionCallback.stateChangeComplete();
-                }
-            });
-            // Assert.fail("Alias should be disallowed for services that are not yet added to any scopes"); // TODO (ALIAS): this restriction is not yet supported
-        } catch(IllegalStateException e) {
-            // assertThat(e.getMessage()).contains("A service should be added to a scope before it is bound to aliases");
-        }
     }
 }

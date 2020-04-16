@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack X.X.X (XXXX-XX-XX)
+--------------------------------
+
+- ADD: `GlobalServices.SCOPE_TAG` to make it possible without relying on internals to see the scope tag of global services.
+
 -Simple Stack 2.3.2 (2020-04-11)
 --------------------------------
 

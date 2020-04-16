@@ -503,52 +503,45 @@ public class ScopingGlobalScopeTest {
             }
         }
 
-        TestKey testKey2 = new TestKey("world");
+        TestKey testKey = new TestKey("world");
 
         final Service service = new Service();
-        final ScopeManager scopeManager = new ScopeManager();
-
-        scopeManager.setGlobalServices(GlobalServices.builder().addService("service", service).build());
+        final Backstack backstack = new Backstack();
+        backstack.setGlobalServices(GlobalServices.builder().addService("service", service).build());
 
         StateChanger stateChanger = new StateChanger() {
             @Override
             public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
-                scopeManager.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
         };
 
-        Backstack backstack = new Backstack();
-        backstack.setup(History.of(testKey2));
+        backstack.setup(History.of(testKey));
         backstack.setStateChanger(stateChanger);
 
-        assertThat(scopeManager.canFindService("service")).isTrue();
+        assertThat(backstack.canFindService("service")).isTrue();
 
-        StateBundle stateBundle = scopeManager.saveStates();
+        StateBundle stateBundle = backstack.toBundle();
 
-        final ScopeManager scopeManager2 = new ScopeManager();
-        scopeManager2.setGlobalServices(GlobalServices.builder()
+        final Backstack backstack2 = new Backstack();
+        backstack2.setGlobalServices(GlobalServices.builder()
                 .addService("service", new Service())
                 .build());
 
         StateChanger stateChanger2 = new StateChanger() {
             @Override
             public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
-                scopeManager2.buildScopes(stateChange.getNewKeys());
                 completionCallback.stateChangeComplete();
             }
         };
 
-        scopeManager2.setRestoredStates(stateBundle);
-
-        Backstack backstack2 = new Backstack();
-        backstack2.setup(History.of(testKey2));
-
+        backstack2.setup(History.of(testKey));
+        backstack2.fromBundle(stateBundle);
         backstack2.setStateChanger(stateChanger2);
 
-        assertThat(scopeManager2.lookupService("service")).isNotSameAs(service);
-        assertThat(scopeManager.<Service>lookupService("service").blah).isEqualTo(2);
-        assertThat(scopeManager2.<Service>lookupService("service").blah).isEqualTo(5);
+        assertThat(backstack2.lookupService("service")).isNotSameAs(service);
+        assertThat(backstack.<Service>lookupService("service").blah).isEqualTo(2);
+        assertThat(backstack2.<Service>lookupService("service").blah).isEqualTo(5);
     }
 
     @Test
