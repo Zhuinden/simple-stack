@@ -675,6 +675,7 @@ public class Backstack
     /**
      * Removes all {@link Backstack.CompletionListener}s added to the {@link Backstack}.
      */
+    @Deprecated
     public void removeAllStateChangeCompletionListeners() {
         checkBackstack("A backstack must be set up before state change completion listeners are removed from it.");
         this.core.removeCompletionListeners();

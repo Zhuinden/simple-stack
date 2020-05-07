@@ -3,6 +3,8 @@
 -Simple Stack X.X.X (XXXX-XX-XX)
 --------------------------------
 
+- DEPRECATED: `backstack.removeAllStateChangeCompletionListeners()`. This was added "for convenience", but in reality it is not a good/safe API, and it should not exist.
+
 - ADD: `GlobalServices.SCOPE_TAG` to make it possible without relying on internals to see the scope tag of global services.
 
 -Simple Stack 2.3.2 (2020-04-11)
