@@ -20,7 +20,7 @@ android {
         targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -35,14 +35,14 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.1") {
-        exclude(group = "com.android.support", module = "support-annotations")
-    }
-    implementation("com.android.support:appcompat-v7:28.0.0")
-    implementation("com.android.support:design:28.0.0")
-    implementation("com.android.support:support-vector-drawable:28.0.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test:rules:1.2.0")
+    implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("com.google.android.material:material:1.1.0")
+    implementation("androidx.vectordrawable:vectordrawable:1.1.0")
 
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72")
 }

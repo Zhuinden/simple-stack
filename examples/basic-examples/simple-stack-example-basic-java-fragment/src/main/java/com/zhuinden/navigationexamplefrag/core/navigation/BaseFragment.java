@@ -1,6 +1,6 @@
 package com.zhuinden.navigationexamplefrag.core.navigation;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by Owner on 2017. 06. 29..

@@ -16,7 +16,7 @@
 
 package com.zhuinden.simplestackexamplemvvm.features.tasks;
 
-import android.databinding.BindingAdapter;
+import androidx.databinding.BindingAdapter;
 import android.widget.ListView;
 
 import com.zhuinden.simplestackexamplemvvm.data.Task;

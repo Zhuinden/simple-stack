@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.tasks
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 
 import com.zhuinden.simplestackdemoexamplefragments.domain.Task
 

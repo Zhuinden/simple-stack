@@ -21,7 +21,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -35,12 +35,12 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72")
-    implementation("com.android.support:appcompat-v7:28.0.0")
-    implementation("com.android.support:recyclerview-v7:28.0.0")
+    implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("com.squareup.okhttp3:okhttp:3.14.2")
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.2")
     implementation("com.google.dagger:dagger:2.27")
-    implementation("com.android.support:support-v4:28.0.0")
+
     kapt("com.google.dagger:dagger-compiler:2.27")
     implementation(project(":simple-stack"))
 
@@ -52,7 +52,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("io.reactivex.rxjava2:rxjava:2.2.19")
     implementation("com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0")
-    implementation("com.android.support:multidex:1.0.3")
+    implementation("androidx.multidex:multidex:2.0.1")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("io.realm:android-adapters:3.0.0")
 }

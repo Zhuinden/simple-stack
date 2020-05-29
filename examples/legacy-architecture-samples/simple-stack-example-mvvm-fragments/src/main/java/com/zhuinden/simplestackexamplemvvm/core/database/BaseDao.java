@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackexamplemvvm.core.database;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemomultistack.util
 
-import android.support.annotation.IdRes
+import androidx.annotation.IdRes
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation
 
 inline fun BottomNavigation.onMenuItemSelected(

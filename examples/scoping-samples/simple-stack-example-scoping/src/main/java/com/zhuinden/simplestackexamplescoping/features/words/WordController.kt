@@ -1,7 +1,7 @@
 package com.zhuinden.simplestackexamplescoping.features.words
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.zhuinden.eventemitter.EventEmitter
 import com.zhuinden.eventemitter.EventSource
 import com.zhuinden.simplestack.Backstack

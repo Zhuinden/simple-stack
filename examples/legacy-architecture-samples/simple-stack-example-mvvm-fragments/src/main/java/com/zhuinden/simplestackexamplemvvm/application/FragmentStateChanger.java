@@ -1,7 +1,7 @@
 package com.zhuinden.simplestackexamplemvvm.application;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.navigator.Navigator;

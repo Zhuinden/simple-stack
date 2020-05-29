@@ -1,8 +1,8 @@
 package com.zhuinden.simplestackdemoexamplefragments.core.navigation
 
 import android.os.Parcelable
-import android.support.annotation.DrawableRes
-import android.support.v4.app.Fragment
+import androidx.annotation.DrawableRes
+import androidx.fragment.app.Fragment
 import android.view.View
 
 /**

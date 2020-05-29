@@ -3,7 +3,7 @@ package com.zhuinden.simplestackdemoexamplemvp.application
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder

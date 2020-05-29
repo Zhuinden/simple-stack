@@ -15,7 +15,7 @@
  */
 package com.zhuinden.simplestackexamplemvvm.core.database;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.zhuinden.simplestackexamplemvvm.core.scheduler.Scheduler;
 

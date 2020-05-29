@@ -2,7 +2,7 @@ package com.community.simplestackkotlindaggerexample.application
 
 import android.app.Application
 import android.content.Context
-import android.support.multidex.MultiDex
+import androidx.multidex.MultiDex
 import com.community.simplestackkotlindaggerexample.application.injection.AppComponent
 import com.community.simplestackkotlindaggerexample.application.injection.AppModule
 import com.community.simplestackkotlindaggerexample.application.injection.DaggerAppComponent

@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.util.scopedservices;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.zhuinden.simplestack.ScopedServices;
 import com.zhuinden.simplestack.ServiceBinder;

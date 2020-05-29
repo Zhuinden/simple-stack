@@ -1,9 +1,9 @@
 package com.zhuinden.simplestackexamplemvvm.features.addedittask;
 
 import android.content.res.Resources;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.Fragment;
 
 import com.google.auto.value.AutoValue;
 import com.zhuinden.simplestackexamplemvvm.R;

@@ -1,7 +1,7 @@
 package com.community.simplestackkotlindaggerexample.core.navigation
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.community.simplestackkotlindaggerexample.R
 import com.zhuinden.simplestack.StateChange
 

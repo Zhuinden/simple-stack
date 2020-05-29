@@ -1,6 +1,6 @@
 package com.zhuinden.navigationexampleview.screens;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
 import com.zhuinden.navigationexampleview.R;

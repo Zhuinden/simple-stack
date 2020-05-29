@@ -3,10 +3,10 @@
 
 -keep class android.arch.** { *; }
 
--keep class android.support.v4.widget.DrawerLayout { *; }
--keep class android.support.test.espresso.IdlingResource { *; }
+-keep class androidx.drawerlayout.widget.DrawerLayout { *; }
+-keep class androidx.test.espresso.IdlingResource { *; }
 -keep class com.google.common.base.Preconditions { *; }
--keep class android.databinding.** { *; }
+-keep class androidx.databinding.** { *; }
 
 # For Guava:
 -dontwarn javax.annotation.**

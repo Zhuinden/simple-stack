@@ -3,7 +3,7 @@ package com.community.simplestackkotlindaggerexample.application
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.community.simplestackkotlindaggerexample.R
 import com.community.simplestackkotlindaggerexample.core.navigation.FragmentStateChanger
 import com.community.simplestackkotlindaggerexample.screens.home.HomeKey

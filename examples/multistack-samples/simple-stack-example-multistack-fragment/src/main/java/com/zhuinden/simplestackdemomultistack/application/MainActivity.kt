@@ -1,7 +1,7 @@
 package com.zhuinden.simplestackdemomultistack.application
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MotionEvent
 import com.zhuinden.simplestackdemomultistack.R
 import com.zhuinden.simplestackdemomultistack.core.navigation.Multistack

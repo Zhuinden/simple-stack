@@ -13,7 +13,7 @@ package com.zhuinden.simplestackdemoexamplefragments.util.optional;
  * the License.
  */
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.zhuinden.simplestackdemoexamplefragments.util.Preconditions;
 

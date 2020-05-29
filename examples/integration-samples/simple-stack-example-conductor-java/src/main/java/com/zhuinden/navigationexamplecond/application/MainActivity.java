@@ -1,9 +1,9 @@
 package com.zhuinden.navigationexamplecond.application;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Conductor;

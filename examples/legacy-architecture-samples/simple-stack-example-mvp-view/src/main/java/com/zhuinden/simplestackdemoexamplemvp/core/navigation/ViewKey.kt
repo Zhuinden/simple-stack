@@ -1,7 +1,7 @@
 package com.zhuinden.simplestackdemoexamplemvp.core.navigation
 
 import android.os.Parcelable
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import android.view.View
 
 import com.zhuinden.simplestack.navigator.DefaultViewKey

@@ -1,6 +1,6 @@
 package com.example.fragmenttransitions;
 
-import android.support.annotation.IntRange;
+import androidx.annotation.IntRange;
 
 import com.google.auto.value.AutoValue;
 

@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.tasks
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.BasePresenter
@@ -75,7 +75,7 @@ class TasksPresenter @Inject constructor(
             .map<Pair<DiffUtil.DiffResult, List<Task>>> { tasks -> view.calculateDiff(tasks) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { pairOfDiffResultAndTasks ->
-                view.showTasks(pairOfDiffResultAndTasks, filterType.value)
+                view.showTasks(pairOfDiffResultAndTasks, filterType.value!!)
             }
     }
 
@@ -129,7 +129,7 @@ class TasksPresenter @Inject constructor(
 
     override fun fromBundle(bundle: StateBundle?) {
         bundle?.run {
-            filterType.accept(getParcelable("FILTERING"))
+            filterType.accept(getParcelable("FILTERING")!!)
         }
     }
 }

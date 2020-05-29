@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemomultistack.core.navigation
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 
 /**
  * Created by Zhuinden on 2018.09.17.

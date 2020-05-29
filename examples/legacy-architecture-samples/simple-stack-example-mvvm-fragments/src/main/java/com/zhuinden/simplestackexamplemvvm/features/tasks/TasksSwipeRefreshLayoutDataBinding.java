@@ -16,8 +16,8 @@
 
 package com.zhuinden.simplestackexamplemvvm.features.tasks;
 
-import android.databinding.BindingAdapter;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.databinding.BindingAdapter;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.zhuinden.simplestackexamplemvvm.util.ScrollChildSwipeRefreshLayout;
 

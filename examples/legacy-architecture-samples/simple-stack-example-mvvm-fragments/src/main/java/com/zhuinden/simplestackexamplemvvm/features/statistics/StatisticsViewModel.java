@@ -16,14 +16,14 @@
 
 package com.zhuinden.simplestackexamplemvvm.features.statistics;
 
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.Observer;
 import android.content.Context;
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
-import android.databinding.ObservableBoolean;
-import android.databinding.ObservableField;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.databinding.ObservableBoolean;
+import androidx.databinding.ObservableField;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.zhuinden.simplestackexamplemvvm.R;
 import com.zhuinden.simplestackexamplemvvm.core.database.LiveResults;

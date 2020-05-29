@@ -18,7 +18,7 @@ android {
         targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -34,15 +34,13 @@ dependencies {
     implementation(project(":simple-stack"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72")
 
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.1") {
-        exclude(group = "com.android.support", module = "support-annotations")
-    }
-    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+    testImplementation("junit:junit:4.13")
 
     compileOnly("org.glassfish:javax.annotation:10.0-b28")
-    implementation("com.android.support:appcompat-v7:28.0.0")
-    implementation("com.android.support:recyclerview-v7:28.0.0")
-    implementation("com.android.support:design:28.0.0")
+    implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("com.google.android.material:material:1.1.0")
     implementation("com.bartoszlipinski:viewpropertyobjectanimator:1.4.5")
 
     implementation("it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.1-rc1")

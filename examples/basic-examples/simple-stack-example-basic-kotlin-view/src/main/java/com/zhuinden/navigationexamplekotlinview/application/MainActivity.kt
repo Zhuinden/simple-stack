@@ -1,7 +1,7 @@
 package com.zhuinden.navigationexamplekotlinview.application
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.navigationexamplekotlinview.R
 import com.zhuinden.navigationexamplekotlinview.screens.DashboardKey
 import com.zhuinden.navigationexamplekotlinview.screens.HomeKey

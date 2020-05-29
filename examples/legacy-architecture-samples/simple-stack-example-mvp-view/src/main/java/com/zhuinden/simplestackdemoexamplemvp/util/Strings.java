@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemoexamplemvp.util;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * Created by Owner on 2017. 01. 27..

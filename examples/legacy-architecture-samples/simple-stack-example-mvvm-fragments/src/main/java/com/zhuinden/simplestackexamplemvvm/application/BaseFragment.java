@@ -1,8 +1,8 @@
 package com.zhuinden.simplestackexamplemvvm.application;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by Zhuinden on 2017.07.26..

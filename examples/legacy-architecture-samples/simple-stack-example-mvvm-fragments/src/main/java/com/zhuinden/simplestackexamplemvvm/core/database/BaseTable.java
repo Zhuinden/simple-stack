@@ -16,7 +16,7 @@
 package com.zhuinden.simplestackexamplemvvm.core.database;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.util.Collections;

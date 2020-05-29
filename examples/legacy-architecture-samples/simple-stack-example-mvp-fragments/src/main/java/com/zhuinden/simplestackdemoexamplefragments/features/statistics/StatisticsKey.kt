@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.statistics
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.View
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R

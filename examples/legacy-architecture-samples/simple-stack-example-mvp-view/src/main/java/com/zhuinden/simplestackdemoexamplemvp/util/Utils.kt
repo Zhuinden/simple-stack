@@ -3,7 +3,7 @@ package com.zhuinden.simplestackdemoexamplemvp.util
 
 import android.app.Activity
 import android.content.Context
-import android.support.annotation.LayoutRes
+import androidx.annotation.LayoutRes
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater

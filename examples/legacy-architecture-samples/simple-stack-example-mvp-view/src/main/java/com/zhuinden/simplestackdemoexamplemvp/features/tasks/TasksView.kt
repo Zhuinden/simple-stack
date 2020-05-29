@@ -2,11 +2,11 @@ package com.zhuinden.simplestackdemoexamplemvp.features.tasks
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.PopupMenu
+import com.google.android.material.snackbar.Snackbar
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.PopupMenu
 import android.util.AttributeSet
 import android.view.MenuItem
 import butterknife.ButterKnife
