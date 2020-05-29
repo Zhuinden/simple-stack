@@ -12,19 +12,26 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/examples" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-java-fragment" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-java-view" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-kotlin-fragment" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-kotlin-view" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-conductor-java" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-kotlin-community-sample" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-multistack-fragment" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-multistack-view" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-mvp-fragments" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-mvp-view" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-mvvm-fragments" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-scoping" />
-            <option value="$PROJECT_DIR$/examples/simple-stack-example-sharedelement-fragment" />
+            <option value="$PROJECT_DIR$/examples/basic-examples" />
+            <option value="$PROJECT_DIR$/examples/basic-examples/simple-stack-example-basic-java-fragment" />
+            <option value="$PROJECT_DIR$/examples/basic-examples/simple-stack-example-basic-java-view" />
+            <option value="$PROJECT_DIR$/examples/basic-examples/simple-stack-example-basic-kotlin-fragment" />
+            <option value="$PROJECT_DIR$/examples/basic-examples/simple-stack-example-basic-kotlin-view" />
+            <option value="$PROJECT_DIR$/examples/community-samples" />
+            <option value="$PROJECT_DIR$/examples/community-samples/simple-stack-example-kotlin-community-sample" />
+            <option value="$PROJECT_DIR$/examples/integration-samples" />
+            <option value="$PROJECT_DIR$/examples/integration-samples/simple-stack-example-conductor-java" />
+            <option value="$PROJECT_DIR$/examples/legacy-architecture-samples" />
+            <option value="$PROJECT_DIR$/examples/legacy-architecture-samples/simple-stack-example-mvp-fragments" />
+            <option value="$PROJECT_DIR$/examples/legacy-architecture-samples/simple-stack-example-mvp-view" />
+            <option value="$PROJECT_DIR$/examples/legacy-architecture-samples/simple-stack-example-mvvm-fragments" />
+            <option value="$PROJECT_DIR$/examples/multistack-samples" />
+            <option value="$PROJECT_DIR$/examples/multistack-samples/simple-stack-example-multistack-fragment" />
+            <option value="$PROJECT_DIR$/examples/multistack-samples/simple-stack-example-multistack-view" />
+            <option value="$PROJECT_DIR$/examples/scoping-samples" />
+            <option value="$PROJECT_DIR$/examples/scoping-samples/simple-stack-example-scoping" />
+            <option value="$PROJECT_DIR$/examples/shared-element-samples" />
+            <option value="$PROJECT_DIR$/examples/shared-element-samples/simple-stack-example-sharedelement-fragment" />
             <option value="$PROJECT_DIR$/simple-stack" />
           </set>
         </option>
