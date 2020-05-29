@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zhuinden.simplestacktutorials">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".app.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".steps.step_1.Step1Activity" />
+        <activity android:name=".steps.step_2.Step2Activity" />
+        <activity
+            android:name=".steps.step_3.Step3Activity"
+            android:theme="@style/AppThemeNoTitle" />
+        <activity android:name=".steps.step_4.Step4Activity" />
+        <activity android:name=".steps.step_5.Step5Activity" />
+        <activity android:name=".steps.step_6.Step6Activity" />
+        <activity android:name=".steps.step_7.Step7Activity" />
+        <activity android:name=".steps.step_8.Step8Activity" />
+        <activity android:name=".steps.step_9.Step9Activity" />
+    </application>
+
+</manifest>

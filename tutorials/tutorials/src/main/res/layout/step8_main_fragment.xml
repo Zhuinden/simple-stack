@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/textResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="32dp"
+            android:text="This is where the result will show."
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/buttonBeginFlow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Begin Flow"
+            android:padding="24dp"/>
+
+    </LinearLayout>
+
+</FrameLayout>
