@@ -11,20 +11,21 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/examples" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-java-fragment" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-java-view" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-kotlin-fragment" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-basic-kotlin-view" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-conductor-java" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-kotlin-community-sample" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-multistack-fragment" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-multistack-view" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-mvp-fragments" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-mvp-view" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-mvvm-fragments" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-scoping" />
+            <option value="$PROJECT_DIR$/examples/simple-stack-example-sharedelement-fragment" />
             <option value="$PROJECT_DIR$/simple-stack" />
-            <option value="$PROJECT_DIR$/simple-stack-example-basic-java-fragment" />
-            <option value="$PROJECT_DIR$/simple-stack-example-basic-java-view" />
-            <option value="$PROJECT_DIR$/simple-stack-example-basic-kotlin-fragment" />
-            <option value="$PROJECT_DIR$/simple-stack-example-basic-kotlin-view" />
-            <option value="$PROJECT_DIR$/simple-stack-example-conductor-java" />
-            <option value="$PROJECT_DIR$/simple-stack-example-kotlin-community-sample" />
-            <option value="$PROJECT_DIR$/simple-stack-example-multistack-fragment" />
-            <option value="$PROJECT_DIR$/simple-stack-example-multistack-view" />
-            <option value="$PROJECT_DIR$/simple-stack-example-mvp-fragments" />
-            <option value="$PROJECT_DIR$/simple-stack-example-mvp-view" />
-            <option value="$PROJECT_DIR$/simple-stack-example-mvvm-fragments" />
-            <option value="$PROJECT_DIR$/simple-stack-example-scoping" />
-            <option value="$PROJECT_DIR$/simple-stack-example-sharedelement-fragment" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
