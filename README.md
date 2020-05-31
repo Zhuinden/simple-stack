@@ -1,6 +1,6 @@
 # Simple Stack
 
-## Why would I want to use this?
+## Why do I want this?
 
 To make navigation to another screen as simple as `backstack.goTo(SomeScreen())`, and going back as simple as `backstack.goBack()`.
 
