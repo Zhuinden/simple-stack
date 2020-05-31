@@ -63,6 +63,39 @@ implementation 'com.github.Zhuinden:simple-stack:2.3.2'
 
 You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack/tree/9013a12edeb6c987758b037089b15a1e9aa423c1/tutorials) for simple examples.
 
+## Fragments
+
+With Fragments, the Activity code typically looks like this:
+
+``` kotlin
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private lateinit var fragmentStateChanger: FragmentStateChanger
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+
+        Navigator.configure()
+            .setStateChanger(SimpleStateChanger(this))
+            .install(this, root, History.of(FirstScreen()))
+    }
+
+    override fun onBackPressed() {
+        if (!Navigator.onBackPressed(this)) {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onNavigationEvent(stateChange: StateChange) {
+        fragmentStateChanger.handleStateChange(stateChange)
+    }
+}
+```
+
+After which going to the second screen is as simple as `Navigator.getBackstack(context).goTo(SecondScreen())`.
+
 ## Scopes
 
 To simplify sharing data/state between screens, a screen key can implement `ScopeKey`.
@@ -85,8 +118,11 @@ inline fun <reified T> ServiceBinder.add(service: Any, serviceTag: String = T::c
 Then:
 
 ``` kotlin
-override fun bindServices(serviceBinder: ServiceBinder) {
-    serviceBinder.add(WordViewModel())
+@Parcelize
+data class WordListKey(private val placeholder: String = ""): HasServices { // see scoping example
+    override fun bindServices(serviceBinder: ServiceBinder) {
+        serviceBinder.add(WordViewModel())
+    }
 }
 
 class WordViewModel : Bundleable, ScopedServices.Registered { // not jetpack vm
