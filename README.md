@@ -105,6 +105,18 @@ class FirstScreen: DefaultFragmentKey() {
 }
 ```
 
+And `FirstFragment` looks like this:
+
+``` kotlin
+class FirstFragment: KeyedFragment(R.layout.first_fragment) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val key: FirstScreen = getKey() // params
+    }
+}
+```
+
 After which going to the second screen is as simple as `backstack.goTo(SecondScreen())`.
 
 ## Scopes
@@ -117,6 +129,10 @@ Services bound to a `ServiceBinder` get lifecycle callbacks: `ScopedServices.Reg
 
 This lets you easily share a class between screens, while still letting you handle Android's lifecycles seamlessly.
 
+Using the `simple-stack-extensions`, this can be simplified using the `DefaultServiceProvider`. 
+
+It looks like this:
+
 ``` kotlin
 Navigator.configure()
     .setScopedServices(DefaultServiceProvider())
@@ -128,9 +144,11 @@ And then:
 
 ``` kotlin
 @Parcelize
-data class WordListKey(private val placeholder: String = ""): DefaultServiceProvider.HasServices {
+class WordListKey: DefaultFragmentKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.add(WordViewModel())
+        with(serviceBinder) {
+            add(WordViewModel())
+        }
     }
 }
 
@@ -150,6 +168,8 @@ class NewWordFragment : BaseFragment() {
     ...
 }
 ```
+
+And our ViewModel is shared between two screens.
 
 Any additional shared scopes on top of screen scopes can be defined using `ScopeKey.Child`.
 
