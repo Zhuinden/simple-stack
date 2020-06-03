@@ -3,6 +3,8 @@
 -Simple Stack X.X.X (XXXX-XX-XX)
 --------------------------------
 
+- UPDATE: Create and release` simple-stack-extensions:2.0.0` for default scoping and default fragment behaviors.
+
 - DEPRECATED: `backstack.removeAllStateChangeCompletionListeners()`. This was added "for convenience", but in reality it is not a good/safe API, and it should not exist.
 
 - ADD: `GlobalServices.SCOPE_TAG` to make it possible without relying on internals to see the scope tag of global services.

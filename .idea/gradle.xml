@@ -12,6 +12,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/samples" />
+            <option value="$PROJECT_DIR$/samples/advanced-samples" />
+            <option value="$PROJECT_DIR$/samples/advanced-samples/extensions-example" />
             <option value="$PROJECT_DIR$/samples/basic-samples" />
             <option value="$PROJECT_DIR$/samples/basic-samples/simple-stack-example-basic-java-fragment" />
             <option value="$PROJECT_DIR$/samples/basic-samples/simple-stack-example-basic-java-view" />

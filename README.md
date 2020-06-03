@@ -50,6 +50,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 ``` kotlin
 // build.gradle.kts
 implementation("com.github.Zhuinden:simple-stack:2.3.2")
+implementation("com.github.Zhuinden:simple-stack-extensions:2.0.0")
 ```
 
 or
@@ -57,6 +58,7 @@ or
 ``` groovy
 // build.gradle
 implementation 'com.github.Zhuinden:simple-stack:2.3.2'
+implementation 'com.github.Zhuinden:simple-stack-extensions:2.0.0'
 ```
 
 ## How do I use it?
@@ -69,13 +71,13 @@ With Fragments, the Activity code typically looks like this:
 
 ``` kotlin
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
-    private lateinit var fragmentStateChanger: FragmentStateChanger
+    private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.root)
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
@@ -94,7 +96,16 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 }
 ```
 
-After which going to the second screen is as simple as `Navigator.getBackstack(context).goTo(SecondScreen())`.
+Where `FirstScreen` looks like this:
+
+``` kotlin
+@Parcelize
+class FirstScreen: DefaultFragmentKey() {
+    override fun instantiateFragment(): Fragment = FirstFragment()
+}
+```
+
+After which going to the second screen is as simple as `backstack.goTo(SecondScreen())`.
 
 ## Scopes
 
@@ -107,19 +118,17 @@ Services bound to a `ServiceBinder` get lifecycle callbacks: `ScopedServices.Reg
 This lets you easily share a class between screens, while still letting you handle Android's lifecycles seamlessly.
 
 ``` kotlin
-inline fun <reified T> Fragment.lookup(serviceTag: String = T::class.java.name) =
-    Navigator.lookupService<T>(requireContext(), serviceTag)
-    
-inline fun <reified T> ServiceBinder.add(service: Any, serviceTag: String = T::class.java.name) {
-    this.addService(serviceTag, service as T)
-}
+Navigator.configure()
+    .setScopedServices(DefaultServiceProvider())
+    /* ... */
 ```
 
-Then:
+And then:
+
 
 ``` kotlin
 @Parcelize
-data class WordListKey(private val placeholder: String = ""): HasServices { // see scoping example
+data class WordListKey(private val placeholder: String = ""): DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.add(WordViewModel())
     }

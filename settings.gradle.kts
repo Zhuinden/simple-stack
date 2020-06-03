@@ -1,4 +1,5 @@
 include(":simple-stack")
+include(":samples:advanced-samples:extensions-example")
 include(":samples:basic-samples:simple-stack-example-basic-java-fragment")
 include(":samples:basic-samples:simple-stack-example-basic-java-view")
 include(":samples:basic-samples:simple-stack-example-basic-kotlin-fragment")
