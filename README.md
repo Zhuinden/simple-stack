@@ -145,6 +145,8 @@ And then:
 ``` kotlin
 @Parcelize
 class WordListKey: DefaultFragmentKey(), DefaultServiceProvider.HasServices {
+    override fun getScopeTag() = javaClass.name
+
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
             add(WordViewModel())
