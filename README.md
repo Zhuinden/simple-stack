@@ -63,7 +63,7 @@ implementation 'com.github.Zhuinden:simple-stack-extensions:2.0.0'
 
 ## How do I use it?
 
-You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack/tree/9013a12edeb6c987758b037089b15a1e9aa423c1/tutorials) for simple examples.
+You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack/tree/842bfc781fa16568af956c4985c1f8ca02da0a6c/tutorials) for simple examples.
 
 ## Fragments
 

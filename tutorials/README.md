@@ -60,9 +60,9 @@ In this step, we'll add RxJava's BehaviorRelays and create ViewModel-internal su
 
 Congratulations! 
 
-You can now check https://github.com/Zhuinden/simple-stack/tree/master/samples/advanced-samples/extensions-example and remove some clutter.
+You can now check [the "advanced" sample which uses `simple-stack-extensions` to remove some clutter](https://github.com/Zhuinden/simple-stack/tree/842bfc781fa16568af956c4985c1f8ca02da0a6c/samples/advanced-samples/extensions-example/src/main/java/com/zhuinden/simplestackextensionsample).
 
-Most of the things written throughout Step 5 to Step 9 are provided by `simple-stack-extensions`.
+Most notably, it uses the `DefaultFragmentStateChanger`, the `DefaultServiceProvider`, and certain extension functions to make things simpler.
 
 ## License
 
