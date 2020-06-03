@@ -15,7 +15,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 
 class LoginViewModel(
-    private val appContext: Context,
+    private val authenticationManager: AuthenticationManager,
     private val backstack: Backstack
 ) : Bundleable, ScopedServices.Registered {
     private val compositeDisposable = CompositeDisposable()
@@ -38,7 +38,7 @@ class LoginViewModel(
 
     fun onLoginClicked() {
         if (isLoginEnabled.get()) {
-            AuthenticationManager.saveRegistration(appContext)
+            authenticationManager.saveRegistration()
             backstack.setHistory(History.of(ProfileKey()), StateChange.FORWARD)
         }
     }

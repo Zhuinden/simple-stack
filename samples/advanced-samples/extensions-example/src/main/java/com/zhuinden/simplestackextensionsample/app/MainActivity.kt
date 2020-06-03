@@ -9,6 +9,7 @@ import com.zhuinden.simplestack.SimpleStateChanger
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.servicesktx.add
 import com.zhuinden.simplestackextensionsample.R
 import com.zhuinden.simplestackextensionsample.features.login.LoginKey
 import com.zhuinden.simplestackextensionsample.features.profile.ProfileKey
@@ -16,27 +17,29 @@ import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
-    private lateinit var appContext: Context
+    private lateinit var authenticationManager: AuthenticationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step9Root)
-        appContext = applicationContext
+
+        val app = application as CustomApplication
+        authenticationManager = app.authenticationManager
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
             .setScopedServices(ServiceProvider())
             .setGlobalServices(
                 GlobalServices.builder()
-                    .addService("appContext", appContext)
+                    .add(authenticationManager)
                     .build()
             )
             .install(
                 this, step9Root, History.of(
                     when {
-                        AuthenticationManager.isAuthenticated(appContext) -> ProfileKey()
+                        authenticationManager.isAuthenticated() -> ProfileKey()
                         else -> LoginKey()
                     }
                 )
@@ -55,7 +58,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
     override fun onDestroy() {
         if (isFinishing) {
-            AuthenticationManager.clearRegistration(appContext) // just for sample repeat sake
+            authenticationManager.clearRegistration() // just for sample repeat sake
         }
 
         super.onDestroy()

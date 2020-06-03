@@ -12,7 +12,7 @@ import kotlinx.android.parcel.Parcelize
 data class LoginKey(private val placeholder: String = "") : DefaultFragmentKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(LoginViewModel(lookup("appContext"), backstack))
+            add(LoginViewModel(lookup(), backstack))
         }
     }
 

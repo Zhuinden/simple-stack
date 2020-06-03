@@ -56,6 +56,14 @@ This way, we can handle result passing between screens as a regular callback met
 
 In this step, we'll add RxJava's BehaviorRelays and create ViewModel-internal subscriptions to provide field validation.
 
+## 10.) Replace custom code with the simple-stack-extensions
+
+Congratulations! 
+
+You can now check https://github.com/Zhuinden/simple-stack/tree/master/samples/advanced-samples/extensions-example and remove some clutter.
+
+Most of the things written throughout Step 5 to Step 9 are provided by `simple-stack-extensions`.
+
 ## License
 
     Copyright 2020 Gabor Varadi

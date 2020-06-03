@@ -9,11 +9,11 @@ import com.zhuinden.simplestackextensionsample.app.AuthenticationManager
 import com.zhuinden.simplestackextensionsample.features.login.LoginKey
 
 class ProfileViewModel(
-    private val appContext: Context,
+    private val authenticationManager: AuthenticationManager,
     private val backstack: Backstack
 ) : ScopedServices.Activated {
     override fun onServiceActive() {
-        if (!AuthenticationManager.isAuthenticated(appContext)) {
+        if (!authenticationManager.isAuthenticated()) {
             backstack.setHistory(History.of(LoginKey()), StateChange.REPLACE)
         }
     }

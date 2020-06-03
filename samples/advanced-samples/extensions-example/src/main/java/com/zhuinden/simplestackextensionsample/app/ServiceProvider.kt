@@ -3,6 +3,7 @@ package com.zhuinden.simplestackextensionsample.app
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import com.zhuinden.simplestackextensions.servicesktx.add
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.simplestackextensionsample.features.registration.RegistrationViewModel
 
 class ServiceProvider : DefaultServiceProvider() {
@@ -13,12 +14,9 @@ class ServiceProvider : DefaultServiceProvider() {
 
         with(serviceBinder) {
             when (scope) { // explicit shared services
-                "registration" -> add(
-                    RegistrationViewModel(
-                        lookupService("appContext"),
-                        backstack
-                    )
-                )
+                "registration" -> {
+                    add(RegistrationViewModel(lookup(), backstack))
+                }
                 else -> {
                 }
             }

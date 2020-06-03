@@ -12,7 +12,7 @@ import kotlinx.android.parcel.Parcelize
 data class ProfileKey(private val placeholder: String = "") : DefaultFragmentKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(ProfileViewModel(lookup("appContext"), backstack))
+            add(ProfileViewModel(lookup(), backstack))
         }
     }
 

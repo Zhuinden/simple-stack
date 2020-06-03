@@ -14,7 +14,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 
 class RegistrationViewModel(
-    private val appContext: Context,
+    private val authenticationManager: AuthenticationManager,
     private val backstack: Backstack
 ) : Bundleable, ScopedServices.Registered, ScopedServices.HandlesBack {
     enum class RegistrationState { // this is actually kinda superfluous/unnecessary but ok
@@ -55,7 +55,7 @@ class RegistrationViewModel(
     fun onRegisterAndLoginClicked() {
         if (isRegisterAndLoginEnabled.get()) {
             currentState = RegistrationState.REGISTRATION_COMPLETED
-            AuthenticationManager.saveRegistration(appContext)
+            authenticationManager.saveRegistration()
             backstack.setHistory(History.of(ProfileKey()), StateChange.FORWARD)
         }
     }
