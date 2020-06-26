@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 Where `FirstScreen` looks like this:
 
 ``` kotlin
-@Parcelize
+@Parcelize // typically data class
 class FirstScreen: DefaultFragmentKey() {
     override fun instantiateFragment(): Fragment = FirstFragment()
 }
@@ -143,35 +143,37 @@ And then:
 
 
 ``` kotlin
-@Parcelize
-class WordListKey: DefaultFragmentKey(), DefaultServiceProvider.HasServices {
+@Parcelize // typically data class
+class FirstScreen: DefaultFragmentKey(), DefaultServiceProvider.HasServices {
+    override fun instantiateFragment(): Fragment = FirstFragment()
+
     override fun getScopeTag() = javaClass.name
 
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(WordViewModel())
+            add(FirstScopedModel())
         }
     }
 }
 
-class WordViewModel : Bundleable, ScopedServices.Registered { // not jetpack vm
+class FirstScopedModel : Bundleable, ScopedServices.Registered { // interfaces are optional
     ...
 }
 
-class WordListFragment : BaseFragment() {
-    private val viewModel by lazy { lookup<WordViewModel>() }
+class FirstFragment : KeyedFragment(R.layout.first_fragment) {
+    private val firstModel by lazy { lookup<FirstScopedModel>() }
 
     ...
 }
 
-class NewWordFragment : BaseFragment() {
-    private val viewModel by lazy { lookup<WordViewModel>() }
+class SecondFragment : KeyedFragment(R.layout.second_fragment) {
+    private val firstModel by lazy { lookup<FirstScopedModel>() } // <- available if FirstScreen is in the backstack
 
     ...
 }
 ```
 
-And our ViewModel is shared between two screens.
+And `FirstScopedModel` is shared between two screens.
 
 Any additional shared scopes on top of screen scopes can be defined using `ScopeKey.Child`.
 
@@ -184,18 +186,10 @@ Instead of hacking around with the right fragment transaction tags, or calling `
 Using `Backstack` to navigate allows you to move navigation responsibilities out of your view layer. No need to run FragmentTransactions directly in a click listener each time you want to move to a different screen. No need to mess around with  `LiveData<Event<T>>` or `SingleLiveData` to get your "view" to decide what state your app should be in either.
 
 ``` java
-public class MyViewModel {
-    private final Backstack backstack;
-
-    public MyViewModel(Backstack backstack) {
-        this.backstack = backstack;
-    }
-
-    // ...
-
-    public void doSomething() {
+class FirstScopedModel(private val backstack: Backstack) {
+    fun doSomething() {
         // ...
-        backstack.goTo(new OtherScreen());
+        backstack.goTo(SecondScreen())
     }
 }
 ```
@@ -203,7 +197,7 @@ public class MyViewModel {
 Another additional benefit is that your navigation history can be unit tested.
 
 ``` java
-assertThat(backstack.getHistory()).containsExactly(new SomeScreen(), new OtherScreen());
+assertThat(backstack.getHistory()).containsExactly(SomeScreen(), OtherScreen())
 ```
 
 And most importantly, navigation (swapping screens) happens in one place, and you are in direct control of what happens in such a scenario. By writing a `StateChanger`, you can set up "how to display my current navigation state" in any way you want. No more `((MainActivity)getActivity()).setTitleText("blah");` inside Fragment's `onStart()`.
@@ -211,8 +205,8 @@ And most importantly, navigation (swapping screens) happens in one place, and yo
 Write once, works in all cases.
 
 ``` java
-public void onNavigationEvent(StateChange stateChange) { // using SimpleStateChanger
-    Screen newScreen = stateChange.topNewKey(); // use your new navigation state
+override fun onNavigationEvent(stateChange: StateChange) { // using SimpleStateChanger
+    val newScreen = stateChange.topNewKey<MyScreen>() // use your new navigation state
 
     setTitle(newScreen.title);
 
