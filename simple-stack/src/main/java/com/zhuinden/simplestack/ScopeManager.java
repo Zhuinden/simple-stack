@@ -331,7 +331,13 @@ class ScopeManager {
     private void buildGlobalScope() {
         if(!scopes.containsKey(GLOBAL_SCOPE_TAG)) {
             if(globalServiceFactory != null) {
-                globalServices = globalServiceFactory.create();
+                globalServices = globalServiceFactory.create(backstack);
+
+                for(Map.Entry<String, Object> entry: globalServices.services()) {
+                    if(entry.getValue() == backstack) {
+                        throw new IllegalArgumentException("The root backstack should not be added as a service, as it would cause a circular save-state loop. Adding it as an alias would work, but should typically not be necessary because of `serviceBinder.getBackstack()`.");
+                    }
+                }
             }
 
             ScopeNode scope = globalServices.getScope();
@@ -352,6 +358,12 @@ class ScopeManager {
 
             if(!isDummyScope) {
                 scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
+
+                for(Map.Entry<String, Object> entry: scope.services()) {
+                    if(entry.getValue() == backstack) {
+                        throw new IllegalArgumentException("The root backstack should not be added as a service, as it would cause a circular save-state loop. Adding it as an alias would work, but should typically not be necessary because of `serviceBinder.getBackstack()`.");
+                    }
+                }
 
                 restoreAndNotifyServices(scopeTag, scope);
             }

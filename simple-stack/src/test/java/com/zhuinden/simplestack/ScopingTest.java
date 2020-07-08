@@ -24,8 +24,7 @@ import com.zhuinden.simplestack.helpers.TestKey;
 import com.zhuinden.simplestack.helpers.TestKeyWithOnlyParentServices;
 import com.zhuinden.statebundle.StateBundle;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -223,6 +222,65 @@ public class ScopingTest {
         } catch(Exception e) {
             assertThat(e.getMessage()).isEqualTo("serviceTag cannot be null!");
         }
+    }
+
+    @Test
+    public void serviceBinderThrowsIfRootBackstackIsAService() {
+        final String serviceTag = "backstack";
+
+        final Backstack backstack = new Backstack();
+
+        TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.addService(serviceTag, backstack);
+            }
+
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(testKeyWithScope));
+        try {
+            backstack.setStateChanger(stateChanger);
+            Assert.fail("This would cause a save-state loop in toBundle()");
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void serviceBinderSucceedsIfRootBackstackIsAnAlias() {
+        final String serviceTag = "backstack";
+
+        final Backstack backstack = new Backstack();
+
+        TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.addAlias(serviceTag, backstack);
+            }
+
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setup(History.of(testKeyWithScope));
+        backstack.setStateChanger(stateChanger);
+
+        assertThat(backstack.lookupService(serviceTag)).isSameAs(backstack);
     }
 
     @Test

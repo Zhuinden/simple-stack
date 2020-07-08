@@ -1,13 +1,22 @@
 # Change log
 
--Simple Stack X.X.X (XXXX-XX-XX)
+-Simple Stack 2.4.0 (2020-07-08)
 --------------------------------
+- SIGNATURE CHANGE: `GlobalServices.Factory` now receives `Backstack` parameter in `create()`. (#231)
 
-- UPDATE: Create and release` simple-stack-extensions:2.0.0` for default scoping and default fragment behaviors.
+I'm aware this is technically "breaking", but the effect should be minor, and hopefully shouldn't cause problems.`
+
+The `Backstack` cannot be added as a `service` directly, but it can be added as an `alias`.
+
+- FIX: `GlobalServices.Factory`'s `create()` method was non-null, but `@Nonnull` was missing.
+
+- MINOR FIX: Adding the `Backstack` from `serviceBinder.getBackstack()` with `addService()` would cause a loop in `toBundle()`. Now it explicitly throws `IllegalArgumentException` instead sooner (not reported before).
 
 - DEPRECATED: `backstack.removeAllStateChangeCompletionListeners()`. This was added "for convenience", but in reality it is not a good/safe API, and it should not exist.
 
-- ADD: `GlobalServices.SCOPE_TAG` to make it possible without relying on internals to see the scope tag of global services.
+- UPDATE: Create and release` simple-stack-extensions:2.0.0` for default scoping and default fragment behaviors.
+
+- ADD: `GlobalServices.SCOPE_TAG` to make it possible to see the scope tag of global services without relying on internals.
 
 -Simple Stack 2.3.2 (2020-04-11)
 --------------------------------

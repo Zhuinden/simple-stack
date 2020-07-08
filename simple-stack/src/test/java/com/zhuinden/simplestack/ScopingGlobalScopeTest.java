@@ -24,6 +24,7 @@ import com.zhuinden.simplestack.helpers.TestKey;
 import com.zhuinden.simplestack.helpers.TestKeyWithScope;
 import com.zhuinden.statebundle.StateBundle;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -733,8 +734,9 @@ public class ScopingGlobalScopeTest {
 
         Backstack backstack = new Backstack();
         backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Nonnull
             @Override
-            public GlobalServices create() {
+            public GlobalServices create(@Nonnull Backstack backstack) {
                 return GlobalServices.builder()
                         .addService("service", service)
                         .build();
@@ -764,8 +766,9 @@ public class ScopingGlobalScopeTest {
                 .build());
 
         backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Nonnull
             @Override
-            public GlobalServices create() {
+            public GlobalServices create(@Nonnull Backstack backstack) {
                 return GlobalServices.builder()
                         .addService("service2", service2)
                         .build();
@@ -791,8 +794,9 @@ public class ScopingGlobalScopeTest {
 
         final AtomicReference<Object> serviceRef = new AtomicReference<>();
         backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Nonnull
             @Override
-            public GlobalServices create() {
+            public GlobalServices create(@Nonnull Backstack backstack) {
                 Object service = new Object();
                 serviceRef.set(service);
                 return GlobalServices.builder()
@@ -823,5 +827,56 @@ public class ScopingGlobalScopeTest {
         Object service2 = serviceRef.get();
 
         assertThat(service1).isNotSameAs(service2);
+    }
+
+
+    @Test
+    public void globalServicesFactoryFailsIfBackstackIsAddedAsService() {
+        Backstack backstack = new Backstack();
+
+        backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Nonnull
+            @Override
+            public GlobalServices create(@Nonnull Backstack backstack) {
+                return GlobalServices.builder().addService("backstack", backstack).build();
+            }
+        });
+
+        backstack.setup(History.of(new TestKey("hello!")));
+        try {
+            backstack.setStateChanger(new StateChanger() {
+                @Override
+                public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                    completionCallback.stateChangeComplete();
+                }
+            });
+            StateBundle bundle = backstack.toBundle();
+            Assert.fail("This would fail on `toBundle()`");
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void globalServicesFactorySucceedsIfBackstackIsAddedAsAlias() {
+        Backstack backstack = new Backstack();
+
+        backstack.setGlobalServices(new GlobalServices.Factory() {
+            @Nonnull
+            @Override
+            public GlobalServices create(@Nonnull Backstack backstack) {
+                return GlobalServices.builder().addAlias("backstack", backstack).build();
+            }
+        });
+
+        backstack.setup(History.of(new TestKey("hello!")));
+        backstack.setStateChanger(new StateChanger() {
+                @Override
+                public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                    completionCallback.stateChangeComplete();
+            }
+            });
+
+        assertThat(backstack.lookupService("backstack")).isSameAs(backstack);
     }
 }

@@ -137,8 +137,10 @@ public class GlobalServices {
         /**
          * Invoked when the global scope is created.
          *
+         * @param backstack the backstack
          * @return the global services
          */
-        GlobalServices create();
+        @Nonnull
+        GlobalServices create(@Nonnull Backstack backstack);
     }
 }
