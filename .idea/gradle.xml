@@ -36,7 +36,7 @@
             <option value="$PROJECT_DIR$/samples/shared-element-samples/simple-stack-example-sharedelement-fragment" />
             <option value="$PROJECT_DIR$/simple-stack" />
             <option value="$PROJECT_DIR$/tutorials" />
-            <option value="$PROJECT_DIR$/tutorials/tutorials" />
+            <option value="$PROJECT_DIR$/tutorials/tutorial-sample" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
