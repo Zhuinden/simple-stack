@@ -4,9 +4,9 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.RelativeLayout
-import com.zhuinden.navigationexamplekotlinview.utils.backstack
 import com.zhuinden.navigationexamplekotlinview.utils.onClick
 import com.zhuinden.simplestack.Backstack
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
 import kotlinx.android.synthetic.main.home_view.view.*
 
 /**

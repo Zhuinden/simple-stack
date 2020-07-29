@@ -1,21 +1,16 @@
 package com.zhuinden.simplestackexamplekotlinfragment.screens
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import com.zhuinden.simplestackexamplekotlinfragment.R
-import com.zhuinden.simplestackexamplekotlinfragment.core.navigation.BaseFragment
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 
 
 /**
  * Created by Owner on 2017.11.13.
  */
 
-class DashboardFragment : BaseFragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-            inflater.inflate(R.layout.dashboard_view, container, false)
-
+class DashboardFragment : KeyedFragment(R.layout.dashboard_view) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // ...

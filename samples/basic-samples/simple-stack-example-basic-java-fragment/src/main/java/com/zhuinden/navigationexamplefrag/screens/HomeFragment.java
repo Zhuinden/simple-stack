@@ -1,16 +1,16 @@
 package com.zhuinden.navigationexamplefrag.screens;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.zhuinden.navigationexamplefrag.R;
-import com.zhuinden.navigationexamplefrag.core.navigation.BaseFragment;
 import com.zhuinden.simplestack.navigator.Navigator;
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -19,7 +19,7 @@ import butterknife.OnClick;
  */
 
 public class HomeFragment
-        extends BaseFragment {
+        extends KeyedFragment {
     @OnClick(R.id.home_button)
     public void goToOtherView(View view) {
         Navigator.getBackstack(getActivity()).goTo(OtherKey.create());

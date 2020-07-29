@@ -1,24 +1,18 @@
 package com.zhuinden.simplestackexamplekotlinfragment.screens
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import com.zhuinden.simplestackexamplekotlinfragment.R
-import com.zhuinden.simplestackexamplekotlinfragment.core.navigation.BaseFragment
-import com.zhuinden.simplestackexamplekotlinfragment.utils.backstack
 import com.zhuinden.simplestackexamplekotlinfragment.utils.onClick
-
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment
+import com.zhuinden.simplestackextensions.fragmentsktx.backstack
 import kotlinx.android.synthetic.main.home_view.*
 
 /**
  * Created by Owner on 2017.11.13.
  */
 
-class HomeFragment : BaseFragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
-        inflater.inflate(R.layout.home_view, container, false)
-
+class HomeFragment : KeyedFragment(R.layout.home_view) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

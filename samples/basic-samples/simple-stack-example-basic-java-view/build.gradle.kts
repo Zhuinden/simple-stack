@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.zhuinden.navigationexampleview"
-        minSdkVersion(15)
+        minSdkVersion(16)
         targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"

@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId = "com.zhuinden.navigationexamplekotlinview"
-        minSdkVersion(15)
+        minSdkVersion(16)
         targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
@@ -35,6 +35,13 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.0.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+
+    implementation("androidx.core:core:1.3.1")
+    implementation("androidx.activity:activity:1.1.0")
+
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
     androidTestImplementation("androidx.test:runner:1.2.0")
     androidTestImplementation("androidx.test:rules:1.2.0")

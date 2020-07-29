@@ -1,15 +1,15 @@
 package com.zhuinden.navigationexamplefrag.screens;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.zhuinden.navigationexamplefrag.R;
-import com.zhuinden.navigationexamplefrag.core.navigation.BaseFragment;
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import butterknife.ButterKnife;
 
 /**
@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
  */
 
 public class OtherFragment
-        extends BaseFragment {
+        extends KeyedFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

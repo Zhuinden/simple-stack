@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.zhuinden.navigationexamplefrag"
-        minSdkVersion(15)
+        minSdkVersion(16)
         targetSdkVersion(28)
         versionCode = 1
         versionName = "1.0"
@@ -35,10 +35,14 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.2.0")
     androidTestImplementation("androidx.test:rules:1.2.0")
     implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("androidx.fragment:fragment:1.2.5")
     implementation("com.google.android.material:material:1.1.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("com.jakewharton:butterknife:10.0.0")
-    annotationProcessor("com.jakewharton:butterknife-compiler:10.0.0")
+    implementation("com.jakewharton:butterknife:10.2.1")
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+    annotationProcessor("com.jakewharton:butterknife-compiler:10.2.1")
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
     testImplementation("junit:junit:4.13")
 }

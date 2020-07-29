@@ -1,13 +1,10 @@
 package com.zhuinden.navigationexamplefrag.application;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.ViewGroup;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.zhuinden.navigationexamplefrag.R;
-import com.zhuinden.navigationexamplefrag.core.navigation.FragmentStateChanger;
 import com.zhuinden.navigationexamplefrag.screens.DashboardKey;
 import com.zhuinden.navigationexamplefrag.screens.HomeKey;
 import com.zhuinden.navigationexamplefrag.screens.NotificationKey;
@@ -16,7 +13,10 @@ import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.SimpleStateChanger;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.navigator.Navigator;
+import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -31,7 +31,7 @@ public class MainActivity
     @BindView(R.id.root)
     ViewGroup root;
 
-    FragmentStateChanger fragmentStateChanger;
+    DefaultFragmentStateChanger fragmentStateChanger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class MainActivity
             return false;
         });
 
-        fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.root);
+        fragmentStateChanger = new DefaultFragmentStateChanger(getSupportFragmentManager(), R.id.root);
 
         Navigator.configure()
                 .setStateChanger(new SimpleStateChanger(this))

@@ -36,6 +36,20 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72")
     implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("androidx.core:core:1.3.1")
+    implementation("androidx.activity:activity:1.1.0")
+    implementation("androidx.fragment:fragment-ktx:1.2.5")
+
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.0.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.0.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("com.squareup.okhttp3:okhttp:3.14.2")
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.2")

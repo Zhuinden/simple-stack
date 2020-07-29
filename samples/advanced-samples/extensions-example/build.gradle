@@ -35,9 +35,8 @@ dependencies {
     implementation "com.xwray:groupie:2.7.0"
     implementation "com.xwray:groupie-kotlin-android-extensions:2.7.0"
 
+    implementation(project(":simple-stack"))
     implementation "com.github.Zhuinden:simple-stack-extensions:2.0.0"
-
-    implementation 'com.github.Zhuinden:simple-stack:2.3.2'
     implementation 'com.github.Zhuinden:event-emitter:1.1.0'
     implementation 'com.github.Zhuinden:rx-combinetuple-kt:1.1.0'
 

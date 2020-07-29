@@ -9,6 +9,7 @@ import com.zhuinden.navigationexamplekotlinview.screens.NotificationKey
 import com.zhuinden.navigationexamplekotlinview.utils.replaceHistory
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.navigator.Navigator
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -17,7 +18,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         navigation.setOnNavigationItemSelectedListener { item ->
-            val backstack = Navigator.getBackstack(this)
             when (item.itemId) {
                 R.id.navigation_home -> {
                     backstack.replaceHistory(HomeKey())
