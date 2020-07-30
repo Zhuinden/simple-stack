@@ -2,14 +2,11 @@ package com.community.simplestackkotlindaggerexample.screens.users
 
 import android.content.Context
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout.VERTICAL
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.community.simplestackkotlindaggerexample.R
 import com.community.simplestackkotlindaggerexample.application.Injector
-import com.community.simplestackkotlindaggerexample.core.navigation.BaseFragment
 import com.community.simplestackkotlindaggerexample.core.schedulers.SchedulerProvider
 import com.community.simplestackkotlindaggerexample.data.api.ApiService
 import com.community.simplestackkotlindaggerexample.data.database.User
@@ -17,6 +14,7 @@ import com.community.simplestackkotlindaggerexample.utils.clearIfNotDisposed
 import com.community.simplestackkotlindaggerexample.utils.hide
 import com.community.simplestackkotlindaggerexample.utils.onTextChanged
 import com.community.simplestackkotlindaggerexample.utils.show
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -25,7 +23,7 @@ import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.fragment_users.*
 import javax.inject.Inject
 
-class UsersFragment : BaseFragment() {
+class UsersFragment : KeyedFragment(R.layout.fragment_users) {
     private val compositeDisposable = CompositeDisposable()
 
     @Inject
@@ -42,11 +40,6 @@ class UsersFragment : BaseFragment() {
         Injector.get().inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_users, container, false)
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -54,7 +47,7 @@ class UsersFragment : BaseFragment() {
 
         usersAdapter = UsersAdapter(realm.where<User>().findAllAsync())
 
-        listContacts.layoutManager = LinearLayoutManager(context, VERTICAL, false)
+        listContacts.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         listContacts.adapter = usersAdapter
 
         textUserSearch.onTextChanged { username ->

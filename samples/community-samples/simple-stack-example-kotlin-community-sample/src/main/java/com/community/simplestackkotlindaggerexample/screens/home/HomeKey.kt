@@ -1,9 +1,9 @@
 package com.community.simplestackkotlindaggerexample.screens.home
 
-import com.community.simplestackkotlindaggerexample.core.navigation.BaseKey
+import com.zhuinden.simplestackextensions.fragments.DefaultFragmentKey
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class HomeKey(private val placeholder: String = "") : BaseKey() {
-    override fun createFragment() = HomeFragment()
+data class HomeKey(private val placeholder: String = "") : DefaultFragmentKey() {
+    override fun instantiateFragment() = HomeFragment()
 }

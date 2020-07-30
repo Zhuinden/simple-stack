@@ -1,12 +1,12 @@
 package com.community.simplestackkotlindaggerexample.screens.userdetail
 
-import com.community.simplestackkotlindaggerexample.core.navigation.BaseKey
 import com.community.simplestackkotlindaggerexample.data.database.User
+import com.zhuinden.simplestackextensions.fragments.DefaultFragmentKey
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class UserDetailKey(val user: User) : BaseKey() {
-    override fun createFragment() = UserDetailFragment()
+data class UserDetailKey(val user: User) : DefaultFragmentKey() {
+    override fun instantiateFragment() = UserDetailFragment()
 
     override fun toString(): String = "UserDetailKey[${user.userId}]"
 }
