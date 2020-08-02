@@ -25,13 +25,12 @@ class WordController(
     private val wordEventEmitter = EventEmitter<Events>()
     val eventEmitter = WordEventEmitter(wordEventEmitter)
 
-    private val mutableWords: MutableLiveData<List<String>> = MutableLiveData()
+    private val mutableWords: MutableLiveData<List<String>> = MutableLiveData(
+        listOf("Bogus", "Magic", "Scoping mechanisms")
+    )
+
     override val wordList: LiveData<List<String>>
         get() = mutableWords
-
-    init {
-        mutableWords.value = listOf("Bogus", "Magic", "Scoping mechanisms")
-    }
 
     private fun addWordToList(word: String) {
         mutableWords.run {
@@ -40,11 +39,11 @@ class WordController(
         wordEventEmitter.emit(Events.NewWordAdded(word))
     }
 
-    override fun onAddNewWordClicked(wordListFragment: WordListFragment) {
+    override fun onAddNewWordClicked() {
         backstack.goTo(NewWordKey())
     }
 
-    override fun onAddWordClicked(newWordFragment: NewWordFragment, word: String) {
+    override fun onAddWordClicked(word: String) {
         if (word.isNotEmpty()) {
             addWordToList(word)
         }

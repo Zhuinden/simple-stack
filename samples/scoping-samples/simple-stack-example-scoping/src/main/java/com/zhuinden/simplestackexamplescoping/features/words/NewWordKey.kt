@@ -1,6 +1,7 @@
 package com.zhuinden.simplestackexamplescoping.features.words
 
-import com.zhuinden.simplestackexamplescoping.core.navigation.BaseFragment
+import androidx.fragment.app.Fragment
+import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackexamplescoping.core.navigation.BaseKey
 import kotlinx.android.parcel.Parcelize
 
@@ -9,5 +10,7 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class NewWordKey(val placeholder: String = "") : BaseKey() {
-    override fun createFragment(): BaseFragment = NewWordFragment()
+    override fun instantiateFragment(): Fragment = NewWordFragment()
+
+    override fun bindServices(serviceBinder: ServiceBinder) {}
 }

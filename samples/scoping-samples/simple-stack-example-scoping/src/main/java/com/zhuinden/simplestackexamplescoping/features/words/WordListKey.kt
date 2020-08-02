@@ -2,19 +2,16 @@ package com.zhuinden.simplestackexamplescoping.features.words
 
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackexamplescoping.core.navigation.BaseKey
-import com.zhuinden.simplestackexamplescoping.core.scoping.HasServices
-import com.zhuinden.simplestackexamplescoping.utils.add
-import com.zhuinden.simplestackexamplescoping.utils.get
-import com.zhuinden.simplestackexamplescoping.utils.rebind
+import com.zhuinden.simplestackextensions.servicesktx.add
+import com.zhuinden.simplestackextensions.servicesktx.get
+import com.zhuinden.simplestackextensions.servicesktx.rebind
 import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Zhuinden on 2018.09.17.
  */
 @Parcelize
-data class WordListKey(val placeholder: String = "") : BaseKey(), HasServices {
-    override fun getScopeTag(): String = fragmentTag
-
+data class WordListKey(val placeholder: String = "") : BaseKey() {
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
             add(WordController(backstack))
@@ -25,5 +22,5 @@ data class WordListKey(val placeholder: String = "") : BaseKey(), HasServices {
         }
     }
 
-    override fun createFragment() = WordListFragment()
+    override fun instantiateFragment() = WordListFragment()
 }

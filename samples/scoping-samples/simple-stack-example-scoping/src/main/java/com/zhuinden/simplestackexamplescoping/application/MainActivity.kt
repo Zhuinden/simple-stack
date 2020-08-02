@@ -7,27 +7,27 @@ import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackexamplescoping.R
-import com.zhuinden.simplestackexamplescoping.core.navigation.FragmentStateChanger
-import com.zhuinden.simplestackexamplescoping.core.scoping.ScopeConfiguration
 import com.zhuinden.simplestackexamplescoping.features.words.WordListKey
+import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
  * Created by Zhuinden on 2018.09.17.
  */
 class MainActivity : AppCompatActivity(), StateChanger {
-    private lateinit var fragmentStateChanger: FragmentStateChanger
+    private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
-        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.root)
 
         Navigator.configure()
             .setStateChanger(this)
-            .setScopedServices(ScopeConfiguration())
+            .setScopedServices(DefaultServiceProvider())
             .install(this, root, History.of(WordListKey()))
     }
 
