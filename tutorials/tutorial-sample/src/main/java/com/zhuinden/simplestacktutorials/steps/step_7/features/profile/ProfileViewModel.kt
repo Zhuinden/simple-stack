@@ -1,8 +1,6 @@
 package com.zhuinden.simplestacktutorials.steps.step_7.features.profile
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.ScopedServices
@@ -14,8 +12,6 @@ class ProfileViewModel(
     private val appContext: Context,
     private val backstack: Backstack
 ) : ScopedServices.Activated {
-    private val handler = Handler(Looper.getMainLooper())
-
     override fun onServiceActive() {
         if (!AuthenticationManager.isAuthenticated(appContext)) {
             backstack.setHistory(History.of(LoginKey()), StateChange.REPLACE)

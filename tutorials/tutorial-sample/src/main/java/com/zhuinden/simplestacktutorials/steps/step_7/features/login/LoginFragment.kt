@@ -1,24 +1,19 @@
 package com.zhuinden.simplestacktutorials.steps.step_7.features.login
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import com.zhuinden.eventemitter.EventSource
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment
+import com.zhuinden.simplestackextensions.fragmentsktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.simplestacktutorials.R
-import com.zhuinden.simplestacktutorials.steps.step_7.core.navigation.BaseFragment
-import com.zhuinden.simplestacktutorials.steps.step_7.core.navigation.backstack
-import com.zhuinden.simplestacktutorials.steps.step_7.core.viewmodels.lookup
 import com.zhuinden.simplestacktutorials.utils.onClick
 import com.zhuinden.simplestacktutorials.utils.onTextChanged
 import kotlinx.android.synthetic.main.step7_login_fragment.*
 
-class LoginFragment : BaseFragment() {
+class LoginFragment : KeyedFragment(R.layout.step7_login_fragment) {
     private val viewModel by lazy { backstack.lookup<LoginViewModel>() }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.step7_login_fragment, container, false)
 
     private var subscription: EventSource.NotificationToken? = null
 

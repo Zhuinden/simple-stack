@@ -1,18 +1,14 @@
 package com.zhuinden.simplestacktutorials.steps.step_8.core.navigation
 
-import android.os.Bundle
-import android.os.Parcelable
-import androidx.fragment.app.Fragment
+import com.zhuinden.simplestack.ServiceBinder
+import com.zhuinden.simplestackextensions.fragments.DefaultFragmentKey
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 
-abstract class FragmentKey: Parcelable {
-    open val fragmentTag: String
-        get() = toString()
+abstract class FragmentKey : DefaultFragmentKey(), DefaultServiceProvider.HasServices {
+    override fun getScopeTag(): String = toString()
 
-    protected abstract fun instantiateFragment(): Fragment
+    override fun getFragmentTag(): String = toString()
 
-    fun createFragment(): Fragment = instantiateFragment().apply {
-        arguments = (arguments ?: Bundle()).also { bundle ->
-            bundle.putParcelable("FRAGMENT_KEY", this@FragmentKey)
-        }
+    override fun bindServices(serviceBinder: ServiceBinder) {
     }
 }

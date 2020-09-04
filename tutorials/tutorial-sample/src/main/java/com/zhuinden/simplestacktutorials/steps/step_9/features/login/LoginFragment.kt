@@ -2,9 +2,9 @@ package com.zhuinden.simplestacktutorials.steps.step_9.features.login
 
 import android.os.Bundle
 import android.view.View
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment
+import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 import com.zhuinden.simplestacktutorials.R
-import com.zhuinden.simplestacktutorials.steps.step_9.core.navigation.BaseFragment
-import com.zhuinden.simplestacktutorials.steps.step_9.core.viewmodels.lookup
 import com.zhuinden.simplestacktutorials.steps.step_9.utils.get
 import com.zhuinden.simplestacktutorials.steps.step_9.utils.set
 import com.zhuinden.simplestacktutorials.utils.onClick
@@ -14,7 +14,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.step9_login_fragment.*
 
-class LoginFragment : BaseFragment(R.layout.step9_login_fragment) {
+class LoginFragment : KeyedFragment(R.layout.step9_login_fragment) {
     private val viewModel by lazy { lookup<LoginViewModel>() }
 
     private val compositeDisposable = CompositeDisposable()
