@@ -9,7 +9,7 @@ import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.MvpPresenter
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.Strings
 import com.zhuinden.simplestackdemoexamplemvp.util.hide
 import com.zhuinden.simplestackdemoexamplemvp.util.show

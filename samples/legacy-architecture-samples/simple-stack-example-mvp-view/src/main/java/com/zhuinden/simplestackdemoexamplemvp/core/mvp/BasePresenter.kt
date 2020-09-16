@@ -6,6 +6,7 @@ import android.view.View
  * Created by Owner on 2017. 01. 27..
  */
 
+@Deprecated(message = "Manual view event dispatch is an anti-pattern.")
 abstract class BasePresenter<V : View>: MvpPresenter<V> {
     var view: V? = null
         private set

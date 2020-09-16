@@ -4,8 +4,8 @@ import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.BasePresenter
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksView
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder

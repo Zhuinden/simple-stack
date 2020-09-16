@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemoexamplemvp.domain
+package com.zhuinden.simplestackdemoexamplemvp.data.models
 
 import com.zhuinden.simplestackdemoexamplemvp.data.entity.DbTask
 

@@ -19,9 +19,8 @@ package com.zhuinden.simplestackdemoexamplemvp.features.tasks
 
 import android.os.Parcelable
 import com.zhuinden.simplestackdemoexamplemvp.R
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
-
 import io.reactivex.Observable
 import kotlinx.android.parcel.Parcelize
 

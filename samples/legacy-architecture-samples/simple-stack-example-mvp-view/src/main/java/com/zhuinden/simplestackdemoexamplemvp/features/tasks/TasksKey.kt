@@ -7,11 +7,11 @@ import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
-import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class TasksKey(val placeholder: String) : ViewKey, ServiceProvider.HasServices {
+data class TasksKey(val placeholder: String) : ViewKey, DefaultServiceProvider.HasServices {
     override fun getScopeTag(): String = "Tasks"
 
     override fun bindServices(serviceBinder: ServiceBinder) {
@@ -34,7 +34,7 @@ data class TasksKey(val placeholder: String) : ViewKey, ServiceProvider.HasServi
     override fun shouldShowUp(): Boolean = false
 
     override fun fabClickListener(view: View): View.OnClickListener =
-        View.OnClickListener{  v ->
+        View.OnClickListener { v ->
             val tasksView = view as TasksView
             tasksView.openAddNewTask()
         }

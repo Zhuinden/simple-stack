@@ -1,12 +1,12 @@
 package com.zhuinden.simplestackdemoexamplemvp.features.tasks
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.Preconditions.checkNotNull
 import com.zhuinden.simplestackdemoexamplemvp.util.inflate
 import com.zhuinden.simplestackdemoexamplemvp.util.onClick

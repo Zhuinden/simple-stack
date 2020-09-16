@@ -8,11 +8,11 @@ import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
-import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class TaskDetailKey(val taskId: String) : ViewKey, ServiceProvider.HasServices {
+data class TaskDetailKey(val taskId: String) : ViewKey, DefaultServiceProvider.HasServices {
     override fun getScopeTag(): String = "TaskDetail[$taskId]"
 
     override fun bindServices(serviceBinder: ServiceBinder) {

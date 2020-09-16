@@ -7,11 +7,11 @@ import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
-import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class StatisticsKey(val placeholder: String) : ViewKey, ServiceProvider.HasServices {
+data class StatisticsKey(val placeholder: String) : ViewKey, DefaultServiceProvider.HasServices {
     override fun getScopeTag(): String = " Statistics"
 
     override fun bindServices(serviceBinder: ServiceBinder) {

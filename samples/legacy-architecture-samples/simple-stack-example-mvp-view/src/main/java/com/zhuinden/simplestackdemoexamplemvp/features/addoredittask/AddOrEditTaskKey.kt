@@ -7,10 +7,10 @@ import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
-import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.parcel.Parcelize
 
-sealed class AddOrEditTaskKey(val parent: ViewKey, val taskId: String = "") : ViewKey, ServiceProvider.HasServices {
+sealed class AddOrEditTaskKey(val parent: ViewKey, val taskId: String = "") : ViewKey, DefaultServiceProvider.HasServices {
     override fun getScopeTag() = "AddOrEditTask"
 
     override fun bindServices(serviceBinder: ServiceBinder) {

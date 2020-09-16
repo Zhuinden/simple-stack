@@ -2,9 +2,9 @@ package com.zhuinden.simplestackdemoexamplemvp.data.repository
 
 import com.zhuinden.simplestackdemoexamplemvp.data.entity.DbTask
 import com.zhuinden.simplestackdemoexamplemvp.data.entity.DbTaskFields
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
-import com.zhuinden.simplestackdemoexamplemvp.domain.fromRealm
-import com.zhuinden.simplestackdemoexamplemvp.domain.toRealm
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
+import com.zhuinden.simplestackdemoexamplemvp.data.models.fromRealm
+import com.zhuinden.simplestackdemoexamplemvp.data.models.toRealm
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder
 import com.zhuinden.simplestackdemoexamplemvp.util.optional.Optional
 import io.reactivex.Observable

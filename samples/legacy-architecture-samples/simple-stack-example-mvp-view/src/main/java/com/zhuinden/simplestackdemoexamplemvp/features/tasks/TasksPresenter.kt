@@ -7,8 +7,8 @@ import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.getKey
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
 import com.zhuinden.simplestackdemoexamplemvp.features.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplemvp.features.taskdetail.TaskDetailKey
 import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder

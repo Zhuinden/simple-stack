@@ -2,15 +2,16 @@ package com.zhuinden.simplestackdemoexamplemvp.application
 
 import android.content.Context
 import android.content.res.Configuration
-import com.google.android.material.navigation.NavigationView
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.ActionBarDrawerToggle
 import android.util.AttributeSet
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.View.OnClickListener
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
@@ -18,6 +19,7 @@ import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
 import com.zhuinden.simplestackdemoexamplemvp.features.statistics.StatisticsKey
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplemvp.util.findActivity
 import com.zhuinden.simplestackdemoexamplemvp.util.showIf
 import kotlinx.android.synthetic.main.activity_main.view.*
 
@@ -59,7 +61,7 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
     }
 
     fun setupViewsForKey(key: ViewKey, newView: View) {
-        val actionBar = MainActivity[context].supportActionBar!!
+        val actionBar = context.findActivity<AppCompatActivity>().supportActionBar!!
         if (key.shouldShowUp()) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
             drawerToggle.isDrawerIndicatorEnabled = false
@@ -71,7 +73,7 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
         }
         drawerToggle.syncState()
         setCheckedItem(key.navigationViewId())
-        MainActivity[context].invalidateOptionsMenu()
+        context.findActivity<AppCompatActivity>().invalidateOptionsMenu()
         buttonAddTask.showIf { key.isFabVisible }
         buttonAddTask.setOnClickListener(key.fabClickListener(newView))
         if (key.fabDrawableIcon() != 0) {
@@ -102,7 +104,7 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
     fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (root != null && root.getChildAt(0) != null) {
             val key = Backstack.getKey<ViewKey>(root.getChildAt(0).context)
-            MainActivity[context].menuInflater.inflate(key.menu(), menu)
+            context.findActivity<AppCompatActivity>().menuInflater.inflate(key.menu(), menu)
             return true
         }
         return false
@@ -111,17 +113,17 @@ class MainView : DrawerLayout, MainActivity.OptionsItemSelectedListener, StateCh
     fun onCreate() {
         navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener)
 
-        MainActivity[context].setSupportActionBar(toolbar)
-        val actionBar = MainActivity[context].supportActionBar!!
-        drawerToggle = object : ActionBarDrawerToggle(MainActivity[context], drawerLayout, toolbar, R.string.open, R.string.close) {
+        context.findActivity<AppCompatActivity>().setSupportActionBar(toolbar)
+        val actionBar = context.findActivity<AppCompatActivity>().supportActionBar!!
+        drawerToggle = object : ActionBarDrawerToggle(context.findActivity<AppCompatActivity>(), drawerLayout, toolbar, R.string.open, R.string.close) {
             override fun onDrawerClosed(drawerView: View) {
                 super.onDrawerClosed(drawerView)
-                MainActivity[context].invalidateOptionsMenu()
+                context.findActivity<AppCompatActivity>().invalidateOptionsMenu()
             }
 
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
-                MainActivity[context].invalidateOptionsMenu()
+                context.findActivity<AppCompatActivity>().invalidateOptionsMenu()
             }
         }
         drawerLayout.setDrawerListener(drawerToggle)

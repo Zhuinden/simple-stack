@@ -3,7 +3,7 @@ package com.zhuinden.simplestackdemoexamplemvp.util
 
 import android.app.Activity
 import android.content.Context
-import androidx.annotation.LayoutRes
+import android.content.ContextWrapper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.annotation.LayoutRes
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 
@@ -22,15 +23,27 @@ fun View.hide() {
     this.visibility = View.GONE
 }
 
-inline fun <T: View> T.showIf(predicate: (T) -> Boolean) {
-    if(predicate(this)) {
+inline fun <T : View> T.showIf(predicate: (T) -> Boolean) {
+    if (predicate(this)) {
         show()
     } else {
         hide()
     }
 }
 
-fun <A, B> combineTwo(aSource: Observable<A>, bSource: Observable<B>): Observable<Pair<A, B>> =
+
+tailrec fun <T : Activity> Context.findActivity(): T {
+    if (this is Activity) {
+        @Suppress("UNCHECKED_CAST")
+        return this as T
+    }
+    val baseContext = (this as ContextWrapper).baseContext
+        ?: throw IllegalArgumentException("Thie context does not contain activity as base context")
+
+    return baseContext.findActivity()
+}
+
+fun <A, B> combineTwo(aSource: Observable<A>, bSource: Observable<B>): Observable<Pair<A, B>> = // TODO: use combineTuple
     Observable.combineLatest(aSource, bSource, BiFunction { t1, t2 -> t1 to t2 })
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToParent: Boolean = false) =

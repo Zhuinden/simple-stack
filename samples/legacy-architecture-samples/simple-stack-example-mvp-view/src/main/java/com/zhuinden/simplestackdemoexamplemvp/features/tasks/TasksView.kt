@@ -1,16 +1,17 @@
 package com.zhuinden.simplestackdemoexamplemvp.features.tasks
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
-import com.google.android.material.snackbar.Snackbar
+import android.util.AttributeSet
+import android.view.MenuItem
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.appcompat.widget.PopupMenu
-import android.util.AttributeSet
-import android.view.MenuItem
 import butterknife.ButterKnife
 import butterknife.OnClick
+import com.google.android.material.snackbar.Snackbar
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
@@ -18,7 +19,7 @@ import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.MvpPresenter
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.*
 import kotlinx.android.synthetic.main.path_tasks.view.*
 import java.util.*
@@ -156,7 +157,7 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
     }
 
     fun showFilteringPopupMenu() {
-        val popup = PopupMenu(this.context, MainActivity[this.context].findViewById(R.id.menu_filter))
+        val popup = PopupMenu(this.context, context.findActivity<Activity>().findViewById(R.id.menu_filter))
         popup.menuInflater.inflate(R.menu.filter_tasks, popup.menu)
 
         popup.setOnMenuItemClickListener { item ->

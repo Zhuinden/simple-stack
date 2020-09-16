@@ -1,12 +1,10 @@
 package com.zhuinden.simplestackdemoexamplemvp.application
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
@@ -14,7 +12,7 @@ import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewStateChanger
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
-import com.zhuinden.simplestackdemoexamplemvp.util.scoping.ServiceProvider
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), StateChanger {
@@ -28,7 +26,6 @@ class MainActivity : AppCompatActivity(), StateChanger {
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
         mainView.onOptionsItemSelected(item)
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean =
         mainView.onCreateOptionsMenu(menu)
 
@@ -41,12 +38,14 @@ class MainActivity : AppCompatActivity(), StateChanger {
         setContentView(R.layout.activity_main)
 
         viewStateChanger = ViewStateChanger(this, root)
+
         val backstack = Navigator.configure()
-            .setScopedServices(ServiceProvider())
+            .setScopedServices(DefaultServiceProvider())
             .setShouldPersistContainerChild(true)
             .setDeferredInitialization(true)
             .setStateChanger(this)
             .install(this, root, History.single(TasksKey()))
+
         backstackHolder.backstack = backstack
 
         val mainScopeListener: MainScopeListener? = supportFragmentManager.findFragmentByTag(
@@ -78,11 +77,6 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
     }
 
-    override fun getSystemService(name: String): Any? = when {
-        TAG == name -> this
-        else -> super.getSystemService(name)
-    }
-
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
         if (stateChange.isTopNewKeyEqualToPrevious) {
             completionCallback.stateChangeComplete()
@@ -95,14 +89,5 @@ class MainActivity : AppCompatActivity(), StateChanger {
                 completionCallback.stateChangeComplete()
             }
         }
-    }
-
-    companion object {
-        const val TAG = "MainActivity"
-
-        @SuppressLint("WrongConstant")
-        @JvmStatic
-        operator fun get(context: Context): MainActivity =
-            context.getSystemService(TAG) as MainActivity
     }
 }

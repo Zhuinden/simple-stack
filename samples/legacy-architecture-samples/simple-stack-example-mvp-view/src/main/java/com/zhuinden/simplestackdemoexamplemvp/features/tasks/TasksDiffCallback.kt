@@ -2,7 +2,7 @@ package com.zhuinden.simplestackdemoexamplemvp.features.tasks
 
 import androidx.recyclerview.widget.DiffUtil
 
-import com.zhuinden.simplestackdemoexamplemvp.domain.Task
+import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 
 /**
  * Created by Zhuinden on 2018. 08. 20.

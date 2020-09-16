@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemoexamplemvp.domain
+package com.zhuinden.simplestackdemoexamplemvp.data.models
 
 import java.util.*
 
