@@ -1,12 +1,12 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.taskdetail
 
-import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.fragment.app.Fragment
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
-import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.HasServices
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -14,7 +14,7 @@ import kotlinx.android.parcel.Parcelize
  */
 
 @Parcelize
-data class TaskDetailKey(val taskId: String) : BaseKey(), HasServices {
+data class TaskDetailKey(val taskId: String) : BaseKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.addService(TaskDetailFragment.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
     }
@@ -26,7 +26,7 @@ data class TaskDetailKey(val taskId: String) : BaseKey(), HasServices {
     override val isFabVisible: Boolean
         get() = true
 
-    override fun createFragment(): Fragment = TaskDetailFragment()
+    override fun instantiateFragment(): Fragment = TaskDetailFragment()
 
     override fun menu(): Int = R.menu.taskdetail_fragment_menu
 

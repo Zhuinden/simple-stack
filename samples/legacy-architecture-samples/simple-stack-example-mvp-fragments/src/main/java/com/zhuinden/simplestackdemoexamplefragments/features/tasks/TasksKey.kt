@@ -1,12 +1,12 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.tasks
 
-import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.fragment.app.Fragment
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
-import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.HasServices
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -14,7 +14,7 @@ import kotlinx.android.parcel.Parcelize
  */
 
 @Parcelize
-data class TasksKey(val placeholder: String = "") : BaseKey(), HasServices {
+data class TasksKey(val placeholder: String = "") : BaseKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.addService(TasksFragment.CONTROLLER_TAG, Injector.get().tasksPresenter())
     }
@@ -28,7 +28,7 @@ data class TasksKey(val placeholder: String = "") : BaseKey(), HasServices {
     override val isFabVisible: Boolean
         get() = true
 
-    override fun createFragment(): Fragment = TasksFragment()
+    override fun instantiateFragment(): Fragment = TasksFragment()
 
     override fun menu(): Int = R.menu.tasks_fragment_menu
 
@@ -36,9 +36,10 @@ data class TasksKey(val placeholder: String = "") : BaseKey(), HasServices {
 
     override fun shouldShowUp(): Boolean = false
 
-    override fun fabClickListener(f: Fragment): View.OnClickListener =
+    override fun fabClickListener(fragment: Fragment): View.OnClickListener =
         View.OnClickListener { v ->
-            val fragment = f as TasksFragment
+            @Suppress("NAME_SHADOWING")
+            val fragment = fragment as TasksFragment
             fragment.addTaskButtonClicked()
         }
 

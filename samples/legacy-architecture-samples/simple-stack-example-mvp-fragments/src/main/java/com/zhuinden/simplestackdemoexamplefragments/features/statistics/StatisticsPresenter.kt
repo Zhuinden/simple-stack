@@ -18,7 +18,7 @@ class StatisticsPresenter @Inject constructor(
     private lateinit var disposable: Disposable
 
     override fun onAttach(view: StatisticsFragment) {
-        disposable = combineTwo(
+        disposable = combineTwo( // TODO: use combineTuple
             taskRepository.activeTasksWithChanges,
             taskRepository.completedTasksWithChanges)
             .subscribeOn(Schedulers.computation())

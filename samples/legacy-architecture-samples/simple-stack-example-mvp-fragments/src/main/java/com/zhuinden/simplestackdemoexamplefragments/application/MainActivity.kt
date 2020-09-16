@@ -1,24 +1,24 @@
 package com.zhuinden.simplestackdemoexamplefragments.application
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.History
+import com.zhuinden.simplestack.SimpleStateChanger
 import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplefragments.R
-import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentStateChanger
+import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
-import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.ServiceProvider
+import com.zhuinden.simplestackdemoexamplefragments.util.onClick
+import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), StateChanger {
-    lateinit var fragmentStateChanger: FragmentStateChanger
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
     private val databaseManager: DatabaseManager = Injector.get().databaseManager()
     private val backstackHolder: BackstackHolder = Injector.get().backstackHolder()
@@ -38,11 +38,11 @@ class MainActivity : AppCompatActivity(), StateChanger {
 
         setContentView(R.layout.activity_main)
 
-        this.fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.root)
+        this.fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.root)
 
         val backstack = Navigator.configure()
-            .setScopedServices(ServiceProvider())
-            .setStateChanger(this)
+            .setScopedServices(DefaultServiceProvider())
+            .setStateChanger(SimpleStateChanger(this))
             .setDeferredInitialization(true)
             .install(this, root, History.of(TasksKey()))
 
@@ -51,6 +51,12 @@ class MainActivity : AppCompatActivity(), StateChanger {
         mainView.onCreate()
 
         Navigator.executeDeferredInitialization(this)
+
+        buttonAddTask.onClick {
+            val top = backstack.top<FragmentKey>()
+            val fragment = supportFragmentManager.findFragmentByTag(top.fragmentTag)
+            top.fabClickListener(fragment!!).onClick(it)
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -72,28 +78,8 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
     }
 
-    override fun getSystemService(name: String): Any? = when {
-        TAG == name -> this
-        else -> super.getSystemService(name)
-    }
-
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewKeyEqualToPrevious) {
-            // no-op
-            completionCallback.stateChangeComplete()
-            return
-        }
-
+    override fun onNavigationEvent(stateChange: StateChange) {
         fragmentStateChanger.handleStateChange(stateChange)
         mainView.setupViewsForKey(stateChange.topNewKey())
-        completionCallback.stateChangeComplete()
-    }
-
-    companion object {
-        @SuppressLint("WrongConstant")
-        operator fun get(context: Context): MainActivity =
-            context.getSystemService(TAG) as MainActivity
-
-        const val TAG = "MainActivity"
     }
 }

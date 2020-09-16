@@ -1,4 +1,4 @@
-package com.zhuinden.simplestackdemoexamplefragments.domain
+package com.zhuinden.simplestackdemoexamplefragments.data.models
 
 /**
  * Created by Zhuinden on 2018. 08. 20.

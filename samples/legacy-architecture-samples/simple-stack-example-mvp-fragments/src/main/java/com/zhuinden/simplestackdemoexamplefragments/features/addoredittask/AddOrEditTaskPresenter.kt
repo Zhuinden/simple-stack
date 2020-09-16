@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.BasePresenter
+import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
-import com.zhuinden.simplestackdemoexamplefragments.domain.Task
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksFragment
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder

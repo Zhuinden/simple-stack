@@ -4,6 +4,7 @@ package com.zhuinden.simplestackdemoexamplefragments.core.mvp
  * Created by Zhuinden on 2018. 08. 20.
  */
 
+@Deprecated(message = "Manual view event dispatch is an anti-pattern.")
 abstract class BasePresenter<V> : MvpPresenter<V> {
     var view: V? = null
 

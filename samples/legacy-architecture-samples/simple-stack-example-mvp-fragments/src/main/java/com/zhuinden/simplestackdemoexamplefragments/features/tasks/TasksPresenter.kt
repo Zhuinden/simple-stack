@@ -5,8 +5,8 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
+import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
-import com.zhuinden.simplestackdemoexamplefragments.domain.Task
 import com.zhuinden.simplestackdemoexamplefragments.features.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplefragments.features.taskdetail.TaskDetailKey
 import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder

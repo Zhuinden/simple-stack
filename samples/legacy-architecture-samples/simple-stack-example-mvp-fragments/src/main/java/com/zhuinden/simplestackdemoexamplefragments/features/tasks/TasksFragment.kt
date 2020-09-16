@@ -1,22 +1,22 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.tasks
 
+import android.app.Activity
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.appcompat.widget.PopupMenu
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
-import com.zhuinden.simplestackdemoexamplefragments.application.MainActivity
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
-import com.zhuinden.simplestackdemoexamplefragments.domain.Task
+import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.*
 import kotlinx.android.synthetic.main.path_tasks.*
 import java.util.*
@@ -143,7 +143,7 @@ class TasksFragment : BaseFragment(), MessageQueue.Receiver {
     }
 
     fun showFilteringPopupMenu() {
-        val popup = PopupMenu(context!!, MainActivity[context!!].findViewById(R.id.menu_filter))
+        val popup = PopupMenu(requireContext(), requireContext().findActivity<Activity>().findViewById(R.id.menu_filter))
         popup.menuInflater.inflate(R.menu.filter_tasks, popup.menu)
 
         popup.setOnMenuItemClickListener { item ->

@@ -1,14 +1,17 @@
 package com.zhuinden.simplestackdemoexamplefragments.util
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Bundle
-import androidx.annotation.LayoutRes
-import androidx.fragment.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
 import com.zhuinden.simplestack.navigator.Navigator
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
@@ -19,6 +22,17 @@ fun View.show() {
 
 fun View.hide() {
     this.visibility = View.GONE
+}
+
+tailrec fun <T : Activity> Context.findActivity(): T {
+    if (this is Activity) {
+        @Suppress("UNCHECKED_CAST")
+        return this as T
+    }
+    val baseContext = (this as ContextWrapper).baseContext
+        ?: throw IllegalArgumentException("Thie context does not contain activity as base context")
+
+    return baseContext.findActivity()
 }
 
 val Fragment.requireArguments: Bundle

@@ -6,7 +6,7 @@ import android.view.View
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
-import com.zhuinden.simplestackdemoexamplefragments.domain.Task
+import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.Strings
 import com.zhuinden.simplestackdemoexamplefragments.util.hide
 import com.zhuinden.simplestackdemoexamplefragments.util.lookup

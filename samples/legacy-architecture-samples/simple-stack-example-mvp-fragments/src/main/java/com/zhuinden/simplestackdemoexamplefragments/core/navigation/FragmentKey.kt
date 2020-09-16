@@ -1,31 +1,27 @@
 package com.zhuinden.simplestackdemoexamplefragments.core.navigation
 
-import android.os.Parcelable
+import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.fragment.app.Fragment
-import android.view.View
+import com.zhuinden.simplestackextensions.fragments.DefaultFragmentKey
 
 /**
  * Created by Zhuinden on 2017. 01. 12..
  */
 
-interface FragmentKey : Parcelable {
-    val fragmentTag: String
+abstract class FragmentKey : DefaultFragmentKey() {
+    abstract val isFabVisible: Boolean
 
-    val isFabVisible: Boolean
+    abstract fun layout(): Int
 
-    fun layout(): Int
+    abstract fun menu(): Int
 
-    fun newFragment(): Fragment
+    abstract fun navigationViewId(): Int
 
-    fun menu(): Int
+    abstract fun shouldShowUp(): Boolean
 
-    fun navigationViewId(): Int
-
-    fun shouldShowUp(): Boolean
-
-    fun fabClickListener(fragment: Fragment): View.OnClickListener
+    abstract fun fabClickListener(fragment: Fragment): View.OnClickListener
 
     @DrawableRes
-    fun fabDrawableIcon(): Int
+    abstract fun fabDrawableIcon(): Int
 }

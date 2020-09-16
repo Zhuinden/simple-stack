@@ -2,17 +2,19 @@ package com.zhuinden.simplestackdemoexamplefragments.application
 
 import android.content.Context
 import android.content.res.Configuration
-import com.google.android.material.navigation.NavigationView
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.ActionBarDrawerToggle
 import android.util.AttributeSet
 import android.view.View
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
 import com.zhuinden.simplestackdemoexamplefragments.features.statistics.StatisticsKey
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplefragments.util.findActivity
 import com.zhuinden.simplestackdemoexamplefragments.util.showIf
 import kotlinx.android.synthetic.main.activity_main.view.*
 
@@ -51,7 +53,7 @@ class MainView : DrawerLayout {
     }
 
     fun setupViewsForKey(key: FragmentKey) {
-        val actionBar = MainActivity[context].supportActionBar!!
+        val actionBar = context.findActivity<AppCompatActivity>().supportActionBar!!
         if (key.shouldShowUp()) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
             drawerToggle.isDrawerIndicatorEnabled = false
@@ -63,12 +65,10 @@ class MainView : DrawerLayout {
         }
         drawerToggle.syncState()
         setCheckedItem(key.navigationViewId())
-        MainActivity[context].invalidateOptionsMenu()
+        context.findActivity<AppCompatActivity>().invalidateOptionsMenu()
 
         buttonAddTask.showIf { key.isFabVisible }
 
-        val fragment = MainActivity[context].supportFragmentManager.findFragmentByTag(key.fragmentTag)!!
-        buttonAddTask.setOnClickListener(key.fabClickListener(fragment))
         if (key.fabDrawableIcon() != 0) {
             buttonAddTask.setImageResource(key.fabDrawableIcon())
         }
@@ -82,19 +82,19 @@ class MainView : DrawerLayout {
     fun onCreate() {
         navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener)
 
-        MainActivity[context].setSupportActionBar(toolbar)
+        context.findActivity<AppCompatActivity>().setSupportActionBar(toolbar)
 
-        val actionBar = MainActivity[context].supportActionBar!!
+        val actionBar = context.findActivity<AppCompatActivity>().supportActionBar!!
 
-        drawerToggle = object : ActionBarDrawerToggle(MainActivity[context], drawerLayout, toolbar, R.string.open, R.string.close) {
+        drawerToggle = object : ActionBarDrawerToggle(context.findActivity<AppCompatActivity>(), drawerLayout, toolbar, R.string.open, R.string.close) {
             override fun onDrawerClosed(drawerView: View) {
                 super.onDrawerClosed(drawerView)
-                MainActivity[context].invalidateOptionsMenu()
+                context.findActivity<AppCompatActivity>().invalidateOptionsMenu()
             }
 
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
-                MainActivity[context].invalidateOptionsMenu()
+                context.findActivity<AppCompatActivity>().invalidateOptionsMenu()
             }
         }
         @Suppress("DEPRECATION")

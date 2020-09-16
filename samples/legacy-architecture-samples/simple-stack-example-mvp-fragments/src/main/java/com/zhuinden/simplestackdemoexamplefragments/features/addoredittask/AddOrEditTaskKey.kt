@@ -1,19 +1,19 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.addoredittask
 
-import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.fragment.app.Fragment
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
-import com.zhuinden.simplestackdemoexamplefragments.util.scopedservices.HasServices
+import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
-sealed class AddOrEditTaskKey(val parent: FragmentKey, val taskId: String = "") : BaseKey(), HasServices {
+sealed class AddOrEditTaskKey(val parent: FragmentKey, val taskId: String = "") : BaseKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         serviceBinder.addService(AddOrEditTaskFragment.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
     }
@@ -35,7 +35,7 @@ sealed class AddOrEditTaskKey(val parent: FragmentKey, val taskId: String = "") 
     override val isFabVisible: Boolean
         get() = true
 
-    override fun createFragment(): Fragment = AddOrEditTaskFragment()
+    override fun instantiateFragment(): Fragment = AddOrEditTaskFragment()
 
     override fun menu(): Int = R.menu.empty_menu
 
