@@ -50,7 +50,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 ``` kotlin
 // build.gradle.kts
 implementation("com.github.Zhuinden:simple-stack:2.4.0")
-implementation("com.github.Zhuinden:simple-stack-extensions:2.0.0")
+implementation("com.github.Zhuinden:simple-stack-extensions:2.0.1")
 ```
 
 or
@@ -58,7 +58,7 @@ or
 ``` groovy
 // build.gradle
 implementation 'com.github.Zhuinden:simple-stack:2.4.0'
-implementation 'com.github.Zhuinden:simple-stack-extensions:2.0.0'
+implementation 'com.github.Zhuinden:simple-stack-extensions:2.0.1'
 ```
 
 ## How do I use it?
