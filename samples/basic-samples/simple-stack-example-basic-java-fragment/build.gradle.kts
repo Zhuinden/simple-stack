@@ -39,7 +39,7 @@ dependencies {
     implementation("com.google.android.material:material:1.1.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     implementation("com.jakewharton:butterknife:10.2.1")
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
     annotationProcessor("com.jakewharton:butterknife-compiler:10.2.1")

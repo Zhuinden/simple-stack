@@ -45,19 +45,19 @@ dependencies {
     implementation("androidx.activity:activity:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.0.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.0.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.0.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.0.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.0.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.0.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.0.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.0.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
