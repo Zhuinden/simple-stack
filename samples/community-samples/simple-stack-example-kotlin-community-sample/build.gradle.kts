@@ -34,9 +34,9 @@ android {
 
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72")
-    implementation("androidx.appcompat:appcompat:1.1.0")
-    implementation("androidx.core:core:1.3.1")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10")
+    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.core:core:1.3.2")
     implementation("androidx.activity:activity:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
 
@@ -53,9 +53,9 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("com.squareup.okhttp3:okhttp:3.14.2")
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.2")
-    implementation("com.google.dagger:dagger:2.27")
+    implementation("com.google.dagger:dagger:2.29.1")
 
-    kapt("com.google.dagger:dagger-compiler:2.27")
+    kapt("com.google.dagger:dagger-compiler:2.29.1")
     implementation(project(":simple-stack"))
 
     implementation("com.squareup.retrofit2:retrofit:2.4.0") {

@@ -9,8 +9,8 @@ android {
     compileSdkVersion(28)
 
     compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -36,10 +36,10 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
 
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
-    implementation("androidx.appcompat:appcompat:1.1.0")
-    implementation("com.google.android.material:material:1.1.0")
-    testImplementation("junit:junit:4.13")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("com.google.android.material:material:1.2.1")
+    testImplementation("junit:junit:4.13.1")
 
     implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
@@ -68,5 +68,5 @@ dependencies {
 
     implementation("com.github.Zhuinden:event-emitter:1.1.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10")
 }

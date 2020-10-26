@@ -26,8 +26,8 @@ android {
     }
 
     compileOptions {
-        this.setSourceCompatibility(JavaVersion.VERSION_1_7)
-        this.setTargetCompatibility(JavaVersion.VERSION_1_7)
+        this.sourceCompatibility = JavaVersion.VERSION_1_7
+        this.targetCompatibility = JavaVersion.VERSION_1_7
     }
 }
 
@@ -35,12 +35,12 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     api("com.google.code.findbugs:jsr305:3.0.2")
     api("com.github.Zhuinden:state-bundle:1.3.0")
-    testImplementation("junit:junit:4.13")
-    testImplementation("org.assertj:assertj-core:3.9.1")
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("org.assertj:assertj-core:3.16.1")
     testImplementation("org.mockito:mockito-core:2.15.0")
-    testImplementation("org.robolectric:robolectric:3.4.2")
+    testImplementation("org.robolectric:robolectric:4.2.1")
     testImplementation("org.apache.maven:maven-ant-tasks:2.1.3")
-    androidTestImplementation("junit:junit:4.13")
+    androidTestImplementation("junit:junit:4.13.1")
 }
 
 // build a jar with source files
@@ -51,7 +51,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 val javadoc by tasks.registering(Javadoc::class) {
     isFailOnError = false
-    source = android.sourceSets["main"].java.sourceFiles
+    source = android.sourceSets["main"].java.getSourceFiles()
     classpath += project.files(android.bootClasspath.joinToString(separator = File.pathSeparator))
     classpath += configurations.compile
 }

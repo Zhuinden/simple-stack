@@ -39,16 +39,16 @@ dependencies {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
-    androidTestImplementation("androidx.test:runner:1.2.0")
-    androidTestImplementation("androidx.test:rules:1.2.0")
-    implementation("androidx.appcompat:appcompat:1.1.0")
-    implementation("androidx.core:core:1.3.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("androidx.test:rules:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.core:core:1.3.2")
     implementation("androidx.activity:activity:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
 
-    implementation("com.google.android.material:material:1.1.0")
-    testImplementation("junit:junit:4.13")
+    implementation("com.google.android.material:material:1.2.1")
+    testImplementation("junit:junit:4.13.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10")
 }

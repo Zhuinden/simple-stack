@@ -31,12 +31,12 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
-    androidTestImplementation("androidx.test:runner:1.2.0")
-    androidTestImplementation("androidx.test:rules:1.2.0")
-    implementation("androidx.appcompat:appcompat:1.1.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("androidx.test:rules:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.fragment:fragment:1.2.5")
-    implementation("com.google.android.material:material:1.1.0")
+    implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     implementation("com.jakewharton:butterknife:10.2.1")
     implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.1") {
@@ -44,5 +44,5 @@ dependencies {
     }
     annotationProcessor("com.jakewharton:butterknife-compiler:10.2.1")
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
-    testImplementation("junit:junit:4.13")
+    testImplementation("junit:junit:4.13.1")
 }
