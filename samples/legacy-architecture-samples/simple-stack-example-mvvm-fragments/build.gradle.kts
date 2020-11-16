@@ -1,5 +1,8 @@
 plugins {
     id("com.android.application")
+    kotlin("android")
+    kotlin("android.extensions")
+    kotlin("kapt")
 }
 
 android {
@@ -35,36 +38,53 @@ android {
         }
     }
 
-    dataBinding.isEnabled = true
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    buildFeatures {
+        viewBinding = true
+
+        dataBinding = false
+    }
 }
 
 dependencies {
     implementation(project(":simple-stack"))
+    implementation("com.github.Zhuinden:simple-stack-extensions:2.0.1") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
 
     // App's dependencies, including test
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10")
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core:1.3.2")
+    implementation("androidx.core:core-ktx:1.3.2")
+    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("com.xwray:groupie:2.7.0")
+    implementation("com.xwray:groupie-kotlin-android-extensions:2.7.0")
+
+    implementation("com.github.Zhuinden:live-event:1.1.0")
+    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.1.0")
+    implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.1.0")
+
+    implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
+    implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
+
     implementation("androidx.activity:activity:1.1.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
-
     // live data
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
 
     // useful stuff
-    implementation("com.jakewharton:butterknife:10.2.1")
-    annotationProcessor("com.jakewharton:butterknife-compiler:10.2.1")
-    compileOnly("com.google.auto.value:auto-value:1.5.2")
-    annotationProcessor("com.google.auto.value:auto-value:1.5.2")
-    implementation("nz.bradcampbell:paperparcel:2.0.4")
-    annotationProcessor("nz.bradcampbell:paperparcel-compiler:2.0.4")
-    annotationProcessor("com.github.reggar:auto-value-ignore-hash-equals:1.1.4")
     implementation("com.google.dagger:dagger:2.29.1")
-    annotationProcessor("com.google.dagger:dagger-compiler:2.29.1")
+    kapt("com.google.dagger:dagger-compiler:2.29.1")
 
     // Dependencies for local unit tests
     testImplementation("junit:junit:4.13.1")
