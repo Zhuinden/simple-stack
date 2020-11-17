@@ -24,8 +24,14 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        getByName("debug") {
             isMinifyEnabled = false
+            multiDexEnabled = true
+        }
+
+        getByName("release") {
+            isMinifyEnabled = true
+            multiDexEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
