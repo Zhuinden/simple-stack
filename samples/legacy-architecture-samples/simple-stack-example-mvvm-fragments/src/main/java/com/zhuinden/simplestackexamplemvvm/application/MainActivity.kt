@@ -76,8 +76,11 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.contentFrame)
 
+        val app = application as CustomApplication
+
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
+            .setGlobalServices(app.globalServices)
             .setScopedServices(DefaultServiceProvider())
             .install(this, binding.contentFrame, History.of(TasksKey()))
     }

@@ -8,9 +8,10 @@ import com.zhuinden.simplestack.ServiceBinder
 
 import com.zhuinden.simplestackexamplemvvm.R
 import com.zhuinden.simplestackexamplemvvm.application.BaseKey
-import com.zhuinden.simplestackexamplemvvm.application.injection.Injector
+import com.zhuinden.simplestackexamplemvvm.application.injection.ApplicationComponent
 import com.zhuinden.simplestackexamplemvvm.data.Task
 import com.zhuinden.simplestackextensions.servicesktx.add
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -19,11 +20,13 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class TaskDetailKey(val task: Task) : BaseKey() {
     override fun bindServices(serviceBinder: ServiceBinder) {
+        val component = serviceBinder.lookup<ApplicationComponent>()
+
         with(serviceBinder) {
             add(TaskDetailViewModel(
-                Injector.get().tasksDataSource(),
+                component.tasksDataSource(),
                 backstack,
-                Injector.get().messageQueue(),
+                component.messageQueue(),
                 getKey<TaskDetailKey>().task
             ))
         }

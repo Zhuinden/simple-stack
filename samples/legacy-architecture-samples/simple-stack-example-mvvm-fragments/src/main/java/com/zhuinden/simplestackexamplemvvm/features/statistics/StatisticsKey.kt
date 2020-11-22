@@ -7,8 +7,9 @@ import com.zhuinden.simplestack.ServiceBinder
 
 import com.zhuinden.simplestackexamplemvvm.R
 import com.zhuinden.simplestackexamplemvvm.application.BaseKey
-import com.zhuinden.simplestackexamplemvvm.application.injection.Injector
+import com.zhuinden.simplestackexamplemvvm.application.injection.ApplicationComponent
 import com.zhuinden.simplestackextensions.servicesktx.add
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -17,8 +18,10 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class StatisticsKey(private val noArgPlaceHolder: String = "") : BaseKey() {
     override fun bindServices(serviceBinder: ServiceBinder) {
+        val component = serviceBinder.lookup<ApplicationComponent>()
+
         with(serviceBinder) {
-            add(StatisticsViewModel(Injector.get().tasksDataSource()))
+            add(StatisticsViewModel(component.tasksDataSource()))
         }
     }
 

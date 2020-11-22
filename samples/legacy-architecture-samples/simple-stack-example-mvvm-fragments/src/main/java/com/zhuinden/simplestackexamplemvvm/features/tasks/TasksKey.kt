@@ -8,8 +8,9 @@ import com.zhuinden.simplestack.ServiceBinder
 
 import com.zhuinden.simplestackexamplemvvm.R
 import com.zhuinden.simplestackexamplemvvm.application.BaseKey
-import com.zhuinden.simplestackexamplemvvm.application.injection.Injector
+import com.zhuinden.simplestackexamplemvvm.application.injection.ApplicationComponent
 import com.zhuinden.simplestackextensions.servicesktx.add
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -20,12 +21,14 @@ data class TasksKey(private val noArgsPlaceHolder: String = "") : BaseKey() {
     override fun instantiateFragment(): Fragment = TasksFragment()
 
     override fun bindServices(serviceBinder: ServiceBinder) {
+        val component = serviceBinder.lookup<ApplicationComponent>()
+
         with(serviceBinder) {
             add(TasksViewModel(
-                Injector.get().tasksDataSource(),
-                Injector.get().resources(),
+                component.tasksDataSource(),
+                component.resources(),
                 backstack,
-                Injector.get().messageQueue(),
+                component.messageQueue(),
                 getKey()
             ))
         }
@@ -47,3 +50,4 @@ data class TasksKey(private val noArgsPlaceHolder: String = "") : BaseKey() {
     override val isFabVisible: Boolean
         get() = true
 }
+
