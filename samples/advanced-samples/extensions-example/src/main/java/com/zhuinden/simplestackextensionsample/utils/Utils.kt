@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
+import com.zhuinden.simplestack.GlobalServices
 
 fun View.onClick(clickListener: (View) -> Unit) {
     setOnClickListener(clickListener)
@@ -60,3 +61,5 @@ fun <T : View> T.hideIf(condition: (T) -> Boolean): T {
 
     return this
 }
+
+inline fun <reified T> GlobalServices.get(serviceTag: String = T::class.java.name): T = getService(serviceTag)

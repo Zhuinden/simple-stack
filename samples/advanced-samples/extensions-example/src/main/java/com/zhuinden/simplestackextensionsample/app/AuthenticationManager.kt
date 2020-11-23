@@ -5,17 +5,19 @@ import android.content.SharedPreferences
 class AuthenticationManager(
     private val sharedPreferences: SharedPreferences
 ) {
-    fun isAuthenticated(): Boolean {
-        return sharedPreferences.getBoolean("isRegistered", false)
+    companion object {
+        private const val KEY_IS_REGISTERED = "isRegistered"
     }
 
+    fun isAuthenticated(): Boolean =
+        sharedPreferences.getBoolean(KEY_IS_REGISTERED, false)
+
+
     fun saveRegistration() {
-        sharedPreferences.edit().putBoolean("isRegistered", true).apply()
+        sharedPreferences.edit().putBoolean(KEY_IS_REGISTERED, true).apply()
     }
 
     fun clearRegistration() {
-        sharedPreferences.edit().remove("isRegistered").apply()
+        sharedPreferences.edit().remove(KEY_IS_REGISTERED).apply()
     }
-
-    var authToken: String = "" // why would this be in the viewModel?
 }

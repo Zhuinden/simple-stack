@@ -1,18 +1,16 @@
 package com.zhuinden.simplestackextensionsample.app
 
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.zhuinden.simplestack.GlobalServices
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.SimpleStateChanger
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
-import com.zhuinden.simplestackextensions.servicesktx.add
 import com.zhuinden.simplestackextensionsample.R
 import com.zhuinden.simplestackextensionsample.features.login.LoginKey
 import com.zhuinden.simplestackextensionsample.features.profile.ProfileKey
+import com.zhuinden.simplestackextensionsample.utils.get
 import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
@@ -26,23 +24,22 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step9Root)
 
         val app = application as CustomApplication
-        authenticationManager = app.authenticationManager
+
+        val globalServices = app.globalServices
+
+        authenticationManager = globalServices.get()
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
             .setScopedServices(ServiceProvider())
-            .setGlobalServices(
-                GlobalServices.builder()
-                    .add(authenticationManager)
-                    .build()
-            )
+            .setGlobalServices(globalServices)
             .install(
                 this, step9Root, History.of(
-                    when {
-                        authenticationManager.isAuthenticated() -> ProfileKey()
-                        else -> LoginKey()
-                    }
-                )
+                when {
+                    authenticationManager.isAuthenticated() -> ProfileKey()
+                    else -> LoginKey()
+                }
+            )
             )
     }
 
