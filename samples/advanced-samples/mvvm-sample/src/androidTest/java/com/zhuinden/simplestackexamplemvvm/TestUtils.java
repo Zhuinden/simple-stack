@@ -19,10 +19,11 @@ package com.zhuinden.simplestackexamplemvvm;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitor;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.Collection;

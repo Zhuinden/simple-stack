@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/samples" />
             <option value="$PROJECT_DIR$/samples/advanced-samples" />
             <option value="$PROJECT_DIR$/samples/advanced-samples/extensions-example" />
+            <option value="$PROJECT_DIR$/samples/advanced-samples/mvvm-sample" />
             <option value="$PROJECT_DIR$/samples/basic-samples" />
             <option value="$PROJECT_DIR$/samples/basic-samples/simple-stack-example-basic-java-fragment" />
             <option value="$PROJECT_DIR$/samples/basic-samples/simple-stack-example-basic-java-view" />
@@ -26,7 +27,6 @@
             <option value="$PROJECT_DIR$/samples/legacy-architecture-samples" />
             <option value="$PROJECT_DIR$/samples/legacy-architecture-samples/simple-stack-example-mvp-fragments" />
             <option value="$PROJECT_DIR$/samples/legacy-architecture-samples/simple-stack-example-mvp-view" />
-            <option value="$PROJECT_DIR$/samples/legacy-architecture-samples/simple-stack-example-mvvm-fragments" />
             <option value="$PROJECT_DIR$/samples/multistack-samples" />
             <option value="$PROJECT_DIR$/samples/multistack-samples/simple-stack-example-multistack-fragment" />
             <option value="$PROJECT_DIR$/samples/multistack-samples/simple-stack-example-multistack-view" />
