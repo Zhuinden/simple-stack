@@ -10,10 +10,10 @@ import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
+import com.zhuinden.simplestackdemoexamplemvp.databinding.PathTaskdetailBinding
 import com.zhuinden.simplestackdemoexamplemvp.util.Strings
 import com.zhuinden.simplestackdemoexamplemvp.util.hide
 import com.zhuinden.simplestackdemoexamplemvp.util.show
-import kotlinx.android.synthetic.main.path_taskdetail.view.*
 
 /**
  * Created by Zhuinden on 2017.01.26..
@@ -37,8 +37,16 @@ class TaskDetailView : RelativeLayout, MainActivity.OptionsItemSelectedListener 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+
+    private lateinit var binding: PathTaskdetailBinding
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        binding = PathTaskdetailBinding.bind(this)
+    }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
@@ -51,26 +59,26 @@ class TaskDetailView : RelativeLayout, MainActivity.OptionsItemSelectedListener 
     }
 
     fun showTitle(title: String) {
-        textTaskDetailTitle.show()
-        textTaskDetailTitle.text = title
+        binding.textTaskDetailTitle.show()
+        binding.textTaskDetailTitle.text = title
     }
 
     fun hideTitle() {
-        textTaskDetailTitle.hide()
+        binding.textTaskDetailTitle.hide()
     }
 
     fun showDescription(description: String) {
-        textTaskDetailDescription.show()
-        textTaskDetailDescription.text = description
+        binding.textTaskDetailDescription.show()
+        binding.textTaskDetailDescription.text = description
     }
 
     fun hideDescription() {
-        textTaskDetailDescription.hide()
+        binding.textTaskDetailDescription.hide()
     }
 
     fun showMissingTask() {
-        textTaskDetailTitle.text = ""
-        textTaskDetailDescription.text = context.getString(R.string.no_data)
+        binding.textTaskDetailTitle.text = ""
+        binding.textTaskDetailDescription.text = context.getString(R.string.no_data)
     }
 
     fun showTask(task: Task) {
@@ -92,8 +100,8 @@ class TaskDetailView : RelativeLayout, MainActivity.OptionsItemSelectedListener 
     }
 
     private fun showCompletionStatus(task: Task, completed: Boolean) {
-        checkboxTaskDetailComplete.isChecked = completed
-        checkboxTaskDetailComplete.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.checkboxTaskDetailComplete.isChecked = completed
+        binding.checkboxTaskDetailComplete.setOnCheckedChangeListener { buttonView, isChecked ->
             taskDetailPresenter.onTaskChecked(task, isChecked)
         }
     }

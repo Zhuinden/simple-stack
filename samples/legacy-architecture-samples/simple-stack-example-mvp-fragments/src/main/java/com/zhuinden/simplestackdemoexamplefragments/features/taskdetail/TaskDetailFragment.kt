@@ -7,11 +7,8 @@ import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
 import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
-import com.zhuinden.simplestackdemoexamplefragments.util.Strings
-import com.zhuinden.simplestackdemoexamplefragments.util.hide
-import com.zhuinden.simplestackdemoexamplefragments.util.lookup
-import com.zhuinden.simplestackdemoexamplefragments.util.show
-import kotlinx.android.synthetic.main.path_taskdetail.*
+import com.zhuinden.simplestackdemoexamplefragments.databinding.PathTaskdetailBinding
+import com.zhuinden.simplestackdemoexamplefragments.util.*
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
@@ -34,6 +31,8 @@ class TaskDetailFragment : BaseFragment() {
         lookup<Presenter>(CONTROLLER_TAG)
     }
 
+    private val binding by viewBinding(PathTaskdetailBinding::bind)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -51,26 +50,26 @@ class TaskDetailFragment : BaseFragment() {
     }
 
     fun showTitle(title: String) {
-        textTaskDetailTitle.show()
-        textTaskDetailTitle.text = title
+        binding.textTaskDetailTitle.show()
+        binding.textTaskDetailTitle.text = title
     }
 
     fun hideTitle() {
-        textTaskDetailTitle.hide()
+        binding.textTaskDetailTitle.hide()
     }
 
     fun showDescription(description: String) {
-        textTaskDetailDescription.show()
-        textTaskDetailDescription.text = description
+        binding.textTaskDetailDescription.show()
+        binding.textTaskDetailDescription.text = description
     }
 
     fun hideDescription() {
-        textTaskDetailDescription.hide()
+        binding.textTaskDetailDescription.hide()
     }
 
     fun showMissingTask() {
-        textTaskDetailTitle.text = ""
-        textTaskDetailDescription.text = activity!!.getString(R.string.no_data)
+        binding.textTaskDetailTitle.text = ""
+        binding.textTaskDetailDescription.text = getString(R.string.no_data)
     }
 
     fun showTask(task: Task) {
@@ -92,8 +91,8 @@ class TaskDetailFragment : BaseFragment() {
     }
 
     private fun showCompletionStatus(task: Task, completed: Boolean) {
-        checkboxTaskDetailComplete.isChecked = completed
-        checkboxTaskDetailComplete.setOnCheckedChangeListener { _, isChecked ->
+        binding.checkboxTaskDetailComplete.isChecked = completed
+        binding.checkboxTaskDetailComplete.setOnCheckedChangeListener { _, isChecked ->
             presenter.onTaskChecked(task, isChecked)
         }
     }

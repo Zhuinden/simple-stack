@@ -11,7 +11,6 @@ import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.util.Preconditions.checkNotNull
 import com.zhuinden.simplestackdemoexamplefragments.util.inflate
 import com.zhuinden.simplestackdemoexamplefragments.util.onClick
-import kotlinx.android.extensions.LayoutContainer
 import java.util.*
 
 /**
@@ -30,9 +29,9 @@ class TasksAdapter(
         }
 
     class TaskViewHolder(
-        override val containerView: View,
+        private val containerView: View,
         private val itemListener: TaskItemListener
-    ) : LayoutContainer, RecyclerView.ViewHolder(containerView) {
+    ) : RecyclerView.ViewHolder(containerView) {
         lateinit var task: Task
 
         private val rowClickListener = View.OnClickListener { _ -> itemListener.onTaskRowClicked(task) }

@@ -1,14 +1,12 @@
 package com.example.fragmenttransitions;
 
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.zhuinden.simplestack.navigator.Navigator;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * ViewHolder for kitten cells in our grid
@@ -17,12 +15,11 @@ import butterknife.ButterKnife;
  */
 public class KittenViewHolder
         extends RecyclerView.ViewHolder {
-    @BindView(R.id.image)
-    ImageView image;
+    private final ImageView image;
 
     public KittenViewHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(this, itemView);
+        image = itemView.findViewById(R.id.image);
     }
 
     public void bind(int position) {

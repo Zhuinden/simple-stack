@@ -3,12 +3,13 @@ package com.zhuinden.simplestackdemomultistack.features.main.cloudsync
 import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.RelativeLayout
 import com.zhuinden.simplestack.Backstack
+import com.zhuinden.simplestackdemomultistack.R
 import com.zhuinden.simplestackdemomultistack.core.navigation.backstack
 import com.zhuinden.simplestackdemomultistack.features.main.cloudsync.another.AnotherKey
 import com.zhuinden.simplestackdemomultistack.util.onClick
-import kotlinx.android.synthetic.main.cloudsync_view.view.*
 
 class CloudSyncView : RelativeLayout {
     lateinit var cloudSyncKey: CloudSyncKey
@@ -28,7 +29,7 @@ class CloudSyncView : RelativeLayout {
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        buttonFirst.onClick {
+        findViewById<View>(R.id.buttonFirst).onClick {
             backstack.goTo(AnotherKey())
         }
     }

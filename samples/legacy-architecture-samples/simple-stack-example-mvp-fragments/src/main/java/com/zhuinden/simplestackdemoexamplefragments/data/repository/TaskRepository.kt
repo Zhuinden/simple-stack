@@ -1,7 +1,6 @@
 package com.zhuinden.simplestackdemoexamplefragments.data.repository
 
 import com.zhuinden.simplestackdemoexamplefragments.data.entity.DbTask
-import com.zhuinden.simplestackdemoexamplefragments.data.entity.DbTaskFields
 import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.data.models.fromRealm
 import com.zhuinden.simplestackdemoexamplefragments.data.models.toRealm
@@ -18,38 +17,34 @@ import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.where
 import java.util.concurrent.Callable
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
-@Singleton
-class TaskRepository @Inject constructor(
-    @param:Named("LOOPER_SCHEDULER") private val looperScheduler: SchedulerHolder,
-    @param:Named("WRITE_SCHEDULER") private val writeScheduler: SchedulerHolder
+class TaskRepository(
+    private val looperScheduler: SchedulerHolder,
+    private val writeScheduler: SchedulerHolder
 ) {
     val tasksWithChanges: Observable<List<Task>>
         get() = createResults { realm ->
             realm.where<DbTask>()
-                .sort(DbTaskFields.ID, Sort.ASCENDING)
+                .sort("id", Sort.ASCENDING)
                 .findAllAsync()
         }
 
     val completedTasksWithChanges: Observable<List<Task>>
         get() = createResults { realm ->
             realm.where<DbTask>()
-                .equalTo(DbTaskFields.COMPLETED, true)
-                .sort(DbTaskFields.ID, Sort.ASCENDING)
+                .equalTo("completed", true)
+                .sort("id", Sort.ASCENDING)
                 .findAllAsync()
         }
 
     val activeTasksWithChanges: Observable<List<Task>>
         get() = createResults { realm ->
             realm.where<DbTask>()
-                .equalTo(DbTaskFields.COMPLETED, false)
-                .sort(DbTaskFields.ID, Sort.ASCENDING)
+                .equalTo("completed", false)
+                .sort("id", Sort.ASCENDING)
                 .findAllAsync()
         }
 
@@ -100,7 +95,7 @@ class TaskRepository @Inject constructor(
     fun deleteCompletedTasks() {
         doWrite { realm ->
             realm.where<DbTask>()
-                .equalTo(DbTaskFields.COMPLETED, true)
+                .equalTo("completed", true)
                 .findAll()
                 .deleteAllFromRealm()
         }
@@ -110,7 +105,7 @@ class TaskRepository @Inject constructor(
         Single.fromCallable(Callable<Optional<Task>> {
             Realm.getDefaultInstance().use { realm ->
                 val tasks = realm.where<DbTask>()
-                    .equalTo(DbTaskFields.ID, taskId)
+                    .equalTo("id", taskId)
                     .findAll()
                 return@Callable when {
                     tasks.size > 0 -> Optional.of(tasks[0]!!.fromRealm())
@@ -130,7 +125,7 @@ class TaskRepository @Inject constructor(
     fun deleteTask(task: Task) {
         doWrite { realm ->
             realm.where<DbTask>()
-                .equalTo(DbTaskFields.ID, task.id)
+                .equalTo("id", task.id)
                 .findAll()
                 .deleteAllFromRealm()
         }

@@ -11,7 +11,6 @@ import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplemvp.features.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplemvp.features.taskdetail.TaskDetailKey
-import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.Single
@@ -19,14 +18,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 /**
  * Created by Owner on 2017. 01. 27..
  */
-// UNSCOPED!
-class TasksPresenter @Inject constructor(
-    private val backstackHolder: BackstackHolder,
+class TasksPresenter(
+    private val backstack: Backstack,
     private val taskRepository: TaskRepository,
     private val messageQueue: MessageQueue
 ) : BasePresenter<TasksView>(), TasksView.Presenter, Bundleable {
@@ -65,7 +62,7 @@ class TasksPresenter @Inject constructor(
     }
 
     override fun onTaskRowClicked(task: Task) {
-        backstackHolder.backstack.goTo(TaskDetailKey(task.id))
+        backstack.goTo(TaskDetailKey(task.id))
     }
 
     override fun onFilterActiveSelected() {
@@ -94,7 +91,7 @@ class TasksPresenter @Inject constructor(
     }
 
     private fun openAddNewTask() {
-        backstackHolder.backstack.goTo(AddOrEditTaskKey.AddTaskKey(view!!.getKey()))
+        backstack.goTo(AddOrEditTaskKey.AddTaskKey(view!!.getKey()))
     }
 
     private fun completeTask(task: Task) {

@@ -10,7 +10,6 @@ import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.util.Preconditions.checkNotNull
 import com.zhuinden.simplestackdemoexamplemvp.util.inflate
 import com.zhuinden.simplestackdemoexamplemvp.util.onClick
-import kotlinx.android.extensions.LayoutContainer
 import java.util.*
 
 class TasksAdapter(
@@ -25,9 +24,12 @@ class TasksAdapter(
         }
 
     class TaskViewHolder(
-        override val containerView: View,
+        private val containerView: View,
         private val itemListener: TaskItemListener
-    ) : LayoutContainer, RecyclerView.ViewHolder(containerView) {
+    ) : RecyclerView.ViewHolder(containerView) {
+        private val title = containerView.findViewById<TextView>(R.id.title)
+        private val complete = containerView.findViewById<CheckBox>(R.id.complete)
+
         lateinit var task: Task
 
         private val rowClickListener = View.OnClickListener { _ -> itemListener.onTaskRowClicked(task) }
@@ -43,8 +45,8 @@ class TasksAdapter(
 
         fun bind(task: Task) {
             this.task = task
-            containerView.findViewById<TextView>(R.id.title).text = task.titleForList
-            containerView.findViewById<CheckBox>(R.id.complete).isChecked = task.isCompleted
+            title.text = task.titleForList
+            complete.isChecked = task.isCompleted
             containerView.setBackgroundResource(when {
                 task.isCompleted -> R.drawable.list_completed_touch_feedback
                 else -> R.drawable.touch_feedback

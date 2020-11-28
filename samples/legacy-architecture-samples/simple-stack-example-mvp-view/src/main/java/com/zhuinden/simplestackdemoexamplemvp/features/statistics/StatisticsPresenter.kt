@@ -1,25 +1,23 @@
 package com.zhuinden.simplestackdemoexamplemvp.features.statistics
 
+import com.zhuinden.rxcombinetuplekt.combineTuple
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
-import com.zhuinden.simplestackdemoexamplemvp.util.combineTwo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
-
 
 /**
  * Created by Owner on 2017. 01. 27..
  */
 
-class StatisticsPresenter @Inject constructor(
+class StatisticsPresenter(
     private val tasksRepository: TaskRepository
-)  : BasePresenter<StatisticsView>(), StatisticsView.Presenter {
+) : BasePresenter<StatisticsView>(), StatisticsView.Presenter {
     lateinit var disposable: Disposable
 
     override fun onAttach(view: StatisticsView) {
-        disposable = combineTwo(
+        disposable = combineTuple(
             tasksRepository.activeTasksWithChanges,
             tasksRepository.completedTasksWithChanges
         ).subscribeOn(Schedulers.computation())

@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemoexamplefragments.features.tasks
 
 import androidx.recyclerview.widget.DiffUtil
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
@@ -9,22 +10,18 @@ import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplefragments.features.addoredittask.AddOrEditTaskKey
 import com.zhuinden.simplestackdemoexamplefragments.features.taskdetail.TaskDetailKey
-import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
-// UNSCOPED!
-class TasksPresenter @Inject constructor(
-    private val backstackHolder: BackstackHolder,
+class TasksPresenter(
+    private val backstack: Backstack,
     private val taskRepository: TaskRepository
 ) : BasePresenter<TasksFragment>(), TasksFragment.Presenter, Bundleable {
     override fun onTaskCheckClicked(task: Task) {
@@ -86,7 +83,7 @@ class TasksPresenter @Inject constructor(
     private fun openAddNewTask() {
         val tasksFragment = view
         val parentKey = tasksFragment!!.getKey<FragmentKey>()
-        backstackHolder.backstack.goTo(AddOrEditTaskKey.AddTaskKey(parentKey))
+        backstack.goTo(AddOrEditTaskKey.AddTaskKey(parentKey))
     }
 
     private fun refresh() {
@@ -101,7 +98,7 @@ class TasksPresenter @Inject constructor(
     }
 
     private fun openTaskDetails(task: Task) {
-        backstackHolder.backstack.goTo(TaskDetailKey(task.id))
+        backstack.goTo(TaskDetailKey(task.id))
     }
 
     private fun completeTask(task: Task) {

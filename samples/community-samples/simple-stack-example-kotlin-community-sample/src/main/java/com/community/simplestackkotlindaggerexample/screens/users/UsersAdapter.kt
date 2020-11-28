@@ -1,10 +1,10 @@
 package com.community.simplestackkotlindaggerexample.screens.users
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.community.simplestackkotlindaggerexample.R
 import com.community.simplestackkotlindaggerexample.data.database.User
 import com.community.simplestackkotlindaggerexample.screens.userdetail.UserDetailKey
@@ -12,7 +12,6 @@ import com.community.simplestackkotlindaggerexample.utils.onClick
 import com.zhuinden.simplestack.navigator.Navigator
 import io.realm.RealmRecyclerViewAdapter
 import io.realm.RealmResults
-import kotlinx.android.synthetic.main.view_item_contact.view.*
 
 class UsersAdapter(
     items: RealmResults<User>
@@ -32,7 +31,7 @@ class UsersAdapter(
     }
 
     inner class UsersViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val userNameView: TextView = itemView.textUsername
+        private val userNameView: TextView = itemView.findViewById(R.id.textUsername)
 
         fun bind(user: User) {
             userNameView.text = user.userName

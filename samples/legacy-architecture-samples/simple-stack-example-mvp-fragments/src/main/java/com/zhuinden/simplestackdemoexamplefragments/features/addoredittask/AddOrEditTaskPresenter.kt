@@ -1,6 +1,7 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.addoredittask
 
 import android.annotation.SuppressLint
+import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.BasePresenter
@@ -8,20 +9,17 @@ import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksFragment
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
-import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
 import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
-import javax.inject.Inject
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
-// UNSCOPED
-class AddOrEditTaskPresenter @Inject constructor(
+class AddOrEditTaskPresenter(
     private val taskRepository: TaskRepository,
     private val messageQueue: MessageQueue,
-    private val backstackHolder: BackstackHolder
+    private val backstack: Backstack
 ) : BasePresenter<AddOrEditTaskFragment>(), AddOrEditTaskFragment.Presenter, Bundleable {
     var title: String? = null
     var description: String? = null
@@ -107,7 +105,7 @@ class AddOrEditTaskPresenter @Inject constructor(
 
     private fun navigateBack() {
         view!!.hideKeyboard()
-        val backstack = backstackHolder.backstack
+
         val addOrEditTaskKey = view!!.getKey<AddOrEditTaskKey>()
         when(addOrEditTaskKey) {
             is AddOrEditTaskKey.AddTaskKey -> {

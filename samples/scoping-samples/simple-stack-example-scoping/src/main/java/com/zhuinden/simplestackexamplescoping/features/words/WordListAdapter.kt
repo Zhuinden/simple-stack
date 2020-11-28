@@ -1,12 +1,11 @@
 package com.zhuinden.simplestackexamplescoping.features.words
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.zhuinden.simplestackexamplescoping.R
 import com.zhuinden.simplestackexamplescoping.utils.inflate
-import kotlinx.android.extensions.LayoutContainer
 import java.util.*
 
 class WordListAdapter : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
@@ -26,7 +25,7 @@ class WordListAdapter : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
         holder.bind(list[position])
     }
 
-    class ViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    class ViewHolder(val containerView: View) : RecyclerView.ViewHolder(containerView) {
         private val text: TextView = containerView.findViewById(R.id.text)
 
         fun bind(word: String) {

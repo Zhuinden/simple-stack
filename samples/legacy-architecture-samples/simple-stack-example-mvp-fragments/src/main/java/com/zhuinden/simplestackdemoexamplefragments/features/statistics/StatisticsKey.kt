@@ -4,10 +4,10 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
-import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
-import kotlinx.android.parcel.Parcelize
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import kotlinx.parcelize.Parcelize
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
@@ -15,7 +15,11 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class StatisticsKey(val placeholder: String = "") : BaseKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.addService(StatisticsFragment.CONTROLLER_TAG, Injector.get().statisticsPresenter())
+        with(serviceBinder) {
+            addService(StatisticsFragment.CONTROLLER_TAG, StatisticsPresenter(
+                lookup()
+            ))
+        }
     }
 
     override fun getScopeTag(): String = "Statistics"

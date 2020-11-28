@@ -5,9 +5,9 @@ import android.view.View
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 import com.zhuinden.simplestacktutorials.R
+import com.zhuinden.simplestacktutorials.databinding.Step8FormFragmentBinding
 import com.zhuinden.simplestacktutorials.utils.onClick
 import com.zhuinden.simplestacktutorials.utils.onTextChanged
-import kotlinx.android.synthetic.main.step8_form_fragment.*
 
 class FormFragment : KeyedFragment(R.layout.step8_form_fragment) {
     private val viewModel by lazy { lookup<FormViewModel>() }
@@ -15,12 +15,14 @@ class FormFragment : KeyedFragment(R.layout.step8_form_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        inputSomeData.setText(viewModel.someData)
-        inputMoreData.setText(viewModel.moreData)
+        val binding = Step8FormFragmentBinding.bind(view)
 
-        inputSomeData.onTextChanged { viewModel.someData = it }
-        inputMoreData.onTextChanged { viewModel.moreData = it }
+        binding.inputSomeData.setText(viewModel.someData)
+        binding.inputMoreData.setText(viewModel.moreData)
 
-        buttonPassResults.onClick { viewModel.onButtonClicked() }
+        binding.inputSomeData.onTextChanged { viewModel.someData = it }
+        binding.inputMoreData.onTextChanged { viewModel.moreData = it }
+
+        binding.buttonPassResults.onClick { viewModel.onButtonClicked() }
     }
 }

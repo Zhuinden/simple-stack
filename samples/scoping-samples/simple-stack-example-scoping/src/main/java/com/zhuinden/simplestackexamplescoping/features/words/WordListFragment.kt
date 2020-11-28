@@ -5,21 +5,23 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.zhuinden.liveevent.observe
 import com.zhuinden.simplestackexamplescoping.R
-import com.zhuinden.simplestackexamplescoping.utils.observe
+import com.zhuinden.simplestackexamplescoping.databinding.WordListViewBinding
 import com.zhuinden.simplestackexamplescoping.utils.onClick
 import com.zhuinden.simplestackexamplescoping.utils.safe
 import com.zhuinden.simplestackexamplescoping.utils.showToast
+import com.zhuinden.simplestackexamplescoping.utils.viewBinding
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
-import kotlinx.android.synthetic.main.word_list_view.*
 
 /**
  * Created by Zhuinden on 2018.09.17.
  */
 
 class WordListFragment : KeyedFragment(R.layout.word_list_view) {
+    private val binding by viewBinding(WordListViewBinding::bind)
+
     interface ActionHandler {
         fun onAddNewWordClicked()
     }
@@ -40,11 +42,10 @@ class WordListFragment : KeyedFragment(R.layout.word_list_view) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val x: RecyclerView
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerView.adapter = adapter
 
-        buttonGoToAddNewWord.onClick { view ->
+        binding.buttonGoToAddNewWord.onClick { view ->
             actionHandler.onAddNewWordClicked()
         }
 

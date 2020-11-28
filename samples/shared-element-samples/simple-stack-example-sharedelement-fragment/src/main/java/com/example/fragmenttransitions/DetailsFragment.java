@@ -1,14 +1,12 @@
 package com.example.fragmenttransitions;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import androidx.annotation.Nullable;
 
 /**
  * Display details for a given kitten
@@ -17,8 +15,6 @@ import butterknife.ButterKnife;
  */
 public class DetailsFragment
         extends BaseFragment {
-    @BindView(R.id.image)
-    ImageView image;
 
     @Nullable
     @Override
@@ -29,11 +25,11 @@ public class DetailsFragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         DetailsKey key = getKey();
         int kittenNumber = key.kittenNumber();
 
+        ImageView image = view.findViewById(R.id.image);
         switch(kittenNumber) {
             case 1:
                 image.setImageResource(R.drawable.placekitten_1);

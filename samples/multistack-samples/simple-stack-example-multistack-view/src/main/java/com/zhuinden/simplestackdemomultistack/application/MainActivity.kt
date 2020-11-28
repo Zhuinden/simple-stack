@@ -1,8 +1,9 @@
 package com.zhuinden.simplestackdemomultistack.application
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MotionEvent
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestackdemomultistack.R
 import com.zhuinden.simplestackdemomultistack.core.navigation.Multistack
 import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackViewStateChanger
@@ -11,7 +12,7 @@ import com.zhuinden.simplestackdemomultistack.features.main.cloudsync.CloudSyncK
 import com.zhuinden.simplestackdemomultistack.features.main.list.ListKey
 import com.zhuinden.simplestackdemomultistack.features.main.mail.MailKey
 import com.zhuinden.simplestackdemomultistack.util.onMenuItemSelected
-import kotlinx.android.synthetic.main.activity_main.*
+import it.sephiroth.android.library.bottomnavigation.BottomNavigation
 
 class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationStateListener {
     lateinit var multistack: Multistack
@@ -42,10 +43,10 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
 
         setContentView(R.layout.activity_main)
 
-        bottomNavigationView.onMenuItemSelected { menuItemId: Int, itemIndex: Int, b: Boolean ->
+        findViewById<BottomNavigation>(R.id.bottomNavigationView).onMenuItemSelected { menuItemId: Int, itemIndex: Int, b: Boolean ->
             multistack.setSelectedStack(StackType.values()[itemIndex].name)
         }
-        multistack.setStateChanger(MultistackViewStateChanger(this, multistack, root, this))
+        multistack.setStateChanger(MultistackViewStateChanger(this, multistack, findViewById(R.id.container), this))
     }
 
     override fun onAnimationStarted() {
@@ -78,7 +79,7 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable("multistack", multistack.toBundle())
-        multistack.persistViewToState(root.getChildAt(0)) // this is needed for views only
+        multistack.persistViewToState(findViewById<ViewGroup>(R.id.container).getChildAt(0)) // this is needed for views only
     }
 
     override fun onDestroy() {

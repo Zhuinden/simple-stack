@@ -6,17 +6,15 @@ import com.zhuinden.simplestackdemoexamplemvp.core.navigation.getKey
 import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplemvp.features.addoredittask.AddOrEditTaskKey
-import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder
 import io.reactivex.android.schedulers.AndroidSchedulers
-import javax.inject.Inject
 
 /**
  * Created by Owner on 2017. 01. 27..
  */
 
-class TaskDetailPresenter @Inject constructor(
+class TaskDetailPresenter(
     private val taskRepository: TaskRepository,
-    private val backstackHolder: BackstackHolder
+    private val backstack: Backstack
 ) : BasePresenter<TaskDetailView>(), TaskDetailView.Presenter {
     lateinit var taskDetailKey: TaskDetailKey
 
@@ -49,7 +47,7 @@ class TaskDetailPresenter @Inject constructor(
             view!!.showMissingTask()
             return
         }
-        backstackHolder.backstack.goTo(AddOrEditTaskKey.EditTaskKey(view!!.getKey(), taskId))
+        backstack.goTo(AddOrEditTaskKey.EditTaskKey(view!!.getKey(), taskId))
     }
 
     fun completeTask(task: Task) {
@@ -71,7 +69,7 @@ class TaskDetailPresenter @Inject constructor(
     override fun onTaskDeleteButtonClicked() {
         if (task != null) {
             taskRepository.deleteTask(task!!)
-            backstackHolder.backstack.goBack()
+            backstack.goBack()
         }
     }
 }

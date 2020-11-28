@@ -1,7 +1,7 @@
 package com.zhuinden.simplestacktutorials.steps.step_5
 
 import androidx.fragment.app.Fragment
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Step5SecondScreen(private val placeholder: String = "") :

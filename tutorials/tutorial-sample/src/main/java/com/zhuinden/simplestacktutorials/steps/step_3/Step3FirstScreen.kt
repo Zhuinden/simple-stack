@@ -1,7 +1,7 @@
 package com.zhuinden.simplestacktutorials.steps.step_3
 
 import com.zhuinden.simplestack.navigator.Navigator
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class Step3FirstScreen : Step3Screen() {

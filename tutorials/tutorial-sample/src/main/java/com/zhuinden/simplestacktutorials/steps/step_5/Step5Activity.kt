@@ -7,20 +7,22 @@ import com.zhuinden.simplestack.SimpleStateChanger
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestacktutorials.R
-import kotlinx.android.synthetic.main.activity_step5.*
+import com.zhuinden.simplestacktutorials.databinding.ActivityStep5Binding
 
 class Step5Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: FragmentStateChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_step5)
+
+        val binding = ActivityStep5Binding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.step5Root)
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
-            .install(this, step5Root, History.of(Step5FirstScreen()))
+            .install(this, binding.step5Root, History.of(Step5FirstScreen()))
     }
 
     override fun onBackPressed() {

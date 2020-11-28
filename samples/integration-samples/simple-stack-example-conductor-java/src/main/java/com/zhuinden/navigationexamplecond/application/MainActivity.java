@@ -1,13 +1,12 @@
 package com.zhuinden.navigationexamplecond.application;
 
 import android.os.Bundle;
-import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Conductor;
 import com.bluelinelabs.conductor.Router;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.zhuinden.navigationexamplecond.R;
 import com.zhuinden.navigationexamplecond.core.navigation.ControllerStateChanger;
+import com.zhuinden.navigationexamplecond.databinding.ActivityMainBinding;
 import com.zhuinden.navigationexamplecond.screens.DashboardKey;
 import com.zhuinden.navigationexamplecond.screens.HomeKey;
 import com.zhuinden.navigationexamplecond.screens.NotificationKey;
@@ -22,8 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity
         extends AppCompatActivity
@@ -33,15 +30,11 @@ public class MainActivity
     private BackstackViewModel backstackViewModel;
     private Backstack backstack;
 
-    @BindView(R.id.navigation)
-    BottomNavigationView navigation;
-
-    @BindView(R.id.root)
-    ViewGroup root;
-
     Router router;
 
     ControllerStateChanger controllerStateChanger;
+
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +44,8 @@ public class MainActivity
             public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
                 BackstackViewModel backstackViewModel = new BackstackViewModel();
                 if(savedInstanceState != null) {
-                    backstackViewModel.backstack.fromBundle(savedInstanceState.getParcelable("backstack"));
+                    backstackViewModel.backstack.fromBundle(savedInstanceState.getParcelable(
+                            "backstack"));
                 }
                 //noinspection unchecked
                 return (T) backstackViewModel;
@@ -61,10 +55,10 @@ public class MainActivity
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        navigation.setOnNavigationItemSelectedListener(item -> {
+        binding.navigation.setOnNavigationItemSelectedListener(item -> {
             switch(item.getItemId()) {
                 case R.id.navigation_home:
                     backstack.setHistory(History.of(HomeKey.create()), StateChange.REPLACE);
@@ -78,7 +72,7 @@ public class MainActivity
             }
             return false;
         });
-        router = Conductor.attachRouter(this, root, savedInstanceState);
+        router = Conductor.attachRouter(this, binding.container, savedInstanceState);
         controllerStateChanger = new ControllerStateChanger(router);
         backstack.setStateChanger(new SimpleStateChanger(this));
     }

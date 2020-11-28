@@ -9,8 +9,7 @@ import com.zhuinden.simplestackextensions.fragments.KeyedFragment
  * Created by Zhuinden on 2017.01.26..
  */
 
-abstract class BaseFragment : KeyedFragment() {
-
+abstract class BaseFragment() : KeyedFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)

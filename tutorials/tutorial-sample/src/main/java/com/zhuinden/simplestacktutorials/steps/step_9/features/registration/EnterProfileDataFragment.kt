@@ -5,6 +5,7 @@ import android.view.View
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 import com.zhuinden.simplestacktutorials.R
+import com.zhuinden.simplestacktutorials.databinding.Step9EnterProfileDataFragmentBinding
 import com.zhuinden.simplestacktutorials.steps.step_9.utils.get
 import com.zhuinden.simplestacktutorials.steps.step_9.utils.set
 import com.zhuinden.simplestacktutorials.utils.onClick
@@ -12,7 +13,6 @@ import com.zhuinden.simplestacktutorials.utils.onTextChanged
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.step9_enter_profile_data_fragment.*
 
 class EnterProfileDataFragment : KeyedFragment(R.layout.step9_enter_profile_data_fragment) {
     private val viewModel by lazy { lookup<RegistrationViewModel>() }
@@ -22,16 +22,18 @@ class EnterProfileDataFragment : KeyedFragment(R.layout.step9_enter_profile_data
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        textFullName.setText(viewModel.fullName.get())
-        textBio.setText(viewModel.bio.get())
+        val binding = Step9EnterProfileDataFragmentBinding.bind(view)
+
+        binding.textFullName.setText(viewModel.fullName.get())
+        binding.textBio.setText(viewModel.bio.get())
 
         viewModel.isEnterProfileNextEnabled.distinctUntilChanged().subscribeBy { enabled ->
-            buttonEnterProfileNext.isEnabled = enabled
+            binding.buttonEnterProfileNext.isEnabled = enabled
         }.addTo(compositeDisposable)
 
-        textFullName.onTextChanged { fullName -> viewModel.fullName.set(fullName) }
-        textBio.onTextChanged { bio -> viewModel.bio.set(bio) }
-        buttonEnterProfileNext.onClick { viewModel.onEnterProfileNextClicked() }
+        binding.textFullName.onTextChanged { fullName -> viewModel.fullName.set(fullName) }
+        binding.textBio.onTextChanged { bio -> viewModel.bio.set(bio) }
+        binding.buttonEnterProfileNext.onClick { viewModel.onEnterProfileNextClicked() }
     }
 
     override fun onDestroyView() {

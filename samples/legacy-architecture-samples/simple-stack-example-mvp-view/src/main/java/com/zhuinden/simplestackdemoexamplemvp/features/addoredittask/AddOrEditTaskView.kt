@@ -6,8 +6,8 @@ import android.util.AttributeSet
 import android.widget.ScrollView
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.MvpPresenter
+import com.zhuinden.simplestackdemoexamplemvp.databinding.PathAddoredittaskBinding
 import com.zhuinden.simplestackdemoexamplemvp.util.onTextChanged
-import kotlinx.android.synthetic.main.path_addoredittask.view.*
 
 /**
  * Created by Owner on 2017. 01. 26..
@@ -31,24 +31,30 @@ class AddOrEditTaskView : ScrollView {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
+    private lateinit var binding: PathAddoredittaskBinding
+
     fun setTitle(title: String) {
-        textAddTaskTitle.setText(title)
+        binding.textAddTaskTitle.setText(title)
     }
 
     fun setDescription(description: String) {
-        textAddTaskDescription.setText(description)
+        binding.textAddTaskDescription.setText(description)
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        textAddTaskTitle.onTextChanged { title ->
+
+        binding = PathAddoredittaskBinding.bind(this)
+
+        binding.textAddTaskTitle.onTextChanged { title ->
             addOrEditTaskPresenter.onTitleChanged(title)
         }
 
-        textAddTaskDescription.onTextChanged { description ->
+        binding.textAddTaskDescription.onTextChanged { description ->
             addOrEditTaskPresenter.onDescriptionChanged(description)
         }
     }

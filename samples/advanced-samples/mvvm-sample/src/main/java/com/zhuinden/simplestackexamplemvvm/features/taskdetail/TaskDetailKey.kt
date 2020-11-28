@@ -12,7 +12,7 @@ import com.zhuinden.simplestackexamplemvvm.application.injection.ApplicationComp
 import com.zhuinden.simplestackexamplemvvm.data.Task
 import com.zhuinden.simplestackextensions.servicesktx.add
 import com.zhuinden.simplestackextensions.servicesktx.lookup
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /**
  * Created by Zhuinden on 2017.07.26..

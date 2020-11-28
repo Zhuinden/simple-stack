@@ -6,9 +6,10 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseFragment
+import com.zhuinden.simplestackdemoexamplefragments.databinding.PathAddoredittaskBinding
 import com.zhuinden.simplestackdemoexamplefragments.util.lookup
 import com.zhuinden.simplestackdemoexamplefragments.util.onTextChanged
-import kotlinx.android.synthetic.main.path_addoredittask.*
+import com.zhuinden.simplestackdemoexamplefragments.util.viewBinding
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
@@ -32,16 +33,18 @@ class AddOrEditTaskFragment : BaseFragment() {
         lookup<Presenter>(CONTROLLER_TAG)
     }
 
+    private val binding by viewBinding(PathAddoredittaskBinding::bind)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         presenter.attachView(this)
 
-        textAddTaskTitle.onTextChanged { title ->
+        binding.textAddTaskTitle.onTextChanged { title ->
             presenter.onTitleChanged(title)
         }
 
-        textAddTaskDescription.onTextChanged { description ->
+        binding.textAddTaskDescription.onTextChanged { description ->
             presenter.onDescriptionChanged(description)
         }
     }
@@ -53,11 +56,11 @@ class AddOrEditTaskFragment : BaseFragment() {
     }
 
     fun setTitle(title: String) {
-        textAddTaskTitle.setText(title)
+        binding.textAddTaskTitle.setText(title)
     }
 
     fun setDescription(description: String) {
-        textAddTaskDescription.setText(description)
+        binding.textAddTaskDescription.setText(description)
     }
 
     fun hideKeyboard() {

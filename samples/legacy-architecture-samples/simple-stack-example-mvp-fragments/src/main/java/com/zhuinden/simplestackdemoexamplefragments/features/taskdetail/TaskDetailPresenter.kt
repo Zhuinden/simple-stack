@@ -1,21 +1,20 @@
 package com.zhuinden.simplestackdemoexamplefragments.features.taskdetail
 
 import android.annotation.SuppressLint
+import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestackdemoexamplefragments.core.mvp.BasePresenter
 import com.zhuinden.simplestackdemoexamplefragments.data.models.Task
 import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplefragments.features.addoredittask.AddOrEditTaskKey
-import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
 import io.reactivex.android.schedulers.AndroidSchedulers
-import javax.inject.Inject
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
 
-class TaskDetailPresenter @Inject constructor(
+class TaskDetailPresenter(
     private val taskRepository: TaskRepository,
-    private val backstackHolder: BackstackHolder
+    private val backstack: Backstack
 ) : BasePresenter<TaskDetailFragment>(), TaskDetailFragment.Presenter {
     override fun onTaskChecked(task: Task, checked: Boolean) {
         if (checked) {
@@ -66,7 +65,7 @@ class TaskDetailPresenter @Inject constructor(
             view?.showMissingTask()
             return
         }
-        backstackHolder.backstack.goTo(AddOrEditTaskKey.EditTaskKey(view!!.getKey(), taskId))
+        backstack.goTo(AddOrEditTaskKey.EditTaskKey(view!!.getKey(), taskId))
     }
 
     private fun completeTask(task: Task) {
@@ -81,7 +80,7 @@ class TaskDetailPresenter @Inject constructor(
         val task = task
         if (task != null) {
             taskRepository.deleteTask(task)
-            backstackHolder.backstack.goBack()
+            backstack.goBack()
         }
     }
 }

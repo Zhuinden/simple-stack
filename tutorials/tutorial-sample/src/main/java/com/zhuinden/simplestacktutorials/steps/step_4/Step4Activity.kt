@@ -4,15 +4,18 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.navigator.Navigator
-import com.zhuinden.simplestacktutorials.R
-import kotlinx.android.synthetic.main.activity_step4.*
+import com.zhuinden.simplestacktutorials.databinding.ActivityStep4Binding
 
 class Step4Activity : AppCompatActivity() {
+    private lateinit var binding: ActivityStep4Binding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_step4)
 
-        Navigator.install(this, step4Root, History.of(Step4FirstScreen()))
+        binding = ActivityStep4Binding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        Navigator.install(this, binding.step4Root, History.of(Step4FirstScreen()))
     }
 
     override fun onBackPressed() {

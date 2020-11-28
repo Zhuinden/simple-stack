@@ -6,17 +6,24 @@ import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestack.navigator.ViewChangeHandler
 import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
+import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
-import kotlinx.android.parcel.Parcelize
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TaskDetailKey(val taskId: String) : ViewKey, DefaultServiceProvider.HasServices {
     override fun getScopeTag(): String = "TaskDetail[$taskId]"
 
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.addService(TaskDetailView.CONTROLLER_TAG, Injector.get().taskDetailPresenter())
+        with(serviceBinder) {
+            addService(TaskDetailView.CONTROLLER_TAG, TaskDetailPresenter(
+                lookup<TaskRepository>(),
+                backstack
+            ))
+        }
+
     }
 
     override fun layout(): Int = R.layout.path_taskdetail

@@ -5,7 +5,7 @@ import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackextensions.servicesktx.add
 import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.simplestacktutorials.steps.step_8.core.navigation.FragmentKey
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FormKey(private val placeholder: String = "") : FragmentKey() {

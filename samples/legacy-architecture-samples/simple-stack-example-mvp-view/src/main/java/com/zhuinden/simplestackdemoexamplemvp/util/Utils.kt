@@ -12,8 +12,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
+import com.zhuinden.simplestack.GlobalServices
 
 fun View.show() {
     this.visibility = View.VISIBLE
@@ -42,9 +41,6 @@ tailrec fun <T : Activity> Context.findActivity(): T {
 
     return baseContext.findActivity()
 }
-
-fun <A, B> combineTwo(aSource: Observable<A>, bSource: Observable<B>): Observable<Pair<A, B>> = // TODO: use combineTuple
-    Observable.combineLatest(aSource, bSource, BiFunction { t1, t2 -> t1 to t2 })
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToParent: Boolean = false) =
     LayoutInflater.from(context).inflate(layoutRes, this, attachToParent)
@@ -78,3 +74,5 @@ inline fun View.onClick(crossinline click: (View) -> Unit) {
         click(view)
     }
 }
+
+inline fun <reified T> GlobalServices.get(serviceTag: String = T::class.java.name): T = getService(serviceTag)

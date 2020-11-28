@@ -1,11 +1,9 @@
 package com.zhuinden.navigationexampleview.application;
 
 import android.os.Bundle;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.appcompat.app.AppCompatActivity;
-import android.view.ViewGroup;
 
 import com.zhuinden.navigationexampleview.R;
+import com.zhuinden.navigationexampleview.databinding.ActivityMainBinding;
 import com.zhuinden.navigationexampleview.screens.DashboardKey;
 import com.zhuinden.navigationexampleview.screens.HomeKey;
 import com.zhuinden.navigationexampleview.screens.NotificationKey;
@@ -14,24 +12,20 @@ import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.navigator.Navigator;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity
         extends AppCompatActivity {
-    @BindView(R.id.navigation)
-    BottomNavigationView navigation;
-
-    @BindView(R.id.root)
-    ViewGroup root;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
 
-        navigation.setOnNavigationItemSelectedListener(item -> {
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        binding.navigation.setOnNavigationItemSelectedListener(item -> {
             Backstack backstack = Navigator.getBackstack(this);
             switch(item.getItemId()) {
                 case R.id.navigation_home:
@@ -47,7 +41,7 @@ public class MainActivity
             return false;
         });
 
-        Navigator.install(this, root, History.single(HomeKey.create()));
+        Navigator.install(this, binding.container, History.single(HomeKey.create()));
     }
 
     @Override

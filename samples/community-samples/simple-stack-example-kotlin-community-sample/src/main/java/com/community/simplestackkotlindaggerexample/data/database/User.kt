@@ -5,7 +5,7 @@ import com.community.simplestackkotlindaggerexample.data.api.UserProfileResponse
 import io.realm.RealmObject
 import io.realm.annotations.Index
 import io.realm.annotations.PrimaryKey
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 
 @Parcelize

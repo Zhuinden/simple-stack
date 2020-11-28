@@ -8,22 +8,19 @@ import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
 import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksView
-import com.zhuinden.simplestackdemoexamplemvp.util.BackstackHolder
 import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue
 import com.zhuinden.simplestackdemoexamplemvp.util.hideKeyboard
 import com.zhuinden.statebundle.StateBundle
 import io.reactivex.android.schedulers.AndroidSchedulers
-import javax.inject.Inject
 
 
 /**
  * Created by Owner on 2017. 01. 27..
  */
-// UNSCOPED
-class AddOrEditTaskPresenter @Inject constructor(
+class AddOrEditTaskPresenter(
     private val taskRepository: TaskRepository,
     private val messageQueue: MessageQueue,
-    private val backstackHolder: BackstackHolder
+    private val backstack: Backstack
 ) : BasePresenter<AddOrEditTaskView>(), AddOrEditTaskView.Presenter, Bundleable {
     private var title: String? = null
     private var description: String? = null
@@ -63,7 +60,6 @@ class AddOrEditTaskPresenter @Inject constructor(
     }
 
     fun navigateBack() {
-        val backstack = backstackHolder.backstack
         val addOrEditTaskKey = Backstack.getKey<AddOrEditTaskKey>(view!!.context)
         view!!.hideKeyboard()
         when (addOrEditTaskKey) {

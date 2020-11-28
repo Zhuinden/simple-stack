@@ -8,10 +8,10 @@ import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
 import com.zhuinden.simplestackextensionsample.R
+import com.zhuinden.simplestackextensionsample.databinding.MainActivityBinding
 import com.zhuinden.simplestackextensionsample.features.login.LoginKey
 import com.zhuinden.simplestackextensionsample.features.profile.ProfileKey
 import com.zhuinden.simplestackextensionsample.utils.get
-import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
@@ -19,7 +19,10 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
+
+        val binding = MainActivityBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step9Root)
 
@@ -34,13 +37,12 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .setScopedServices(ServiceProvider())
             .setGlobalServices(globalServices)
             .install(
-                this, step9Root, History.of(
+                this, binding.step9Root, History.of(
                 when {
                     authenticationManager.isAuthenticated() -> ProfileKey()
                     else -> LoginKey()
                 }
-            )
-            )
+            ))
     }
 
     override fun onBackPressed() {

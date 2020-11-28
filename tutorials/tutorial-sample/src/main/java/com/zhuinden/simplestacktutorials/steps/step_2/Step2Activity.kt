@@ -9,13 +9,12 @@ import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.SimpleStateChanger
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.navigator.Navigator
-import com.zhuinden.simplestacktutorials.R
+import com.zhuinden.simplestacktutorials.databinding.ActivityStep2Binding
 import com.zhuinden.simplestacktutorials.utils.hide
 import com.zhuinden.simplestacktutorials.utils.onClick
 import com.zhuinden.simplestacktutorials.utils.safe
 import com.zhuinden.simplestacktutorials.utils.show
-import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.activity_step2.*
+import kotlinx.parcelize.Parcelize
 
 private val Context.backstack: Backstack
     get() = Navigator.getBackstack(this)
@@ -29,13 +28,17 @@ class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         object Second : Screens()
     }
 
+    private lateinit var binding: ActivityStep2Binding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_step2)
+
+        binding = ActivityStep2Binding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
-            .install(this, step2Root, History.of(Screens.First)) // auto-install backstack
+            .install(this, binding.step2Root, History.of(Screens.First)) // auto-install backstack
     }
 
     override fun onBackPressed() {
@@ -49,17 +52,17 @@ class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
 
         when (newKey) {
             Screens.First -> {
-                step2Text.text = "First Screen"
+                binding.step2Text.text = "First Screen"
 
-                step2Button.show()
-                step2Button.onClick {
+                binding.step2Button.show()
+                binding.step2Button.onClick {
                     backstack.goTo(Screens.Second)
                 }
             }
             Screens.Second -> {
-                step2Text.text = "Second Screen"
+                binding.step2Text.text = "Second Screen"
 
-                step2Button.hide()
+                binding.step2Button.hide()
             }
         }.safe()
     }

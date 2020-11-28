@@ -4,10 +4,11 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
-import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
+import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
-import kotlinx.android.parcel.Parcelize
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import kotlinx.parcelize.Parcelize
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
@@ -16,7 +17,12 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class TasksKey(val placeholder: String = "") : BaseKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.addService(TasksFragment.CONTROLLER_TAG, Injector.get().tasksPresenter())
+        with(serviceBinder) {
+            addService(TasksFragment.CONTROLLER_TAG, TasksPresenter(
+                backstack,
+                lookup<TaskRepository>()
+            ))
+        }
     }
 
     override fun getScopeTag(): String = "Tasks"

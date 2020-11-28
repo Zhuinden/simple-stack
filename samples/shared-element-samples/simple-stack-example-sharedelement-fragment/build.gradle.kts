@@ -24,6 +24,10 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -32,8 +36,6 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("com.jakewharton:butterknife:10.2.1")
-    annotationProcessor("com.jakewharton:butterknife-compiler:10.2.1")
     compileOnly("com.google.auto.value:auto-value:1.5.2")
     annotationProcessor("com.google.auto.value:auto-value:1.5.2")
     implementation("nz.bradcampbell:paperparcel:2.0.4")

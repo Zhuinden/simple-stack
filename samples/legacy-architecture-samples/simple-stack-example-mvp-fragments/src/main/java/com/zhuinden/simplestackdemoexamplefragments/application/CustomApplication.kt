@@ -1,35 +1,41 @@
 package com.zhuinden.simplestackdemoexamplefragments.application
 
 import android.app.Application
-import android.content.Context
+import com.zhuinden.simplestack.GlobalServices
 
-import com.zhuinden.simplestackdemoexamplefragments.application.injection.DaggerSingletonComponent
-import com.zhuinden.simplestackdemoexamplefragments.application.injection.SingletonComponent
+import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
+import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
+import com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue
+import com.zhuinden.simplestackdemoexamplefragments.util.SchedulerHolder
+import com.zhuinden.simplestackextensions.servicesktx.add
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.Executors
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
 
 class CustomApplication : Application() {
-    private var component: SingletonComponent? = null
-
-    companion object {
-        private var INSTANCE: CustomApplication? = null
-
-        @JvmStatic
-        fun getComponent() = get().component!!
-
-        @JvmStatic
-        fun get(context: Context): CustomApplication =
-            context.applicationContext as CustomApplication
-
-        @JvmStatic
-        fun get(): CustomApplication = INSTANCE!!
-    }
+    lateinit var globalServices: GlobalServices
+        private set
 
     override fun onCreate() {
         super.onCreate()
-        INSTANCE = this
-        component = DaggerSingletonComponent.create()
+
+        val looperScheduler = SchedulerHolder()
+        val databaseManager = DatabaseManager(looperScheduler)
+        val writeScheduler = SchedulerHolder().also { holder ->
+            holder.scheduler = Schedulers.from(Executors.newSingleThreadExecutor())
+        }
+        val taskRepository = TaskRepository(looperScheduler, writeScheduler)
+        val messageQueue = MessageQueue()
+
+        globalServices = GlobalServices.builder()
+            .add(looperScheduler, "LOOPER_SCHEDULER")
+            .add(writeScheduler, "WRITE_SCHEDULER")
+            .add(databaseManager)
+            .add(taskRepository)
+            .add(messageQueue)
+            .build()
     }
 }

@@ -10,6 +10,7 @@ import com.community.simplestackkotlindaggerexample.application.Injector
 import com.community.simplestackkotlindaggerexample.core.schedulers.SchedulerProvider
 import com.community.simplestackkotlindaggerexample.data.api.ApiService
 import com.community.simplestackkotlindaggerexample.data.database.User
+import com.community.simplestackkotlindaggerexample.databinding.FragmentUsersBinding
 import com.community.simplestackkotlindaggerexample.utils.clearIfNotDisposed
 import com.community.simplestackkotlindaggerexample.utils.hide
 import com.community.simplestackkotlindaggerexample.utils.onTextChanged
@@ -20,7 +21,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
 import io.realm.kotlin.where
-import kotlinx.android.synthetic.main.fragment_users.*
 import javax.inject.Inject
 
 class UsersFragment : KeyedFragment(R.layout.fragment_users) {
@@ -43,14 +43,16 @@ class UsersFragment : KeyedFragment(R.layout.fragment_users) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val binding = FragmentUsersBinding.bind(view)
+
         realm = Realm.getDefaultInstance()
 
         usersAdapter = UsersAdapter(realm.where<User>().findAllAsync())
 
-        listContacts.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        listContacts.adapter = usersAdapter
+        binding.listContacts.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        binding.listContacts.adapter = usersAdapter
 
-        textUserSearch.onTextChanged { username ->
+        binding.textUserSearch.onTextChanged { username ->
             val query = realm.where<User>().run {
                 if (username.isNotEmpty()) {
                     return@run this.contains("userName", username)
@@ -61,36 +63,38 @@ class UsersFragment : KeyedFragment(R.layout.fragment_users) {
             usersAdapter.updateData(query.findAllAsync())
         }
 
-        loadUsers()
-    }
 
-    private fun loadUsers() {
-        loadingView.show()
+        fun loadUsers() {
+            binding.loadingView.root.show()
 
-        compositeDisposable += apiService
-            .getAllUsers()
-            .subscribeOn(schedulerProvider.io())
-            .doOnNext { userResponse ->
-                val users = userResponse.result.map { user -> User.createFromUser(user) }
+            compositeDisposable += apiService
+                .getAllUsers()
+                .subscribeOn(schedulerProvider.io())
+                .doOnNext { userResponse ->
+                    val users = userResponse.result.map { user -> User.createFromUser(user) }
 
-                Realm.getDefaultInstance().use { r ->
-                    r.executeTransaction { realm ->
-                        realm.insertOrUpdate(users)
+                    Realm.getDefaultInstance().use { r ->
+                        r.executeTransaction { realm ->
+                            realm.insertOrUpdate(users)
+                        }
                     }
                 }
-            }
-            .observeOn(schedulerProvider.ui())
-            .doFinally { loadingView.hide() }
-            .subscribeBy(
-                onNext = {
-                    println("Saved users to Realm.")
-                },
-                onError = { e ->
-                    e.printStackTrace()
-                },
-                onComplete = {
-                }
-            )
+                .observeOn(schedulerProvider.ui())
+                .doFinally { binding.loadingView.root.hide() }
+                .subscribeBy(
+                    onNext = {
+                        println("Saved users to Realm.")
+                    },
+                    onError = { e ->
+                        e.printStackTrace()
+                    },
+                    onComplete = {
+                    }
+                )
+        }
+
+
+        loadUsers()
     }
 
     override fun onDestroyView() {

@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.view.View
 import com.community.simplestackkotlindaggerexample.R
 import com.community.simplestackkotlindaggerexample.data.database.User
+import com.community.simplestackkotlindaggerexample.databinding.FragmentUserDetailBinding
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
-import kotlinx.android.synthetic.main.fragment_user_detail.*
-
 
 class UserDetailFragment : KeyedFragment(R.layout.fragment_user_detail) {
     private lateinit var user: User
@@ -21,8 +20,10 @@ class UserDetailFragment : KeyedFragment(R.layout.fragment_user_detail) {
 
         val user = user
 
-        textUsername.text = user.userName
-        userPhoneNumber.text = "${user.userPhoneNumber} (${user.userPhoneNumberType})"
-        userEmail.text = user.userEmail
+        val binding = FragmentUserDetailBinding.bind(view)
+
+        binding.textUsername.text = user.userName
+        binding.userPhoneNumber.text = "${user.userPhoneNumber} (${user.userPhoneNumberType})"
+        binding.userEmail.text = user.userEmail
     }
 }

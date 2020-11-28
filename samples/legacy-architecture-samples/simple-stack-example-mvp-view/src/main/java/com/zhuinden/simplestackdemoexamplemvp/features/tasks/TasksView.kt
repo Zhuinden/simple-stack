@@ -9,19 +9,16 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import butterknife.ButterKnife
-import butterknife.OnClick
 import com.google.android.material.snackbar.Snackbar
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.application.MainActivity
 import com.zhuinden.simplestackdemoexamplemvp.core.mvp.MvpPresenter
 import com.zhuinden.simplestackdemoexamplemvp.data.models.Task
+import com.zhuinden.simplestackdemoexamplemvp.databinding.PathTasksBinding
 import com.zhuinden.simplestackdemoexamplemvp.util.*
-import kotlinx.android.synthetic.main.path_tasks.view.*
 import java.util.*
 
 /**
@@ -54,9 +51,9 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-    private val tasksPresenter by lazy { Navigator.lookupService<Presenter>(context, CONTROLLER_TAG) }
+    lateinit var binding: PathTasksBinding
 
-    private val myResources = Injector.get().resources()
+    private val tasksPresenter by lazy { Navigator.lookupService<Presenter>(context, CONTROLLER_TAG) }
 
     lateinit var tasksAdapter: TasksAdapter
 
@@ -97,25 +94,26 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
         completionCallback.stateChangeComplete()
     }
 
-    @OnClick(R.id.buttonNoTasksAdd)
-    fun openAddNewTask() {
-        tasksPresenter.onNoTasksAddButtonClicked()
-    }
-
     class SavedSuccessfullyMessage
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        ButterKnife.bind(this)
+
+        binding = PathTasksBinding.bind(this)
+
+        binding.buttonNoTasksAdd.setOnClickListener {
+            tasksPresenter.onNoTasksAddButtonClicked()
+        }
+
         tasksAdapter = TasksAdapter(ArrayList(0), taskItemListener)
-        recyclerTasks.adapter = tasksAdapter
-        recyclerTasks.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerTasks.adapter = tasksAdapter
+        binding.recyclerTasks.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         setColorSchemeColors(ContextCompat.getColor(this.context, R.color.colorPrimary),
             ContextCompat.getColor(this.context, R.color.colorAccent),
             ContextCompat.getColor(this.context, R.color.colorPrimaryDark))
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        setScrollUpChild(recyclerTasks)
+        setScrollUpChild(binding.recyclerTasks)
     }
 
     override fun onAttachedToWindow() {
@@ -140,8 +138,8 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
         Pair(DiffUtil.calculateDiff(TasksDiffCallback(tasksAdapter.data, tasks)), tasks)
 
     fun hideEmptyViews() {
-        tasksView.show()
-        viewNoTasks.hide()
+        binding.tasksView.show()
+        binding.viewNoTasks.hide()
     }
 
     fun showTasks(pairOfDiffResultAndTasks: Pair<DiffUtil.DiffResult, List<Task>>, filterType: TasksFilterType) {
@@ -179,35 +177,35 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
     }
 
     fun showNoActiveTasks() {
-        showNoTasksViews(myResources.getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false)
+        showNoTasksViews(context.getString(R.string.no_tasks_active), R.drawable.ic_check_circle_24dp, false)
     }
 
     fun showNoTasks() {
-        showNoTasksViews(myResources.getString(R.string.no_tasks_all), R.drawable.ic_assignment_turned_in_24dp, false)
+        showNoTasksViews(context.getString(R.string.no_tasks_all), R.drawable.ic_assignment_turned_in_24dp, false)
     }
 
     fun showNoCompletedTasks() {
-        showNoTasksViews(myResources.getString(R.string.no_tasks_completed), R.drawable.ic_verified_user_24dp, false)
+        showNoTasksViews(context.getString(R.string.no_tasks_completed), R.drawable.ic_verified_user_24dp, false)
     }
 
     fun showTaskMarkedComplete() {
-        showMessage(myResources.getString(R.string.task_marked_complete))
+        showMessage(context.getString(R.string.task_marked_complete))
     }
 
     fun showTaskMarkedActive() {
-        showMessage(myResources.getString(R.string.task_marked_active))
+        showMessage(context.getString(R.string.task_marked_active))
     }
 
     fun showCompletedTasksCleared() {
-        showMessage(myResources.getString(R.string.completed_tasks_cleared))
+        showMessage(context.getString(R.string.completed_tasks_cleared))
     }
 
     fun showLoadingTasksError() {
-        showMessage(myResources.getString(R.string.loading_tasks_error))
+        showMessage(context.getString(R.string.loading_tasks_error))
     }
 
     fun showSuccessfullySavedMessage() {
-        showMessage(myResources.getString(R.string.successfully_saved_task_message))
+        showMessage(context.getString(R.string.successfully_saved_task_message))
     }
 
     private fun showMessage(message: String) {
@@ -215,16 +213,19 @@ class TasksView : ScrollChildSwipeRefreshLayout, MainActivity.OptionsItemSelecte
     }
 
     private fun showNoTasksViews(mainText: String, iconRes: Int, showAddView: Boolean) {
-        tasksView.hide()
-        viewNoTasks.show()
+        binding.tasksView.hide()
+        binding.viewNoTasks.show()
 
-        textNoTasksMain.text = mainText
-        imageNoTasksIcon.setImageDrawable(ContextCompat.getDrawable(context, iconRes))
-        buttonNoTasksAdd.showIf { showAddView }
+        binding.textNoTasksMain.text = mainText
+        binding.imageNoTasksIcon.setImageDrawable(ContextCompat.getDrawable(context, iconRes))
+        binding.buttonNoTasksAdd.showIf { showAddView }
     }
 
     fun setFilterLabelText(filterText: Int) {
-        textFilterLabel.setText(filterText)
+        binding.textFilterLabel.setText(filterText)
     }
 
+    fun openAddNewTask() {
+        tasksPresenter.onNoTasksAddButtonClicked()
+    }
 }

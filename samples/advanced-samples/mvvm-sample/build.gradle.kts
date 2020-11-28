@@ -1,17 +1,12 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("android.extensions")
+    id("kotlin-parcelize")
     kotlin("kapt")
 }
 
 android {
     compileSdkVersion(28)
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplemvvm"
@@ -38,6 +33,11 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -56,13 +56,12 @@ dependencies {
     }
 
     // App's dependencies, including test
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.20")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("com.xwray:groupie:2.7.0")
-    implementation("com.xwray:groupie-kotlin-android-extensions:2.7.0")
 
     implementation("com.github.Zhuinden:live-event:1.1.0")
     implementation("com.github.Zhuinden:rx-combinetuple-kt:1.1.0")

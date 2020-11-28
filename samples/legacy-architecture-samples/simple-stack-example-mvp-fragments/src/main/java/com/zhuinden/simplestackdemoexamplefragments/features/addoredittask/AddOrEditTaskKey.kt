@@ -4,18 +4,25 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestackdemoexamplefragments.R
-import com.zhuinden.simplestackdemoexamplefragments.application.Injector
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.BaseKey
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
+import com.zhuinden.simplestackdemoexamplefragments.data.repository.TaskRepository
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
-import kotlinx.android.parcel.Parcelize
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import kotlinx.parcelize.Parcelize
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
 sealed class AddOrEditTaskKey(val parent: FragmentKey, val taskId: String = "") : BaseKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.addService(AddOrEditTaskFragment.CONTROLLER_TAG, Injector.get().addOrEditTaskPresenter())
+        with(serviceBinder) {
+            addService(AddOrEditTaskFragment.CONTROLLER_TAG, AddOrEditTaskPresenter(
+                lookup<TaskRepository>(),
+                lookup<com.zhuinden.simplestackdemoexamplefragments.util.MessageQueue>(),
+                backstack
+            ))
+        }
     }
 
     constructor(parent: FragmentKey) : this(parent, "")

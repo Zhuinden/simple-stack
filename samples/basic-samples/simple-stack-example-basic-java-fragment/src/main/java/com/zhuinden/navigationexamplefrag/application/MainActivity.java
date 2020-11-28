@@ -1,10 +1,9 @@
 package com.zhuinden.navigationexamplefrag.application;
 
 import android.os.Bundle;
-import android.view.ViewGroup;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.zhuinden.navigationexamplefrag.R;
+import com.zhuinden.navigationexamplefrag.databinding.ActivityMainBinding;
 import com.zhuinden.navigationexamplefrag.screens.DashboardKey;
 import com.zhuinden.navigationexamplefrag.screens.HomeKey;
 import com.zhuinden.navigationexamplefrag.screens.NotificationKey;
@@ -17,30 +16,24 @@ import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity
         extends AppCompatActivity
         implements SimpleStateChanger.NavigationHandler {
     private static final String TAG = "MainActivity";
 
-    @BindView(R.id.navigation)
-    BottomNavigationView navigation;
-
-    @BindView(R.id.root)
-    ViewGroup root;
-
     DefaultFragmentStateChanger fragmentStateChanger;
+
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        navigation.setOnNavigationItemSelectedListener(item -> {
+        binding.navigation.setOnNavigationItemSelectedListener(item -> {
             Backstack backstack = Navigator.getBackstack(this);
             switch(item.getItemId()) {
                 case R.id.navigation_home:
@@ -56,11 +49,12 @@ public class MainActivity
             return false;
         });
 
-        fragmentStateChanger = new DefaultFragmentStateChanger(getSupportFragmentManager(), R.id.root);
+        fragmentStateChanger = new DefaultFragmentStateChanger(getSupportFragmentManager(),
+                                                               R.id.container);
 
         Navigator.configure()
                 .setStateChanger(new SimpleStateChanger(this))
-                .install(this, root, History.single(HomeKey.create()));
+                .install(this, binding.container, History.single(HomeKey.create()));
     }
 
     @Override

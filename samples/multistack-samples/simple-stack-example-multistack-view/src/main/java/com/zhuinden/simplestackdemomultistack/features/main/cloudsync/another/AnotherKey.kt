@@ -3,7 +3,7 @@ package com.zhuinden.simplestackdemomultistack.features.main.cloudsync.another
 import com.zhuinden.simplestackdemomultistack.R
 import com.zhuinden.simplestackdemomultistack.application.MainActivity
 import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackViewKey
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class AnotherKey(private val placeholder: String = "") : MultistackViewKey() {

@@ -92,8 +92,8 @@ class Multistack : Bundleable {
     fun persistViewToState(view: View?) {
         if (view != null) {
             val key = Backstack.getKey<MultistackFragmentKey>(view.context)
-            val backstackDelegate = key.selectBackstack(view.context)
-            backstackDelegate.persistViewToState(view)
+            val backstack = key.selectBackstack(view.context)
+            backstack.persistViewToState(view)
         }
     }
 

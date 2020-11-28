@@ -7,13 +7,12 @@ import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
-import com.zhuinden.simplestacktutorials.R
+import com.zhuinden.simplestacktutorials.databinding.ActivityStep1Binding
 import com.zhuinden.simplestacktutorials.utils.hide
 import com.zhuinden.simplestacktutorials.utils.onClick
 import com.zhuinden.simplestacktutorials.utils.safe
 import com.zhuinden.simplestacktutorials.utils.show
-import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.activity_step1.*
+import kotlinx.parcelize.Parcelize
 
 class Step1Activity : AppCompatActivity(), StateChanger {
     private lateinit var backstack: Backstack
@@ -26,18 +25,22 @@ class Step1Activity : AppCompatActivity(), StateChanger {
         object Second : Screens()
     }
 
+    private lateinit var binding: ActivityStep1Binding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_step1)
+        binding = ActivityStep1Binding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         @Suppress("DEPRECATION") // don't worry, Navigator will handle it in step 2
-        backstack = lastCustomNonConfigurationInstance?.let { it as Backstack } ?: Backstack().also { backstack ->
-            backstack.setup(History.of(Screens.First))
+        backstack = lastCustomNonConfigurationInstance?.let { it as Backstack }
+            ?: Backstack().also { backstack ->
+                backstack.setup(History.of(Screens.First))
 
-            savedInstanceState?.let { bundle ->
-                backstack.fromBundle(bundle.getParcelable("BACKSTACK_STATE"))
+                savedInstanceState?.let { bundle ->
+                    backstack.fromBundle(bundle.getParcelable("BACKSTACK_STATE"))
+                }
             }
-        }
 
         backstack.setStateChanger(this) // handle navigation in this class
     }
@@ -58,17 +61,17 @@ class Step1Activity : AppCompatActivity(), StateChanger {
 
         when (newKey) {
             Screens.First -> {
-                step1Text.text = "First Screen"
+                binding.step1Text.text = "First Screen"
 
-                step1Button.show()
-                step1Button.onClick {
+                binding.step1Button.show()
+                binding.step1Button.onClick {
                     backstack.goTo(Screens.Second)
                 }
             }
             Screens.Second -> {
-                step1Text.text = "Second Screen"
+                binding.step1Text.text = "Second Screen"
 
-                step1Button.hide()
+                binding.step1Button.hide()
             }
         }.safe()
 

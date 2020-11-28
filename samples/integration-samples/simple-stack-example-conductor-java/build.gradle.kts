@@ -26,6 +26,10 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -42,8 +46,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0")
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("com.jakewharton:butterknife:10.2.1")
-    annotationProcessor("com.jakewharton:butterknife-compiler:10.2.1")
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
     implementation("com.bluelinelabs:conductor:2.1.5")
     testImplementation("junit:junit:4.13.1")

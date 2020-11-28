@@ -9,17 +9,12 @@ import io.reactivex.disposables.Disposables
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import io.realm.RealmConfiguration
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
-
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
  */
-@Singleton
-class DatabaseManager @Inject constructor(
-    @param:Named("LOOPER_SCHEDULER") private val looperScheduler: SchedulerHolder
+class DatabaseManager(
+    private val looperScheduler: SchedulerHolder
 ) {
     private var disposable: Disposable? = null
 

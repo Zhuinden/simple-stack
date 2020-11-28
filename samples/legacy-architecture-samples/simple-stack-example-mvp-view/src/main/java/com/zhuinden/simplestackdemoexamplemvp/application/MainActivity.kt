@@ -9,44 +9,49 @@ import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestack.navigator.Navigator
-import com.zhuinden.simplestackdemoexamplemvp.R
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewStateChanger
+import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager
+import com.zhuinden.simplestackdemoexamplemvp.databinding.ActivityMainBinding
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
+import com.zhuinden.simplestackdemoexamplemvp.util.get
+import com.zhuinden.simplestackdemoexamplemvp.util.viewBinding
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), StateChanger {
-    private val databaseManager = Injector.get().databaseManager()
-    private val backstackHolder = Injector.get().backstackHolder()
+    private val binding by viewBinding(ActivityMainBinding::inflate)
 
     interface OptionsItemSelectedListener {
         fun onOptionsItemSelected(menuItem: MenuItem): Boolean
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
-        mainView.onOptionsItemSelected(item)
+        binding.mainView.onOptionsItemSelected(item)
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean =
-        mainView.onCreateOptionsMenu(menu)
+        binding.mainView.onCreateOptionsMenu(menu)
 
     private lateinit var viewStateChanger: ViewStateChanger
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val app = application as CustomApplication
+        val globalServices = app.globalServices
+
+        val databaseManager = globalServices.get<DatabaseManager>()
+
         databaseManager.init(this)
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
-        viewStateChanger = ViewStateChanger(this, root)
+        viewStateChanger = ViewStateChanger(this, binding.viewContainer)
 
         val backstack = Navigator.configure()
+            .setGlobalServices(globalServices)
             .setScopedServices(DefaultServiceProvider())
             .setShouldPersistContainerChild(true)
             .setDeferredInitialization(true)
             .setStateChanger(this)
-            .install(this, root, History.single(TasksKey()))
-
-        backstackHolder.backstack = backstack
+            .install(this, binding.viewContainer, History.single(TasksKey()))
 
         val mainScopeListener: MainScopeListener? = supportFragmentManager.findFragmentByTag(
             "MAIN_SCOPE_LISTENER") as MainScopeListener?
@@ -54,22 +59,22 @@ class MainActivity : AppCompatActivity(), StateChanger {
             supportFragmentManager.beginTransaction().add(MainScopeListener(), "MAIN_SCOPE_LISTENER").commit()
         }
 
-        mainView.onCreate()
+        binding.mainView.onCreate()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         Navigator.executeDeferredInitialization(this)
-        mainView.onPostCreate()
+        binding.mainView.onPostCreate()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        mainView.onConfigChanged(newConfig)
+        binding.mainView.onConfigChanged(newConfig)
     }
 
     override fun onBackPressed() {
-        if (mainView.onBackPressed()) {
+        if (binding.mainView.onBackPressed()) {
             return
         }
         if (!Navigator.onBackPressed(this)) {
@@ -84,8 +89,8 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
 
         viewStateChanger.handleStateChange(stateChange) {
-            mainView.handleStateChange(stateChange) {
-                mainView.setupViewsForKey(stateChange.topNewKey(), root.getChildAt(0))
+            binding.mainView.handleStateChange(stateChange) {
+                binding.mainView.setupViewsForKey(stateChange.topNewKey(), binding.viewContainer.getChildAt(0))
                 completionCallback.stateChangeComplete()
             }
         }

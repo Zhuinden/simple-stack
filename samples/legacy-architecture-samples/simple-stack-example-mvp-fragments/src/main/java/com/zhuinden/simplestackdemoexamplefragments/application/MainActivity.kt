@@ -10,20 +10,24 @@ import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
+import com.zhuinden.simplestackdemoexamplefragments.databinding.ActivityMainBinding
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
-import com.zhuinden.simplestackdemoexamplefragments.util.BackstackHolder
-import com.zhuinden.simplestackdemoexamplefragments.util.onClick
+import com.zhuinden.simplestackdemoexamplefragments.util.get
+import com.zhuinden.simplestackdemoexamplefragments.util.viewBinding
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private val binding by viewBinding(ActivityMainBinding::inflate)
+
     lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
-    private val databaseManager: DatabaseManager = Injector.get().databaseManager()
-    private val backstackHolder: BackstackHolder = Injector.get().backstackHolder()
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        val app = application as CustomApplication
+
+        val globalServices = app.globalServices
+
+        val databaseManager = globalServices.get<DatabaseManager>()
         databaseManager.init(this)
 
         super.onCreate(savedInstanceState)
@@ -36,23 +40,22 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             }
         }
 
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
-        this.fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.root)
+        this.fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.fragmentContainer)
 
         val backstack = Navigator.configure()
+            .setGlobalServices(globalServices)
             .setScopedServices(DefaultServiceProvider())
             .setStateChanger(SimpleStateChanger(this))
             .setDeferredInitialization(true)
-            .install(this, root, History.of(TasksKey()))
+            .install(this, binding.fragmentContainer, History.of(TasksKey()))
 
-        backstackHolder.backstack = backstack
-
-        mainView.onCreate()
+        binding.mainView.onCreate()
 
         Navigator.executeDeferredInitialization(this)
 
-        buttonAddTask.onClick {
+        binding.buttonAddTask.setOnClickListener {
             val top = backstack.top<FragmentKey>()
             val fragment = supportFragmentManager.findFragmentByTag(top.fragmentTag)
             top.fabClickListener(fragment!!).onClick(it)
@@ -61,16 +64,16 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        mainView.onPostCreate()
+        binding.mainView.onPostCreate()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        mainView.onConfigChanged(newConfig)
+        binding.mainView.onConfigChanged(newConfig)
     }
 
     override fun onBackPressed() {
-        if (mainView.onBackPressed()) {
+        if (binding.mainView.onBackPressed()) {
             return
         }
         if (!Navigator.onBackPressed(this)) {
@@ -80,6 +83,6 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
     override fun onNavigationEvent(stateChange: StateChange) {
         fragmentStateChanger.handleStateChange(stateChange)
-        mainView.setupViewsForKey(stateChange.topNewKey())
+        binding.mainView.setupViewsForKey(stateChange.topNewKey())
     }
 }

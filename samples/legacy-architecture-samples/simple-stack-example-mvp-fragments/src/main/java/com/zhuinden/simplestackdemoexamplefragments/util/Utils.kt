@@ -12,9 +12,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import com.zhuinden.simplestack.GlobalServices
 import com.zhuinden.simplestack.navigator.Navigator
-import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
 
 fun View.show() {
     this.visibility = View.VISIBLE
@@ -49,9 +48,6 @@ inline fun <T : View> T.showIf(predicate: (T) -> Boolean) {
     }
 }
 
-fun <A, B> combineTwo(aSource: Observable<A>, bSource: Observable<B>): Observable<Pair<A, B>> =
-    Observable.combineLatest(aSource, bSource, BiFunction { t1, t2 -> t1 to t2 })
-
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToParent: Boolean = false) =
     LayoutInflater.from(context).inflate(layoutRes, this, attachToParent)
 
@@ -74,3 +70,5 @@ inline fun View.onClick(crossinline click: (View) -> Unit) {
         click(view)
     }
 }
+
+inline fun <reified T> GlobalServices.get(serviceTag: String = T::class.java.name): T = getService(serviceTag)

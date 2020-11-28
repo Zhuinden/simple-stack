@@ -10,9 +10,9 @@ import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
 import com.zhuinden.simplestacktutorials.R
+import com.zhuinden.simplestacktutorials.databinding.ActivityStep7Binding
 import com.zhuinden.simplestacktutorials.steps.step_7.features.login.LoginKey
 import com.zhuinden.simplestacktutorials.steps.step_7.features.profile.ProfileKey
-import kotlinx.android.synthetic.main.activity_step7.*
 
 class Step7Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
@@ -20,7 +20,9 @@ class Step7Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_step7)
+
+        val binding = ActivityStep7Binding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step7Root)
         appContext = applicationContext
@@ -34,12 +36,12 @@ class Step7Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
                     .build()
             )
             .install(
-                this, step7Root, History.of(
-                    when {
-                        AuthenticationManager.isAuthenticated(appContext) -> ProfileKey()
-                        else -> LoginKey()
-                    }
-                )
+                this, binding.step7Root, History.of(
+                when {
+                    AuthenticationManager.isAuthenticated(appContext) -> ProfileKey()
+                    else -> LoginKey()
+                }
+            )
             )
     }
 

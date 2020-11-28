@@ -12,11 +12,11 @@ import com.google.android.material.navigation.NavigationView
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemoexamplefragments.R
 import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
+import com.zhuinden.simplestackdemoexamplefragments.databinding.ActivityMainBinding
 import com.zhuinden.simplestackdemoexamplefragments.features.statistics.StatisticsKey
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
 import com.zhuinden.simplestackdemoexamplefragments.util.findActivity
 import com.zhuinden.simplestackdemoexamplefragments.util.showIf
-import kotlinx.android.synthetic.main.activity_main.view.*
 
 /**
  * Created by Zhuinden on 2018. 08. 20.
@@ -30,6 +30,8 @@ class MainView : DrawerLayout {
     private lateinit var drawerLayout: DrawerLayout
 
     private lateinit var drawerToggle: ActionBarDrawerToggle
+
+    private lateinit var binding: ActivityMainBinding // TODO: wtf is this sample?
 
     private val navigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -45,7 +47,7 @@ class MainView : DrawerLayout {
     }
 
     private fun setCheckedItem(navigationItemId: Int) {
-        val menu = navigationView.menu
+        val menu = binding.navigationView.menu
         for (i in 0 until menu.size()) {
             val menuItem = menu.getItem(i)
             menuItem.isChecked = menuItem.itemId == navigationItemId
@@ -67,26 +69,28 @@ class MainView : DrawerLayout {
         setCheckedItem(key.navigationViewId())
         context.findActivity<AppCompatActivity>().invalidateOptionsMenu()
 
-        buttonAddTask.showIf { key.isFabVisible }
+        binding.buttonAddTask.showIf { key.isFabVisible }
 
         if (key.fabDrawableIcon() != 0) {
-            buttonAddTask.setImageResource(key.fabDrawableIcon())
+            binding.buttonAddTask.setImageResource(key.fabDrawableIcon())
         }
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
+        binding = ActivityMainBinding.bind(this)
+
         drawerLayout = this
     }
 
     fun onCreate() {
-        navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener)
+        binding.navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener)
 
-        context.findActivity<AppCompatActivity>().setSupportActionBar(toolbar)
+        context.findActivity<AppCompatActivity>().setSupportActionBar(binding.toolbar)
 
         val actionBar = context.findActivity<AppCompatActivity>().supportActionBar!!
 
-        drawerToggle = object : ActionBarDrawerToggle(context.findActivity<AppCompatActivity>(), drawerLayout, toolbar, R.string.open, R.string.close) {
+        drawerToggle = object : ActionBarDrawerToggle(context.findActivity<AppCompatActivity>(), drawerLayout, binding.toolbar, R.string.open, R.string.close) {
             override fun onDrawerClosed(drawerView: View) {
                 super.onDrawerClosed(drawerView)
                 context.findActivity<AppCompatActivity>().invalidateOptionsMenu()

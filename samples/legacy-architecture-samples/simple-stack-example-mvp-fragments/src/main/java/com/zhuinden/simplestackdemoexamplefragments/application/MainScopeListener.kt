@@ -4,10 +4,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import androidx.fragment.app.Fragment
-
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.util.SchedulerHolder
-
+import com.zhuinden.simplestackdemoexamplefragments.util.get
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
@@ -17,11 +16,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 class MainScopeListener : Fragment() {
     lateinit var handlerThread: HandlerThread
 
-    private val looperScheduler: SchedulerHolder = Injector.get().looperScheduler()
-    private val databaseManager: DatabaseManager = Injector.get().databaseManager()
-
     init {
         retainInstance = true
+    }
+
+    private val looperScheduler by lazy {
+        (requireContext().applicationContext as CustomApplication).globalServices.get<SchedulerHolder>("LOOPER_SCHEDULER") // workaround
+    }
+
+    private val databaseManager by lazy {
+        (requireContext().applicationContext as CustomApplication).globalServices.get<DatabaseManager>() // workaround
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

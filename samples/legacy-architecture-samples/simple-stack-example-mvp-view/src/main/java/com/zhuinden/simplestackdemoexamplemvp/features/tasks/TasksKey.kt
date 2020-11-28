@@ -5,17 +5,25 @@ import com.zhuinden.simplestack.ServiceBinder
 import com.zhuinden.simplestack.navigator.ViewChangeHandler
 import com.zhuinden.simplestack.navigator.changehandlers.SegueViewChangeHandler
 import com.zhuinden.simplestackdemoexamplemvp.R
-import com.zhuinden.simplestackdemoexamplemvp.application.Injector
 import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewKey
+import com.zhuinden.simplestackdemoexamplemvp.data.repository.TaskRepository
+import com.zhuinden.simplestackdemoexamplemvp.util.MessageQueue
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
-import kotlinx.android.parcel.Parcelize
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TasksKey(val placeholder: String) : ViewKey, DefaultServiceProvider.HasServices {
     override fun getScopeTag(): String = "Tasks"
 
     override fun bindServices(serviceBinder: ServiceBinder) {
-        serviceBinder.addService(TasksView.CONTROLLER_TAG, Injector.get().tasksPresenter())
+        with(serviceBinder) {
+            addService(TasksView.CONTROLLER_TAG, TasksPresenter(
+                backstack,
+                lookup<TaskRepository>(),
+                lookup<MessageQueue>()
+            ))
+        }
     }
 
     constructor() : this("")
