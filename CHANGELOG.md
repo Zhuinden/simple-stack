@@ -2,9 +2,14 @@
 
 -Simple Stack 2.5.0 (2020-XX-XX)
 --------------------------------
+
 - ADD: `Backstack.exitScope(scopeTag)`, `Backstack.exitScope(scopeTag, direction)` and `Backstack.exitScopeTo(scopeTag, targetKey, direction)`.
 
 If a scope is found, the backstack now allows exiting from it. Providing a target allows exiting into a new target key.
+
+- ADD: `AsyncStateChanger` for convenience.
+
+Mirroring the addition of `SimpleStateChanger` for synchronous state changes, `AsyncStateChanger` is for async state changes (while still no longer having to remember checking for the same key being provided using `isTopNewKeyEqualToPrevious`).
 
 -Simple Stack 2.4.0 (2020-07-08)
 --------------------------------

@@ -21,44 +21,40 @@ class MultistackViewStateChanger(
     private val multistack: Multistack,
     private val root: ViewGroup,
     private val animationStateListener: AnimationStateListener
-) : StateChanger {
+) {
     interface AnimationStateListener {
         fun onAnimationStarted()
 
         fun onAnimationEnded()
     }
 
-    private fun exchangeViewForKey(newKey: MultistackViewKey, direction: Int) {
+    private fun exchangeViewForKey(stateChange: StateChange, direction: Int, completionCallback: StateChanger.Callback) {
+        val newKey = stateChange.topNewKey<MultistackViewKey>()
+
         multistack.persistViewToState(root.getChildAt(0))
         multistack.setSelectedStack(newKey.stackIdentifier())
-        val newContext = KeyContextWrapper(activity, newKey)
+        val newContext = stateChange.createContext(activity, newKey)
         val previousView: View? = root.getChildAt(0)
         val newView = LayoutInflater.from(newContext).inflate(newKey.layout(), root, false)
         multistack.restoreViewFromState(newView)
         root.addView(newView)
 
         if (previousView == null || direction == StateChange.REPLACE) {
-            finishStateChange(previousView)
+            finishStateChange(previousView, completionCallback)
         } else {
             animationStateListener.onAnimationStarted()
             newView.waitForMeasure { _, _, _ ->
                 runAnimation(previousView, newView, direction, object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         animationStateListener.onAnimationEnded()
-                        finishStateChange(previousView)
+                        finishStateChange(previousView, completionCallback)
                     }
                 })
             }
         }
     }
 
-
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewKeyEqualToPrevious) {
-            // no-op
-            completionCallback.stateChangeComplete()
-            return
-        }
+    fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
         var direction = StateChange.REPLACE
 
         val currentView: View? = root.getChildAt(0)
@@ -73,14 +69,14 @@ class MultistackViewStateChanger(
                 else -> StateChange.REPLACE
             }
         }
-        exchangeViewForKey(stateChange.topNewKey(), direction)
-        completionCallback.stateChangeComplete()
+        exchangeViewForKey(stateChange, direction, completionCallback)
     }
 
-    private fun finishStateChange(previousView: View?) {
+    private fun finishStateChange(previousView: View?, completionCallback: StateChanger.Callback) {
         if (previousView != null) {
             root.removeView(previousView)
         }
+        completionCallback.stateChangeComplete()
     }
 
     // animation

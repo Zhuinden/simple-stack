@@ -5,9 +5,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zhuinden.simplestack.History;
+import com.zhuinden.simplestack.SimpleStateChanger;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.StateChanger;
 import com.zhuinden.simplestack.navigator.Navigator;
+
+import javax.annotation.Nonnull;
 
 /**
  * Main activity that holds our fragments
@@ -16,7 +19,7 @@ import com.zhuinden.simplestack.navigator.Navigator;
  */
 public class MainActivity
         extends AppCompatActivity
-        implements StateChanger {
+        implements SimpleStateChanger.NavigationHandler {
     static final String TAG = "MainActivity";
 
     FragmentStateChanger fragmentStateChanger;
@@ -28,7 +31,7 @@ public class MainActivity
         fragmentStateChanger = new FragmentStateChanger(getSupportFragmentManager(), R.id.container);
 
         Navigator.configure()
-                .setStateChanger(this)
+                .setStateChanger(new SimpleStateChanger(this))
                 .install(this, findViewById(R.id.container), History.of(GridKey.create()));
     }
 
@@ -40,10 +43,7 @@ public class MainActivity
     }
 
     @Override
-    public void handleStateChange(@NonNull StateChange stateChange, @NonNull Callback completionCallback) {
-        if(!stateChange.isTopNewKeyEqualToPrevious()) {
-            fragmentStateChanger.handleStateChange(stateChange);
-        }
-        completionCallback.stateChangeComplete();
+    public void onNavigationEvent(@Nonnull StateChange stateChange) {
+        fragmentStateChanger.handleStateChange(stateChange);
     }
 }

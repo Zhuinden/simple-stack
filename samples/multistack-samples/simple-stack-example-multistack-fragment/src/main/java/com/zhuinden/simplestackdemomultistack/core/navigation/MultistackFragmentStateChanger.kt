@@ -10,14 +10,8 @@ import com.zhuinden.simplestackdemomultistack.R
 class MultistackFragmentStateChanger(
     private val containerId: Int,
     private val fragmentManager: FragmentManager
-) : StateChanger {
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewKeyEqualToPrevious) {
-            // no-op
-            completionCallback.stateChangeComplete()
-            return
-        }
-
+) {
+    fun handleStateChange(stateChange: StateChange) {
         val previousState = stateChange.getPreviousKeys<MultistackFragmentKey>()
         val newState = stateChange.getNewKeys<MultistackFragmentKey>()
 
@@ -111,7 +105,5 @@ class MultistackFragmentStateChanger(
             }
         }
         fragmentTransaction.commitAllowingStateLoss()
-
-        completionCallback.stateChangeComplete()
     }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.zhuinden.simplestack.AsyncStateChanger
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
@@ -17,7 +18,7 @@ import com.zhuinden.simplestackdemoexamplemvp.util.get
 import com.zhuinden.simplestackdemoexamplemvp.util.viewBinding
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 
-class MainActivity : AppCompatActivity(), StateChanger {
+class MainActivity : AppCompatActivity(), AsyncStateChanger.NavigationHandler {
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
     interface OptionsItemSelectedListener {
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
             .setScopedServices(DefaultServiceProvider())
             .setShouldPersistContainerChild(true)
             .setDeferredInitialization(true)
-            .setStateChanger(this)
+            .setStateChanger(AsyncStateChanger(this))
             .install(this, binding.viewContainer, History.single(TasksKey()))
 
         val mainScopeListener: MainScopeListener? = supportFragmentManager.findFragmentByTag(
@@ -82,12 +83,7 @@ class MainActivity : AppCompatActivity(), StateChanger {
         }
     }
 
-    override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
-        if (stateChange.isTopNewKeyEqualToPrevious) {
-            completionCallback.stateChangeComplete()
-            return
-        }
-
+    override fun onNavigationEvent(stateChange: StateChange, completionCallback: StateChanger.Callback) {
         viewStateChanger.handleStateChange(stateChange) {
             binding.mainView.handleStateChange(stateChange) {
                 binding.mainView.setupViewsForKey(stateChange.topNewKey(), binding.viewContainer.getChildAt(0))
