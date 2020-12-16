@@ -19,10 +19,14 @@ import android.content.Context;
 import android.os.Parcelable;
 import android.view.View;
 
+import com.zhuinden.simplestack.helpers.ServiceProvider;
 import com.zhuinden.simplestack.helpers.TestKey;
+import com.zhuinden.simplestack.helpers.TestKeyWithExplicitParent;
+import com.zhuinden.simplestack.helpers.TestKeyWithOnlyParentServices;
+import com.zhuinden.simplestack.helpers.TestKeyWithScope;
 import com.zhuinden.statebundle.StateBundle;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -409,5 +413,470 @@ public class BackstackTest {
         assertThat(service2.isUnregisteredCalled).isTrue();
         assertThat(service2.isActivatedCalled).isTrue();
         assertThat(service2.isDeactivatedCalled).isTrue();
+    }
+    
+    @Test
+    public void exitScopeThrowsWhenBackstackIsEmpty() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(key));
+
+        try {
+            backstack.exitScope("blah");
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void exitScopeThrowsWhenScopeIsNotFound() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(key));
+
+        try {
+            backstack.exitScope("blahhhh");
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+    
+    @Test
+    public void exitScopeDefaultsToJumpToRootIfRootHasScope() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(key));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScope("blah");
+
+        assertThat(backstack.getHistory()).containsExactly(key);
+    }
+
+    @Test
+    public void exitScopeExitsImplicitScopeCorrectly() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(firstKey, key, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScope("blah");
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey);
+    }
+
+    @Test
+    public void exitScopeExitsExplicitScopeCorrectly() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key = new TestKeyWithOnlyParentServices("key", History.of("blah")) {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(firstKey, key, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScope("blah");
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey);
+    }
+
+    @Test
+    public void exitScopeExitsExplicitScopesCorrectly() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object secondKey = new TestKey("secondKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key1 = new TestKeyWithExplicitParent("key1") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("blah", "parentKey1");
+            }
+
+            @Override
+            protected void bindParentServices(ServiceBinder serviceBinder) {
+            }
+
+            @Override
+            protected void bindOwnServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        Object key2 = new TestKeyWithExplicitParent("key2") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("blah", "parentKey2");
+            }
+
+            @Override
+            protected void bindParentServices(ServiceBinder serviceBinder) {
+            }
+
+            @Override
+            protected void bindOwnServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(firstKey, secondKey, key1, key2, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScope("blah");
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey, secondKey);
+    }
+
+    @Test
+    public void exitScopeToThrowsWhenBackstackIsEmpty() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(key));
+
+        Object targetKey = new TestKey("target");
+
+        try {
+            backstack.exitScopeTo("blah", targetKey, StateChange.FORWARD);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void exitScopeToThrowsWhenScopeIsNotFound() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(key));
+
+        Object targetKey = new TestKey("target");
+
+        try {
+            backstack.exitScopeTo("blah", targetKey, StateChange.FORWARD);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
+    public void exitScopeToExitsImplicitScopeCorrectlyAndGoesBackIfFound() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object secondKey = new TestKey("secondKey");
+        Object thirdKey = new TestKey("thirdKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(firstKey, secondKey, thirdKey, key, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScopeTo("blah", secondKey, StateChange.BACKWARD);
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey, secondKey);
+    }
+
+    @Test
+    public void exitScopeToExitsImplicitScopeCorrectlyAndAppendsIfNotFound() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object secondKey = new TestKey("secondKey");
+        Object thirdKey = new TestKey("thirdKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        Object targetKey = new TestKey("targetKey");
+
+        backstack.setup(History.of(firstKey, secondKey, thirdKey, key, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScopeTo("blah", targetKey, StateChange.FORWARD);
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey, secondKey, thirdKey, targetKey);
+    }
+
+    @Test
+    public void exitScopeToExitsExplicitScopeCorrectlyAndGoesBackIfFound() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object secondKey = new TestKey("secondKey");
+        Object thirdKey = new TestKey("thirdKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key = new TestKeyWithOnlyParentServices("key", History.of("blah")) {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(firstKey, secondKey, thirdKey, key, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScopeTo("blah", secondKey, StateChange.BACKWARD);
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey, secondKey);
+    }
+
+    @Test
+    public void exitScopeToExitsExplicitScopeCorrectlyAndAppendsIfNotFound() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object secondKey = new TestKey("secondKey");
+        Object thirdKey = new TestKey("thirdKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key = new TestKeyWithOnlyParentServices("key", History.of("blah")) {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        Object targetKey = new TestKey("targetKey");
+
+        backstack.setup(History.of(firstKey, secondKey, thirdKey, key, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScopeTo("blah", targetKey, StateChange.FORWARD);
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey, secondKey, thirdKey, targetKey);
+    }
+
+    @Test
+    public void exitScopeToExitsExplicitScopesCorrectly() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object firstKey = new TestKey("firstKey");
+        Object secondKey = new TestKey("secondKey");
+        Object lastKey = new TestKey("lastKey");
+
+        Object key1 = new TestKeyWithExplicitParent("key1") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("blah", "parentKey1");
+            }
+
+            @Override
+            protected void bindParentServices(ServiceBinder serviceBinder) {
+            }
+
+            @Override
+            protected void bindOwnServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        Object key2 = new TestKeyWithExplicitParent("key2") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("blah", "parentKey2");
+            }
+
+            @Override
+            protected void bindParentServices(ServiceBinder serviceBinder) {
+            }
+
+            @Override
+            protected void bindOwnServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(firstKey, secondKey, key1, key2, lastKey));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        Object targetKey = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.exitScopeTo("blah", targetKey, StateChange.FORWARD);
+
+        assertThat(backstack.getHistory()).containsExactly(firstKey, secondKey, targetKey);
+    }
+
+    @Test
+    public void exitScopeToDefaultsToJumpToRootIfRootHasScope() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        backstack.setup(History.of(key));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScopeTo("blah", key, StateChange.BACKWARD);
+
+        assertThat(backstack.getHistory()).containsExactly(key);
+    }
+
+    @Test
+    public void exitScopeToWorks() {
+        Backstack backstack = new Backstack();
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        Object key = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+            }
+        };
+
+        Object targetKey = new TestKey("targetKey");
+
+        backstack.setup(History.of(key));
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.exitScopeTo("blah", targetKey, StateChange.FORWARD);
+
+        assertThat(backstack.getHistory()).containsExactly(targetKey);
     }
 }

@@ -924,6 +924,119 @@ public class Backstack
     }
 
     /**
+     * Exits the provided scope, removing all keys that exist that include the given scope.
+     *
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException when the backstack is still empty.
+     *
+     * @param scopeTag the scope to exit from
+     */
+    public void exitScope(@Nonnull String scopeTag) {
+        exitScope(scopeTag, StateChange.BACKWARD);
+    }
+
+    /**
+     * Exits the provided scope, removing all keys that exist that include the given scope.
+     *
+     * If the scope is provided by the first key in the history, then it works as {@link Backstack#jumpToRoot(direction)}.
+     *
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException when the backstack is still empty.
+     *
+     * @param scopeTag the scope to exit from
+     * @param direction the direction
+     */
+    public void exitScope(@Nonnull String scopeTag, @StateChange.StateChangeDirection int direction) {
+        checkBackstack("A backstack must be set up before navigation.");
+
+        //noinspection ConstantConditions
+        if(scopeTag == null) {
+            throw new NullPointerException("scopeTag must not be null!");
+        }
+
+        History<Object> keys = getHistory();
+
+        if(keys.isEmpty()) {
+            throw new IllegalStateException("Cannot exit scope [" + scopeTag + "] within an empty backstack.");
+        }
+
+        if(!scopeManager.hasScope(scopeTag)) {
+            throw new IllegalArgumentException("Cannot exit scope [" + scopeTag + "] as it does not exist.");
+        }
+
+        Object candidateKey = keys.get(0);
+
+        for(Object key: keys) {
+            if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
+                break;
+            }
+
+            candidateKey = key;
+        }
+
+        core.setHistory(History.builderFrom(keys).removeUntil(candidateKey).build(), direction);
+    }
+
+    /**
+     * Exits the provided scope, removing all keys that exist that include the given scope.
+     * During the exit, the provided new key will be appended to the history if it's not yet added, otherwise, it'll go to it.
+     *
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException when the backstack is still empty.
+     *
+     * @param scopeTag the scope to exit from
+     * @param targetKey the key to exit to, inclusive if found, appended if not found
+     * @param direction the direction
+     */
+    public void exitScopeTo(@Nonnull String scopeTag, @Nonnull Object targetKey, @StateChange.StateChangeDirection int direction) {
+        checkBackstack("A backstack must be set up before navigation.");
+
+        //noinspection ConstantConditions
+        if(scopeTag == null) {
+            throw new NullPointerException("scopeTag must not be null!");
+        }
+
+        //noinspection ConstantConditions
+        if(targetKey == null) {
+            throw new NullPointerException("newKey must not be null!");
+        }
+
+        History<Object> keys = getHistory();
+
+        if(keys.isEmpty()) {
+            throw new IllegalStateException("Cannot exit scope [" + scopeTag + "] within an empty backstack.");
+        }
+
+        if(!scopeManager.hasScope(scopeTag)) {
+            throw new IllegalArgumentException("Cannot exit scope [" + scopeTag + "] as it does not exist.");
+        }
+
+        Object candidateKey = keys.get(0);
+
+        for(Object key: keys) {
+            if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
+                break;
+            }
+
+            candidateKey = key;
+        }
+
+        History.Builder builder = History.builderFrom(keys).removeUntil(candidateKey);
+
+        if(scopeManager.canFindScope(builder.get(0), scopeTag, ScopeLookupMode.EXPLICIT)) { // root had the scope
+            builder.removeAt(0);
+        }
+
+        if(!builder.contains(targetKey)) {
+            builder.add(targetKey);
+        } else {
+            builder.removeUntil(targetKey);
+        }
+
+        core.setHistory(builder.build(), direction);
+    }
+
+    /**
      * Goes "up" once to the provided chain of parents.
      * If the chain of parents is found as previous elements, then it works as back navigation to that chain, removing all other elements on top of it (unless specified otherwise).
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.

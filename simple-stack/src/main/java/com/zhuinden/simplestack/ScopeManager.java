@@ -760,6 +760,19 @@ class ScopeManager {
         return lookupMode.executeCanFindFromService(this, scopeTag, serviceTag);
     }
 
+    boolean canFindScope(Object targetKey, String scopeTag, ScopeLookupMode lookupMode) {
+        checkScopeTag(scopeTag);
+        checkScopeLookupMode(lookupMode);
+
+        if(!isInitialized) {
+            return false;
+        }
+
+        Set<String> activeScopes = scopes.findScopesForKey(targetKey, lookupMode == ScopeLookupMode.EXPLICIT);
+
+        return activeScopes.contains(scopeTag);
+    }
+
     boolean canFindFromScopeExplicit(String scopeTag, String identifier) {
         if(!isInitialized) {
             return false;

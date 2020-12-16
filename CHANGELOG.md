@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 2.5.0 (2020-XX-XX)
+--------------------------------
+- ADD: `Backstack.exitScope(scopeTag)`, `Backstack.exitScope(scopeTag, direction)` and `Backstack.exitScopeTo(scopeTag, targetKey, direction)`.
+
+If a scope is found, the backstack now allows exiting from it. Providing a target allows exiting into a new target key.
+
 -Simple Stack 2.4.0 (2020-07-08)
 --------------------------------
 - SIGNATURE CHANGE: `GlobalServices.Factory` now receives `Backstack` parameter in `create()`. (#231)
