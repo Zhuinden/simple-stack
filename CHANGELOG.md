@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack 2.5.0 (2020-XX-XX)
+-Simple Stack 2.5.0 (2020-12-16)
 --------------------------------
 
 - ADD: `Backstack.exitScope(scopeTag)`, `Backstack.exitScope(scopeTag, direction)` and `Backstack.exitScopeTo(scopeTag, targetKey, direction)`.
