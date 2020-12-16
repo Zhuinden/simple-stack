@@ -11,6 +11,8 @@ If a scope is found, the backstack now allows exiting from it. Providing a targe
 
 Mirroring the addition of `SimpleStateChanger` for synchronous state changes, `AsyncStateChanger` is for async state changes (while still no longer having to remember checking for the same key being provided using `isTopNewKeyEqualToPrevious`).
 
+- UPDATE: `state-bundle` is updated to `1.4.0` (add a few missing `@Nullable`s that became platform types instead of nullables).
+
 -Simple Stack 2.4.0 (2020-07-08)
 --------------------------------
 - SIGNATURE CHANGE: `GlobalServices.Factory` now receives `Backstack` parameter in `create()`. (#231)
