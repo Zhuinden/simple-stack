@@ -74,5 +74,3 @@ inline fun View.onClick(crossinline click: (View) -> Unit) {
         click(view)
     }
 }
-
-inline fun <reified T> GlobalServices.get(serviceTag: String = T::class.java.name): T = getService(serviceTag)

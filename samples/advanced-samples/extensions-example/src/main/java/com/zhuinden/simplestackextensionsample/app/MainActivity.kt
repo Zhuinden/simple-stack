@@ -7,6 +7,7 @@ import com.zhuinden.simplestack.SimpleStateChanger
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.servicesktx.get
 import com.zhuinden.simplestackextensionsample.R
 import com.zhuinden.simplestackextensionsample.databinding.MainActivityBinding
 import com.zhuinden.simplestackextensionsample.features.login.LoginKey

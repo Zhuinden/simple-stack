@@ -6,7 +6,7 @@ import android.os.HandlerThread
 import androidx.fragment.app.Fragment
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplemvp.util.SchedulerHolder
-import com.zhuinden.simplestackdemoexamplemvp.util.get
+import com.zhuinden.simplestackextensions.servicesktx.get
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**

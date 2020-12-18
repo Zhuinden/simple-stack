@@ -14,9 +14,9 @@ import com.zhuinden.simplestackdemoexamplemvp.core.navigation.ViewStateChanger
 import com.zhuinden.simplestackdemoexamplemvp.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplemvp.databinding.ActivityMainBinding
 import com.zhuinden.simplestackdemoexamplemvp.features.tasks.TasksKey
-import com.zhuinden.simplestackdemoexamplemvp.util.get
 import com.zhuinden.simplestackdemoexamplemvp.util.viewBinding
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
+import com.zhuinden.simplestackextensions.servicesktx.get
 
 class MainActivity : AppCompatActivity(), AsyncStateChanger.NavigationHandler {
     private val binding by viewBinding(ActivityMainBinding::inflate)

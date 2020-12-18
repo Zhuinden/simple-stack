@@ -12,10 +12,10 @@ import com.zhuinden.simplestackdemoexamplefragments.core.navigation.FragmentKey
 import com.zhuinden.simplestackdemoexamplefragments.data.manager.DatabaseManager
 import com.zhuinden.simplestackdemoexamplefragments.databinding.ActivityMainBinding
 import com.zhuinden.simplestackdemoexamplefragments.features.tasks.TasksKey
-import com.zhuinden.simplestackdemoexamplefragments.util.get
 import com.zhuinden.simplestackdemoexamplefragments.util.viewBinding
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
+import com.zhuinden.simplestackextensions.servicesktx.get
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private val binding by viewBinding(ActivityMainBinding::inflate)

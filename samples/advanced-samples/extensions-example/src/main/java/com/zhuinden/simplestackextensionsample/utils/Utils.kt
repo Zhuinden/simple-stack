@@ -61,5 +61,3 @@ fun <T : View> T.hideIf(condition: (T) -> Boolean): T {
 
     return this
 }
-
-inline fun <reified T> GlobalServices.get(serviceTag: String = T::class.java.name): T = getService(serviceTag)
