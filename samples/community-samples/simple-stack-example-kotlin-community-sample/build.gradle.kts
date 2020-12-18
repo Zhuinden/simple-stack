@@ -38,19 +38,21 @@ android {
 
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.20")
+
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.core:core:1.3.2")
     implementation("androidx.activity:activity:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.1") {
+    implementation(project(":simple-stack"))
+
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
@@ -60,7 +62,6 @@ dependencies {
     implementation("com.google.dagger:dagger:2.29.1")
 
     kapt("com.google.dagger:dagger-compiler:2.29.1")
-    implementation(project(":simple-stack"))
 
     implementation("com.squareup.retrofit2:retrofit:2.4.0") {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import

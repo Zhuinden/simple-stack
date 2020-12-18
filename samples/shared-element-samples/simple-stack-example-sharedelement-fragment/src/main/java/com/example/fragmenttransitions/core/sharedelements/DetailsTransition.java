@@ -1,4 +1,4 @@
-package com.example.fragmenttransitions;
+package com.example.fragmenttransitions.core.sharedelements;
 
 import android.annotation.TargetApi;
 import android.content.Context;

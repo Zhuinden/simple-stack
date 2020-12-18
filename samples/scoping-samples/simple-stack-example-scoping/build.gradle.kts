@@ -51,19 +51,19 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
@@ -78,5 +78,5 @@ dependencies {
 
     implementation("com.github.Zhuinden:live-event:1.1.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.20")
+
 }

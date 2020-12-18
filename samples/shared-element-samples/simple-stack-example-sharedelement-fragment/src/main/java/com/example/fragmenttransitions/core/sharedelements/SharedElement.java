@@ -1,4 +1,4 @@
-package com.example.fragmenttransitions;
+package com.example.fragmenttransitions.core.sharedelements;
 
 import android.os.Parcelable;
 

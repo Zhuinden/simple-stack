@@ -1,4 +1,4 @@
-package com.example.fragmenttransitions;
+package com.example.fragmenttransitions.features.kitten.grid;
 
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -8,12 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.fragmenttransitions.R;
+import com.example.fragmenttransitions.core.navigation.BaseFragment;
+
 /**
  * Displays a grid of pictures
  *
  * @author bherbst
  */
-public class GridFragment
+public class KittenGridFragment
         extends BaseFragment {
     @Nullable
     @Override

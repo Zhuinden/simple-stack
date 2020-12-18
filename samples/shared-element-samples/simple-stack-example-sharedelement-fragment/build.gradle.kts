@@ -33,6 +33,17 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
+    
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.1.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.1.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.1.0") {
+        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    }
+
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")

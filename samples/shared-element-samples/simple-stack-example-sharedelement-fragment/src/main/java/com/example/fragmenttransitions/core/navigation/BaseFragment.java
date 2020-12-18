@@ -1,29 +1,31 @@
-package com.example.fragmenttransitions;
+package com.example.fragmenttransitions.core.navigation;
 
 import android.os.Bundle;
+
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.View;
 
+import com.zhuinden.simplestackextensions.fragments.KeyedFragment;
+
 /**
- * Created by Owner on 2017. 08. 08..
+ * Created by Zhuinden on 2020. 12. 18..
  */
 
 public class BaseFragment
-        extends Fragment {
+        extends KeyedFragment {
+    public BaseFragment() {
+    }
+
+    public BaseFragment(@LayoutRes int layoutRes) {
+        super(layoutRes);
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         startPostponedEnterTransition();
-    }
-
-    @NonNull
-    public final <T extends BaseKey> T getKey() {
-        T key = getArguments() != null ? getArguments().getParcelable("KEY") : null;
-        if(key == null) {
-            throw new NullPointerException("Key should not be null");
-        }
-        return key;
     }
 }

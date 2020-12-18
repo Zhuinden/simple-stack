@@ -1,8 +1,11 @@
-package com.example.fragmenttransitions;
+package com.example.fragmenttransitions.features.kitten.grid;
 
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.fragmenttransitions.features.kitten.details.KittenDetailsKey;
+import com.example.fragmenttransitions.R;
+import com.example.fragmenttransitions.core.sharedelements.SharedElement;
 import com.zhuinden.simplestack.navigator.Navigator;
 
 import androidx.core.view.ViewCompat;
@@ -57,8 +60,8 @@ public class KittenViewHolder
             // we cannot risk the transition name being nulled out, so we'll just set it again...
             ViewCompat.setTransitionName(image, position + "_image");
 
-            DetailsKey detailsKey = DetailsKey.create(SharedElement.create(ViewCompat.getTransitionName(image), "kittenImage"), kittenNumber);
-            Navigator.getBackstack(v.getContext()).goTo(detailsKey);
+            KittenDetailsKey kittenDetailsKey = KittenDetailsKey.create(SharedElement.create(ViewCompat.getTransitionName(image), "kittenImage"), kittenNumber);
+            Navigator.getBackstack(v.getContext()).goTo(kittenDetailsKey);
         });
     }
 }

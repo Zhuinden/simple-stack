@@ -51,12 +51,12 @@ android {
 
 dependencies {
     implementation(project(":simple-stack"))
-    implementation("com.github.Zhuinden:simple-stack-extensions:2.0.1") {
+    implementation("com.github.Zhuinden:simple-stack-extensions:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
     // App's dependencies, including test
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.20")
+
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")

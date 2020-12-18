@@ -49,7 +49,7 @@ android.registerTransform(RealmTransformer(project))
 
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.20")
+
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     androidTestImplementation("androidx.test:runner:1.3.0")
@@ -70,19 +70,19 @@ dependencies {
     implementation("io.realm:realm-android-kotlin-extensions:10.1.0")
     annotationProcessor("io.realm:realm-annotations-processor:10.1.0")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.0.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 

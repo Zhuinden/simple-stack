@@ -1,9 +1,13 @@
-package com.example.fragmenttransitions;
+package com.example.fragmenttransitions.features.kitten.grid;
 
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.fragmenttransitions.R;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Adapts Views containing kittens to RecyclerView cells
@@ -12,7 +16,7 @@ import android.view.ViewGroup;
  */
 public class KittenGridAdapter
         extends RecyclerView.Adapter<KittenViewHolder> {
-    private final int mSize;
+    private final int size;
 
     /**
      * Constructor
@@ -20,9 +24,10 @@ public class KittenGridAdapter
      * @param size The number of kittens to show
      */
     public KittenGridAdapter(int size) {
-        mSize = size;
+        this.size = size;
     }
 
+    @NotNull
     @Override
     public KittenViewHolder onCreateViewHolder(ViewGroup container, int position) {
         LayoutInflater inflater = LayoutInflater.from(container.getContext());
@@ -37,7 +42,7 @@ public class KittenGridAdapter
 
     @Override
     public int getItemCount() {
-        return mSize;
+        return size;
     }
 
 }

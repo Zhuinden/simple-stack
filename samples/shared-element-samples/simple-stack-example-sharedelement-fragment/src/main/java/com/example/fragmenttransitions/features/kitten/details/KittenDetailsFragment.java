@@ -1,32 +1,30 @@
-package com.example.fragmenttransitions;
+package com.example.fragmenttransitions.features.kitten.details;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
+
+import com.example.fragmenttransitions.R;
+import com.example.fragmenttransitions.core.navigation.BaseFragment;
 
 /**
  * Display details for a given kitten
  *
  * @author bherbst
  */
-public class DetailsFragment
+public class KittenDetailsFragment
         extends BaseFragment {
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.details_fragment, container, false);
+    public KittenDetailsFragment() {
+        super(R.layout.details_fragment);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        DetailsKey key = getKey();
+        KittenDetailsKey key = getKey();
         int kittenNumber = key.kittenNumber();
 
         ImageView image = view.findViewById(R.id.image);
