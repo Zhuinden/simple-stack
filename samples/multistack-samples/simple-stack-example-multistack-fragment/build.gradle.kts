@@ -59,5 +59,5 @@ dependencies {
     implementation("com.google.android.material:material:1.2.1")
     implementation("com.bartoszlipinski:viewpropertyobjectanimator:1.4.5")
 
-    implementation("it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.1.0-rc1")
+    implementation("it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.0")
 }
