@@ -1,17 +1,42 @@
 package com.zhuinden.simplestackdemomultistack.core.navigation
 
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
 import com.zhuinden.simplestackdemomultistack.R
 
 class MultistackFragmentStateChanger(
     private val containerId: Int,
     private val fragmentManager: FragmentManager
 ) {
+    private val handler = Handler(Looper.getMainLooper())
+
     fun handleStateChange(stateChange: StateChange) {
+        var didExecutePendingTransactions = false
+
+        try {
+            fragmentManager.executePendingTransactions() // two synchronous immediate fragment transactions can overlap.
+            didExecutePendingTransactions = true
+        } catch (e: IllegalStateException) { // executePendingTransactions() can fail, but this should "just work".
+        }
+
+        if (didExecutePendingTransactions) {
+            executeFragmentTransaction(stateChange)
+        } else { // failed to execute pending transactions
+            if (!fragmentManager.isDestroyed) { // ignore state change if activity is dead. :(
+                handler.post {
+                    if (!fragmentManager.isDestroyed) { // ignore state change if activity is dead. :(
+                        executeFragmentTransaction(stateChange)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun executeFragmentTransaction(stateChange: StateChange) {
         val previousState = stateChange.getPreviousKeys<MultistackFragmentKey>()
         val newState = stateChange.getNewKeys<MultistackFragmentKey>()
 
@@ -58,8 +83,6 @@ class MultistackFragmentStateChanger(
         }
         // end detach fragment not in this backstack
 
-        val previousKey = stateChange.topPreviousKey<MultistackFragmentKey>()
-
         fragmentTransaction.apply {
             when (stateChange.direction) {
                 StateChange.FORWARD -> {
@@ -104,6 +127,7 @@ class MultistackFragmentStateChanger(
                 }
             }
         }
+
         fragmentTransaction.commitAllowingStateLoss()
     }
 }
