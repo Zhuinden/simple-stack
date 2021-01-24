@@ -29,6 +29,7 @@
             <option value="$PROJECT_DIR$/samples/legacy-architecture-samples/simple-stack-example-mvp-view" />
             <option value="$PROJECT_DIR$/samples/multistack-samples" />
             <option value="$PROJECT_DIR$/samples/multistack-samples/simple-stack-example-multistack-fragment" />
+            <option value="$PROJECT_DIR$/samples/multistack-samples/simple-stack-example-multistack-nested-fragment" />
             <option value="$PROJECT_DIR$/samples/multistack-samples/simple-stack-example-multistack-view" />
             <option value="$PROJECT_DIR$/samples/scoping-samples" />
             <option value="$PROJECT_DIR$/samples/scoping-samples/simple-stack-example-scoping" />

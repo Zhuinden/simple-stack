@@ -1,5 +1,10 @@
 # Change log
 
+-Simple Stack X.X.X (XXXX-XX-XX)
+--------------------------------
+
+- UPDATE: Add `simple-stack-example-multistack-nested-fragment` that shows how to create a fragment that has `Backstack`s for its child fragments, thus creating true multi-stack apps using nested backstacks.
+
 -Simple Stack 2.5.0 (2020-12-16)
 --------------------------------
 
