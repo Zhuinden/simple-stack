@@ -77,11 +77,11 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.root)
+        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.container)
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
-            .install(this, root, History.of(FirstScreen()))
+            .install(this, findViewById(R.id.container), History.of(FirstScreen()))
     }
 
     override fun onBackPressed() {
