@@ -31,9 +31,9 @@ class RootFragment : KeyedFragment(R.layout.root_fragment) {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-            val firstFragment = FragmentStackHostFragment.newInstance(RootScreen.FIRST_STACK_HOST).also { this.firstFragment = it }
-            val secondFragment = FragmentStackHostFragment.newInstance(RootScreen.SECOND_STACK_HOST).also { this.secondFragment = it }
-            val thirdFragment = FragmentStackHostFragment.newInstance(RootScreen.THIRD_STACK_HOST).also { this.thirdFragment = it }
+            val firstFragment = FragmentStackHostFragment.newInstance(RootScreen.FIRST_STACK).also { this.firstFragment = it }
+            val secondFragment = FragmentStackHostFragment.newInstance(RootScreen.SECOND_STACK).also { this.secondFragment = it }
+            val thirdFragment = FragmentStackHostFragment.newInstance(RootScreen.THIRD_STACK).also { this.thirdFragment = it }
 
             childFragmentManager.beginTransaction()
                 .add(R.id.containerBottomNavContent, firstFragment, "firstFragment")
