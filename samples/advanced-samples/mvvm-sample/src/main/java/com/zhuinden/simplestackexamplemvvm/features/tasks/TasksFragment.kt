@@ -15,9 +15,6 @@ import com.zhuinden.simplestackexamplemvvm.databinding.TasksFragmentBinding
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 
-/**
- * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
- */
 class TasksFragment : KeyedFragment(R.layout.tasks_fragment), TaskItem.Listener {
     private val tasksViewModel by lazy { lookup<TasksViewModel>() }
 
