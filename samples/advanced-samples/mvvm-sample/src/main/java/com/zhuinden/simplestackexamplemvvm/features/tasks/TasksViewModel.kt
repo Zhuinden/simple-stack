@@ -1,41 +1,26 @@
 package com.zhuinden.simplestackexamplemvvm.features.tasks
 
-import android.content.res.Resources
-import android.os.Handler
-import android.os.Looper
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
-import com.zhuinden.eventemitter.EventEmitter
-import com.zhuinden.eventemitter.EventSource
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestack.ScopedServices
 import com.zhuinden.simplestackexamplemvvm.R
+import com.zhuinden.simplestackexamplemvvm.application.SnackbarTextEmitter
 import com.zhuinden.simplestackexamplemvvm.data.Task
-import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource
+import com.zhuinden.simplestackexamplemvvm.data.tasks.TasksDataSource
 import com.zhuinden.simplestackexamplemvvm.features.addedittask.AddEditTaskKey
-import com.zhuinden.simplestackexamplemvvm.util.MessageQueue
 import com.zhuinden.statebundle.StateBundle
 
 class TasksViewModel(
+    private val snackbarTextEmitter: SnackbarTextEmitter,
     private val tasksDataSource: TasksDataSource,
-    private val resources: Resources,
     private val backstack: Backstack,
-    private val messageQueue: MessageQueue,
     private val key: TasksKey
-) : Bundleable, ScopedServices.Activated {
-    private val handler = Handler(Looper.getMainLooper()) // todo: inject
-
-    private val isCurrentlyRefreshing = MutableLiveData(false)
-    val isRefreshing: LiveData<Boolean> = isCurrentlyRefreshing
-
+) : Bundleable {
     val selectedFilter = MutableLiveData(TasksFilterType.ALL_TASKS)
 
-    private val snackBarTextEmitter = EventEmitter<String>()
-    val snackbarText: EventSource<String> = snackBarTextEmitter
-
-    val tasks = tasksDataSource.tasksWithChanges
+    val hasTasks = tasksDataSource.tasksWithChanges.map { it.isNotEmpty() }
 
     @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
     val filteredTasks = selectedFilter.switchMap { filterType ->
@@ -53,7 +38,7 @@ class TasksViewModel(
     fun clearCompletedTasks() {
         tasksDataSource.clearCompletedTasks()
 
-        snackBarTextEmitter.emit(resources.getString(R.string.completed_tasks_cleared))
+        snackbarTextEmitter.emit(R.string.completed_tasks_cleared)
     }
 
     fun onAddNewTaskClicked() {
@@ -68,39 +53,16 @@ class TasksViewModel(
         }
     }
 
-    fun refresh() {
-        if (isCurrentlyRefreshing.value!!) {
-            return
-        }
-
-        isCurrentlyRefreshing.value = true
-        tasksDataSource.refreshTasks()
-
-        handler.postDelayed({ isCurrentlyRefreshing.value = false }, 2000L)
+    fun onTaskSaved() {
+        snackbarTextEmitter.emit(R.string.successfully_saved_task_message)
     }
 
-    class SavedTaskMessage
-
-    class AddedTaskMessage
-    class DeletedTaskMessage
-
-    override fun onServiceActive() {
-        messageQueue.requestMessages(key) {
-            when {
-                it is SavedTaskMessage -> {
-                    snackBarTextEmitter.emit(resources.getString(R.string.successfully_saved_task_message))
-                }
-                it is AddedTaskMessage -> {
-                    snackBarTextEmitter.emit(resources.getString(R.string.successfully_added_task_message))
-                }
-                it is DeletedTaskMessage -> {
-                    snackBarTextEmitter.emit(resources.getString(R.string.successfully_deleted_task_message))
-                }
-            }
-        }
+    fun onTaskAdded() {
+        snackbarTextEmitter.emit(R.string.successfully_added_task_message)
     }
 
-    override fun onServiceInactive() {
+    fun onTaskDeleted() {
+        snackbarTextEmitter.emit(R.string.successfully_deleted_task_message)
     }
 
     override fun toBundle(): StateBundle {

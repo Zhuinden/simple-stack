@@ -2,82 +2,50 @@ package com.zhuinden.simplestackexamplemvvm.features.tasks
 
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.xwray.groupie.GroupieAdapter
 import com.zhuinden.livedatacombinetuplekt.combineTuple
-import com.zhuinden.liveevent.observe
 import com.zhuinden.simplestackexamplemvvm.R
 import com.zhuinden.simplestackexamplemvvm.data.Task
 import com.zhuinden.simplestackexamplemvvm.databinding.TasksFragmentBinding
-import com.zhuinden.simplestackexamplemvvm.util.showSnackbar
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
  */
-class TasksFragment : KeyedFragment(R.layout.tasks_fragment), TasksAdapter.Listener {
+class TasksFragment : KeyedFragment(R.layout.tasks_fragment), TaskItem.Listener {
     private val tasksViewModel by lazy { lookup<TasksViewModel>() }
 
-    private lateinit var adapter: TasksAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
+    private val adapter = GroupieAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = TasksFragmentBinding.bind(view)
         with(binding) {
-            tasksList.adapter = TasksAdapter(this@TasksFragment).also {
-                adapter = it
-            }
-
-            val swipeRefreshLayout = binding.refreshLayout
-            swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(requireActivity(), R.color.colorPrimary),
-                ContextCompat.getColor(requireActivity(), R.color.colorAccent),
-                ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark))
-
-            swipeRefreshLayout.setScrollUpChild(tasksList)
-
-            viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
-                override fun onDestroy(owner: LifecycleOwner) {
-                    owner.lifecycle.removeObserver(this)
-
-                    swipeRefreshLayout.isRefreshing = false
-                    swipeRefreshLayout.destroyDrawingCache()
-                    swipeRefreshLayout.clearAnimation()
-                }
-            })
+            tasksList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            tasksList.adapter = adapter
 
             noTasksAdd.setOnClickListener {
                 tasksViewModel.onAddNewTaskClicked()
             }
+
+            fab.setOnClickListener {
+                tasksViewModel.onAddNewTaskClicked()
+            }
         }
 
-        tasksViewModel.snackbarText.observe(viewLifecycleOwner) { snackBarText ->
-            showSnackbar(binding.root, snackBarText)
-        }
-
-        tasksViewModel.tasks.observe(viewLifecycleOwner) { tasks ->
-            binding.noTasksAdd.isVisible = tasks.isEmpty()
+        tasksViewModel.hasTasks.observe(viewLifecycleOwner) { hasTasks ->
+            binding.noTasksAdd.isVisible = !hasTasks
         }
 
         tasksViewModel.filteredTasks.observe(viewLifecycleOwner) { tasks ->
-            adapter.replaceData(tasks)
-        }
-
-        tasksViewModel.isRefreshing.observe(viewLifecycleOwner) { isRefreshing ->
-            binding.refreshLayout.isRefreshing = isRefreshing
+            adapter.replaceAll(tasks.map { TaskItem(it, this) })
         }
 
         tasksViewModel.selectedFilter.observe(viewLifecycleOwner) { filterType ->
@@ -86,6 +54,14 @@ class TasksFragment : KeyedFragment(R.layout.tasks_fragment), TasksAdapter.Liste
                 TasksFilterType.ACTIVE_TASKS -> R.string.label_active
                 TasksFilterType.COMPLETED_TASKS -> R.string.label_completed
             })
+        }
+
+        binding.toolbar.root.addExtraAction("Clear Completed", R.drawable.ic_baseline_delete_sweep_white_24) {
+            tasksViewModel.clearCompletedTasks()
+        }
+
+        binding.toolbar.root.addExtraAction("Filter", R.drawable.ic_filter_list) { anchor ->
+            showFilteringPopUpMenu(anchor)
         }
 
         @Suppress("NAME_SHADOWING")
@@ -109,21 +85,8 @@ class TasksFragment : KeyedFragment(R.layout.tasks_fragment), TasksAdapter.Liste
             }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_clear -> tasksViewModel.clearCompletedTasks()
-            R.id.menu_filter -> showFilteringPopUpMenu()
-            R.id.menu_refresh -> tasksViewModel.refresh()
-        }
-        return true
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tasks_fragment_menu, menu)
-    }
-
-    private fun showFilteringPopUpMenu() {
-        val popup = PopupMenu(requireContext(), requireActivity().findViewById(R.id.menu_filter))
+    private fun showFilteringPopUpMenu(anchor: View) {
+        val popup = PopupMenu(requireContext(), anchor)
         popup.menuInflater.inflate(R.menu.filter_tasks, popup.menu)
         popup.setOnMenuItemClickListener { item: MenuItem ->
             when (item.itemId) {
@@ -135,10 +98,6 @@ class TasksFragment : KeyedFragment(R.layout.tasks_fragment), TasksAdapter.Liste
             true
         }
         popup.show()
-    }
-
-    fun onAddNewTaskClicked() {
-        tasksViewModel.onAddNewTaskClicked()
     }
 
     override fun onTaskCheckChanged(task: Task, isChecked: Boolean) {

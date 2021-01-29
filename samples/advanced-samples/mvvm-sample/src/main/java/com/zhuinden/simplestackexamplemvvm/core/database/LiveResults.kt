@@ -21,7 +21,10 @@ import com.zhuinden.simplestackexamplemvvm.core.database.DatabaseManager.QueryDe
 import com.zhuinden.simplestackexamplemvvm.core.scheduler.Scheduler
 import java.util.concurrent.atomic.AtomicBoolean
 
-class LiveResults<T>(
+/**
+ * Created by Zhuinden on 2017.07.26..
+ */
+class LiveResults<T : Any>(
     private val backgroundScheduler: Scheduler,
     private val databaseManager: DatabaseManager,
     val table: DatabaseManager.Table,

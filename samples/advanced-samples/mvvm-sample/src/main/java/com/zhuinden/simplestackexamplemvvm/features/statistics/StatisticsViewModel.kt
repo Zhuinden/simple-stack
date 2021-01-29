@@ -1,6 +1,6 @@
 package com.zhuinden.simplestackexamplemvvm.features.statistics
 
-import com.zhuinden.simplestackexamplemvvm.data.source.TasksDataSource
+import com.zhuinden.simplestackexamplemvvm.data.tasks.TasksDataSource
 
 class StatisticsViewModel(tasksDataSource: TasksDataSource) {
     val activeTasks = tasksDataSource.activeTasksWithChanges

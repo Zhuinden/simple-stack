@@ -24,11 +24,11 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.zhuinden.simplestackexamplemvvm.core.scheduler.BackgroundScheduler
 import java.lang.ref.WeakReference
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class DatabaseManager @Inject constructor(
+/**
+ * Created by Zhuinden on 2017.07.26..
+ */
+class DatabaseManager constructor(
     appContext: Context,
     private val tables: List<@JvmSuppressWildcards Table>,
     private val backgroundScheduler: BackgroundScheduler
@@ -47,7 +47,7 @@ class DatabaseManager @Inject constructor(
     class Fields(
         val fieldName: String,
         val fieldType: String,
-        val fieldAdditional: String
+        val fieldAdditional: String?
     ) {
         override fun toString(): String = fieldName
     }
@@ -74,7 +74,7 @@ class DatabaseManager @Inject constructor(
         fun execute(sqLiteDatabase: SQLiteDatabase)
     }
 
-    interface Mapper<T> {
+    interface Mapper<T : Any> {
         fun from(cursor: Cursor): T
         fun from(contentValues: ContentValues, t: T): ContentValues
     }
@@ -91,7 +91,7 @@ class DatabaseManager @Inject constructor(
         }
     }
 
-    private fun <T> collectObjectFromCursor(mapper: Mapper<T>, cursor: Cursor): List<T> {
+    private fun <T : Any> collectObjectFromCursor(mapper: Mapper<T>, cursor: Cursor): List<T> {
         val list: MutableList<T> = LinkedList()
         if (cursor.moveToFirst()) {
             do {
@@ -102,31 +102,31 @@ class DatabaseManager @Inject constructor(
         return Collections.unmodifiableList(ArrayList(list))
     }
 
-    fun <T> findAll(table: Table, mapper: Mapper<T>): List<T> {
+    fun <T : Any> findAll(table: Table, mapper: Mapper<T>): List<T> {
         return findAll(table,
             mapper,
             QueryBuilder.of(table).buildDefinition()
         )
     }
 
-    fun <T> findAll(table: Table, mapper: Mapper<T>, queryDefinition: QueryDefinition): List<T> {
+    fun <T : Any> findAll(table: Table, mapper: Mapper<T>, queryDefinition: QueryDefinition): List<T> {
         val cursor = queryDefinition.query(database, table)
         val list: List<T> = collectObjectFromCursor(mapper, cursor)
         cursor.close()
         return list
     }
 
-    fun <T> findOne(table: Table, mapper: Mapper<T>, queryDefinition: QueryDefinition): T? {
+    fun <T : Any> findOne(table: Table, mapper: Mapper<T>, queryDefinition: QueryDefinition): T? {
         val list: List<T> = findAll(table, mapper, queryDefinition)
         return if (list.isEmpty()) null else list[0]
     }
 
-    fun <T> insert(table: Table, mapper: Mapper<T>, element: T) {
+    fun <T : Any> insert(table: Table, mapper: Mapper<T>, element: T) {
         insert(table, mapper, listOf(element))
         // calls to other insert
     }
 
-    fun <T> insert(table: Table, mapper: Mapper<T>, elements: List<T>) {
+    fun <T : Any> insert(table: Table, mapper: Mapper<T>, elements: List<T>) {
         executeTransaction { sqLiteDatabase: SQLiteDatabase ->
             var contentValues = ContentValues()
             for (t in elements) {
@@ -169,10 +169,10 @@ class DatabaseManager @Inject constructor(
         refresh(table)
     }
 
-    // Experimental. This allows for reactivity.
+    // This allows for reactivity.
     private val liveDatas = Collections.synchronizedList(LinkedList<WeakReference<LiveResults<*>>>())
 
-    fun <T> findAllWithChanges(table: Table, mapper: Mapper<T>, queryDefinition: QueryDefinition): LiveResults<T> {
+    fun <T : Any> findAllWithChanges(table: Table, mapper: Mapper<T>, queryDefinition: QueryDefinition): LiveResults<T> {
         return LiveResults(backgroundScheduler, this, table, mapper, queryDefinition)
     }
 

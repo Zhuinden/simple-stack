@@ -5,6 +5,9 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import com.zhuinden.simplestackexamplemvvm.core.database.DatabaseManager.QueryDefinition
 
+/**
+ * Created by Zhuinden on 2017.07.26..
+ */
 class QueryBuilder private constructor() {
     enum class Sort(val value: String) {
         NONE(""), ASC("ASC"), DESC("DESC");

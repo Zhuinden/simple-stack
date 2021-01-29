@@ -47,6 +47,10 @@ android {
 
         dataBinding = false
     }
+
+    packagingOptions {
+        exclude("META-INF/*.kotlin_module")
+    }
 }
 
 dependencies {
@@ -61,11 +65,13 @@ dependencies {
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
-    implementation("com.xwray:groupie:2.7.0")
+    implementation("com.xwray:groupie:2.9.0")
+    implementation("com.xwray:groupie-viewbinding:2.9.0")
 
-    implementation("com.github.Zhuinden:live-event:1.1.0")
-    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.1.0")
-    implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.1.0")
+    implementation("com.github.Zhuinden:live-event:1.2.0")
+    implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.2.0")
+    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.2.0")
+    implementation("com.github.Zhuinden:rx-validateby-kt:2.1.0")
 
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
@@ -80,10 +86,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common-java8:2.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
-
-    // useful stuff
-    implementation("com.google.dagger:dagger:2.29.1")
-    kapt("com.google.dagger:dagger-compiler:2.29.1")
 
     // Dependencies for local unit tests
     testImplementation("junit:junit:4.13.1")

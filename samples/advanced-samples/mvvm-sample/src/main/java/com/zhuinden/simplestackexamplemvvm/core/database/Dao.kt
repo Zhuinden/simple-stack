@@ -4,12 +4,12 @@ package com.zhuinden.simplestackexamplemvvm.core.database
 import com.zhuinden.simplestackexamplemvvm.core.database.DatabaseManager.QueryDefinition
 
 /**
- * Created by Owner on 2017. 09. 03..
+ * Created by Zhuinden on 2017.07.26..
  */
-interface Dao<T> {
+interface Dao<T : Any> {
     val table: DatabaseManager.Table
     fun refresh()
-    fun findOne(id: String): T?
+    fun findOne(id: String?): T?
 
     //T findOne(final Long id, boolean withRelations);
     fun findOne(queryDefinition: QueryDefinition): T?

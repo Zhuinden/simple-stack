@@ -3,12 +3,13 @@ package com.zhuinden.simplestackexamplemvvm.application
 
 import android.app.Application
 import com.zhuinden.simplestack.GlobalServices
-import com.zhuinden.simplestackexamplemvvm.application.injection.DaggerApplicationComponent
+import com.zhuinden.simplestackexamplemvvm.core.database.DatabaseManager
+import com.zhuinden.simplestackexamplemvvm.core.scheduler.BackgroundScheduler
+import com.zhuinden.simplestackexamplemvvm.data.tasks.TaskDao
+import com.zhuinden.simplestackexamplemvvm.data.tasks.TaskTable
+import com.zhuinden.simplestackexamplemvvm.data.tasks.TasksDataSource
 import com.zhuinden.simplestackextensions.servicesktx.add
 
-/**
- * Created by Zhuinden on 2017.07.26..
- */
 class CustomApplication : Application() {
     lateinit var globalServices: GlobalServices
         private set
@@ -16,10 +17,24 @@ class CustomApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val applicationComponent = DaggerApplicationComponent.factory().create(this)
+        val snackbarTextEmitter = SnackbarTextEmitter()
+
+        val backgroundScheduler = BackgroundScheduler()
+
+        val taskTable = TaskTable()
+
+        val databaseManager = DatabaseManager(this, listOf(taskTable), backgroundScheduler)
+
+        val taskDao = TaskDao(databaseManager, taskTable)
+
+        val tasksDataSource = TasksDataSource(backgroundScheduler, taskDao)
 
         globalServices = GlobalServices.builder()
-            .add(applicationComponent)
+            .add(snackbarTextEmitter)
+            .add(backgroundScheduler)
+            .add(databaseManager)
+            .add(taskDao)
+            .add(tasksDataSource)
             .build()
     }
 }

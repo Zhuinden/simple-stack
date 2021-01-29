@@ -15,7 +15,7 @@ buildscript {
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
         classpath("io.realm:realm-gradle-plugin:10.1.0")
         classpath("io.realm:realm-transformer:10.1.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.20")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

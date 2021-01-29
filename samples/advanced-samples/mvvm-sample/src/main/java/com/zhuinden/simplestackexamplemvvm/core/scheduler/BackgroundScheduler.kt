@@ -17,14 +17,8 @@ package com.zhuinden.simplestackexamplemvvm.core.scheduler
 
 
 import java.util.concurrent.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
-/**
- * Created by Owner on 2017. 07. 27..
- */
-@Singleton
-class BackgroundScheduler @Inject internal constructor() : Scheduler {
+class BackgroundScheduler : Scheduler {
     private val poolWorkQueue: BlockingQueue<Runnable> = LinkedBlockingQueue()
 
     val executor: Executor = ThreadPoolExecutor(

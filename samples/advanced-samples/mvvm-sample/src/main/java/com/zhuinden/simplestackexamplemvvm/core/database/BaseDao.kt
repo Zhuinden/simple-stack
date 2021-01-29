@@ -3,7 +3,10 @@ package com.zhuinden.simplestackexamplemvvm.core.database
 
 import com.zhuinden.simplestackexamplemvvm.core.database.DatabaseManager.QueryDefinition
 
-abstract class BaseDao<T>(
+/**
+ * Created by Zhuinden on 2017.07.26..
+ */
+abstract class BaseDao<T : Any>(
     private val databaseManager: DatabaseManager,
     override val table: DatabaseManager.Table,
     private val mapper: DatabaseManager.Mapper<T>
@@ -12,7 +15,7 @@ abstract class BaseDao<T>(
         databaseManager.refresh(table)
     }
 
-    override fun findOne(id: String): T? {
+    override fun findOne(id: String?): T? {
         return if (id == null) {
             databaseManager.findOne(table, mapper, QueryBuilder.of(table)
                 .where("1 = 0")
