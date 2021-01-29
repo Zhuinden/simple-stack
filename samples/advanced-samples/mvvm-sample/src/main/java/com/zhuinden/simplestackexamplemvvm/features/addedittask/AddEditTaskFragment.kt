@@ -3,11 +3,8 @@ package com.zhuinden.simplestackexamplemvvm.features.addedittask
 import android.os.Bundle
 import android.view.View
 import androidx.core.widget.doAfterTextChanged
-import com.zhuinden.liveevent.observe
-
 import com.zhuinden.simplestackexamplemvvm.R
 import com.zhuinden.simplestackexamplemvvm.databinding.AddtaskFragmentBinding
-import com.zhuinden.simplestackexamplemvvm.util.showSnackbar
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 
@@ -30,10 +27,6 @@ class AddEditTaskFragment : KeyedFragment(R.layout.addtask_fragment) {
             addTaskDescription.doAfterTextChanged {
                 viewModel.description = it.toString()
             }
-        }
-
-        viewModel.snackbarText.observe(viewLifecycleOwner) { snackBarText ->
-            showSnackbar(binding.root, getString(snackBarText))
         }
 
         val key = getKey<AddEditTaskKey>()

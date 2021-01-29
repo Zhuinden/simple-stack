@@ -1,25 +1,22 @@
 package com.zhuinden.simplestackexamplemvvm.features.addedittask
 
 
-import com.zhuinden.eventemitter.EventEmitter
-import com.zhuinden.eventemitter.EventSource
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.Bundleable
 import com.zhuinden.simplestackexamplemvvm.R
+import com.zhuinden.simplestackexamplemvvm.application.SnackbarTextEmitter
 import com.zhuinden.simplestackexamplemvvm.data.Task
 import com.zhuinden.simplestackexamplemvvm.data.tasks.TasksDataSource
 import com.zhuinden.simplestackexamplemvvm.features.tasks.TasksViewModel
 import com.zhuinden.statebundle.StateBundle
 
 class AddEditTaskViewModel(
+    private val snackbarTextEmitter: SnackbarTextEmitter,
     private val tasksViewModel: TasksViewModel,
     private val tasksDataSource: TasksDataSource,
     private val backstack: Backstack,
     private val key: AddEditTaskKey
 ) : Bundleable {
-    private val snackbarTextEmitter: EventEmitter<Int> = EventEmitter()
-    val snackbarText: EventSource<Int> = snackbarTextEmitter
-
     var title: String = key.task?.title ?: ""
     var description: String = key.task?.description ?: ""
 
