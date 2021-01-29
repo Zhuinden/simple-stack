@@ -6,7 +6,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.material.navigation.NavigationView
 import com.zhuinden.liveevent.observe
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.SimpleStateChanger
@@ -24,23 +23,8 @@ import com.zhuinden.simplestackextensions.servicesktx.get
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
-
-    private lateinit var binding: MainActivityBinding
-
     private lateinit var snackbarTextEmitter: SnackbarTextEmitter
-
-    private val navigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
-        when (item.itemId) {
-            R.id.list_navigation_menu_item -> backstack.goTo(TasksKey())
-            R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey())
-            else -> {
-            }
-        }
-        setCheckedItem(item.itemId)
-
-        binding.drawerLayout.closeDrawers()
-        true
-    }
+    private lateinit var binding: MainActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +37,20 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         snackbarTextEmitter = globalServices.get()
 
         binding.drawerLayout.setStatusBarBackground(R.color.colorPrimaryDark)
-        binding.navView.setNavigationItemSelectedListener(navigationItemSelectedListener)
+
+        binding.navView.setNavigationItemSelectedListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.list_navigation_menu_item -> backstack.goTo(TasksKey())
+                R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey())
+                else -> {
+                }
+            }
+
+            setCheckedItem(item.itemId)
+
+            binding.drawerLayout.closeDrawers()
+            true
+        }
 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.contentFrame)
 
