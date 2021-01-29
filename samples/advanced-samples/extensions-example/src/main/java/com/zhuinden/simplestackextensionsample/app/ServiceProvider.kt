@@ -14,7 +14,7 @@ class ServiceProvider : DefaultServiceProvider() {
 
         with(serviceBinder) {
             when (scope) { // explicit shared services
-                "registration" -> {
+                RegistrationViewModel::class.java.name -> {
                     add(RegistrationViewModel(lookup(), backstack))
                 }
                 else -> {

@@ -1,12 +1,18 @@
 package com.zhuinden.simplestackextensionsample.utils
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
-import com.zhuinden.simplestack.GlobalServices
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 
 fun View.onClick(clickListener: (View) -> Unit) {
     setOnClickListener(clickListener)
@@ -61,3 +67,19 @@ fun <T : View> T.hideIf(condition: (T) -> Boolean): T {
 
     return this
 }
+
+fun Context.showToast(message: String, length: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, message, length).show()
+}
+
+fun Fragment.showToast(message: String, length: Int = Toast.LENGTH_SHORT) {
+    requireContext().showToast(message, length)
+}
+
+inline fun <T : Any> Observable<T>.observe(compositeDisposable: CompositeDisposable, crossinline observer: (T) -> Unit) {
+    this.subscribeBy(onNext = {
+        observer(it)
+    }).addTo(compositeDisposable)
+}
+
+fun Observable<String>.isNotBlank(): Observable<Boolean> = this.map { it.isNotBlank() }

@@ -6,13 +6,8 @@ import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 import com.zhuinden.simplestackextensionsample.R
 import com.zhuinden.simplestackextensionsample.databinding.LoginFragmentBinding
-import com.zhuinden.simplestackextensionsample.utils.get
-import com.zhuinden.simplestackextensionsample.utils.onClick
-import com.zhuinden.simplestackextensionsample.utils.onTextChanged
-import com.zhuinden.simplestackextensionsample.utils.set
+import com.zhuinden.simplestackextensionsample.utils.*
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 
 class LoginFragment : KeyedFragment(R.layout.login_fragment) {
     private val viewModel by lazy { lookup<LoginViewModel>() }
@@ -27,9 +22,9 @@ class LoginFragment : KeyedFragment(R.layout.login_fragment) {
         binding.textUsername.setText(viewModel.username.get())
         binding.textPassword.setText(viewModel.password.get())
 
-        viewModel.isLoginEnabled.distinctUntilChanged().subscribeBy { enabled ->
+        viewModel.isLoginEnabled.observe(compositeDisposable) { enabled ->
             binding.buttonLogin.isEnabled = enabled
-        }.addTo(compositeDisposable)
+        }
 
         binding.textUsername.onTextChanged { username -> viewModel.username.set(username) }
         binding.textPassword.onTextChanged { password -> viewModel.password.set(password) }

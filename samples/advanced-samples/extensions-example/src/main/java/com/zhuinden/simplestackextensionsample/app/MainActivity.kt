@@ -12,7 +12,6 @@ import com.zhuinden.simplestackextensionsample.R
 import com.zhuinden.simplestackextensionsample.databinding.MainActivityBinding
 import com.zhuinden.simplestackextensionsample.features.login.LoginKey
 import com.zhuinden.simplestackextensionsample.features.profile.ProfileKey
-import com.zhuinden.simplestackextensionsample.utils.get
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(
                 this, binding.step9Root, History.of(
                 when {
-                    authenticationManager.isAuthenticated() -> ProfileKey()
+                    authenticationManager.isAuthenticated() -> ProfileKey(authenticationManager.getAuthenticatedUser())
                     else -> LoginKey()
                 }
             ))

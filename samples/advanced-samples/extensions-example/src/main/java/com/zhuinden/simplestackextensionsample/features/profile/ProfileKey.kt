@@ -9,7 +9,7 @@ import com.zhuinden.simplestackextensions.servicesktx.lookup
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ProfileKey(private val placeholder: String = "") : DefaultFragmentKey(), DefaultServiceProvider.HasServices {
+data class ProfileKey(val username: String) : DefaultFragmentKey(), DefaultServiceProvider.HasServices {
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
             add(ProfileViewModel(lookup(), backstack))

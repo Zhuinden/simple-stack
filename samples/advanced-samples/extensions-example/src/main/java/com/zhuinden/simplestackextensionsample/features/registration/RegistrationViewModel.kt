@@ -1,30 +1,22 @@
 package com.zhuinden.simplestackextensionsample.features.registration
 
-import android.content.Context
 import com.jakewharton.rxrelay2.BehaviorRelay
-import com.zhuinden.rxcombinetuplekt.combineTuple
+import com.zhuinden.rxvalidatebykt.validateBy
 import com.zhuinden.simplestack.*
 import com.zhuinden.simplestackextensionsample.app.AuthenticationManager
 import com.zhuinden.simplestackextensionsample.features.profile.ProfileKey
 import com.zhuinden.simplestackextensionsample.utils.get
+import com.zhuinden.simplestackextensionsample.utils.isNotBlank
+import com.zhuinden.simplestackextensionsample.utils.observe
 import com.zhuinden.simplestackextensionsample.utils.set
 import com.zhuinden.statebundle.StateBundle
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 
 class RegistrationViewModel(
     private val authenticationManager: AuthenticationManager,
     private val backstack: Backstack
-) : Bundleable, ScopedServices.Registered, ScopedServices.HandlesBack {
-    enum class RegistrationState { // this is actually kinda superfluous/unnecessary but ok
-        COLLECT_PROFILE_DATA,
-        COLLECT_USER_PASSWORD,
-        REGISTRATION_COMPLETED
-    }
-
-    private var currentState: RegistrationState = RegistrationState.COLLECT_PROFILE_DATA
-
+) : Bundleable, ScopedServices.Registered {
     private val compositeDisposable = CompositeDisposable()
 
     val fullName = BehaviorRelay.createDefault("")
@@ -33,19 +25,20 @@ class RegistrationViewModel(
     val username = BehaviorRelay.createDefault("")
     val password = BehaviorRelay.createDefault("")
 
-    val isRegisterAndLoginEnabled = BehaviorRelay.createDefault(false)
-    val isEnterProfileNextEnabled = BehaviorRelay.createDefault(false)
+    private val isRegisterAndLoginEnabledRelay = BehaviorRelay.createDefault(false)
+    val isRegisterAndLoginEnabled: Observable<Boolean> = isRegisterAndLoginEnabledRelay
+
+    private val isEnterProfileNextEnabledRelay = BehaviorRelay.createDefault(false)
+    val isEnterProfileNextEnabled: Observable<Boolean> = isEnterProfileNextEnabledRelay
 
     override fun onServiceRegistered() {
-        combineTuple(fullName, bio)
-            .subscribeBy { (fullName, bio) ->
-                isEnterProfileNextEnabled.set(fullName.isNotBlank() && bio.isNotBlank())
-            }.addTo(compositeDisposable)
+        validateBy(fullName.isNotBlank(), bio.isNotBlank()).observe(compositeDisposable) {
+            isEnterProfileNextEnabledRelay.set(it)
+        }
 
-        combineTuple(username, password)
-            .subscribeBy { (username, password) ->
-                isRegisterAndLoginEnabled.set(username.isNotBlank() && password.isNotBlank())
-            }.addTo(compositeDisposable)
+        validateBy(username.isNotBlank(), password.isNotBlank()).observe(compositeDisposable) {
+            isRegisterAndLoginEnabledRelay.set(it)
+        }
     }
 
     override fun onServiceUnregistered() {
@@ -53,30 +46,19 @@ class RegistrationViewModel(
     }
 
     fun onRegisterAndLoginClicked() {
-        if (isRegisterAndLoginEnabled.get()) {
-            currentState = RegistrationState.REGISTRATION_COMPLETED
-            authenticationManager.saveRegistration()
-            backstack.setHistory(History.of(ProfileKey()), StateChange.FORWARD)
+        if (isRegisterAndLoginEnabledRelay.get()) {
+            authenticationManager.saveRegistration(username.get())
+            backstack.setHistory(History.of(ProfileKey(username.get())), StateChange.FORWARD)
         }
     }
 
     fun onEnterProfileNextClicked() {
-        if (isEnterProfileNextEnabled.get()) {
-            currentState = RegistrationState.COLLECT_USER_PASSWORD
+        if (isEnterProfileNextEnabledRelay.get()) {
             backstack.goTo(CreateLoginCredentialsKey())
         }
     }
 
-    override fun onBackEvent(): Boolean {
-        if (currentState == RegistrationState.COLLECT_USER_PASSWORD) {
-            currentState = RegistrationState.COLLECT_PROFILE_DATA
-            return false // already dispatching, so just go back a screen
-        }
-        return false
-    }
-
     override fun toBundle(): StateBundle = StateBundle().apply {
-        putSerializable("currentState", currentState)
         putString("username", username.get())
         putString("password", password.get())
         putString("fullName", fullName.get())
@@ -85,7 +67,6 @@ class RegistrationViewModel(
 
     override fun fromBundle(bundle: StateBundle?) {
         bundle?.run {
-            currentState = getSerializable("currentState") as RegistrationState
             username.set(getString("username", ""))
             password.set(getString("password", ""))
             fullName.set(getString("fullName", ""))

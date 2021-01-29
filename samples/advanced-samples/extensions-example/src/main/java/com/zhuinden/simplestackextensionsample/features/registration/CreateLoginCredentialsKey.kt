@@ -9,5 +9,5 @@ import kotlinx.parcelize.Parcelize
 data class CreateLoginCredentialsKey(private val placeholder: String = "") : DefaultFragmentKey(), ScopeKey.Child {
     override fun instantiateFragment(): Fragment = CreateLoginCredentialsFragment()
 
-    override fun getParentScopes(): List<String> = listOf("registration")
+    override fun getParentScopes(): List<String> = listOf(RegistrationViewModel::class.java.name)
 }

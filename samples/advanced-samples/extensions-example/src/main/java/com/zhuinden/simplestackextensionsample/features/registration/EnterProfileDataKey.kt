@@ -9,5 +9,5 @@ import kotlinx.parcelize.Parcelize
 data class EnterProfileDataKey(private val placeholder: String = "") : DefaultFragmentKey(), ScopeKey.Child {
     override fun instantiateFragment(): Fragment = EnterProfileDataFragment()
 
-    override fun getParentScopes(): List<String> = listOf("registration")
+    override fun getParentScopes(): List<String> = listOf(RegistrationViewModel::class.java.name)
 }
