@@ -69,7 +69,7 @@ dependencies {
     }
     implementation("com.squareup.retrofit2:converter-gson:2.5.0")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
-    implementation("io.reactivex.rxjava2:rxjava:2.2.19")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.20")
     implementation("com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0")
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")

@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 
 /**
  * Created by zhuinden on 2018. 03. 03..
@@ -32,3 +34,9 @@ fun Context.showToast(text: String, duration: Int = Toast.LENGTH_LONG) {
 fun Fragment.showToast(text: String, duration: Int = Toast.LENGTH_LONG) {
     requireContext().showToast(text, duration)
 }
+
+
+inline fun <T : ViewBinding> AppCompatActivity.viewBinding(crossinline bindingInflater: (LayoutInflater) -> T) =
+    lazy(LazyThreadSafetyMode.NONE) {
+        bindingInflater.invoke(layoutInflater)
+    }

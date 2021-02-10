@@ -5,13 +5,13 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import com.zhuinden.liveevent.observe
 import com.zhuinden.simplestackexamplescoping.R
 import com.zhuinden.simplestackexamplescoping.databinding.WordListViewBinding
 import com.zhuinden.simplestackexamplescoping.utils.onClick
 import com.zhuinden.simplestackexamplescoping.utils.safe
 import com.zhuinden.simplestackexamplescoping.utils.showToast
-import com.zhuinden.simplestackexamplescoping.utils.viewBinding
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 

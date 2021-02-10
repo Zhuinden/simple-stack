@@ -2,10 +2,10 @@ package com.zhuinden.simplestackexamplescoping.features.words
 
 import android.os.Bundle
 import android.view.View
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import com.zhuinden.simplestackexamplescoping.R
 import com.zhuinden.simplestackexamplescoping.databinding.NewWordFragmentBinding
 import com.zhuinden.simplestackexamplescoping.utils.onClick
-import com.zhuinden.simplestackexamplescoping.utils.viewBinding
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 import com.zhuinden.simplestackextensions.fragmentsktx.lookup
 

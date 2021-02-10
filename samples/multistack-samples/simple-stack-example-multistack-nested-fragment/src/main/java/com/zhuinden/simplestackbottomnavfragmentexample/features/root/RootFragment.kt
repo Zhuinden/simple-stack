@@ -6,10 +6,10 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import com.zhuinden.simplestackbottomnavfragmentexample.R
 import com.zhuinden.simplestackbottomnavfragmentexample.core.navigation.FragmentStackHostFragment
 import com.zhuinden.simplestackbottomnavfragmentexample.databinding.RootFragmentBinding
-import com.zhuinden.simplestackbottomnavfragmentexample.utils.viewBinding
 import com.zhuinden.simplestackextensions.fragments.KeyedFragment
 
 class RootFragment : KeyedFragment(R.layout.root_fragment) {
