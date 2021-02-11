@@ -47,10 +47,6 @@ android {
 
         dataBinding = false
     }
-
-    packagingOptions {
-        exclude("META-INF/*.kotlin_module")
-    }
 }
 
 dependencies {
@@ -69,9 +65,9 @@ dependencies {
     implementation("com.xwray:groupie-viewbinding:2.9.0")
 
     implementation("com.github.Zhuinden:live-event:1.2.0")
-    implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.2.0")
-    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.2.0")
-    implementation("com.github.Zhuinden:rx-validateby-kt:2.1.0")
+    implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.2.1")
+    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.2.1")
+    implementation("com.github.Zhuinden:rx-validateby-kt:2.1.1")
 
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
