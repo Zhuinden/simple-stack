@@ -72,35 +72,35 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.activity:activity:1.1.0")
+    implementation("androidx.activity:activity:1.2.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // live data
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.0")
 
     // Dependencies for local unit tests
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.11.1")
     testImplementation("org.mockito:mockito-core:2.19.0")
 
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-all:1.10.19")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
 
     // Espresso UI Testing
     // Unit Tests
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
     testImplementation("org.powermock:powermock-module-junit4:1.6.5")
     // Espresso Idling Resource
 
     // Dependencies for Android unit tests
-    androidTestImplementation("junit:junit:4.13.1")
+    androidTestImplementation("junit:junit:4.13.2")
     androidTestImplementation("org.mockito:mockito-core:2.19.0")
     androidTestImplementation("com.google.dexmaker:dexmaker:1.2")
     androidTestImplementation("com.google.dexmaker:dexmaker-mockito:1.2")

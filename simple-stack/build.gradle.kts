@@ -35,12 +35,12 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     api("com.google.code.findbugs:jsr305:3.0.2")
     api("com.github.Zhuinden:state-bundle:1.4.0")
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.16.1")
     testImplementation("org.mockito:mockito-core:2.15.0")
     testImplementation("org.robolectric:robolectric:4.2.1")
     testImplementation("org.apache.maven:maven-ant-tasks:2.1.3")
-    androidTestImplementation("junit:junit:4.13.1")
+    androidTestImplementation("junit:junit:4.13.2")
 }
 
 // build a jar with source files

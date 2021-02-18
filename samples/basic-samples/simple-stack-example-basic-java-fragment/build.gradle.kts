@@ -46,5 +46,5 @@ dependencies {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
 }

@@ -45,11 +45,11 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("com.google.android.material:material:1.2.1")
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
 
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.0")
 
     implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.1.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
@@ -74,8 +74,8 @@ dependencies {
     implementation("com.jakewharton.rxbinding2:rxbinding:2.2.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.0")
 
     implementation("com.github.Zhuinden:live-event:1.2.0")
 

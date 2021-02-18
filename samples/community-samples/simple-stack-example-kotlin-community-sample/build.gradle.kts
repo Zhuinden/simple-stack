@@ -41,8 +41,8 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.core:core:1.3.2")
-    implementation("androidx.activity:activity:1.1.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.activity:activity:1.2.0")
+    implementation("androidx.fragment:fragment-ktx:1.3.0")
 
     implementation(project(":simple-stack"))
 
