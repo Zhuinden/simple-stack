@@ -10,7 +10,7 @@ android {
         minSdkVersion(9)
         targetSdkVersion(28)
         versionCode = 1
-        versionName = "0.6.0"
+        versionName = "2.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -37,7 +37,7 @@ dependencies {
     api("com.github.Zhuinden:state-bundle:1.4.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.16.1")
-    testImplementation("org.mockito:mockito-core:2.15.0")
+    testImplementation("org.mockito:mockito-core:3.8.0")
     testImplementation("org.robolectric:robolectric:4.2.1")
     testImplementation("org.apache.maven:maven-ant-tasks:2.1.3")
     androidTestImplementation("junit:junit:4.13.2")

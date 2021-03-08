@@ -1,9 +1,19 @@
 # Change log
 
--Simple Stack X.X.X (XXXX-XX-XX)
+-Simple Stack 2.6.0 (2021-03-08)
 --------------------------------
 
+- ADD: `Backstack.addRetainedObject(objectTag, retainedObject)`, `Backstack.hasRetainedObject(objectTag)`, `Backstack.removeRetainedObject(objectTag)`.
+
+This allows simpler way of persisting an object instance across configuration changes.
+
+Also, retained objects that implement `Bundleable` are given state restoration callbacks.
+
 - UPDATE: Add `simple-stack-example-multistack-nested-fragment` that shows how to create a fragment that has `Backstack`s for its child fragments, thus creating true multi-stack apps using nested backstacks.
+
+- DEPRECATED: `Backstack.addCompletionListener`, `Backstack.removeCompletionListener`, `Backstack.removeCompletionListeners`.
+
+These were the same as `addStateChangeCompletionListener` and `removeStateChangeCompletionListener`, and should not have been duplicate APIs.
 
 -Simple Stack 2.5.0 (2020-12-16)
 --------------------------------

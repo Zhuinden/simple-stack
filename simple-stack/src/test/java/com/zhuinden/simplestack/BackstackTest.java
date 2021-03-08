@@ -27,7 +27,6 @@ import com.zhuinden.simplestack.helpers.TestKeyWithScope;
 import com.zhuinden.statebundle.StateBundle;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -878,5 +878,170 @@ public class BackstackTest {
         backstack.exitScopeTo("blah", targetKey, StateChange.FORWARD);
 
         assertThat(backstack.getHistory()).containsExactly(targetKey);
+    }
+
+    @Test
+    public void retainedObjectCannotBeRegisteredWithSameKey() {
+        Object retainedObject = new Object();
+
+        Backstack backstack = new Backstack();
+        assertThat(backstack.hasRetainedObject("duplicateKey")).isFalse();
+        backstack.addRetainedObject("duplicateKey", retainedObject);
+
+        try {
+            assertThat(backstack.hasRetainedObject("duplicateKey")).isTrue();
+
+            backstack.addRetainedObject("duplicateKey", retainedObject);
+            Assert.fail("Should have thrown");
+        } catch (IllegalArgumentException e) {
+            // OK
+        }
+
+        Object obj = backstack.removeRetainedObject("duplicateKey");
+        assertThat(obj).isSameAs(retainedObject);
+    }
+
+    @Test
+    public void retainedObjectsDoRestorePendingState() {
+        TestKey initialKey = new TestKey("initialKey");
+        TestKey newKey = new TestKey("newKey");
+
+        Backstack backstack = new Backstack();
+        backstack.setup(History.of(initialKey));
+
+        class TestObject implements Bundleable {
+            private int currentState = 3;
+
+            @Nonnull
+            @Override
+            public StateBundle toBundle() {
+                StateBundle stateBundle = new StateBundle();
+                stateBundle.putInt("currentState", 5);
+                return stateBundle;
+            }
+
+            @Override
+            public void fromBundle(@Nullable StateBundle bundle) {
+                if (bundle != null) {
+                    currentState = bundle.getInt("currentState", 3);
+                }
+            }
+        }
+
+        class InvalidObject {
+        }
+
+        TestObject testObject = new TestObject();
+        TestObject testPendingObject = new TestObject();
+        TestObject testRemovedObject = new TestObject();
+
+        backstack.addRetainedObject("testObject", testObject);
+        backstack.addRetainedObject("testPendingObject", testPendingObject);
+        backstack.addRetainedObject("testRemovedObject", testRemovedObject);
+
+        assertThat(testObject.currentState).isEqualTo(3);
+        assertThat(testPendingObject.currentState).isEqualTo(3);
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull StateChanger.Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.setHistory(History.of(newKey), StateChange.REPLACE);
+
+        StateBundle bundle = backstack.toBundle();
+
+        Backstack backstack2 = new Backstack();
+        backstack2.setup(History.of(initialKey));
+
+        assertThat(testObject.currentState).isEqualTo(3);
+        backstack2.addRetainedObject("testObject", testObject);
+        assertThat(testObject.currentState).isEqualTo(3);
+
+        backstack2.fromBundle(bundle);
+        assertThat(testObject.currentState).isEqualTo(5);
+
+        try {
+            backstack2.addRetainedObject("testPendingObject", new InvalidObject());
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // OK!
+        }
+
+        assertThat(testPendingObject.currentState).isEqualTo(3);
+        backstack2.addRetainedObject("testPendingObject", testPendingObject);
+        assertThat(testPendingObject.currentState).isEqualTo(5);
+
+        backstack2.removeRetainedObject("testRemovedObject");
+        backstack2.addRetainedObject("testRemovedObject", testRemovedObject);
+        assertThat(testRemovedObject.currentState).isEqualTo(3);
+
+        backstack2.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull StateChanger.Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack2.getHistory()).containsExactly(newKey);
+    }
+
+    @Test
+    public void retainedObjectRestoringInvalidObjectFails() {
+        TestKey initialKey = new TestKey("initialKey");
+
+        Backstack backstack = new Backstack();
+        backstack.setup(History.of(initialKey));
+
+        class TestObject implements Bundleable {
+            private int currentState = 3;
+
+            @Nonnull
+            @Override
+            public StateBundle toBundle() {
+                StateBundle stateBundle = new StateBundle();
+                stateBundle.putInt("currentState", 5);
+                return stateBundle;
+            }
+
+            @Override
+            public void fromBundle(@Nullable StateBundle bundle) {
+                if (bundle != null) {
+                    currentState = bundle.getInt("currentState", 3);
+                }
+            }
+        }
+
+        class InvalidObject {
+        }
+
+        TestObject testObject = new TestObject();
+        InvalidObject invalidObject = new InvalidObject();
+
+        backstack.addRetainedObject("testObject", testObject);
+
+        assertThat(testObject.currentState).isEqualTo(3);
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull StateChanger.Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        StateBundle bundle = backstack.toBundle();
+
+        Backstack backstack2 = new Backstack();
+        backstack2.setup(History.of(initialKey));
+
+        backstack2.addRetainedObject("testObject", invalidObject);
+        try {
+            backstack2.fromBundle(bundle);
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // OK!
+        }
     }
 }

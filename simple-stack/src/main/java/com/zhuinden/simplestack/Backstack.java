@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +37,15 @@ import javax.annotation.Nullable;
 
 /**
  * The backstack manages the navigation history internally, and wraps it with the ability of persisting view state.
- *
+ * <p>
  * Based on the configuration of {@link ScopedServices}, it also holds and saves/restores the state of services bound to scopes.
- *
+ * <p>
  * The backstack is initialized with {@link Backstack#setup(List)}, and {@link Backstack#setStateChanger(StateChanger)}.
  */
 public class Backstack
         implements Bundleable {
+    private final long threadId = Thread.currentThread().getId();
+
     /**
      * Retrieves the key from the provided Context. This relies on that within the base context chain, there is at least one {@link KeyContextWrapper}.
      *
@@ -73,6 +76,7 @@ public class Backstack
     private static final String HISTORY_TAG = "HISTORY";
     private static final String STATES_TAG = "STATES";
     private static final String SCOPES_TAG = "SCOPES";
+    private static final String RETAINED_OBJECT_STATES_TAG = "RETAINED_OBJECT_STATES_TAG";
 
     static String getHistoryTag() {
         return HISTORY_TAG;
@@ -84,6 +88,10 @@ public class Backstack
 
     static String getScopesTag() {
         return SCOPES_TAG;
+    }
+
+    static String getRetainedObjectStatesTag() {
+        return RETAINED_OBJECT_STATES_TAG;
     }
 
     private Object previousTopKeyWithAssociatedScope = null;
@@ -588,13 +596,90 @@ public class Backstack
      */
     @Nonnull
     public SavedState getSavedState(@Nonnull Object key) {
-        if(key == null) {
+        if (key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
         }
-        if(!keyStateMap.containsKey(key)) {
+        if (!keyStateMap.containsKey(key)) {
             keyStateMap.put(key, SavedState.builder().setKey(key).build());
         }
         return keyStateMap.get(key);
+    }
+
+    // ----- retained objects
+
+    private final Map<String, Object> retainedObjects = new LinkedHashMap<>();
+    private final StateBundle pendingRestoredRetainedObjectStates = new StateBundle();
+
+    /**
+     * Returns if a retained object is contained for a given tag.
+     *
+     * @param objectTag the object tag
+     * @return if there is a retained object for the given tag
+     */
+    public boolean hasRetainedObject(@Nonnull String objectTag) {
+        assertCorrectThread();
+
+        return retainedObjects.containsKey(objectTag);
+    }
+
+    /**
+     * Add an object as a retained object. This will make it persist across configuration changes.
+     * <p>
+     * Retained objects that implement Bundleable will receive appropriate state registration callbacks when they're re-added.
+     * <p>
+     * Throws if an object is already found for that given object tag.
+     *
+     * @param objectTag      the object tag
+     * @param retainedObject the retained object
+     */
+    public void addRetainedObject(@Nonnull String objectTag, @Nonnull Object retainedObject) {
+        //noinspection ConstantConditions
+        if (objectTag == null) {
+            throw new NullPointerException("objectTag cannot be null!");
+        }
+
+        //noinspection ConstantConditions
+        if (retainedObject == null) {
+            throw new NullPointerException("retainedObject cannot be null!");
+        }
+
+        assertCorrectThread();
+
+        if (retainedObjects.containsKey(objectTag)) {
+            throw new IllegalArgumentException("A retained object is already added with the object tag [" + objectTag + "]");
+        }
+
+        if (pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
+            if (!(retainedObject instanceof Bundleable)) {
+                throw new IllegalStateException("State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
+            }
+
+            ((Bundleable) retainedObject).fromBundle(pendingRestoredRetainedObjectStates.getBundle(objectTag));
+            pendingRestoredRetainedObjectStates.remove(objectTag);
+        }
+
+        retainedObjects.put(objectTag, retainedObject);
+    }
+
+    /**
+     * Removes the retained object registered with the given object tag.
+     * <p>
+     * This also clears pending restored state for the given tag.
+     *
+     * @param objectTag the object tag
+     */
+    @Nullable
+    public <T> T removeRetainedObject(@Nonnull String objectTag) {
+        //noinspection ConstantConditions
+        if (objectTag == null) {
+            throw new NullPointerException("objectTag cannot be null!");
+        }
+
+        assertCorrectThread();
+
+        pendingRestoredRetainedObjectStates.remove(objectTag);
+        //noinspection unchecked
+        return (T) retainedObjects.remove(objectTag);
     }
 
     // ----- viewstate persistence
@@ -606,15 +691,17 @@ public class Backstack
      * @param view the view that belongs to a certain key
      */
     public void persistViewToState(@Nullable View view) {
-        if(view != null) {
+        assertCorrectThread();
+
+        if (view != null) {
             Object key = KeyContextWrapper.getKey(view.getContext());
-            if(key == null) {
+            if (key == null) {
                 throw new IllegalArgumentException("The view [" + view + "] contained no key in its context hierarchy. The view or its parent hierarchy should be inflated by a layout inflater from `stateChange.createContext(baseContext, key)`, or a KeyContextWrapper.");
             }
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             view.saveHierarchyState(viewHierarchyState);
             StateBundle bundle = null;
-            if(view instanceof Bundleable) {
+            if (view instanceof Bundleable) {
                 bundle = ((Bundleable) view).toBundle();
             }
             SavedState previousSavedState = getSavedState(key);
@@ -629,13 +716,15 @@ public class Backstack
      * @param view the view that belongs to a certain key
      */
     public void restoreViewFromState(@Nonnull View view) {
-        if(view == null) {
+        assertCorrectThread();
+
+        if (view == null) {
             throw new IllegalArgumentException("You cannot restore state into null view!");
         }
         Object newKey = KeyContextWrapper.getKey(view.getContext());
         SavedState savedState = getSavedState(newKey);
         view.restoreHierarchyState(savedState.getViewHierarchyState());
-        if(view instanceof Bundleable) {
+        if (view instanceof Bundleable) {
             ((Bundleable) view).fromBundle(savedState.getViewBundle());
         }
     }
@@ -692,11 +781,13 @@ public class Backstack
     public void fromBundle(@Nullable StateBundle stateBundle) {
         checkBackstack("A backstack must be set up before it is restored!");
 
-        if(stateBundle != null) {
+        assertCorrectThread();
+
+        if (stateBundle != null) {
             List<Object> keys = new ArrayList<>();
             List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(getHistoryTag());
-            if(parcelledKeys != null) {
-                for(Parcelable parcelledKey : parcelledKeys) {
+            if (parcelledKeys != null) {
+                for (Parcelable parcelledKey : parcelledKeys) {
                     keys.add(keyParceler.fromParcelable(parcelledKey));
                 }
             }
@@ -724,11 +815,36 @@ public class Backstack
             }
 
             scopeManager.setRestoredStates(stateBundle.getBundle(SCOPES_TAG));
+
+            StateBundle retainedStates = stateBundle.getBundle(RETAINED_OBJECT_STATES_TAG);
+            if (retainedStates != null) {
+                pendingRestoredRetainedObjectStates.putAll(retainedStates);
+
+                for (Map.Entry<String, Object> retainedEntry : retainedObjects.entrySet()) {
+                    String objectTag = retainedEntry.getKey();
+                    Object retainedObject = retainedEntry.getValue();
+
+                    if (pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
+                        if (!(retainedObject instanceof Bundleable)) {
+                            throw new IllegalStateException("State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
+                        }
+                        ((Bundleable) retainedObject).fromBundle(pendingRestoredRetainedObjectStates.getBundle(objectTag));
+                        pendingRestoredRetainedObjectStates.remove(objectTag);
+                    }
+                }
+            }
+        }
+    }
+
+    private void assertCorrectThread() {
+        if (Thread.currentThread().getId() != threadId) {
+            throw new IllegalStateException(
+                    "The backstack is not thread-safe, and must be manipulated only from the thread where it was originally created.");
         }
     }
 
     private void checkBackstack(String message) {
-        if(core == null) {
+        if (core == null) {
             throw new IllegalStateException(message);
         }
     }
@@ -741,25 +857,41 @@ public class Backstack
     @Nonnull
     @Override
     public StateBundle toBundle() {
+        assertCorrectThread();
+
         StateBundle stateBundle = new StateBundle();
         ArrayList<Parcelable> history = new ArrayList<>();
-        for(Object key : getHistory()) {
+        for (Object key : getHistory()) {
             history.add(keyParceler.toParcelable(key));
         }
         stateBundle.putParcelableArrayList(getHistoryTag(), history);
 
-        ArrayList<ParcelledState> states = new ArrayList<>();
-        for(SavedState savedState : keyStateMap.values()) {
+        ArrayList<ParcelledState> parcelledStates = new ArrayList<>();
+        for (SavedState savedState : keyStateMap.values()) {
             ParcelledState parcelledState = new ParcelledState();
             parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
             parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
             parcelledState.bundle = savedState.getBundle();
             parcelledState.viewBundle = savedState.getViewBundle();
-            states.add(parcelledState);
+            parcelledStates.add(parcelledState);
         }
-        stateBundle.putParcelableArrayList(getStatesTag(), states);
+        stateBundle.putParcelableArrayList(getStatesTag(), parcelledStates);
 
         stateBundle.putParcelable(getScopesTag(), scopeManager.saveStates());
+
+        StateBundle retainedObjectStates = new StateBundle();
+        for (Map.Entry<String, Object> entry : retainedObjects.entrySet()) {
+            final String objectTag = entry.getKey();
+            final Object retainedObject = entry.getValue();
+
+            if (retainedObject instanceof Bundleable) {
+                StateBundle retainedBundle = ((Bundleable) retainedObject).toBundle();
+                retainedObjectStates.putParcelable(objectTag, retainedBundle);
+            }
+        }
+
+        stateBundle.putParcelable(getRetainedObjectStatesTag(), retainedObjectStates);
+
         return stateBundle;
     }
 
@@ -938,7 +1070,7 @@ public class Backstack
     /**
      * Exits the provided scope, removing all keys that exist that include the given scope.
      *
-     * If the scope is provided by the first key in the history, then it works as {@link Backstack#jumpToRoot(direction)}.
+     * If the scope is provided by the first key in the history, then it works as {@link Backstack#jumpToRoot(int direction)}.
      *
      * @throws IllegalArgumentException when the scope does not exist.
      * @throws IllegalStateException when the backstack is still empty.
@@ -949,14 +1081,16 @@ public class Backstack
     public void exitScope(@Nonnull String scopeTag, @StateChange.StateChangeDirection int direction) {
         checkBackstack("A backstack must be set up before navigation.");
 
+        assertCorrectThread();
+
         //noinspection ConstantConditions
-        if(scopeTag == null) {
+        if (scopeTag == null) {
             throw new NullPointerException("scopeTag must not be null!");
         }
 
         History<Object> keys = getHistory();
 
-        if(keys.isEmpty()) {
+        if (keys.isEmpty()) {
             throw new IllegalStateException("Cannot exit scope [" + scopeTag + "] within an empty backstack.");
         }
 
@@ -1199,28 +1333,35 @@ public class Backstack
      * Registers the {@link Backstack.CompletionListener}.
      *
      * @param completionListener The non-null completion listener to be registered.
+     *
+     * @deprecated use {@link Backstack#addStateChangeCompletionListener(CompletionListener)}.
      */
+    @Deprecated
     public void addCompletionListener(@Nonnull Backstack.CompletionListener completionListener) {
-        checkBackstack("A backstack must be set up before adding listeners.");
-        core.addCompletionListener(completionListener);
+        addStateChangeCompletionListener(completionListener);
     }
 
     /**
      * Unregisters the {@link Backstack.CompletionListener}.
      *
      * @param completionListener The non-null completion listener to be unregistered.
+     *
+     * @deprecated use {@link Backstack#removeStateChangeCompletionListener(CompletionListener)}.
      */
+    @Deprecated
     public void removeCompletionListener(@Nonnull Backstack.CompletionListener completionListener) {
-        checkBackstack("A backstack must be set up before removing listeners.");
-        core.removeCompletionListener(completionListener);
+        removeStateChangeCompletionListener(completionListener);
     }
 
     /**
      * Unregisters all {@link Backstack.CompletionListener}s.
+     *
+     * @deprecated use {@link Backstack#removeStateChangeCompletionListener(CompletionListener)}.
      */
+    @Deprecated
     public void removeCompletionListeners() {
-        checkBackstack("A backstack must be set up before removing listeners.");
-        core.removeCompletionListeners();
+        //noinspection deprecation
+        removeAllStateChangeCompletionListeners();
     }
 
     /**
