@@ -934,10 +934,12 @@ public class BackstackTest {
         TestObject testObject = new TestObject();
         TestObject testPendingObject = new TestObject();
         TestObject testRemovedObject = new TestObject();
+        Object testNormalObject = new Object();
 
         backstack.addRetainedObject("testObject", testObject);
         backstack.addRetainedObject("testPendingObject", testPendingObject);
         backstack.addRetainedObject("testRemovedObject", testRemovedObject);
+        backstack.addRetainedObject("testNormalObject", testNormalObject);
 
         assertThat(testObject.currentState).isEqualTo(3);
         assertThat(testPendingObject.currentState).isEqualTo(3);
@@ -962,6 +964,8 @@ public class BackstackTest {
 
         backstack2.fromBundle(bundle);
         assertThat(testObject.currentState).isEqualTo(5);
+
+        backstack2.addRetainedObject("testNormalObject", testNormalObject);
 
         try {
             backstack2.addRetainedObject("testPendingObject", new InvalidObject());
