@@ -897,6 +897,16 @@ public class BackstackTest {
             // OK
         }
 
+        try {
+            backstack.getRetainedObject("blah");
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            // OK
+        }
+
+        Object currentObj = backstack.getRetainedObject("duplicateKey");
+        assertThat(currentObj).isSameAs(retainedObject);
+
         Object obj = backstack.removeRetainedObject("duplicateKey");
         assertThat(obj).isSameAs(retainedObject);
     }

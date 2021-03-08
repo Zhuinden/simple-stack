@@ -3,7 +3,7 @@
 -Simple Stack 2.6.0 (2021-03-08)
 --------------------------------
 
-- ADD: `Backstack.addRetainedObject(objectTag, retainedObject)`, `Backstack.hasRetainedObject(objectTag)`, `Backstack.removeRetainedObject(objectTag)`.
+- ADD: `Backstack.addRetainedObject(objectTag, retainedObject)`, `Backstack.hasRetainedObject(objectTag)`, `Backstack.removeRetainedObject(objectTag)`, `Backstack.getRetainedObject(objectTag)`.
 
 This allows simpler way of persisting an object instance across configuration changes.
 

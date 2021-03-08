@@ -623,6 +623,25 @@ public class Backstack
     }
 
     /**
+     * Gets the retained object with the given tag. Throws if does not exist.
+     *
+     * @param objectTag the object tag
+     * @param <T>       the type of the retained object
+     * @return the retained object
+     */
+    @Nonnull
+    public <T> T getRetainedObject(@Nonnull String objectTag) {
+        assertCorrectThread();
+
+        if (!retainedObjects.containsKey(objectTag)) {
+            throw new IllegalArgumentException("Retained object with tag [" + objectTag + "] was not found.!");
+        }
+
+        //noinspection unchecked
+        return (T) retainedObjects.get(objectTag);
+    }
+
+    /**
      * Add an object as a retained object. This will make it persist across configuration changes.
      * <p>
      * Retained objects that implement Bundleable will receive appropriate state registration callbacks when they're re-added.
