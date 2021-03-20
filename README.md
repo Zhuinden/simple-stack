@@ -57,7 +57,7 @@ or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.5.0'
+implementation 'com.github.Zhuinden:simple-stack:2.6.0'
 implementation 'com.github.Zhuinden:simple-stack-extensions:2.2.0'
 ```
 
