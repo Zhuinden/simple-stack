@@ -50,7 +50,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 ``` kotlin
 // build.gradle.kts
 implementation("com.github.Zhuinden:simple-stack:2.6.0")
-implementation("com.github.Zhuinden:simple-stack-extensions:2.1.0")
+implementation("com.github.Zhuinden:simple-stack-extensions:2.2.0")
 ```
 
 or
@@ -58,7 +58,7 @@ or
 ``` groovy
 // build.gradle
 implementation 'com.github.Zhuinden:simple-stack:2.5.0'
-implementation 'com.github.Zhuinden:simple-stack-extensions:2.1.0'
+implementation 'com.github.Zhuinden:simple-stack-extensions:2.2.0'
 ```
 
 ## How do I use it?
@@ -221,6 +221,9 @@ Whether you navigate forward or backward, or you rotate the screen, or you come 
 
 For more information, check the [wiki page](https://github.com/Zhuinden/simple-stack/wiki).
 
+## What about Jetpack Compose?
+
+See https://github.com/Zhuinden/simple-stack-compose-integration/ for a default way to use composables as screens.
 
 ## License
 
