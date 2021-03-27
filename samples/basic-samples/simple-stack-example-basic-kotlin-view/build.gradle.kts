@@ -39,7 +39,7 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.1.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.0") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
@@ -50,7 +50,7 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test:rules:1.3.0")
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("com.google.android.material:material:1.2.1")
+    implementation("com.google.android.material:material:1.3.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
 
     testImplementation("junit:junit:4.13.2")

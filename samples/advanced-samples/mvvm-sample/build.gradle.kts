@@ -74,14 +74,14 @@ dependencies {
 
     implementation("androidx.activity:activity:1.2.0")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("com.google.android.material:material:1.2.1")
+    implementation("com.google.android.material:material:1.3.0")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // live data
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
 
     // Dependencies for local unit tests
     testImplementation("junit:junit:4.13.2")

@@ -9,6 +9,7 @@ include(":samples:community-samples:simple-stack-example-kotlin-community-sample
 include(":samples:legacy-samples:simple-stack-example-multistack-view")
 include(":samples:legacy-samples:simple-stack-example-multistack-fragment")
 include(":samples:multistack-samples:simple-stack-example-multistack-nested-fragment")
-include(":samples:scoping-samples:simple-stack-example-scoping")
+include(":samples:scoping-samples:simple-stack-example-scoping-java")
+include(":samples:scoping-samples:simple-stack-example-scoping-kotlin")
 include(":samples:shared-element-samples:simple-stack-example-sharedelement-fragment")
 include(":tutorials:tutorial-sample")
