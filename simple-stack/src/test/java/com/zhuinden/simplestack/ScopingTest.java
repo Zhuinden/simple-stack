@@ -141,9 +141,19 @@ public class ScopingTest {
     }
 
     @Test
-    public void scopedServicesShouldBeSetBeforeSetup() {
+    public void scopedServicesCanBeSetBeforeInitialStateChange() {
         Backstack backstack = new Backstack();
         backstack.setup(History.of(testKey1));
+
+        backstack.setScopedServices(new ServiceProvider());
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
         try {
             backstack.setScopedServices(new ServiceProvider());
             Assert.fail();
@@ -360,8 +370,45 @@ public class ScopingTest {
         StateBundle stateBundle = backstack.toBundle();
 
         //noinspection ConstantConditions
-        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah"))
-                .isEqualTo(5); // backstack.getScopesTag() is internal
+        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah")).isEqualTo(5); // backstack.getScopesTag() is internal
+    }
+
+    @Test
+    public void scopeServicesArePersistedToStateBundleDelayedScopedServicesCall() {
+        final Backstack backstack = new Backstack();
+
+        final Service service = new Service();
+        TestKeyWithScope testKeyWithScope = new TestKeyWithScope("blah") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                assertThat(serviceBinder.getScopeTag()).isEqualTo(getScopeTag());
+                serviceBinder.addService(SERVICE_TAG, service);
+            }
+
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return "beep";
+            }
+        };
+
+        backstack.setup(History.of(testKeyWithScope));
+
+        backstack.setScopedServices(new ServiceProvider()); // !
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.hasService(testKeyWithScope.getScopeTag(), SERVICE_TAG)).isTrue();
+
+        StateBundle stateBundle = backstack.toBundle();
+
+        //noinspection ConstantConditions
+        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah")).isEqualTo(5); // backstack.getScopesTag() is internal
     }
 
     @Test

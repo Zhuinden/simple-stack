@@ -244,12 +244,14 @@ public class Backstack
 
     /**
      * Specifies a {@link ScopedServices} to allow handling the creation of scoped services.
+     * <p>
+     * Must be called before the initial state change.
      *
      * @param scopedServices the {@link ScopedServices}.
      */
     public void setScopedServices(@Nonnull ScopedServices scopedServices) {
-        if(core != null) {
-            throw new IllegalStateException("Scope provider should be set before calling `setup()`");
+        if(didRunInitialStateChange) {
+            throw new IllegalStateException("Scope provider should be set before the initial state change!");
         }
         if(scopedServices == null) {
             throw new IllegalArgumentException("The scope provider cannot be null!");
@@ -260,13 +262,15 @@ public class Backstack
     /**
      * Specifies a {@link GlobalServices} that describes the services of the global scope.
      *
+     * Must be called before the initial state change.
+     *
      * Please note that setting a {@link GlobalServices.Factory} overrides this configuration option.
      *
      * @param globalServices the {@link GlobalServices}.
      */
     public void setGlobalServices(@Nonnull GlobalServices globalServices) {
-        if(core != null) {
-            throw new IllegalStateException("Global scope services should be set before calling `setup()`");
+        if(didRunInitialStateChange) {
+            throw new IllegalStateException("Scope provider should be set before the initial state change!");
         }
         if(globalServices == null) {
             throw new IllegalArgumentException("The global services cannot be null!");
@@ -277,6 +281,8 @@ public class Backstack
     /**
      * Specifies a {@link GlobalServices.Factory} that describes the services of the global scope that are deferred until first creation.
      *
+     * Must be called before the initial state change.
+     *
      * Please note that a strong reference is kept to the factory, and the {@link Backstack} is typically preserved across configuration change.
      * It is recommended that it is NOT an anonymous inner class or normal inner class in an Activity,
      * because that could cause memory leaks.
@@ -286,8 +292,8 @@ public class Backstack
      * @param globalServiceFactory the {@link GlobalServices.Factory}.
      */
     public void setGlobalServices(@Nonnull GlobalServices.Factory globalServiceFactory) {
-        if(core != null) {
-            throw new IllegalStateException("Global scope service factory should be set before calling `setup()`");
+        if(didRunInitialStateChange) {
+            throw new IllegalStateException("Scope provider should be set before the initial state change!");
         }
         if(globalServiceFactory == null) {
             throw new IllegalArgumentException("The global service factory cannot be null!");
@@ -308,6 +314,8 @@ public class Backstack
     StateChanger stateChanger;
 
     private boolean isStateChangerAttached = false; // tracked to ensure enqueue behavior during activation dispatch.
+
+    private boolean didRunInitialStateChange = false;
 
     /**
      * Setup creates the {@link Backstack} with the specified initial keys.
@@ -331,6 +339,10 @@ public class Backstack
 
     private void initializeBackstack(StateChanger stateChanger) {
         if(stateChanger != null) {
+            if(!didRunInitialStateChange) {
+                didRunInitialStateChange = true;
+            }
+
             isStateChangerAttached = true;
             core.setStateChanger(managedStateChanger);
         }

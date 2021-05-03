@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stack 2.6.1 (2021-05-03)
+--------------------------------
+
+- CHANGE: `Backstack.setScopedServices(ScopedServices)`, `Backstack.setGlobalServices(GlobalServices)`, and `Backstack.setGlobalServices(GlobalServices.Factory)` can now be called after `setup()`, but before `setStateChanger()`.
+
+This allows setting the scoped services on the backstack instance, when using deferred initialization, before the initial state change is run.
+
 -Simple Stack 2.6.0 (2021-03-08)
 --------------------------------
 
