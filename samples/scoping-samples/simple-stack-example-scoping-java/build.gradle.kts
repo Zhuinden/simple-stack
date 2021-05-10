@@ -44,10 +44,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1")
     implementation("androidx.lifecycle:lifecycle-livedata:2.3.1")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
