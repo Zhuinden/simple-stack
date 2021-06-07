@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplemvvm"
         minSdkVersion(16)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
         versionCode = 1
         versionName = "1.0"
 
@@ -57,10 +57,10 @@ dependencies {
 
     // App's dependencies, including test
 
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core-ktx:1.3.2")
+    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("androidx.core:core-ktx:1.5.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("com.xwray:groupie:2.9.0")
     implementation("com.xwray:groupie-viewbinding:2.9.0")
 
@@ -72,10 +72,10 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.activity:activity:1.2.0")
+    implementation("androidx.activity:activity:1.2.3")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.material:material:1.3.0")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // live data

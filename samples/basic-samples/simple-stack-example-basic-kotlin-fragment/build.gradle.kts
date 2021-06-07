@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplekotlinfragment"
         minSdkVersion(16)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -46,10 +46,10 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test:rules:1.3.0")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core:1.3.2")
-    implementation("androidx.activity:activity:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("androidx.core:core:1.5.0")
+    implementation("androidx.activity:activity:1.2.3")
+    implementation("androidx.fragment:fragment-ktx:1.3.4")
 
     implementation("com.google.android.material:material:1.3.0")
     testImplementation("junit:junit:4.13.2")

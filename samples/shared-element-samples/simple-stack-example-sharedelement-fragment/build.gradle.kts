@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.example.fragmenttransitions"
         minSdkVersion(16)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
         versionCode = 1
         versionName = "1.0"
     }
@@ -33,7 +33,7 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
-    
+
     implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.1") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
@@ -44,8 +44,8 @@ dependencies {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     compileOnly("com.google.auto.value:auto-value:1.5.2")
     annotationProcessor("com.google.auto.value:auto-value:1.5.2")

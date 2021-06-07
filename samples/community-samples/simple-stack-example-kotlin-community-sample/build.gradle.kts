@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.community.simplestackkotlindaggerexample"
         minSdkVersion(16)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
         versionCode = 1
         versionName = "1.0"
 
@@ -39,10 +39,10 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
 
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core:1.3.2")
-    implementation("androidx.activity:activity:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("androidx.core:core:1.5.0")
+    implementation("androidx.activity:activity:1.2.3")
+    implementation("androidx.fragment:fragment-ktx:1.3.4")
 
     implementation(project(":simple-stack"))
 
@@ -56,7 +56,7 @@ dependencies {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("com.squareup.okhttp3:okhttp:3.14.2")
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.2")
     implementation("com.google.dagger:dagger:2.29.1")

@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.zhuinden.navigationexampleview"
         minSdkVersion(16)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -38,7 +38,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test:rules:1.3.0")
-    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.appcompat:appcompat:1.3.0")
     implementation("com.google.android.material:material:1.3.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
