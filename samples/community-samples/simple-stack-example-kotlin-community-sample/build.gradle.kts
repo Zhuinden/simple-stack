@@ -46,13 +46,13 @@ dependencies {
 
     implementation(project(":simple-stack"))
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.2") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.2") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.2") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
