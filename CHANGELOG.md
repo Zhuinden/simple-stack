@@ -1,5 +1,12 @@
 # Change log
 
+-Simple Stack 2.6.2 (2021-06-07)
+--------------------------------
+
+- ADDED: `Backstack.canSetScopeProviders()`.
+
+This is in conjunction with the 2.6.1 change, while making it safe to use them without extra checks such as `if(lastNonConfigurationInstance == null) {`.
+
 -Simple Stack 2.6.1 (2021-05-03)
 --------------------------------
 

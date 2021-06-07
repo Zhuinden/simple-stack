@@ -163,6 +163,37 @@ public class ScopingTest {
     }
 
     @Test
+    public void serviceProviderCanBeSetWorksCorrectly() {
+        Backstack backstack = new Backstack();
+
+        assertThat(backstack.canSetScopeProviders()).isTrue();
+        backstack.setup(History.of(testKey1));
+
+        assertThat(backstack.canSetScopeProviders()).isTrue();
+
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setGlobalServices(GlobalServices.builder().build());
+
+        assertThat(backstack.canSetScopeProviders()).isTrue();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.canSetScopeProviders()).isFalse();
+
+        try {
+            backstack.setScopedServices(new ServiceProvider());
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+    }
+
+    @Test
     public void scopedServicesThrowIfNoScopedServicesAreDefinedAndServicesAreToBeBound() {
         Backstack backstack = new Backstack();
         backstack.setup(History.of(testKey2));

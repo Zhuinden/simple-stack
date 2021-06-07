@@ -243,14 +243,25 @@ public class Backstack
     }
 
     /**
+     * Specifies if setting a scope provider, such as either {@link Backstack#setScopedServices(ScopedServices)} or {@link Backstack#setGlobalServices(GlobalServices)} is allowed.
+     * <p>
+     * This can be useful in case of deferred initialization, as scope providers shouldn't be set and aren't allowed once the initial state change happens.
+     *
+     * @return true if scope provider can be set
+     */
+    public final boolean canSetScopeProviders() {
+        return !didRunInitialStateChange;
+    }
+
+    /**
      * Specifies a {@link ScopedServices} to allow handling the creation of scoped services.
      * <p>
-     * Must be called before the initial state change.
+     * Must be called before the initial state change. Call {@link Backstack#canSetScopeProviders()} to see if it's allowed.
      *
      * @param scopedServices the {@link ScopedServices}.
      */
     public void setScopedServices(@Nonnull ScopedServices scopedServices) {
-        if(didRunInitialStateChange) {
+        if(!canSetScopeProviders()) {
             throw new IllegalStateException("Scope provider should be set before the initial state change!");
         }
         if(scopedServices == null) {
@@ -262,14 +273,14 @@ public class Backstack
     /**
      * Specifies a {@link GlobalServices} that describes the services of the global scope.
      *
-     * Must be called before the initial state change.
+     * Must be called before the initial state change. Call {@link Backstack#canSetScopeProviders()} to see if it's allowed.
      *
      * Please note that setting a {@link GlobalServices.Factory} overrides this configuration option.
      *
      * @param globalServices the {@link GlobalServices}.
      */
     public void setGlobalServices(@Nonnull GlobalServices globalServices) {
-        if(didRunInitialStateChange) {
+        if(!canSetScopeProviders()) {
             throw new IllegalStateException("Scope provider should be set before the initial state change!");
         }
         if(globalServices == null) {
@@ -281,7 +292,7 @@ public class Backstack
     /**
      * Specifies a {@link GlobalServices.Factory} that describes the services of the global scope that are deferred until first creation.
      *
-     * Must be called before the initial state change.
+     * Must be called before the initial state change. Call {@link Backstack#canSetScopeProviders()} to see if it's allowed.
      *
      * Please note that a strong reference is kept to the factory, and the {@link Backstack} is typically preserved across configuration change.
      * It is recommended that it is NOT an anonymous inner class or normal inner class in an Activity,
@@ -292,7 +303,7 @@ public class Backstack
      * @param globalServiceFactory the {@link GlobalServices.Factory}.
      */
     public void setGlobalServices(@Nonnull GlobalServices.Factory globalServiceFactory) {
-        if(didRunInitialStateChange) {
+        if(!canSetScopeProviders()) {
             throw new IllegalStateException("Scope provider should be set before the initial state change!");
         }
         if(globalServiceFactory == null) {
@@ -300,7 +311,6 @@ public class Backstack
         }
         this.scopeManager.setGlobalServices(globalServiceFactory);
     }
-
 
     NavigationCore core;
 
