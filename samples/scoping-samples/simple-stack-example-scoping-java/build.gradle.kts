@@ -57,7 +57,6 @@ dependencies {
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
-    implementation("com.jakewharton.rxbinding2:rxbinding:2.2.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1")
