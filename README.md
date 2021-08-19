@@ -225,6 +225,8 @@ For more information, check the [wiki page](https://github.com/Zhuinden/simple-s
 
 See https://github.com/Zhuinden/simple-stack-compose-integration/ for a default way to use composables as screens.
 
+This however is only required if ONLY composables are used, and NO fragments. When using Fragments, refer to the official [Fragment Compose interop](https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments) guide.
+
 ## License
 
     Copyright 2017-2021 Gabor Varadi
