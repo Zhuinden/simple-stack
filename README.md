@@ -221,6 +221,10 @@ Whether you navigate forward or backward, or you rotate the screen, or you come 
 
 For more information, check the [wiki page](https://github.com/Zhuinden/simple-stack/wiki).
 
+## Talk
+
+For an overview of the "why" and the "what" of what Simple-Stack offers, you can check out [this talk called `Simplified Single-Activity Apps using Simple-Stack`](https://www.youtube.com/watch?v=5ACcin1Z2HQ).
+
 ## What about Jetpack Compose?
 
 See https://github.com/Zhuinden/simple-stack-compose-integration/ for a default way to use composables as screens.
