@@ -45,6 +45,20 @@ allprojects {
 }
 ```
 
+In newer projects, you need to also update the `settings.gradle` file's `dependencyResolutionManagement` block:
+
+```
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }  // <--
+        jcenter() // Warning: this repository is going to shut down soon
+    }
+}
+```
+
 and then, add the dependency to your module's `build.gradle.kts` (or `build.gradle`):
 
 ``` kotlin
