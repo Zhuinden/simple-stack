@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion(29)
+    compileSdk = 31
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -12,8 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.fragmenttransitions"
-        minSdkVersion(16)
-        targetSdkVersion(29)
+        minSdk = 16
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
     }
@@ -44,7 +44,7 @@ dependencies {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
-    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.3.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     compileOnly("com.google.auto.value:auto-value:1.5.2")
@@ -52,13 +52,6 @@ dependencies {
     implementation("nz.bradcampbell:paperparcel:2.0.4")
     annotationProcessor("nz.bradcampbell:paperparcel-compiler:2.0.4")
     annotationProcessor("com.github.reggar:auto-value-ignore-hash-equals:1.1.4")
-    implementation("com.google.dagger:dagger:2.29.1")
-    annotationProcessor("com.google.dagger:dagger-compiler:2.29.1")
-}
-
-configurations.compile.get().dependencies.forEach { compileDependency ->
-    println("Excluding implementation dependency: ${compileDependency.name}")
-    configurations.androidTestCompile.get().dependencies.forEach {
-        configurations.androidTestCompile.get().exclude(module = compileDependency.name)
-    }
+    implementation("com.google.dagger:dagger:2.39")
+    annotationProcessor("com.google.dagger:dagger-compiler:2.39")
 }

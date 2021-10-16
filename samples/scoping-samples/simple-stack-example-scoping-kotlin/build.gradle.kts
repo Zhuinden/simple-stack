@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(29)
+    compileSdk = 31
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplescopingkotlin"
-        minSdkVersion(16)
-        targetSdkVersion(29)
+        minSdk = 16
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -42,8 +42,8 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
 
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
-    implementation("androidx.appcompat:appcompat:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    implementation("androidx.appcompat:appcompat:1.3.1")
     implementation("com.google.android.material:material:1.3.0")
     testImplementation("junit:junit:4.13.2")
 
@@ -69,7 +69,7 @@ dependencies {
 
     implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.0")
 
-    implementation("io.reactivex.rxjava2:rxjava:2.2.20")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 

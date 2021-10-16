@@ -15,6 +15,7 @@
 
         <activity
             android:name="com.community.simplestackkotlindaggerexample.application.SplashActivity"
+            android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

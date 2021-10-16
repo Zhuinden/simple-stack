@@ -1,16 +1,14 @@
 plugins {
     id("com.android.library")
-    id("com.github.dcendents.android-maven")
+    id("maven-publish")
 }
 
 android {
-    compileSdkVersion(29)
+    compileSdk = 31
 
     defaultConfig {
-        minSdkVersion(9)
-        targetSdkVersion(29)
-        versionCode = 1
-        versionName = "2.6.0"
+        minSdk = 9
+        targetSdk = 31
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -53,7 +51,7 @@ val javadoc by tasks.registering(Javadoc::class) {
     isFailOnError = false
     source = android.sourceSets["main"].java.getSourceFiles()
     classpath += project.files(android.bootClasspath.joinToString(separator = File.pathSeparator))
-    classpath += configurations.compile
+    classpath += configurations.api
 }
 
 // build a jar with javadoc
@@ -66,4 +64,17 @@ val javadocJar by tasks.registering(Jar::class) {
 artifacts {
     archives(sourcesJar)
     archives(javadocJar)
+}
+
+publishing {
+    publications {
+        register("mavenJava", MavenPublication::class) {
+            groupId = "com.github.Zhuinden"
+            artifactId = "simple-stack"
+            version = "2.6.2"
+
+            artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+            artifact(sourcesJar.get())
+        }
+    }
 }

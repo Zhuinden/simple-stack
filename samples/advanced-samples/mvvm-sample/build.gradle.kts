@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(29)
+    compileSdk = 31
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplemvvm"
-        minSdkVersion(16)
-        targetSdkVersion(29)
+        minSdk = 16
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
 
@@ -57,12 +57,12 @@ dependencies {
 
     // App's dependencies, including test
 
-    implementation("androidx.appcompat:appcompat:1.3.0")
-    implementation("androidx.core:core-ktx:1.5.0")
+    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("androidx.core:core-ktx:1.6.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("com.xwray:groupie:2.9.0")
-    implementation("com.xwray:groupie-viewbinding:2.9.0")
+    implementation("com.github.lisawray.groupie:groupie:2.10.0")
+    implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.0")
 
     implementation("com.github.Zhuinden:live-event:1.2.0")
     implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.2.1")
@@ -72,7 +72,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.activity:activity:1.2.3")
+    implementation("androidx.activity:activity:1.3.1")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.material:material:1.3.0")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
@@ -112,11 +112,11 @@ dependencies {
     implementation("androidx.test.espresso:espresso-idling-resource:3.1.0") {
         exclude(group = "javax.inject")
     }
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0") {
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0") {
         exclude(group = "javax.inject")
     }
-    androidTestImplementation("androidx.test:runner:1.3.0")
-    androidTestImplementation("androidx.test:rules:1.3.0")
+    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test:rules:1.4.0")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.1.0") {
         exclude(group = "javax.inject")
     }
