@@ -1,5 +1,6 @@
 include(":simple-stack")
 include(":samples:advanced-samples:extensions-example")
+include(":samples:advanced-samples:extensions-compose-example")
 include(":samples:advanced-samples:mvvm-sample")
 include(":samples:basic-samples:simple-stack-example-basic-java-fragment")
 include(":samples:basic-samples:simple-stack-example-basic-java-view")
