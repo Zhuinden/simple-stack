@@ -6,7 +6,9 @@ import com.zhuinden.simplestackextensionscomposesample.app.FragmentKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class EnterProfileDataKey : FragmentKey(), ScopeKey.Child {
+data class EnterProfileDataKey(
+    private val noArgsPlaceholder: String = "",
+) : FragmentKey(), ScopeKey.Child {
     override fun getParentScopes(): List<String> = listOf(RegistrationViewModel::class.java.name)
 
     override fun instantiateFragment(): Fragment = EnterProfileDataFragment()
