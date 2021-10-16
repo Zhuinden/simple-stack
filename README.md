@@ -245,6 +245,8 @@ See https://github.com/Zhuinden/simple-stack-compose-integration/ for a default 
 
 This however is only required if ONLY composables are used, and NO fragments. When using Fragments, refer to the official [Fragment Compose interop](https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments) guide.
 
+For Fragment + Simple-Stack + Compose integration, you can also check [the corresponding sample](https://github.com/Zhuinden/simple-stack/tree/ced6d11e711fa2dda85e3bd7813cb2a192f10396/samples/advanced-samples/extensions-compose-example).
+
 ## License
 
     Copyright 2017-2021 Gabor Varadi
