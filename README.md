@@ -1,3 +1,5 @@
+![simple-stack](https://user-images.githubusercontent.com/11718392/138650683-c09952fa-b9dd-4c7e-87b2-31ca542e2f69.png)
+
 # Simple Stack
 
 ## Why do I want this?
