@@ -1,6 +1,6 @@
 ![featured](https://androidweekly.net/issues/issue-489/badge)
 
-![simple-stack](https://user-images.githubusercontent.com/11718392/138650683-c09952fa-b9dd-4c7e-87b2-31ca542e2f69.png | width=400)
+![simple-stack](https://user-images.githubusercontent.com/11718392/138650683-c09952fa-b9dd-4c7e-87b2-31ca542e2f69.png)
 
 # Simple Stack
 
