@@ -133,6 +133,42 @@ class FirstFragment: KeyedFragment(R.layout.first_fragment) {
 
 After which going to the second screen is as simple as `backstack.goTo(SecondScreen())`.
 
+### Warning regarding integration against OnBackPressedDispatcher
+
+The addition of `OnBackPressedDispatcher` by Jetpack's ComponentActivity effectively breaks all code that ever relied on `onBackPressed()` due to poor design decisions.OnBackPressedDispatcher
+
+This means that in order to use `OnBackPressedDispatcher` in either Fragments or via the `BackHandler` in Compose, we need to adjust the back handling code to use the following, slightly hacky approach:
+
+``` kotlin
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private val backPressedCallback = object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@MainActivity)) {
+                this.remove() // this is the only safe way to invoke onBackPressed while cancelling the execution of this callback
+                onBackPressed() // this is the only safe way to invoke onBackPressed while cancelling the execution of this callback
+                this@MainActivity.onBackPressedDispatcher.addCallback(this) // this is the only safe way to invoke onBackPressed while cancelling the execution of this callback
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // ...
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+        // ...
+    }
+
+    @Suppress("RedundantModalityModifier")
+    override final fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed() // `OnBackPressedDispatcher` by Google effectively breaks all usages of `onBackPressed()` because they do not respect the original contract of `onBackPressed()`
+    }
+}
+```
+
+There's a chance that this will unfortunately have to become the "canonical way" of back handling in all libraries that use `onBackPressed()`.
+
+Currently, it only stands here as a "known issue" regarding `OnBackPressedDispatcher` integration.
+
+
 ## Scopes
 
 To simplify sharing data/state between screens, a screen key can implement `ScopeKey`.
