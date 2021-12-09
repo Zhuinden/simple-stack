@@ -141,7 +141,7 @@ After which going to the second screen is as simple as `backstack.goTo(SecondScr
 
 ### Warning regarding integration against OnBackPressedDispatcher
 
-The addition of `OnBackPressedDispatcher` by Jetpack's ComponentActivity effectively breaks all code that ever relied on `onBackPressed()` due to poor design decisions.OnBackPressedDispatcher
+The addition of `OnBackPressedDispatcher` by Jetpack's ComponentActivity effectively breaks all code that ever relied on `onBackPressed()` due to poor design decisions.
 
 This means that in order to use `OnBackPressedDispatcher` in either Fragments or via the `BackHandler` in Compose, we need to adjust the back handling code to use the following, slightly hacky approach:
 
