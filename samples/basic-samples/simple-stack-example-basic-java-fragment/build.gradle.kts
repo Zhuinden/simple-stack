@@ -38,9 +38,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("androidx.test:runner:1.4.0")
     androidTestImplementation("androidx.test:rules:1.4.0")
-    implementation("androidx.appcompat:appcompat:1.3.1")
-    implementation("androidx.fragment:fragment:1.3.2")
-    implementation("com.google.android.material:material:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.4.1")
+    implementation("androidx.fragment:fragment:1.4.1")
+    implementation("com.google.android.material:material:1.5.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.2") {
         exclude(module = "simple-stack") // only needed because of jitpack vs local

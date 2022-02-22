@@ -44,7 +44,7 @@ dependencies {
         exclude(module = "simple-stack") // only needed because of jitpack vs local
     }
 
-    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     compileOnly("com.google.auto.value:auto-value:1.5.2")
