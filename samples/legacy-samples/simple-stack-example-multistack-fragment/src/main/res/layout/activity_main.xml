@@ -8,7 +8,7 @@
     <RelativeLayout
         android:id="@+id/root"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></RelativeLayout>
+        android:layout_height="match_parent" />
 
     <it.sephiroth.android.library.bottomnavigation.BottomNavigation
         android:id="@+id/bottomNavigationView"
