@@ -57,17 +57,17 @@ dependencies {
     }
 
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("com.squareup.okhttp3:okhttp:3.14.2")
-    implementation("com.squareup.okhttp3:logging-interceptor:3.14.2")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.google.dagger:dagger:2.39")
 
     kapt("com.google.dagger:dagger-compiler:2.39")
 
-    implementation("com.squareup.retrofit2:retrofit:2.4.0") {
+    implementation("com.squareup.retrofit2:retrofit:2.9.0") {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import
         exclude(module = "okhttp")
     }
-    implementation("com.squareup.retrofit2:converter-gson:2.5.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0")
