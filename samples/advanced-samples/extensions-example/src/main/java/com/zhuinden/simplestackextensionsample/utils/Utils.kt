@@ -81,5 +81,3 @@ inline fun <T : Any> Observable<T>.observe(compositeDisposable: CompositeDisposa
         observer(it)
     }).addTo(compositeDisposable)
 }
-
-fun Observable<String>.isNotBlank(): Observable<Boolean> = this.map { it.isNotBlank() }

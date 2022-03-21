@@ -2,11 +2,14 @@ package com.zhuinden.simplestackextensionsample.features.registration
 
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.rxvalidatebykt.validateBy
-import com.zhuinden.simplestack.*
+import com.zhuinden.simplestack.Backstack
+import com.zhuinden.simplestack.Bundleable
+import com.zhuinden.simplestack.History
+import com.zhuinden.simplestack.ScopedServices
+import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestackextensionsample.app.AuthenticationManager
 import com.zhuinden.simplestackextensionsample.features.profile.ProfileKey
 import com.zhuinden.simplestackextensionsample.utils.get
-import com.zhuinden.simplestackextensionsample.utils.isNotBlank
 import com.zhuinden.simplestackextensionsample.utils.observe
 import com.zhuinden.simplestackextensionsample.utils.set
 import com.zhuinden.statebundle.StateBundle
@@ -32,11 +35,17 @@ class RegistrationViewModel(
     val isEnterProfileNextEnabled: Observable<Boolean> = isEnterProfileNextEnabledRelay
 
     override fun onServiceRegistered() {
-        validateBy(fullName.isNotBlank(), bio.isNotBlank()).observe(compositeDisposable) {
+        validateBy(
+            fullName.map { it.isNotBlank() },
+            bio.map { it.isNotBlank() },
+        ).observe(compositeDisposable) {
             isEnterProfileNextEnabledRelay.set(it)
         }
 
-        validateBy(username.isNotBlank(), password.isNotBlank()).observe(compositeDisposable) {
+        validateBy(
+            username.map { it.isNotBlank() },
+            password.map { it.isNotBlank() },
+        ).observe(compositeDisposable) {
             isRegisterAndLoginEnabledRelay.set(it)
         }
     }
