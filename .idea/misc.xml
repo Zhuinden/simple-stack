@@ -4,7 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Work/HomeProjects/simple-stack-demo/samples/advanced-samples/extensions-compose-example/src/main/res/layout/main_activity.xml" value="0.15833333333333333" />
-        <entry key="..\:/Work/HomeProjects/simple-stack-demo/samples/legacy-samples/simple-stack-example-multistack-fragment/src/main/res/layout/activity_main.xml" value="0.15925925925925927" />
+        <entry key="..\:/Work/HomeProjects/simple-stack-demo/samples/legacy-samples/simple-stack-example-multistack-fragment/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Work/HomeProjects/simple-stack-demo/samples/legacy-samples/simple-stack-example-multistack-fragment/src/main/res/menu/bottom_nav.xml" value="0.13697916666666668" />
         <entry key="..\:/Work/HomeProjects/simple-stack-demo/samples/legacy-samples/simple-stack-example-multistack-view/src/main/res/layout/activity_main.xml" value="0.15940685820203893" />
       </map>
     </option>

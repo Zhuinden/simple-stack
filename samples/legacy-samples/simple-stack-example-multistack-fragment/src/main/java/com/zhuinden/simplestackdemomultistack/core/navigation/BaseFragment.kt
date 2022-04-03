@@ -8,5 +8,5 @@ import androidx.fragment.app.Fragment
  */
 
 open class BaseFragment(@LayoutRes layoutId: Int) : Fragment(layoutId) {
-    fun <T : MultistackFragmentKey> getKey(): T = arguments!!.getParcelable<T>("KEY")!!
+    fun <T : MultistackFragmentKey> getKey(): T = requireArguments().getParcelable<T>("KEY")!!
 }

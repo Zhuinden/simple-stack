@@ -58,6 +58,4 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("com.google.android.material:material:1.5.0")
     implementation("com.bartoszlipinski:viewpropertyobjectanimator:1.5.0")
-
-    implementation("it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.0")
 }

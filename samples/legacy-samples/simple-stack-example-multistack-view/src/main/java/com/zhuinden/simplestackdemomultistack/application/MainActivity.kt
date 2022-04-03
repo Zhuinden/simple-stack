@@ -2,6 +2,7 @@ package com.zhuinden.simplestackdemomultistack.application
 
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.AsyncStateChanger
@@ -14,8 +15,7 @@ import com.zhuinden.simplestackdemomultistack.features.main.chromecast.ChromeCas
 import com.zhuinden.simplestackdemomultistack.features.main.cloudsync.CloudSyncKey
 import com.zhuinden.simplestackdemomultistack.features.main.list.ListKey
 import com.zhuinden.simplestackdemomultistack.features.main.mail.MailKey
-import com.zhuinden.simplestackdemomultistack.util.onMenuItemSelected
-import it.sephiroth.android.library.bottomnavigation.BottomNavigation
+
 
 class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationStateListener, AsyncStateChanger.NavigationHandler {
     lateinit var multistack: Multistack
@@ -50,8 +50,20 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
 
         multistackViewStateChanger = MultistackViewStateChanger(this, multistack, findViewById(R.id.container), this)
 
-        findViewById<BottomNavigation>(R.id.bottomNavigationView).onMenuItemSelected { menuItemId: Int, itemIndex: Int, b: Boolean ->
-            multistack.setSelectedStack(StackType.values()[itemIndex].name)
+        findViewById<View>(R.id.bbn_item1).setOnClickListener {
+            multistack.setSelectedStack(StackType.values()[0].name)
+        }
+
+        findViewById<View>(R.id.bbn_item2).setOnClickListener {
+            multistack.setSelectedStack(StackType.values()[1].name)
+        }
+
+        findViewById<View>(R.id.bbn_item3).setOnClickListener {
+            multistack.setSelectedStack(StackType.values()[2].name)
+        }
+
+        findViewById<View>(R.id.action4).setOnClickListener {
+            multistack.setSelectedStack(StackType.values()[3].name)
         }
 
         multistack.setStateChanger(AsyncStateChanger(this))
