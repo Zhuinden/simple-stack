@@ -14,9 +14,10 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class WordListFragment
         extends KeyedFragment {
@@ -29,7 +30,7 @@ public class WordListFragment
     }
 
     public interface DataProvider {
-        public LiveData<List<String>> getWordList();
+        public Observable<List<String>> getWordList();
     }
 
     private ActionHandler actionHandler;
@@ -40,6 +41,8 @@ public class WordListFragment
     private WordListAdapter adapter = new WordListAdapter();
 
     private EventSource.NotificationToken notificationToken = null;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -56,7 +59,7 @@ public class WordListFragment
 
         view.findViewById(R.id.buttonGoToAddNewWord).setOnClickListener(v -> actionHandler.onAddNewWordClicked());
 
-        dataProvider.getWordList().observe(getViewLifecycleOwner(), words -> adapter.updateWords(words));
+
     }
 
     @Override
@@ -65,13 +68,19 @@ public class WordListFragment
 
         notificationToken = controllerEvents.startListening(event -> {
             if(event instanceof WordController.Events.NewWordAdded) {
-                Toast.makeText(requireContext(), "Added " + ((WordController.Events.NewWordAdded) event).getWord(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(),
+                               "Added " + ((WordController.Events.NewWordAdded) event).getWord(),
+                               Toast.LENGTH_SHORT).show();
             }
         });
+
+        compositeDisposable.add(dataProvider.getWordList().subscribe(strings -> adapter.updateWords(strings)));
     }
 
     @Override
     public void onStop() {
+        compositeDisposable.clear();
+
         if(notificationToken != null) {
             notificationToken.stopListening();
             notificationToken = null;

@@ -73,5 +73,4 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0")
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
-    implementation("io.realm:android-adapters:3.0.0")
 }

@@ -1,5 +1,6 @@
 package com.zhuinden.simplestackexamplescoping.features.words;
 
+import com.jakewharton.rxrelay2.BehaviorRelay;
 import com.zhuinden.eventemitter.EventEmitter;
 import com.zhuinden.eventemitter.EventSource;
 import com.zhuinden.simplestack.Backstack;
@@ -14,12 +15,13 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import io.reactivex.Observable;
 
 public class WordController
         implements NewWordFragment.ActionHandler, WordListFragment.ActionHandler, WordListFragment.DataProvider, Bundleable {
-    private final MutableLiveData<List<String>> words = new MutableLiveData<>(Arrays.asList("Bogus", "Magic", "Scoping mechanisms"));
+    private final BehaviorRelay<List<String>> words = BehaviorRelay.createDefault(Arrays.asList("Bogus",
+                                                                                                "Magic",
+                                                                                                "Scoping mechanisms"));
     private final EventEmitter<Events> wordEventEmitter = new EventEmitter<>();
 
     private final Backstack backstack;
@@ -45,7 +47,7 @@ public class WordController
     @Override
     public void fromBundle(@Nullable StateBundle bundle) {
         if(bundle != null) {
-            words.setValue(Collections.unmodifiableList(bundle.getStringArrayList("words")));
+            words.accept(Collections.unmodifiableList(bundle.getStringArrayList("words")));
         }
     }
 
@@ -57,7 +59,7 @@ public class WordController
         //noinspection ConstantConditions
         List<String> list = new ArrayList<>(words.getValue());
         list.add(word);
-        words.setValue(Collections.unmodifiableList(list));
+        words.accept(Collections.unmodifiableList(list));
         wordEventEmitter.emit(new Events.NewWordAdded(word));
         backstack.goBack();
     }
@@ -68,7 +70,7 @@ public class WordController
     }
 
     @Override
-    public LiveData<List<String>> getWordList() {
+    public Observable<List<String>> getWordList() {
         return words;
     }
 
