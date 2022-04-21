@@ -81,7 +81,8 @@ afterEvaluate {
                 artifact(sourcesJar.get())
 
                 pom.withXml {
-                    val dependenciesNode = asNode().appendNode("dependencies")
+                    val dependenciesNode: groovy.util.Node =
+                        (asNode().get("dependencies") as groovy.util.NodeList).get(0) as groovy.util.Node
                     val configurationNames = arrayOf("implementation", "api")
 
                     configurationNames.forEach { configurationName ->
@@ -91,6 +92,7 @@ afterEvaluate {
                                 dependencyNode.appendNode("groupId", it.group)
                                 dependencyNode.appendNode("artifactId", it.name)
                                 dependencyNode.appendNode("version", it.version)
+                                dependencyNode.appendNode("scope", configurationName)
                             }
                         }
                     }
