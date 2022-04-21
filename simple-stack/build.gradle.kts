@@ -48,6 +48,9 @@ val sourcesJar by tasks.registering(Jar::class) {
 }
 
 val javadoc by tasks.registering(Javadoc::class) {
+    configurations.implementation.get().isCanBeResolved = true
+    configurations.api.get().isCanBeResolved = true
+
     isFailOnError = false
     source = android.sourceSets["main"].java.getSourceFiles()
     classpath += project.files(android.bootClasspath.joinToString(separator = File.pathSeparator))
