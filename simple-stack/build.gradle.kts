@@ -75,7 +75,7 @@ afterEvaluate {
             register("mavenJava", MavenPublication::class) {
                 groupId = "com.github.Zhuinden"
                 artifactId = "simple-stack"
-                version = "2.6.3"
+                version = "2.6.4"
 
                 from(components["release"])
                 artifact(sourcesJar.get())
@@ -87,12 +87,12 @@ afterEvaluate {
 
                     configurationNames.forEach { configurationName ->
                         configurations[configurationName].allDependencies.forEach {
-                            if (it.group != null && it.version != "unspecified") {
+                            if (it.group != null) {
                                 val dependencyNode = dependenciesNode.appendNode("dependency")
                                 dependencyNode.appendNode("groupId", it.group)
                                 dependencyNode.appendNode("artifactId", it.name)
                                 dependencyNode.appendNode("version", it.version)
-                                dependencyNode.appendNode("scope", configurationName)
+                                //dependencyNode.appendNode("scope", configurationName)
                             }
                         }
                     }
