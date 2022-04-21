@@ -40,10 +40,10 @@ dependencies {
     implementation("com.google.android.material:material:1.5.0")
     testImplementation("junit:junit:4.13.2")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.4") {
         exclude(module = "simple-stack")
     }
 
@@ -51,7 +51,7 @@ dependencies {
 
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
 
-    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.41")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
