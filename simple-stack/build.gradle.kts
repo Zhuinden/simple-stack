@@ -77,7 +77,7 @@ afterEvaluate {
                 artifactId = "simple-stack"
                 version = "2.6.3"
 
-                artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+                from(components["release"])
                 artifact(sourcesJar.get())
 
                 pom.withXml {
