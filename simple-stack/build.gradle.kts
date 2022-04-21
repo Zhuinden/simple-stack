@@ -80,19 +80,13 @@ afterEvaluate {
                 artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
                 artifact(sourcesJar.get())
 
-                pom {
-                    withXml {
-                        val dependenciesNode = asNode().appendNode("dependencies")
-                        configurations.getByName("implementation") {
-                            dependencies.forEach {
-                                val dependencyNode = dependenciesNode.appendNode("dependency")
-                                dependencyNode.appendNode("groupId", it.group)
-                                dependencyNode.appendNode("artifactId", it.name)
-                                dependencyNode.appendNode("version", it.version)
-                            }
-                        }
-                        configurations.getByName("api") {
-                            dependencies.forEach {
+                pom.withXml {
+                    val dependenciesNode = asNode().appendNode("dependencies")
+                    val configurationNames = arrayOf("implementation", "api")
+
+                    configurationNames.forEach { configurationName ->
+                        configurations[configurationName].allDependencies.forEach {
+                            if (it.group != null && it.version != "unspecified") {
                                 val dependencyNode = dependenciesNode.appendNode("dependency")
                                 dependencyNode.appendNode("groupId", it.group)
                                 dependencyNode.appendNode("artifactId", it.name)
@@ -105,3 +99,4 @@ afterEvaluate {
         }
     }
 }
+
