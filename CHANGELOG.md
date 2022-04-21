@@ -1,5 +1,11 @@
 # Change log
 
+-Simple Stack 2.6.3 (2022-04-21)
+--------------------------------
+
+- FIX: Attempt at fixing a crash related to `LinkedHashMap.retainAll()` specifically on Android 6 and Android 6.1 devices (#256).
+
+
 -Simple Stack 2.6.2 (2021-06-07)
 --------------------------------
 

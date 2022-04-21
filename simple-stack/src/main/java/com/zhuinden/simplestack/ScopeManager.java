@@ -542,8 +542,8 @@ class ScopeManager {
             }
         }
 
-        trackedKeys.retainAll(newKeys);
-        dummyScopeTags.keySet().retainAll(newKeys);
+        CollectionHelper.retainAll(trackedKeys, newKeys); // see #256
+        CollectionHelper.retainAll(dummyScopeTags.keySet(), newKeys); // see #256
 
         for(String currentScope : currentScopes) {
             if(activeScopes.contains(currentScope)) {

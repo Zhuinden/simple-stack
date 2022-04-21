@@ -26,6 +26,6 @@ public class DefaultStateClearStrategy
         implements Backstack.StateClearStrategy {
     @Override
     public void clearStatesNotIn(@Nonnull Map<Object, SavedState> keyStateMap, @Nonnull StateChange stateChange) {
-        keyStateMap.keySet().retainAll(stateChange.getNewKeys());
+        CollectionHelper.retainAll(keyStateMap.keySet(), stateChange.getNewKeys()); // see #256
     }
 }

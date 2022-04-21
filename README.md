@@ -20,7 +20,7 @@ This allows preserving your navigation history across configuration changes and 
 
 Each screen can be associated with a scope, or a shared scope - to easily share data between screens.
 
-This simplifies navigation and state management within an Activity using fragments, views, or whatever else.
+This simplifies navigation and state management within an Activity using either fragments, views, or whatever else.
 
 ## Using Simple Stack
 
@@ -69,7 +69,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.6.2")
+implementation("com.github.Zhuinden:simple-stack:2.6.3")
 implementation("com.github.Zhuinden:simple-stack-extensions:2.2.2")
 ```
 
@@ -77,7 +77,7 @@ or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.6.2'
+implementation 'com.github.Zhuinden:simple-stack:2.6.3'
 implementation 'com.github.Zhuinden:simple-stack-extensions:2.2.2'
 ```
 

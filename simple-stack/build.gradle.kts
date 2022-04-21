@@ -71,7 +71,7 @@ publishing {
         register("mavenJava", MavenPublication::class) {
             groupId = "com.github.Zhuinden"
             artifactId = "simple-stack"
-            version = "2.6.2"
+            version = "2.6.3"
 
             artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
             artifact(sourcesJar.get())
