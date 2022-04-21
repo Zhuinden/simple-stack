@@ -39,8 +39,17 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.2") {
-        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.3") {
+        exclude(module = "simple-stack")
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.3") {
+        exclude(module = "simple-stack")
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.3") {
+        exclude(module = "simple-stack")
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.3") {
+        exclude(module = "simple-stack")
     }
 
     implementation("androidx.core:core:1.7.0")

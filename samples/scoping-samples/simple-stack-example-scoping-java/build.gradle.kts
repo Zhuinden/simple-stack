@@ -40,11 +40,11 @@ dependencies {
     implementation("com.google.android.material:material:1.5.0")
     testImplementation("junit:junit:4.13.2")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.2") {
-        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.3") {
+        exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.2") {
-        exclude(module = "simple-stack") // only needed because of jitpack vs local
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.3") {
+        exclude(module = "simple-stack")
     }
 
     implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.0")

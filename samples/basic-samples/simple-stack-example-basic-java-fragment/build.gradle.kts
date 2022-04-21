@@ -42,9 +42,14 @@ dependencies {
     implementation("androidx.fragment:fragment:1.4.1")
     implementation("com.google.android.material:material:1.5.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.2") {
-        exclude(module = "simple-stack") // only needed because of jitpack vs local
+
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.3") {
+        exclude(module = "simple-stack")
     }
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.3") {
+        exclude(module = "simple-stack")
+    }
+
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
     testImplementation("junit:junit:4.13.2")
 }
