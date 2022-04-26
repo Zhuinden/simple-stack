@@ -53,6 +53,14 @@ public class CollectionHelperTest {
         public String getB() {
             return b;
         }
+
+        @Override
+        public String toString() {
+            return "PlaceholderClass{" +
+                    "a='" + a + '\'' +
+                    ", b='" + b + '\'' +
+                    '}';
+        }
     }
 
     @Test
@@ -68,9 +76,20 @@ public class CollectionHelperTest {
         list.add(new PlaceholderClass("aaaaaaaa1", "bbbbbbb1"));
         list.add(new PlaceholderClass("aaaaaaaa5", "bbbbbbb5"));
 
+        Set<PlaceholderClass> items2 = new LinkedHashSet<>();
+        items2.add(new PlaceholderClass("aaaaaaaa1", "bbbbbbb1"));
+        items2.add(new PlaceholderClass("aaaaaaaa2", "bbbbbbb2"));
+        items2.add(new PlaceholderClass("aaaaaaaa3", "bbbbbbb3"));
+        items2.add(new PlaceholderClass("aaaaaaaa4", "bbbbbbb4"));
+        items2.add(new PlaceholderClass("aaaaaaaa5", "bbbbbbb5"));
+
         CollectionHelper.retainAll(items, list);
+        items2.retainAll(list);
 
         assertThat(items).containsExactly(new PlaceholderClass("aaaaaaaa1", "bbbbbbb1"),
                                           new PlaceholderClass("aaaaaaaa5", "bbbbbbb5"));
+        assertThat(items2).containsExactly(new PlaceholderClass("aaaaaaaa1", "bbbbbbb1"),
+                                           new PlaceholderClass("aaaaaaaa5", "bbbbbbb5"));
+        assertThat(items).containsExactlyElementsOf(items2);
     }
 }
