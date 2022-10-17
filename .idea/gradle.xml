@@ -38,7 +38,6 @@
             <option value="$PROJECT_DIR$/tutorials/tutorial-sample" />
           </set>
         </option>
-        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

@@ -23,8 +23,7 @@ class AuthenticationManager(
 
     fun getAuthenticatedUser(): String =
         checkNotNull(
-            sharedPreferences.getString(KEY_USERNAME, "").takeIf { it!!.isNotEmpty() }
-        )
+            sharedPreferences.getString(KEY_USERNAME, "")?.takeIf { it.isNotEmpty() }, { "Username should not be null" })
 
     companion object {
         private const val KEY_USERNAME = "username"
