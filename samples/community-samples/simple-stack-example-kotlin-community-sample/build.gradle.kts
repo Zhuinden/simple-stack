@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -39,10 +39,10 @@ android {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
 
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("androidx.core:core:1.7.0")
-    implementation("androidx.activity:activity:1.4.0")
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("androidx.core:core:1.9.0")
+    implementation("androidx.activity:activity:1.6.0")
+    implementation("androidx.fragment:fragment-ktx:1.5.3")
 
     implementation(project(":simple-stack"))
 
@@ -66,11 +66,11 @@ dependencies {
     }
 
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    implementation("com.google.dagger:dagger:2.39")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    implementation("com.google.dagger:dagger:2.42")
 
-    kapt("com.google.dagger:dagger-compiler:2.39")
+    kapt("com.google.dagger:dagger-compiler:2.42")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0") {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import

@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -53,9 +53,9 @@ dependencies {
         exclude(module = "simple-stack")
     }
 
-    implementation("androidx.appcompat:appcompat:1.4.1")
+    implementation("androidx.appcompat:appcompat:1.5.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("com.google.dagger:dagger:2.41")
-    annotationProcessor("com.google.dagger:dagger-compiler:2.41")
+    implementation("com.google.dagger:dagger:2.42")
+    annotationProcessor("com.google.dagger:dagger-compiler:2.42")
 }

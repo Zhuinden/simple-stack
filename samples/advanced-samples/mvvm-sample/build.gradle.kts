@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplemvvm"
@@ -75,8 +75,8 @@ dependencies {
 
     // App's dependencies, including test
 
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("com.github.lisawray.groupie:groupie:2.10.0")
@@ -90,16 +90,16 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.activity:activity:1.4.0")
+    implementation("androidx.activity:activity:1.6.0")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("com.google.android.material:material:1.6.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // live data
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     // Dependencies for local unit tests
     testImplementation("junit:junit:4.13.2")

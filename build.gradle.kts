@@ -10,11 +10,11 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.android.tools.build:gradle:7.2.2")
         classpath("me.tatarka:gradle-retrolambda:3.7.0")
-        classpath("io.realm:realm-gradle-plugin:10.1.0")
-        classpath("io.realm:realm-transformer:10.1.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
+        classpath("io.realm:realm-gradle-plugin:10.12.0")
+        classpath("io.realm:realm-transformer:10.12.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

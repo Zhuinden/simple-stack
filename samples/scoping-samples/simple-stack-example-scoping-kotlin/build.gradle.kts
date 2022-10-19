@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplescopingkotlin"
@@ -43,13 +43,13 @@ dependencies {
     implementation(project(":simple-stack"))
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("com.google.android.material:material:1.6.1")
     testImplementation("junit:junit:4.13.2")
 
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.4") {
         exclude(module = "simple-stack")
@@ -70,14 +70,14 @@ dependencies {
         exclude(module = "simple-stack")
     }
 
-    implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.0")
+    implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.1")
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     implementation("com.github.Zhuinden:live-event:1.2.0")
 

@@ -7,7 +7,7 @@ plugins {
 
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -52,14 +52,14 @@ dependencies {
         exclude(module = "simple-stack")
     }
 
-    implementation("androidx.core:core:1.7.0")
-    implementation("androidx.activity:activity:1.4.0")
+    implementation("androidx.core:core:1.9.0")
+    implementation("androidx.activity:activity:1.6.0")
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("androidx.test:runner:1.4.0")
     androidTestImplementation("androidx.test:rules:1.4.0")
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("com.google.android.material:material:1.6.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
 
     testImplementation("junit:junit:4.13.2")
