@@ -12,6 +12,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -49,6 +51,8 @@ dependencies {
 
     implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.1")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
@@ -57,5 +61,5 @@ dependencies {
 
     implementation("com.github.Zhuinden:event-emitter:1.3.0")
 
-
+    implementation("androidx.multidex:multidex:2.0.1")
 }

@@ -19,13 +19,12 @@ android {
         }
     }
 
-    lintOptions {
-        isAbortOnError = false
-    }
-
     compileOptions {
         this.sourceCompatibility = JavaVersion.VERSION_1_7
         this.targetCompatibility = JavaVersion.VERSION_1_7
+    }
+    lint {
+        abortOnError = false
     }
 }
 

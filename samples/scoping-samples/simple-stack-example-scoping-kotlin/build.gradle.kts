@@ -15,6 +15,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -78,6 +80,8 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
+
+    implementation("androidx.multidex:multidex:2.0.1")
 
     implementation("com.github.Zhuinden:live-event:1.2.0")
 

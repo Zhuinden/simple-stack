@@ -10,7 +10,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.2.2")
+        classpath("com.android.tools.build:gradle:7.3.1")
         classpath("me.tatarka:gradle-retrolambda:3.7.0")
         classpath("io.realm:realm-gradle-plugin:10.12.0")
         classpath("io.realm:realm-transformer:10.12.0")
