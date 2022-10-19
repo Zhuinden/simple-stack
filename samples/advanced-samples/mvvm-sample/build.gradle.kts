@@ -82,7 +82,7 @@ dependencies {
     implementation("com.github.lisawray.groupie:groupie:2.10.0")
     implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.0")
 
-    implementation("com.github.Zhuinden:live-event:1.2.0")
+    implementation("com.github.Zhuinden:live-event:1.3.0")
     implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.2.1")
     implementation("com.github.Zhuinden:rx-combinetuple-kt:1.2.1")
     implementation("com.github.Zhuinden:rx-validateby-kt:2.1.1")

@@ -83,7 +83,7 @@ dependencies {
 
     implementation("androidx.multidex:multidex:2.0.1")
 
-    implementation("com.github.Zhuinden:live-event:1.2.0")
+    implementation("com.github.Zhuinden:live-event:1.3.0")
 
 
 }
