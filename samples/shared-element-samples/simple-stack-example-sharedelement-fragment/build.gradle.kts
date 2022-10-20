@@ -56,6 +56,6 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.5.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("com.google.dagger:dagger:2.42")
-    annotationProcessor("com.google.dagger:dagger-compiler:2.42")
+    implementation("com.google.dagger:dagger:2.44")
+    annotationProcessor("com.google.dagger:dagger-compiler:2.44")
 }

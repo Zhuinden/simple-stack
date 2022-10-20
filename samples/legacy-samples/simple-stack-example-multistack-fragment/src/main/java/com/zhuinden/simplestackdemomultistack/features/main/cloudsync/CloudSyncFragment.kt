@@ -16,7 +16,7 @@ class CloudSyncFragment : BaseFragment(R.layout.cloudsync_fragment) {
         val binding = CloudsyncFragmentBinding.bind(view)
 
         binding.buttonFirst.onClick {
-            backstack.goTo(AnotherKey())
+            backstack.goTo(AnotherKey)
         }
     }
 }

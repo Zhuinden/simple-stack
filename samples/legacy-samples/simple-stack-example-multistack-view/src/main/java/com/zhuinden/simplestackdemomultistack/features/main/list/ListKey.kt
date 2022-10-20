@@ -6,7 +6,7 @@ import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackViewKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ListKey(private val placeholder: String = "") : MultistackViewKey() {
+data object ListKey : MultistackViewKey() {
     override fun layout(): Int = R.layout.list_view
     override fun stackIdentifier(): String = MainActivity.StackType.LIST.name
 }

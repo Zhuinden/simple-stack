@@ -6,7 +6,7 @@ import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackFragment
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ListKey(private val placeholder: String = "") : MultistackFragmentKey() {
+data object ListKey : MultistackFragmentKey() {
     override fun stackIdentifier(): String = MainActivity.StackType.LIST.name
 
     override fun createFragment(): BaseFragment = ListFragment()

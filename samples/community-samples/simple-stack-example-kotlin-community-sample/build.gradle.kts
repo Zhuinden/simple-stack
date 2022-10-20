@@ -26,6 +26,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    kotlinOptions {
+        jvmTarget = "1.8"
+        languageVersion = "1.8" // data objects
+    }
+
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -70,9 +76,9 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    implementation("com.google.dagger:dagger:2.42")
+    implementation("com.google.dagger:dagger:2.44")
 
-    kapt("com.google.dagger:dagger-compiler:2.42")
+    kapt("com.google.dagger:dagger-compiler:2.44")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0") {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import

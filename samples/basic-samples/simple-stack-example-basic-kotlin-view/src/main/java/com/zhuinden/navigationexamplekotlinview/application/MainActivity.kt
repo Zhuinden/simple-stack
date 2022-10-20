@@ -22,22 +22,22 @@ class MainActivity : AppCompatActivity() {
         binding.navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    backstack.replaceHistory(HomeKey())
+                    backstack.replaceHistory(HomeKey)
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.navigation_dashboard -> {
-                    backstack.replaceHistory(DashboardKey())
+                    backstack.replaceHistory(DashboardKey)
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.navigation_notifications -> {
-                    backstack.replaceHistory(NotificationKey())
+                    backstack.replaceHistory(NotificationKey)
                     return@setOnNavigationItemSelectedListener true
                 }
             }
             false
         }
 
-        Navigator.install(this, binding.container, History.single(HomeKey()))
+        Navigator.install(this, binding.container, History.single(HomeKey))
     }
 
     override fun onBackPressed() {

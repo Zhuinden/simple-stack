@@ -29,9 +29,9 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         binding.navigation.setOnNavigationItemSelectedListener { item ->
             val destination = when (item.itemId) {
-                R.id.navigation_home -> HomeKey()
-                R.id.navigation_dashboard -> DashboardKey()
-                R.id.navigation_notifications -> NotificationKey()
+                R.id.navigation_home -> HomeKey
+                R.id.navigation_dashboard -> DashboardKey
+                R.id.navigation_notifications -> NotificationKey
                 else -> null
             }
 
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
-            .install(this, binding.container, History.single(HomeKey()))
+            .install(this, binding.container, History.single(HomeKey))
     }
 
     override fun onBackPressed() {

@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
  * Created by Owner on 2017. 06. 29..
  */
 @Parcelize
-data class OtherKey(private val placeholder: String = "") : BaseKey() {
+data object OtherKey : BaseKey() {
     override fun layout(): Int = R.layout.other_view
 
     override fun viewChangeHandler(): ViewChangeHandler = SegueViewChangeHandler()

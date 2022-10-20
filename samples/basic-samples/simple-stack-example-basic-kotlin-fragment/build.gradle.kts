@@ -17,6 +17,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    kotlinOptions {
+        jvmTarget = "1.8"
+        languageVersion = "1.8" // data objects
+    }
+
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false

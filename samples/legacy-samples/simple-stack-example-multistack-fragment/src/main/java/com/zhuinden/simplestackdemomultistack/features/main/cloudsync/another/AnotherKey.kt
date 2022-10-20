@@ -6,7 +6,7 @@ import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackFragment
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AnotherKey(private val placeholder: String = "") : MultistackFragmentKey() {
+data object AnotherKey : MultistackFragmentKey() {
     override fun stackIdentifier(): String = MainActivity.StackType.CLOUDSYNC.name
 
     override fun createFragment(): BaseFragment = AnotherFragment()

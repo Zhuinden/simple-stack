@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
                 this, binding.step9Root, History.of(
                 when {
                     authenticationManager.isAuthenticated() -> ProfileKey(authenticationManager.getAuthenticatedUser())
-                    else -> LoginKey()
+                    else -> LoginKey
                 }
             ))
     }

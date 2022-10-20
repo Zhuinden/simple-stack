@@ -2,11 +2,7 @@ package com.zhuinden.simplestackextensionsample.features.login
 
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.rxvalidatebykt.validateBy
-import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.ScopedServices
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestackextensionsample.app.AuthenticationManager
 import com.zhuinden.simplestackextensionsample.features.profile.ProfileKey
 import com.zhuinden.simplestackextensionsample.features.registration.EnterProfileDataKey
@@ -50,7 +46,7 @@ class LoginViewModel(
     }
 
     fun onRegisterClicked() {
-        backstack.goTo(EnterProfileDataKey())
+        backstack.goTo(EnterProfileDataKey)
     }
 
     override fun toBundle(): StateBundle = StateBundle().apply {

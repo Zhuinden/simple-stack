@@ -6,7 +6,7 @@ import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackViewKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ChromeCastKey(private val placeholder: String = "") : MultistackViewKey() {
+data object ChromeCastKey : MultistackViewKey() {
     override fun layout(): Int = R.layout.chromecast_view
     override fun stackIdentifier(): String = MainActivity.StackType.CHROMECAST.name
 }

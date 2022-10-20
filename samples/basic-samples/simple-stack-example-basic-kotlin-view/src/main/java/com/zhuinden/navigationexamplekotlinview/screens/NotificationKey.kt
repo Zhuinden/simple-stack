@@ -8,6 +8,6 @@ import kotlinx.parcelize.Parcelize
  * Created by Owner on 2017. 06. 29..
  */
 @Parcelize
-data class NotificationKey(private val placeholder: String = "") : BaseKey() {
+data object NotificationKey : BaseKey() {
     override fun layout(): Int = R.layout.notification_view
 }

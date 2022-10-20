@@ -42,6 +42,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        languageVersion = "1.8" // data objects
     }
 
     buildFeatures {

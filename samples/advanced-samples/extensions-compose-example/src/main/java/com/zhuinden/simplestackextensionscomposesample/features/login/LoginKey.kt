@@ -9,7 +9,7 @@ import com.zhuinden.simplestackextensionscomposesample.app.FragmentKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class LoginKey(private val noArgsPlaceholder: String = "") : FragmentKey() {
+data object LoginKey : FragmentKey() {
     @Suppress("RemoveExplicitTypeArguments")
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {

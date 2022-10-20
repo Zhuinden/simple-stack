@@ -6,7 +6,7 @@ import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackViewKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MailKey(private val placeholder: String = "") : MultistackViewKey() {
+data object MailKey : MultistackViewKey() {
     override fun layout(): Int = R.layout.mail_view
     override fun stackIdentifier(): String = MainActivity.StackType.MAIL.name
 }

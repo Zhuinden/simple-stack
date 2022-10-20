@@ -29,7 +29,7 @@ class HomeView : RelativeLayout {
         binding = HomeViewBinding.bind(this)
 
         binding.buttonHome.onClick {
-            backstack.goTo(OtherKey())
+            backstack.goTo(OtherKey)
         }
 
         val homeKey = Backstack.getKey<HomeKey>(context) // get args

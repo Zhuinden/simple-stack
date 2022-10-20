@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
  * Created by Zhuinden on 2018.09.17.
  */
 @Parcelize
-data class NewWordKey(val placeholder: String = "") : BaseKey() {
+data object NewWordKey : BaseKey() {
     override fun instantiateFragment(): Fragment = NewWordFragment()
 
     override fun bindServices(serviceBinder: ServiceBinder) {}

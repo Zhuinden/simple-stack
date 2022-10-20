@@ -30,7 +30,7 @@ class CloudSyncView : RelativeLayout {
         super.onFinishInflate()
 
         findViewById<View>(R.id.buttonFirst).onClick {
-            backstack.goTo(AnotherKey())
+            backstack.goTo(AnotherKey)
         }
     }
 }

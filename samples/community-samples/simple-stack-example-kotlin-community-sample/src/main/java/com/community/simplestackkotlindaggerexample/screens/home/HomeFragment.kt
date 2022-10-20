@@ -17,7 +17,7 @@ class HomeFragment : KeyedFragment(R.layout.fragment_home) {
         val binding = FragmentHomeBinding.bind(view)
 
         binding.buttonLoadUsers.onClick {
-            backstack.goTo(UsersKey())
+            backstack.goTo(UsersKey)
         }
     }
 }

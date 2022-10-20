@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
                 this, androidContentFrame, History.of(
                     when {
                         authenticationManager.isAuthenticated() -> ProfileKey(authenticationManager.getAuthenticatedUser())
-                        else -> LoginKey()
+                        else -> LoginKey
                     }
                 )
             )

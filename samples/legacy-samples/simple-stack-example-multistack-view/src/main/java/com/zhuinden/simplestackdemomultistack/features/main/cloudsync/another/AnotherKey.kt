@@ -6,7 +6,7 @@ import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackViewKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AnotherKey(private val placeholder: String = "") : MultistackViewKey() {
+data object AnotherKey : MultistackViewKey() {
     override fun layout(): Int = R.layout.another_view
     override fun stackIdentifier(): String = MainActivity.StackType.CLOUDSYNC.name
 }

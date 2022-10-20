@@ -31,10 +31,10 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         this.multistack = (lastCustomNonConfigurationInstance as Multistack?)
             ?: Multistack().apply {
-                add(CloudSyncKey())
-                add(ChromeCastKey())
-                add(MailKey())
-                add(ListKey())
+                add(CloudSyncKey)
+                add(ChromeCastKey)
+                add(MailKey)
+                add(ListKey)
 
                 if (savedInstanceState != null) {
                     fromBundle(savedInstanceState.getParcelable("multistack"))

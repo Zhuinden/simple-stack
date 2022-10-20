@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
             .setScopedServices(DefaultServiceProvider())
-            .install(this, binding.container, History.of(WordListKey()))
+            .install(this, binding.container, History.of(WordListKey))
     }
 
     override fun onBackPressed() {

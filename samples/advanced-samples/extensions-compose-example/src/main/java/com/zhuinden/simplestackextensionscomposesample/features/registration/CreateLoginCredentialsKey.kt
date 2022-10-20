@@ -6,9 +6,7 @@ import com.zhuinden.simplestackextensionscomposesample.app.FragmentKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class CreateLoginCredentialsKey(
-    private val noArgsPlaceholder: String = "",
-) : FragmentKey(), ScopeKey.Child {
+data object CreateLoginCredentialsKey : FragmentKey(), ScopeKey.Child {
     override fun getParentScopes(): List<String> = listOf(RegistrationViewModel::class.java.name)
 
     override fun instantiateFragment(): Fragment = CreateLoginCredentialsFragment()

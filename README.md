@@ -128,11 +128,39 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 }
 ```
 
-Where `FirstScreen` looks like this:
+Where `FirstScreen` looks like this (assuming you have `data object` enabled):
+
+```groovy
+    kotlinOptions {
+    jvmTarget = "1.8"
+    languageVersion = '1.8' // data objects
+}
+```
+
+```kotlin
+// no args
+@Parcelize
+data object FirstScreen : DefaultFragmentKey() {
+    override fun instantiateFragment(): Fragment = FirstFragment()
+}
+```
+
+If you don't have `data object` support yet, then no-args keys look like this (to ensure stable
+hashCode/equals/toString):
 
 ``` kotlin
-@Parcelize // typically data class
-class FirstScreen: DefaultFragmentKey() {
+// no args
+@Parcelize
+data class FirstScreen(private val noArgsPlaceholder: String = ""): DefaultFragmentKey() {
+    override fun instantiateFragment(): Fragment = FirstFragment()
+}
+
+// has args
+@Parcelize
+data class FirstScreen(
+    val username: String, 
+    val password: String,
+): DefaultFragmentKey() {
     override fun instantiateFragment(): Fragment = FirstFragment()
 }
 ```
@@ -212,10 +240,10 @@ And then:
 
 ``` kotlin
 @Parcelize // typically data class
-class FirstScreen: DefaultFragmentKey(), DefaultServiceProvider.HasServices {
+data object FirstScreen: DefaultFragmentKey(), DefaultServiceProvider.HasServices {
     override fun instantiateFragment(): Fragment = FirstFragment()
 
-    override fun getScopeTag() = javaClass.name
+    override fun getScopeTag() = toString()
 
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
@@ -257,7 +285,7 @@ Using `Backstack` to navigate allows you to move navigation responsibilities out
 class FirstScopedModel(private val backstack: Backstack) {
     fun doSomething() {
         // ...
-        backstack.goTo(SecondScreen())
+        backstack.goTo(SecondScreen)
     }
 }
 ```
@@ -265,7 +293,7 @@ class FirstScopedModel(private val backstack: Backstack) {
 Another additional benefit is that your navigation history can be unit tested.
 
 ``` java
-assertThat(backstack.getHistory()).containsExactly(SomeScreen(), OtherScreen())
+assertThat(backstack.getHistory()).containsExactly(SomeScreen, OtherScreen)
 ```
 
 And most importantly, navigation (swapping screens) happens in one place, and you are in direct control of what happens in such a scenario. By writing a `StateChanger`, you can set up "how to display my current navigation state" in any way you want. No more `((MainActivity)getActivity()).setTitleText("blah");` inside Fragment's `onStart()`.
@@ -303,7 +331,7 @@ For Fragment + Simple-Stack + Compose integration, you can also check [the corre
 
 ## License
 
-    Copyright 2017-2021 Gabor Varadi
+    Copyright 2017-2022 Gabor Varadi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

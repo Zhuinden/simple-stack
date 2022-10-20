@@ -8,6 +8,6 @@ import kotlinx.parcelize.Parcelize
  * Created by Owner on 2017. 06. 29..
  */
 @Parcelize
-data class HomeKey(private val placeholder: String = "") : BaseKey() {
+data object HomeKey : BaseKey() {
     override fun layout(): Int = R.layout.home_view
 }

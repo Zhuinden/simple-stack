@@ -6,7 +6,7 @@ import com.zhuinden.simplestackextensions.fragments.DefaultFragmentKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class CreateLoginCredentialsKey(private val placeholder: String = "") : DefaultFragmentKey(), ScopeKey.Child {
+data object CreateLoginCredentialsKey : DefaultFragmentKey(), ScopeKey.Child {
     override fun instantiateFragment(): Fragment = CreateLoginCredentialsFragment()
 
     override fun getParentScopes(): List<String> = listOf(RegistrationViewModel::class.java.name)

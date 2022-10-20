@@ -8,6 +8,6 @@ import kotlinx.parcelize.Parcelize
  * Created by Owner on 2017.11.13.
  */
 @Parcelize
-data class DashboardKey(private val placeholder: String = "") : DefaultFragmentKey() { // generate reliable `toString()` for no-args data class
+data object DashboardKey : DefaultFragmentKey() { // generate reliable `toString()` for no-args data class
     override fun instantiateFragment(): Fragment = DashboardFragment()
 }

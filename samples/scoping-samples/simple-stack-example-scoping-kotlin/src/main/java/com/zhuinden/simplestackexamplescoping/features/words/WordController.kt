@@ -40,7 +40,7 @@ class WordController(
     }
 
     override fun onAddNewWordClicked() {
-        backstack.goTo(NewWordKey())
+        backstack.goTo(NewWordKey)
     }
 
     override fun onAddWordClicked(word: String) {

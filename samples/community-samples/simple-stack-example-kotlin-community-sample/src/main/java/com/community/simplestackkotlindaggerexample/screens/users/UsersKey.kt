@@ -4,6 +4,6 @@ import com.zhuinden.simplestackextensions.fragments.DefaultFragmentKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class UsersKey(private val placeholder: String = "") : DefaultFragmentKey() {
+data object UsersKey : DefaultFragmentKey() {
     override fun instantiateFragment() = UsersFragment()
 }

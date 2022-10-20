@@ -2,11 +2,7 @@ package com.zhuinden.simplestackextensionscomposesample.features.registration
 
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.rxvalidatebykt.validateBy
-import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestack.Bundleable
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.ScopedServices
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestackextensionscomposesample.app.AuthenticationManager
 import com.zhuinden.simplestackextensionscomposesample.features.profile.ProfileKey
 import com.zhuinden.simplestackextensionscomposesample.utils.get
@@ -65,7 +61,7 @@ class RegistrationViewModel(
 
     fun onEnterProfileNextClicked() {
         if (isEnterProfileNextEnabledRelay.get()) {
-            backstack.goTo(CreateLoginCredentialsKey())
+            backstack.goTo(CreateLoginCredentialsKey)
         }
     }
 

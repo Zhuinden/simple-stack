@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         binding.navView.setNavigationItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
-                R.id.list_navigation_menu_item -> backstack.goTo(TasksKey())
-                R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey())
+                R.id.list_navigation_menu_item -> backstack.goTo(TasksKey)
+                R.id.statistics_navigation_menu_item -> backstack.goTo(StatisticsKey)
                 else -> {
                 }
             }
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .setStateChanger(SimpleStateChanger(this))
             .setGlobalServices(globalServices)
             .setScopedServices(DefaultServiceProvider())
-            .install(this, binding.contentFrame, History.of(TasksKey()))
+            .install(this, binding.contentFrame, History.of(TasksKey))
     }
 
     override fun onBackPressed() {

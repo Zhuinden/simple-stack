@@ -1,6 +1,5 @@
 package com.zhuinden.simplestackextensionsample.features.profile
 
-import android.content.Context
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.ScopedServices
@@ -14,7 +13,7 @@ class ProfileViewModel(
 ) : ScopedServices.Activated {
     override fun onServiceActive() {
         if (!authenticationManager.isAuthenticated()) {
-            backstack.setHistory(History.of(LoginKey()), StateChange.REPLACE)
+            backstack.setHistory(History.of(LoginKey), StateChange.REPLACE)
         }
     }
 

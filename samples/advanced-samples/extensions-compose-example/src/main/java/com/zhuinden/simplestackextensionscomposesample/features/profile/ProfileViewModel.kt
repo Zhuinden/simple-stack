@@ -13,7 +13,7 @@ class ProfileViewModel(
 ) : ScopedServices.Activated {
     override fun onServiceActive() {
         if (!authenticationManager.isAuthenticated()) {
-            backstack.setHistory(History.of(LoginKey()), StateChange.REPLACE)
+            backstack.setHistory(History.of(LoginKey), StateChange.REPLACE)
         }
     }
 

@@ -19,7 +19,7 @@ class HomeFragment : KeyedFragment(R.layout.home_view) {
         val binding = HomeViewBinding.bind(view)
 
         binding.homeButton.onClick {
-            backstack.goTo(OtherKey())
+            backstack.goTo(OtherKey)
         }
 
         val homeKey = getKey<HomeKey>() // args

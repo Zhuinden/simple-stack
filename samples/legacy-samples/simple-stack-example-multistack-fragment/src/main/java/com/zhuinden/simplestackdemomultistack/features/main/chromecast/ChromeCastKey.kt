@@ -6,7 +6,7 @@ import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackFragment
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ChromeCastKey(private val placeholder: String = "") : MultistackFragmentKey() {
+data object ChromeCastKey : MultistackFragmentKey() {
     override fun stackIdentifier(): String = MainActivity.StackType.CHROMECAST.name
 
     override fun createFragment(): BaseFragment = ChromeCastFragment()

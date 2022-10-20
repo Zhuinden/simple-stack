@@ -13,7 +13,7 @@ import kotlinx.parcelize.Parcelize
  * Created by Zhuinden on 2017.07.26..
  */
 @Parcelize
-data class StatisticsKey(private val noArgPlaceHolder: String = "") : BaseKey() {
+data object StatisticsKey : BaseKey() {
     override fun instantiateFragment(): Fragment = StatisticsFragment()
 
     @Suppress("RemoveExplicitTypeArguments")

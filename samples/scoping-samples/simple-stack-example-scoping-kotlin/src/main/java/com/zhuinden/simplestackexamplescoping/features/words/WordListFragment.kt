@@ -3,7 +3,6 @@ package com.zhuinden.simplestackexamplescoping.features.words
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import com.zhuinden.liveevent.observe

@@ -11,17 +11,18 @@ import com.zhuinden.simplestackextensions.servicesktx.lookup
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class TasksKey(private val noArgsPlaceHolder: String = "") : BaseKey() {
+data object TasksKey : BaseKey() {
     override fun instantiateFragment(): Fragment = TasksFragment()
 
     @Suppress("RemoveExplicitTypeArguments")
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(TasksViewModel(
-                lookup<SnackbarTextEmitter>(),
-                lookup<TasksDataSource>(),
-                backstack,
-                getKey()
+            add(
+                TasksViewModel(
+                    lookup<SnackbarTextEmitter>(),
+                    lookup<TasksDataSource>(),
+                    backstack,
+                    getKey()
             ))
         }
     }

@@ -29,6 +29,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        languageVersion = '1.8' // data objects
     }
 
     buildFeatures {
@@ -36,8 +37,9 @@ android {
 
         compose = true
     }
+
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion "1.3.2"
     }
     packagingOptions {
         resources {
@@ -45,8 +47,8 @@ android {
             pickFirsts += ['META-INF/core-ktx_release.kotlin_module']
         }
     }
-
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

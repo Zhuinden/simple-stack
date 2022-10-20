@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
  * Created by Zhuinden on 2018.09.17.
  */
 @Parcelize
-data class WordListKey(val placeholder: String = "") : BaseKey() {
+data object WordListKey : BaseKey() {
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
             add(WordController(backstack))
