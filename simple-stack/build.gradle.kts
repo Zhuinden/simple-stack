@@ -74,7 +74,7 @@ afterEvaluate {
             register("mavenJava", MavenPublication::class) {
                 groupId = "com.github.Zhuinden"
                 artifactId = "simple-stack"
-                version = "2.6.4"
+                version = "2.6.5"
 
                 from(components["release"])
                 artifact(sourcesJar.get())

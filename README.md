@@ -69,7 +69,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.6.4")
+implementation("com.github.Zhuinden:simple-stack:2.6.5")
 
 implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.4")
 implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.4")
@@ -83,7 +83,7 @@ or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.6.4'
+implementation 'com.github.Zhuinden:simple-stack:2.6.5'
 
 implementation 'com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.4'
 implementation 'com.github.Zhuinden.simple-stack-extensions:fragments:2.2.4'

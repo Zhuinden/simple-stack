@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
@@ -272,6 +273,67 @@ public class BackstackCoreTest {
         assertThat(backstack.isStateChangePending()).isFalse();
         Mockito.verify(completionListener, Mockito.only()).stateChangeCompleted(stateChange);
     }
+
+    @Test
+    public void completionListenerCanRemoveItself() {
+        TestKey initial = new TestKey("hello");
+        final TestKey second = new TestKey("world");
+        final Backstack backstack = new Backstack();
+        backstack.setup(History.of(initial));
+
+        final AtomicInteger listener1Called = new AtomicInteger(0);
+        final AtomicInteger listener2Called = new AtomicInteger(0);
+        final AtomicInteger listener3Called = new AtomicInteger(0);
+
+        Backstack.CompletionListener completionListener1 = new Backstack.CompletionListener() {
+            @Override
+            public void stateChangeCompleted(@Nonnull StateChange stateChange) {
+                listener1Called.addAndGet(1);
+            }
+        };
+        Backstack.CompletionListener completionListener2 = new Backstack.CompletionListener() {
+            @Override
+            public void stateChangeCompleted(@Nonnull StateChange stateChange) {
+                listener2Called.addAndGet(1);
+                backstack.removeCompletionListener(this);
+            }
+        };
+        Backstack.CompletionListener completionListener3 = new Backstack.CompletionListener() {
+            @Override
+            public void stateChangeCompleted(@Nonnull StateChange stateChange) {
+                listener3Called.addAndGet(1);
+            }
+        };
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange _stateChange, @Nonnull Callback completionCallback) {
+                stateChange = _stateChange;
+                callback = completionCallback;
+            }
+        };
+        backstack.addCompletionListener(completionListener1);
+        backstack.addCompletionListener(completionListener2);
+        backstack.addCompletionListener(completionListener2); // intentional duplicate line to reproduce #263
+        backstack.addCompletionListener(completionListener3);
+        backstack.setStateChanger(stateChanger);
+
+        callback.stateChangeComplete();
+
+        assertThat(backstack.isStateChangePending()).isFalse();
+
+        assertThat(listener1Called.get()).isEqualTo(1);
+        assertThat(listener2Called.get()).isEqualTo(2);
+        assertThat(listener3Called.get()).isEqualTo(1);
+
+        backstack.goTo(second);
+
+        callback.stateChangeComplete();
+
+        assertThat(listener1Called.get()).isEqualTo(2);
+        assertThat(listener2Called.get()).isEqualTo(2);
+        assertThat(listener3Called.get()).isEqualTo(2);
+    }
+
 
     @Test
     public void removedCompletionListenerShouldNotBeCalled() {

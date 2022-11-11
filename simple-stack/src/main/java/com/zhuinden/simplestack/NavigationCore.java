@@ -705,8 +705,16 @@ class NavigationCore {
     }
 
     private void notifyCompletionListeners(StateChange stateChange) {
-        for(Backstack.CompletionListener completionListener : completionListeners) {
+        final StateChanger currentStateChanger = stateChanger;
+        if(currentStateChanger != null) {
+            stateChanger = null;
+        }
+        for(int i = completionListeners.size() - 1; i >= 0; i--) {
+            Backstack.CompletionListener completionListener = completionListeners.get(i);
             completionListener.stateChangeCompleted(stateChange);
+        }
+        if(stateChanger == null && currentStateChanger != null) {
+            this.stateChanger = currentStateChanger; // do not use `setStateChanger(REATTACH)` here, it would try to start state changes twice in succession
         }
     }
 

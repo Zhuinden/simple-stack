@@ -1,12 +1,23 @@
 # Change log
 
+-Simple Stack 2.6.5 (2022-11-11)
+--------------------------------
+
+- FIX: `Backstack.CompletionListener` added to `Backstack` that unregistered themselves during dispatching notifications
+  would cause either a ConcurrentModificationException or invalid results, this is now fixed and no longer the case (
+  #263, thanks @angusholder)
+
+- MINOR CHANGE: When `Backstack.CompletionListener`'s are being notified, the state changer is temporarily removed (
+  similarly to dispatching `ScopedServices.Activated` events), so that navigation actions invoked on `Backstack` are
+  deferred until all `Backstack.CompletionListener`s are notified.
+
 -Simple Stack 2.6.4 (2022-04-21)
 --------------------------------
 
-- FIX: Attempt at fixing a crash related to `LinkedHashMap.retainAll()` specifically on Android 6 and Android 6.1 devices (#256).
+- FIX: Attempt at fixing a crash related to `LinkedHashMap.retainAll()` specifically on Android 6 and Android 6.1
+  devices (#256).
 
 - 2.6.3 had an issue with `maven-publish` and transitive dependencies were missing, and is therefore skipped.
-
 
 -Simple Stack 2.6.2 (2021-06-07)
 --------------------------------
