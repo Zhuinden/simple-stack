@@ -39,34 +39,34 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.test:runner:1.4.0")
-    androidTestImplementation("androidx.test:rules:1.4.0")
+    androidTestImplementation("androidx.test:runner:1.5.1")
+    androidTestImplementation("androidx.test:rules:1.5.0")
     implementation("androidx.appcompat:appcompat:1.5.1")
     implementation("androidx.core:core:1.9.0")
-    implementation("androidx.activity:activity:1.6.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.3")
+    implementation("androidx.activity:activity:1.6.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.4")
 
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("com.google.android.material:material:1.7.0")
     testImplementation("junit:junit:4.13.2")
 
 

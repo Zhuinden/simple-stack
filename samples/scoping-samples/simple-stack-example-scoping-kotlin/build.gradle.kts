@@ -47,33 +47,33 @@ dependencies {
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("com.google.android.material:material:1.7.0")
     testImplementation("junit:junit:4.13.2")
 
     implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
 
-    implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.1")
+    implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.2")
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")

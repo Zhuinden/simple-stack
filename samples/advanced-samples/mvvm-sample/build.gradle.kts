@@ -55,22 +55,22 @@ android {
 dependencies {
     implementation(project(":simple-stack"))
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.5") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.4") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5") {
         exclude(module = "simple-stack")
     }
 
@@ -91,9 +91,9 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.activity:activity:1.6.0")
+    implementation("androidx.activity:activity:1.6.1")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("com.google.android.material:material:1.7.0")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
@@ -134,8 +134,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0") {
         exclude(group = "javax.inject")
     }
-    androidTestImplementation("androidx.test:runner:1.4.0")
-    androidTestImplementation("androidx.test:rules:1.4.0")
+    androidTestImplementation("androidx.test:runner:1.5.1")
+    androidTestImplementation("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.1.0") {
         exclude(group = "javax.inject")
     }
