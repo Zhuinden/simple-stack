@@ -131,9 +131,13 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 Where `FirstScreen` looks like this (assuming you have `data object` enabled):
 
 ```groovy
-    kotlinOptions {
+kotlinOptions {
     jvmTarget = "1.8"
-    languageVersion = '1.8' // data objects
+    languageVersion = '1.8' // data objects, 1.9 in 1.8.0
+}
+
+kotlin.sourceSets.all {
+    it.languageSettings.enableLanguageFeature("DataObjects")
 }
 ```
 
