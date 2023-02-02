@@ -2,6 +2,7 @@ package com.zhuinden.simplestacktutorials.steps.step_3
 
 import android.app.Activity
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
@@ -18,6 +19,24 @@ private val Activity.backstack: Backstack
     get() = Navigator.getBackstack(this)
 
 class Step3Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@Step3Activity)) {
+                this.remove()
+                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                this@Step3Activity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("RedundantModalityModifier", "deprecation")
+    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed()
+    }
+
+
     private lateinit var binding: ActivityStep3Binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,15 +48,11 @@ class Step3Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
             backstack.goBack()
         }
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
             .install(this, binding.step3Root, History.of(Step3FirstScreen()))
-    }
-
-    override fun onBackPressed() {
-        if (!Navigator.onBackPressed(this)) {
-            super.onBackPressed()
-        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

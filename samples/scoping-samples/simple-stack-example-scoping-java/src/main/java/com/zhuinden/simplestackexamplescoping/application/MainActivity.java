@@ -13,13 +13,31 @@ import com.zhuinden.simplestackextensions.services.DefaultServiceProvider;
 
 import javax.annotation.Nonnull;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity
-        extends AppCompatActivity
-        implements SimpleStateChanger.NavigationHandler {
+    extends AppCompatActivity
+    implements SimpleStateChanger.NavigationHandler {
     private DefaultFragmentStateChanger fragmentStateChanger;
+
+    @SuppressWarnings("DEPRECATION")
+    private final OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if(!Navigator.onBackPressed(MainActivity.this)) {
+                this.remove();
+                onBackPressed();  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                MainActivity.this.getOnBackPressedDispatcher().addCallback(this);
+            }
+        }
+    };
+
+    @Override
+    public final void onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,14 +47,12 @@ public class MainActivity
 
         fragmentStateChanger = new DefaultFragmentStateChanger(getSupportFragmentManager(), R.id.container);
 
-        Navigator.configure().setStateChanger(new SimpleStateChanger(this)).setScopedServices(new DefaultServiceProvider()).install(this, findViewById(R.id.container), History.of(WordListKey.create()));
-    }
+        getOnBackPressedDispatcher().addCallback(backPressedCallback); // this is required for `onBackPressedDispatcher` to work correctly
 
-    @Override
-    public void onBackPressed() {
-        if(!Navigator.onBackPressed(this)) {
-            super.onBackPressed();
-        }
+        Navigator.configure()
+            .setStateChanger(new SimpleStateChanger(this)) //
+            .setScopedServices(new DefaultServiceProvider()) //
+            .install(this, findViewById(R.id.container), History.of(WordListKey.create()));
     }
 
     @Override

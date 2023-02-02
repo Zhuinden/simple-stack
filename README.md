@@ -99,27 +99,42 @@ You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack/t
 
 ## Fragments
 
-With Fragments, the Activity code typically looks like this:
+With Fragments, the Activity code looks like this:
 
 ``` kotlin
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@MainActivity)) {
+                this.remove() 
+                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using `OnBackPressedDispatcher` 
+                this@MainActivity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+    
+    @Deprecated("Deprecated in Java")
+    @Suppress("RedundantModalityModifier", "deprecation")
+    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed() 
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.container)
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+        
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
-            .install(this, findViewById(R.id.container), History.of(FirstScreen()))
-    }
-
-    override fun onBackPressed() {
-        if (!Navigator.onBackPressed(this)) {
-            super.onBackPressed()
-        }
+            .install(this, binding.container, History.single(HomeKey))
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {
@@ -128,7 +143,17 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 }
 ```
 
-Where `FirstScreen` looks like this (assuming you have `data object` enabled):
+Originally, handling back was simpler, as all you had to do is override `onBackPressed()` (then
+call `backstack.goBack()`, if it returned `true` then you would not call `super.onBackPressed()`) , but in order to
+support `BackHandler` in Compose, or Fragments that use `OnBackPressedDispatcher` internally, you cannot
+override `onBackPressed` anymore in a reliable manner.
+
+With targetSdkVersion 34, `onBackPressed` will no longer be called. Simple-Stack does not yet
+support `targetSdkVersion 34`, it is tracked in issue #259.
+
+## Screens
+
+`FirstScreen` looks like this (assuming you have `data object` enabled):
 
 ```groovy
 kotlinOptions {
@@ -182,41 +207,6 @@ class FirstFragment: KeyedFragment(R.layout.first_fragment) {
 ```
 
 After which going to the second screen is as simple as `backstack.goTo(SecondScreen())`.
-
-### Warning regarding integration against OnBackPressedDispatcher
-
-The addition of `OnBackPressedDispatcher` by Jetpack's ComponentActivity effectively breaks all code that ever relied on `onBackPressed()` due to poor design decisions.
-
-This means that in order to use `OnBackPressedDispatcher` in either Fragments or via the `BackHandler` in Compose, we need to adjust the back handling code to use the following, slightly hacky approach:
-
-``` kotlin
-class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
-    private val backPressedCallback = object: OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove() // this is the only safe way to invoke onBackPressed while cancelling the execution of this callback
-                onBackPressed() // this is the only safe way to invoke onBackPressed while cancelling the execution of this callback
-                this@MainActivity.onBackPressedDispatcher.addCallback(this) // this is the only safe way to invoke onBackPressed while cancelling the execution of this callback
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        // ...
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
-        // ...
-    }
-
-    @Suppress("RedundantModalityModifier")
-    override final fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed() // `OnBackPressedDispatcher` by Google effectively breaks all usages of `onBackPressed()` because they do not respect the original contract of `onBackPressed()`
-    }
-}
-```
-
-There's a chance that this will unfortunately have to become the "canonical way" of back handling in all libraries that use `onBackPressed()`.
-
-Currently, it only stands here as a "known issue" regarding `OnBackPressedDispatcher` integration.
 
 
 ## Scopes
@@ -335,7 +325,7 @@ For Fragment + Simple-Stack + Compose integration, you can also check [the corre
 
 ## License
 
-    Copyright 2017-2022 Gabor Varadi
+    Copyright 2017-2023 Gabor Varadi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

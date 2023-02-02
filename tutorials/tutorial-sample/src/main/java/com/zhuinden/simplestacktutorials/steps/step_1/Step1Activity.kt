@@ -2,11 +2,13 @@ package com.zhuinden.simplestacktutorials.steps.step_1
 
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestacktutorials.databinding.ActivityStep1Binding
 import com.zhuinden.simplestacktutorials.utils.hide
 import com.zhuinden.simplestacktutorials.utils.onClick
@@ -16,6 +18,25 @@ import kotlinx.parcelize.Parcelize
 
 class Step1Activity : AppCompatActivity(), StateChanger {
     private lateinit var backstack: Backstack
+
+
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!backstack.goBack()) {
+                this.remove()
+                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                this@Step1Activity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("RedundantModalityModifier", "deprecation")
+    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed()
+    }
+
 
     sealed class Screens : Parcelable { // a screen should be Parcelable so they can be put to Bundle.
         @Parcelize
@@ -42,13 +63,9 @@ class Step1Activity : AppCompatActivity(), StateChanger {
                 }
             }
 
-        backstack.setStateChanger(this) // handle navigation in this class
-    }
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
 
-    override fun onBackPressed() {
-        if (!backstack.goBack()) {
-            super.onBackPressed()
-        }
+        backstack.setStateChanger(this) // handle navigation in this class
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {

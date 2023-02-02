@@ -14,17 +14,36 @@ import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.navigator.Navigator;
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import kotlin.Suppress;
 
 public class MainActivity
-        extends AppCompatActivity
-        implements SimpleStateChanger.NavigationHandler {
+    extends AppCompatActivity
+    implements SimpleStateChanger.NavigationHandler {
     private static final String TAG = "MainActivity";
 
     DefaultFragmentStateChanger fragmentStateChanger;
 
     private ActivityMainBinding binding;
+
+    @SuppressWarnings("DEPRECATION")
+    private final OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if(!Navigator.onBackPressed(MainActivity.this)) {
+                this.remove();
+                onBackPressed();  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                MainActivity.this.getOnBackPressedDispatcher().addCallback(this);
+            }
+        }
+    };
+
+    @Override
+    public final void onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,16 +71,11 @@ public class MainActivity
         fragmentStateChanger = new DefaultFragmentStateChanger(getSupportFragmentManager(),
                                                                R.id.container);
 
-        Navigator.configure()
-                .setStateChanger(new SimpleStateChanger(this))
-                .install(this, binding.container, History.single(HomeKey.create()));
-    }
+        getOnBackPressedDispatcher().addCallback(backPressedCallback); // this is required for `onBackPressedDispatcher` to work correctly
 
-    @Override
-    public void onBackPressed() {
-        if(!Navigator.onBackPressed(this)) {
-            super.onBackPressed();
-        }
+        Navigator.configure()
+            .setStateChanger(new SimpleStateChanger(this))
+            .install(this, binding.container, History.single(HomeKey.create()));
     }
 
     @Override

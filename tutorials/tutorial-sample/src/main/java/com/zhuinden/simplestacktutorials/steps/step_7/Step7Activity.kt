@@ -2,6 +2,7 @@ package com.zhuinden.simplestacktutorials.steps.step_7
 
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.GlobalServices
 import com.zhuinden.simplestack.History
@@ -15,6 +16,24 @@ import com.zhuinden.simplestacktutorials.steps.step_7.features.login.LoginKey
 import com.zhuinden.simplestacktutorials.steps.step_7.features.profile.ProfileKey
 
 class Step7Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@Step7Activity)) {
+                this.remove()
+                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                this@Step7Activity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("RedundantModalityModifier", "deprecation")
+    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed()
+    }
+
+
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
     private lateinit var appContext: Context
 
@@ -27,6 +46,8 @@ class Step7Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step7Root)
         appContext = applicationContext
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
             .setScopedServices(ServiceProvider())
@@ -37,18 +58,12 @@ class Step7Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
             )
             .install(
                 this, binding.step7Root, History.of(
-                when {
-                    AuthenticationManager.isAuthenticated(appContext) -> ProfileKey()
-                    else -> LoginKey()
-                }
+                    when {
+                        AuthenticationManager.isAuthenticated(appContext) -> ProfileKey()
+                        else -> LoginKey()
+                    }
+                )
             )
-            )
-    }
-
-    override fun onBackPressed() {
-        if (!Navigator.onBackPressed(this)) {
-            super.onBackPressed()
-        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

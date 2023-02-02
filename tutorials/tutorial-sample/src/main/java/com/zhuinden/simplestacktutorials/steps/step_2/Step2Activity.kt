@@ -3,6 +3,7 @@ package com.zhuinden.simplestacktutorials.steps.step_2
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
@@ -20,6 +21,25 @@ private val Context.backstack: Backstack
     get() = Navigator.getBackstack(this)
 
 class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@Step2Activity)) {
+                this.remove()
+                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                this@Step2Activity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("RedundantModalityModifier", "deprecation")
+    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed()
+    }
+
+
     sealed class Screens : Parcelable {
         @Parcelize
         object First : Screens()
@@ -36,15 +56,11 @@ class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         binding = ActivityStep2Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
             .install(this, binding.step2Root, History.of(Screens.First)) // auto-install backstack
-    }
-
-    override fun onBackPressed() {
-        if (!Navigator.onBackPressed(this)) {
-            super.onBackPressed()
-        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

@@ -3,6 +3,7 @@ package com.zhuinden.simplestackexamplemvvm.application
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -25,6 +26,24 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
     private lateinit var snackbarTextEmitter: SnackbarTextEmitter
     private lateinit var binding: MainActivityBinding
+
+
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@MainActivity)) {
+                this.remove()
+                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                this@MainActivity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("RedundantModalityModifier", "deprecation")
+    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,17 +77,13 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             showSnackbar(binding.root, getString(textRes))
         }
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))
             .setGlobalServices(globalServices)
             .setScopedServices(DefaultServiceProvider())
             .install(this, binding.contentFrame, History.of(TasksKey))
-    }
-
-    override fun onBackPressed() {
-        if (!Navigator.onBackPressed(this)) {
-            super.onBackPressed()
-        }
     }
 
     fun toggleLeftDrawer() {

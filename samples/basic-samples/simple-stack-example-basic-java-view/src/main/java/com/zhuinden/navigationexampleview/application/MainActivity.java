@@ -12,11 +12,29 @@ import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
 import com.zhuinden.simplestack.navigator.Navigator;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity
-        extends AppCompatActivity {
+    extends AppCompatActivity {
     private ActivityMainBinding binding;
+
+    @SuppressWarnings("DEPRECATION")
+    private final OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if(!Navigator.onBackPressed(MainActivity.this)) {
+                this.remove();
+                onBackPressed();  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                MainActivity.this.getOnBackPressedDispatcher().addCallback(this);
+            }
+        }
+    };
+
+    @Override
+    public final void onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +59,8 @@ public class MainActivity
             return false;
         });
 
-        Navigator.install(this, binding.container, History.single(HomeKey.create()));
-    }
+        getOnBackPressedDispatcher().addCallback(backPressedCallback); // this is required for `onBackPressedDispatcher` to work correctly
 
-    @Override
-    public void onBackPressed() {
-        if(!Navigator.onBackPressed(this)) {
-            super.onBackPressed();
-        }
+        Navigator.install(this, binding.container, History.single(HomeKey.create()));
     }
 }

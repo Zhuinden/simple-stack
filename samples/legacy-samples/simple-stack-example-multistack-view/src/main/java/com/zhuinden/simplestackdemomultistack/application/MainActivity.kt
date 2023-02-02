@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.AsyncStateChanger
 import com.zhuinden.simplestack.StateChange
 import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackdemomultistack.R
 import com.zhuinden.simplestackdemomultistack.core.navigation.Multistack
 import com.zhuinden.simplestackdemomultistack.core.navigation.MultistackViewStateChanger
@@ -18,6 +20,26 @@ import com.zhuinden.simplestackdemomultistack.features.main.mail.MailKey
 
 
 class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationStateListener, AsyncStateChanger.NavigationHandler {
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            val backstack = multistack.getSelectedStack()
+
+            if (!backstack.goBack()) {
+                this.remove()
+                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                this@MainActivity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("RedundantModalityModifier", "deprecation")
+    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
+        super.onBackPressed()
+    }
+
+
     lateinit var multistack: Multistack
 
     private var isAnimating: Boolean = false
@@ -66,6 +88,8 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
             multistack.setSelectedStack(StackType.values()[3].name)
         }
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+
         multistack.setStateChanger(AsyncStateChanger(this))
     }
 
@@ -87,13 +111,6 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
     override fun onPause() {
         multistack.pause()
         super.onPause()
-    }
-
-    override fun onBackPressed() {
-        val backstack = multistack.getSelectedStack()
-        if (!backstack.goBack()) {
-            super.onBackPressed()
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
