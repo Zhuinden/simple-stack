@@ -28,7 +28,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        languageVersion = "1.8" // data objects
+        languageVersion = "1.9" // data objects
     }
 
 
@@ -44,13 +44,17 @@ android {
     }
 }
 
+kotlin.sourceSets.all {
+    languageSettings.enableLanguageFeature("DataObjects")
+}
+
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
 
-    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core:1.9.0")
     implementation("androidx.activity:activity:1.6.1")
-    implementation("androidx.fragment:fragment-ktx:1.5.4")
+    implementation("androidx.fragment:fragment-ktx:1.5.5")
 
     implementation(project(":simple-stack"))
 

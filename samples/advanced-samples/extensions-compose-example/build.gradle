@@ -2,8 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
-def compose_version = "1.3.0-rc01"
-
 android {
     compileSdk 33
 
@@ -29,7 +27,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        languageVersion = '1.8' // data objects
+        languageVersion = "1.9" // data objects
     }
 
     buildFeatures {
@@ -39,7 +37,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion "1.3.2"
+        kotlinCompilerExtensionVersion '1.4.3'
     }
     packagingOptions {
         resources {
@@ -47,6 +45,10 @@ android {
             pickFirsts += ['META-INF/core-ktx_release.kotlin_module']
         }
     }
+}
+
+kotlin.sourceSets.all {
+    languageSettings.enableLanguageFeature("DataObjects")
 }
 
 
@@ -58,10 +60,10 @@ dependencies {
     implementation "com.github.lisawray.groupie:groupie:2.10.0"
     implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.0")
 
-    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.activity:activity-ktx:1.6.1")
-    implementation("androidx.fragment:fragment-ktx:1.5.4")
+    implementation("androidx.fragment:fragment-ktx:1.5.5")
 
     implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
@@ -78,22 +80,22 @@ dependencies {
     implementation 'com.github.Zhuinden:rx-combinetuple-kt:1.2.1'
     implementation 'com.github.Zhuinden:rx-validateby-kt:2.1.1'
 
-    implementation "androidx.compose.runtime:runtime:$compose_version"
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.ui:ui-util:$compose_version"
-    implementation "androidx.compose.ui:ui-text:$compose_version"
-    implementation "androidx.compose.ui:ui-unit:$compose_version"
-    implementation "androidx.compose.ui:ui-geometry:$compose_version"
-    implementation "androidx.compose.foundation:foundation-layout:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    implementation "androidx.compose.foundation:foundation:$compose_version"
-    implementation "androidx.compose.animation:animation:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling:$compose_version"
+    implementation "androidx.compose.runtime:runtime:1.3.3"
+    implementation "androidx.compose.ui:ui:1.3.3"
+    implementation "androidx.compose.ui:ui-util:1.3.3"
+    implementation "androidx.compose.ui:ui-text:1.3.3"
+    implementation "androidx.compose.ui:ui-unit:1.3.3"
+    implementation "androidx.compose.ui:ui-geometry:1.3.3"
+    implementation "androidx.compose.foundation:foundation:1.3.1"
+    implementation "androidx.compose.foundation:foundation-layout:1.3.1"
+    implementation "androidx.compose.material:material:1.3.1"
+    implementation "androidx.compose.material:material-icons-extended:1.3.1"
+    implementation "androidx.compose.animation:animation:1.3.3"
+    implementation "androidx.compose.ui:ui-tooling:1.3.3"
 
     implementation 'androidx.activity:activity-compose:1.6.1'
 
-    implementation "androidx.compose.runtime:runtime-rxjava2:$compose_version"
+    implementation "androidx.compose.runtime:runtime-rxjava2:1.3.3"
 
 
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
@@ -101,5 +103,5 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

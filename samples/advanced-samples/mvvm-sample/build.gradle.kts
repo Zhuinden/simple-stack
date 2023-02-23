@@ -42,7 +42,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        languageVersion = "1.8" // data objects
+        languageVersion = "1.9" // data objects
     }
 
     buildFeatures {
@@ -50,6 +50,10 @@ android {
 
         dataBinding = false
     }
+}
+
+kotlin.sourceSets.all {
+    languageSettings.enableLanguageFeature("DataObjects")
 }
 
 dependencies {
@@ -76,7 +80,7 @@ dependencies {
 
     // App's dependencies, including test
 
-    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
@@ -93,7 +97,7 @@ dependencies {
 
     implementation("androidx.activity:activity:1.6.1")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("com.google.android.material:material:1.7.0")
+    implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
@@ -131,10 +135,10 @@ dependencies {
     implementation("androidx.test.espresso:espresso-idling-resource:3.1.0") {
         exclude(group = "javax.inject")
     }
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0") {
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1") {
         exclude(group = "javax.inject")
     }
-    androidTestImplementation("androidx.test:runner:1.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.1.0") {
         exclude(group = "javax.inject")

@@ -26,7 +26,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        languageVersion = "1.8" // data objects
+        languageVersion = "1.9" // data objects
     }
 
 
@@ -40,6 +40,10 @@ android {
     buildFeatures {
         viewBinding = true
     }
+}
+
+kotlin.sourceSets.all {
+    languageSettings.enableLanguageFeature("DataObjects")
 }
 
 dependencies {
@@ -61,11 +65,11 @@ dependencies {
     implementation("androidx.core:core:1.9.0")
     implementation("androidx.activity:activity:1.6.1")
 
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.test:runner:1.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.5.0")
-    implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
 
     testImplementation("junit:junit:4.13.2")

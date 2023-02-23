@@ -158,11 +158,11 @@ support `targetSdkVersion 34`, it is tracked in issue #259.
 ```groovy
 kotlinOptions {
     jvmTarget = "1.8"
-    languageVersion = '1.8' // data objects, 1.9 in 1.8.0
+    languageVersion = '1.9' // data objects, 1.8 in 1.7.21, 1.9 in 1.8.10
 }
 
 kotlin.sourceSets.all {
-    it.languageSettings.enableLanguageFeature("DataObjects")
+    languageSettings.enableLanguageFeature("DataObjects")
 }
 ```
 
