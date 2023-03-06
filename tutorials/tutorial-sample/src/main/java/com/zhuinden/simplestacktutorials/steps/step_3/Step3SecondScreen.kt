@@ -3,7 +3,9 @@ package com.zhuinden.simplestacktutorials.steps.step_3
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class Step3SecondScreen : Step3Screen() {
+data object Step3SecondScreen : Step3Screen() {
+    operator fun invoke() = this
+
     override val titleText: String
         get() = "Second title"
     override val centerText: String

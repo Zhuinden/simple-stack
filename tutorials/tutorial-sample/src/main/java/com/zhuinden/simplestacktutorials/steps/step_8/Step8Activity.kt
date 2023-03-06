@@ -18,18 +18,11 @@ class Step8Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         override fun handleOnBackPressed() {
             if (!Navigator.onBackPressed(this@Step8Activity)) {
                 this.remove()
-                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed() // this is the reliable way to handle back for now
                 this@Step8Activity.onBackPressedDispatcher.addCallback(this)
             }
         }
     }
-
-    @Deprecated("Deprecated in Java")
-    @Suppress("RedundantModalityModifier", "deprecation")
-    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed()
-    }
-
 
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
@@ -37,9 +30,9 @@ class Step8Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_step8)
 
-        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step8Root)
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
 
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step8Root)
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))

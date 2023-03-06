@@ -24,16 +24,10 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
             if (!backstack.goBack()) {
                 this.remove()
-                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed() // this is the reliable way to handle back for now
                 this@MainActivity.onBackPressedDispatcher.addCallback(this)
             }
         }
-    }
-
-    @Deprecated("Deprecated in Java")
-    @Suppress("RedundantModalityModifier", "deprecation")
-    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed()
     }
 
     lateinit var multistack: Multistack
@@ -66,6 +60,8 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         setContentView(R.layout.activity_main)
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
+
         multistackFragmentStateChanger = MultistackFragmentStateChanger(R.id.root, supportFragmentManager)
 
         findViewById<View>(R.id.bbn_item1).setOnClickListener {
@@ -83,8 +79,6 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         findViewById<View>(R.id.action4).setOnClickListener {
             multistack.setSelectedStack(StackType.values()[3].name)
         }
-
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
 
         multistack.setStateChanger(SimpleStateChanger(this))
     }

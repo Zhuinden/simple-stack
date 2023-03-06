@@ -10,13 +10,17 @@ import com.zhuinden.simplestacktutorials.steps.step_8.features.form.FormViewMode
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MainKey(private val placeholder: String = "") : FragmentKey() {
+data object MainKey : FragmentKey() {
     override fun instantiateFragment(): Fragment = MainFragment()
 
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(MainViewModel())
-            rebind<FormViewModel.ResultHandler>(get<MainViewModel>())
+            val mainViewModel = MainViewModel()
+
+            add(mainViewModel)
+            rebind<FormViewModel.ResultHandler>(mainViewModel)
         }
     }
+
+    operator fun invoke() = this
 }

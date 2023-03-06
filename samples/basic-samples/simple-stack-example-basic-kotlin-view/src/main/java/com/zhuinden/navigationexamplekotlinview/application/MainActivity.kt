@@ -19,16 +19,10 @@ class MainActivity : AppCompatActivity() {
         override fun handleOnBackPressed() {
             if (!Navigator.onBackPressed(this@MainActivity)) {
                 this.remove()
-                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed() // this is the reliable way to handle back for now
                 this@MainActivity.onBackPressedDispatcher.addCallback(this)
             }
         }
-    }
-
-    @Deprecated("Deprecated in Java")
-    @Suppress("RedundantModalityModifier", "deprecation")
-    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +30,8 @@ class MainActivity : AppCompatActivity() {
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
 
         binding.navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -54,8 +50,6 @@ class MainActivity : AppCompatActivity() {
             }
             false
         }
-
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
 
         Navigator.install(this, binding.container, History.single(HomeKey))
     }

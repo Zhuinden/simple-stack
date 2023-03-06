@@ -20,9 +20,18 @@ android {
         }
     }
 
-    buildFeatures {
-        viewBinding true
+    kotlinOptions {
+        jvmTarget = "1.8"
+        languageVersion = "1.9" // data objects
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+}
+
+kotlin.sourceSets.all {
+    languageSettings.enableLanguageFeature("DataObjects")
 }
 
 dependencies {

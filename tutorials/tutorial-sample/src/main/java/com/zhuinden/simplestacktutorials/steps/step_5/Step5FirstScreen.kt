@@ -4,7 +4,8 @@ import androidx.fragment.app.Fragment
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Step5FirstScreen(private val placeholder: String = "") :
-    Step5Screen() {  // generate equals/hashCode/toString
+data object Step5FirstScreen : Step5Screen() {  // generate equals/hashCode/toString
+    operator fun invoke() = this
+
     override fun instantiateFragment(): Fragment = Step5FirstFragment()
 }

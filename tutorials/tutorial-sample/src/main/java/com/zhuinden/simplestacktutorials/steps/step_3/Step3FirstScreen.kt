@@ -4,7 +4,9 @@ import com.zhuinden.simplestack.navigator.Navigator
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class Step3FirstScreen : Step3Screen() {
+data object Step3FirstScreen : Step3Screen() {
+    operator fun invoke() = this
+
     override val titleText: String
         get() = "First title"
     override val centerText: String

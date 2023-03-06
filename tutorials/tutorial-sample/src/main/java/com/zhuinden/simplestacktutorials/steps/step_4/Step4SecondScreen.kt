@@ -4,7 +4,8 @@ import com.zhuinden.simplestacktutorials.R
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Step4SecondScreen(private val placeholder: String = "") :
-    Step4Screen() {  // generate equals/hashCode/toString
+data object Step4SecondScreen : Step4Screen() {  // generate equals/hashCode/toString
+    operator fun invoke() = this
+
     override fun layout(): Int = R.layout.step4_second_view
 }

@@ -25,7 +25,7 @@ public class MainActivity
         public void handleOnBackPressed() {
             if(!Navigator.onBackPressed(MainActivity.this)) {
                 this.remove();
-                onBackPressed();  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed(); // this is the reliable way to handle back for now
                 MainActivity.this.getOnBackPressedDispatcher().addCallback(this);
             }
         }
@@ -59,7 +59,7 @@ public class MainActivity
             return false;
         });
 
-        getOnBackPressedDispatcher().addCallback(backPressedCallback); // this is required for `onBackPressedDispatcher` to work correctly
+        getOnBackPressedDispatcher().addCallback(backPressedCallback); // this is the reliable way to handle back for now
 
         Navigator.install(this, binding.container, History.single(HomeKey.create()));
     }

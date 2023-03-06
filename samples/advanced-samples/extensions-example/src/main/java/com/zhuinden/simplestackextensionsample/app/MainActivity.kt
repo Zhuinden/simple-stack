@@ -23,23 +23,18 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         override fun handleOnBackPressed() {
             if (!Navigator.onBackPressed(this@MainActivity)) {
                 this.remove()
-                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed() // this is the reliable way to handle back for now
                 this@MainActivity.onBackPressedDispatcher.addCallback(this)
             }
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    @Suppress("RedundantModalityModifier", "deprecation")
-    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed()
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val binding = MainActivityBinding.inflate(layoutInflater)
+
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
 
         setContentView(binding.root)
 
@@ -50,8 +45,6 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         val globalServices = app.globalServices
 
         authenticationManager = globalServices.get()
-
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))

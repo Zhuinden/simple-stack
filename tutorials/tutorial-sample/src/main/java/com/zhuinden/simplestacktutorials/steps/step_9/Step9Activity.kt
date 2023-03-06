@@ -21,16 +21,10 @@ class Step9Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         override fun handleOnBackPressed() {
             if (!Navigator.onBackPressed(this@Step9Activity)) {
                 this.remove()
-                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed() // this is the reliable way to handle back for now
                 this@Step9Activity.onBackPressedDispatcher.addCallback(this)
             }
         }
-    }
-
-    @Deprecated("Deprecated in Java")
-    @Suppress("RedundantModalityModifier", "deprecation")
-    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed()
     }
 
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
@@ -42,10 +36,10 @@ class Step9Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         val binding = ActivityStep9Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
+
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.step9Root)
         appContext = applicationContext
-
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))

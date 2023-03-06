@@ -27,25 +27,18 @@ class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         override fun handleOnBackPressed() {
             if (!Navigator.onBackPressed(this@Step2Activity)) {
                 this.remove()
-                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed() // this is the reliable way to handle back for now
                 this@Step2Activity.onBackPressedDispatcher.addCallback(this)
             }
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    @Suppress("RedundantModalityModifier", "deprecation")
-    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed()
-    }
-
-
     sealed class Screens : Parcelable {
         @Parcelize
-        object First : Screens()
+        data object First : Screens()
 
         @Parcelize
-        object Second : Screens()
+        data object Second : Screens()
     }
 
     private lateinit var binding: ActivityStep2Binding
@@ -56,7 +49,7 @@ class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         binding = ActivityStep2Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
 
         Navigator.configure()
             .setStateChanger(SimpleStateChanger(this))

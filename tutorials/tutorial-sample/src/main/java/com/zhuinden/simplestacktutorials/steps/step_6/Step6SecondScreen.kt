@@ -4,6 +4,8 @@ import androidx.fragment.app.Fragment
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Step6SecondScreen(private val noArg: String = "") : Step6Screen() {
+data object Step6SecondScreen : Step6Screen() {
+    operator fun invoke() = this
+
     override fun instantiateFragment(): Fragment = Step6SecondFragment()
 }

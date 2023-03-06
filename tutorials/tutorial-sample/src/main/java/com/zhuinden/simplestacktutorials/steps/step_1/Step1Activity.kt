@@ -25,25 +25,18 @@ class Step1Activity : AppCompatActivity(), StateChanger {
         override fun handleOnBackPressed() {
             if (!backstack.goBack()) {
                 this.remove()
-                onBackPressed()  // this is the only safe way to manually invoke onBackPressed when using onBackPressedDispatcher`
+                onBackPressed() // this is the reliable way to handle back for now
                 this@Step1Activity.onBackPressedDispatcher.addCallback(this)
             }
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    @Suppress("RedundantModalityModifier", "deprecation")
-    final override fun onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed()
-    }
-
-
     sealed class Screens : Parcelable { // a screen should be Parcelable so they can be put to Bundle.
         @Parcelize
-        object First : Screens()
+        data object First : Screens()
 
         @Parcelize
-        object Second : Screens()
+        data object Second : Screens()
     }
 
     private lateinit var binding: ActivityStep1Binding
@@ -63,7 +56,7 @@ class Step1Activity : AppCompatActivity(), StateChanger {
                 }
             }
 
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is required for `onBackPressedDispatcher` to work correctly
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
 
         backstack.setStateChanger(this) // handle navigation in this class
     }

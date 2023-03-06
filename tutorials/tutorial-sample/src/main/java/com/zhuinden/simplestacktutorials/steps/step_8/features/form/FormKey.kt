@@ -8,12 +8,19 @@ import com.zhuinden.simplestacktutorials.steps.step_8.core.navigation.FragmentKe
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class FormKey(private val placeholder: String = "") : FragmentKey() {
+data object FormKey : FragmentKey() {
     override fun instantiateFragment(): Fragment = FormFragment()
 
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(FormViewModel(lookup(), backstack))
+            add(
+                FormViewModel(
+                    resultHandler = lookup(),
+                    backstack = backstack,
+                )
+            )
         }
     }
+
+    operator fun invoke() = this
 }
