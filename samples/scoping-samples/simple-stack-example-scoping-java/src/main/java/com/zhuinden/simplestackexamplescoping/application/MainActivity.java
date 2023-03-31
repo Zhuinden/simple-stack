@@ -2,6 +2,9 @@ package com.zhuinden.simplestackexamplescoping.application;
 
 import android.os.Bundle;
 
+import com.zhuinden.simplestack.AheadOfTimeWillHandleBackChangedListener;
+import com.zhuinden.simplestack.BackHandlingModel;
+import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.SimpleStateChanger;
 import com.zhuinden.simplestack.StateChange;
@@ -22,22 +25,21 @@ public class MainActivity
     implements SimpleStateChanger.NavigationHandler {
     private DefaultFragmentStateChanger fragmentStateChanger;
 
-    @SuppressWarnings("DEPRECATION")
-    private final OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
+    private Backstack backstack;
+
+    private OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(false) {
         @Override
         public void handleOnBackPressed() {
-            if(!Navigator.onBackPressed(MainActivity.this)) {
-                this.remove();
-                onBackPressed(); // this is the reliable way to handle back for now
-                MainActivity.this.getOnBackPressedDispatcher().addCallback(this);
-            }
+            backstack.goBack();
         }
     };
 
-    @Override
-    public final void onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed();
-    }
+    private AheadOfTimeWillHandleBackChangedListener updateBackPressedCallback = new AheadOfTimeWillHandleBackChangedListener() {
+        @Override
+        public void willHandleBackChanged(boolean willHandleBack) {
+            backPressedCallback.setEnabled(willHandleBack);
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,12 +49,22 @@ public class MainActivity
 
         fragmentStateChanger = new DefaultFragmentStateChanger(getSupportFragmentManager(), R.id.container);
 
-        getOnBackPressedDispatcher().addCallback(backPressedCallback); // this is the reliable way to handle back for now
+        getOnBackPressedDispatcher().addCallback(backPressedCallback);
 
-        Navigator.configure()
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
             .setStateChanger(new SimpleStateChanger(this)) //
             .setScopedServices(new DefaultServiceProvider()) //
             .install(this, findViewById(R.id.container), History.of(WordListKey.create()));
+
+        backPressedCallback.setEnabled(backstack.willHandleAheadOfTimeBack());
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback);
+    }
+
+    @Override
+    protected void onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback);
+        super.onDestroy();
     }
 
     @Override

@@ -3,9 +3,7 @@ package com.zhuinden.simplestackexamplescoping.application
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.SimpleStateChanger
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackexamplescoping.R
 import com.zhuinden.simplestackexamplescoping.databinding.ActivityMainBinding
@@ -18,17 +16,17 @@ import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
  * Created by Zhuinden on 2018.09.17.
  */
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
     }
 
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
+    }
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
@@ -42,10 +40,19 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.container)
 
-        Navigator.configure()
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
             .setStateChanger(SimpleStateChanger(this))
             .setScopedServices(DefaultServiceProvider())
             .install(this, binding.container, History.of(WordListKey))
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+    }
+
+    override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+        super.onDestroy()
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

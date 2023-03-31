@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), MultistackViewStateChanger.AnimationSt
 
             if (!backstack.goBack()) {
                 this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
+                onBackPressed() // this is the reliable way to handle back for now when using EVENT_BUBBLING back handling model
                 this@MainActivity.onBackPressedDispatcher.addCallback(this)
             }
         }

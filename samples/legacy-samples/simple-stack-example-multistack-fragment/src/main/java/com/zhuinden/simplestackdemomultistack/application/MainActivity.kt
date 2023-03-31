@@ -18,17 +18,18 @@ import com.zhuinden.simplestackdemomultistack.features.main.mail.MailKey
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            val backstack = multistack.getSelectedStack()
+    private val backPressedCallback =
+        object : OnBackPressedCallback(true) { // TODO: update this code to use AHEAD_OF_TIME model
+            override fun handleOnBackPressed() {
+                val backstack = multistack.getSelectedStack()
 
-            if (!backstack.goBack()) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
+                if (!backstack.goBack()) {
+                    this.remove()
+                    onBackPressed() // this is the reliable way to handle back for now when using EVENT_BUBBLING back handling model
+                    this@MainActivity.onBackPressedDispatcher.addCallback(this)
+                }
             }
         }
-    }
 
     lateinit var multistack: Multistack
 

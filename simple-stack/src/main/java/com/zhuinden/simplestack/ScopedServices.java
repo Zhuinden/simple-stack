@@ -63,10 +63,14 @@ public interface ScopedServices {
 
     /**
      * When a service implements {@link HandlesBack}, then it will receive a callback when back is being dispatched across the active scope chain.
+     * <p>
+     * Only supported in {@link BackHandlingModel#EVENT_BUBBLING} back handling model.
+     * <p>
+     * If using {@link BackHandlingModel#AHEAD_OF_TIME}, {@link ServiceBinder#getAheadOfTimeBackCallbackRegistry()} and {@link AheadOfTimeBackCallback} should be used instead.
      */
     public static interface HandlesBack {
         /**
-         * Called when back is being dispatched.
+         * Called when back is being dispatched. Returning true will ensure that back is not dispatched further.
          *
          * @return whether the service handled back.
          */

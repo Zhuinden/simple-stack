@@ -95,7 +95,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.activity:activity:1.6.1")
+    implementation("androidx.activity:activity:1.7.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.recyclerview:recyclerview:1.2.1")

@@ -34,8 +34,42 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 class ScopeManager {
-    private class ScopeRegistrations {
-        private final Map<ScopeRegistration, ScopeNode> scopeRegistrations = new LinkedHashMap<>();
+    private boolean willHandleAheadOfTimeBackEvent;
+
+    private List<AheadOfTimeWillHandleBackChangedListener> aheadOfTimeWillHandleBackChangedListeners = new ArrayList<>();
+
+    public void addAheadOfTimeWillHandleBackChangedListener(AheadOfTimeWillHandleBackChangedListener aheadOfTimeWillHandleBackChangedListener) {
+        aheadOfTimeWillHandleBackChangedListeners.add(aheadOfTimeWillHandleBackChangedListener);
+    }
+
+    public void removeAheadOfTimeWillHandleBackChangedListener(AheadOfTimeWillHandleBackChangedListener aheadOfTimeWillHandleBackChangedListener) {
+        aheadOfTimeWillHandleBackChangedListeners.remove(aheadOfTimeWillHandleBackChangedListener);
+    }
+
+    private final AheadOfTimeBackCallback.EnabledChangedListener innerEnabledChangedListener = new AheadOfTimeBackCallback.EnabledChangedListener() {
+        @Override
+        public void onEnabledChanged(boolean isEnabled) {
+            if(backstack.previousTopKeyWithAssociatedScope != null) {
+                updateWillHandleAheadOfTimeBackEvent(backstack.previousTopKeyWithAssociatedScope);
+            }
+        }
+    };
+
+    private static class ScopeRegistrations {
+        public static class ScopeInternals {
+            public final ScopeNode scopeNode;
+            public final AheadOfTimeBackCallbackRegistry aheadOfTimeBackCallbackRegistry;
+
+            public ScopeInternals(
+                ScopeNode scopeNode,
+                AheadOfTimeBackCallbackRegistry aheadOfTimeBackCallbackRegistry
+            ) {
+                this.scopeNode = scopeNode;
+                this.aheadOfTimeBackCallbackRegistry = aheadOfTimeBackCallbackRegistry;
+            }
+        }
+
+        private final Map<ScopeRegistration, ScopeInternals> scopeRegistrations = new LinkedHashMap<>();
 
         public boolean containsKey(String scopeTag) {
             for(ScopeRegistration registration : scopeRegistrations.keySet()) {
@@ -55,28 +89,34 @@ class ScopeManager {
             return Collections.unmodifiableSet(scopes);
         }
 
-        public Set<Map.Entry<String, ScopeNode>> entrySet() {
-            LinkedHashSet<Map.Entry<String, ScopeNode>> set = new LinkedHashSet<>();
-            for(Map.Entry<ScopeRegistration, ScopeNode> entry : scopeRegistrations.entrySet()) {
-                Map.Entry<String, ScopeNode> mappedEntry = new AbstractMap.SimpleEntry<>(entry.getKey().scopeTag, entry.getValue());
+        public Set<Map.Entry<String, ScopeInternals>> entrySet() {
+            LinkedHashSet<Map.Entry<String, ScopeInternals>> set = new LinkedHashSet<>();
+            for(Map.Entry<ScopeRegistration, ScopeInternals> entry : scopeRegistrations.entrySet()) {
+                Map.Entry<String, ScopeInternals> mappedEntry = new AbstractMap.SimpleEntry<>(entry.getKey().scopeTag,
+                                                                                              entry.getValue());
                 set.add(mappedEntry);
             }
             return Collections.unmodifiableSet(set);
         }
 
-        public void putKey(Object key, String scopeTag, ScopeNode scopeNode, boolean isExplicitParent, boolean isGlobalScope, boolean isDummyScope) {
+        public void putKey(Object key, String scopeTag, ScopeInternals scopeInternals, boolean isExplicitParent, boolean isGlobalScope, boolean isDummyScope) {
             final List<String> explicitParentScopes;
             if(key instanceof ScopeKey.Child) {
                 explicitParentScopes = ((ScopeKey.Child) key).getParentScopes();
             } else {
                 explicitParentScopes = Collections.emptyList();
             }
-            ScopeRegistration scopeRegistration = new ScopeRegistration(key, scopeTag, explicitParentScopes, isExplicitParent, isGlobalScope, isDummyScope);
-            put(scopeRegistration, scopeNode);
+            ScopeRegistration scopeRegistration = new ScopeRegistration(key,
+                                                                        scopeTag,
+                                                                        explicitParentScopes,
+                                                                        isExplicitParent,
+                                                                        isGlobalScope,
+                                                                        isDummyScope);
+            put(scopeRegistration, scopeInternals);
         }
 
         @Nullable
-        public ScopeNode get(String scopeTag) {
+        public ScopeInternals get(String scopeTag) {
             for(ScopeRegistration registration : scopeRegistrations.keySet()) {
                 if(registration.scopeTag.equals(scopeTag)) {
                     return scopeRegistrations.get(registration);
@@ -85,20 +125,20 @@ class ScopeManager {
             return null;
         }
 
-        public void put(ScopeRegistration scopeRegistration, ScopeNode scopeNode) {
-            scopeRegistrations.put(scopeRegistration, scopeNode);
+        public void put(ScopeRegistration scopeRegistration, ScopeInternals scopeInternals) {
+            scopeRegistrations.put(scopeRegistration, scopeInternals);
         }
 
         @Nullable
-        public ScopeNode remove(String scopeTag) {
-            Iterator<Map.Entry<ScopeRegistration, ScopeNode>> iterator = scopeRegistrations.entrySet().iterator();
+        public ScopeInternals remove(String scopeTag) {
+            Iterator<Map.Entry<ScopeRegistration, ScopeInternals>> iterator = scopeRegistrations.entrySet().iterator();
             while(iterator.hasNext()) {
-                Map.Entry<ScopeRegistration, ScopeNode> entry = iterator.next();
+                Map.Entry<ScopeRegistration, ScopeInternals> entry = iterator.next();
                 String currentScopeTag = entry.getKey().scopeTag;
                 if(currentScopeTag.equals(scopeTag)) {
-                    ScopeNode scopeNode = entry.getValue();
+                    ScopeInternals scopeInternals = entry.getValue();
                     iterator.remove();
-                    return scopeNode;
+                    return scopeInternals;
                 }
             }
             return null;
@@ -202,9 +242,9 @@ class ScopeManager {
         void reorderToEnd(@Nonnull String scopeTag) {
             ScopeRegistration scopeRegistration = findScopeRegistrationForScopeTag(scopeTag);
             if(scopeRegistration != null) {
-                ScopeNode scopeNode = scopeRegistrations.remove(scopeRegistration);
+                ScopeInternals scopeInternals = scopeRegistrations.remove(scopeRegistration);
                 //noinspection ConstantConditions
-                scopeRegistrations.put(scopeRegistration, scopeNode);
+                scopeRegistrations.put(scopeRegistration, scopeInternals);
             }
         }
     }
@@ -218,12 +258,12 @@ class ScopeManager {
         private boolean isDummyScope;
 
         public ScopeRegistration(
-                @Nullable Object key, // key is null if global scope
-                @Nonnull String scopeTag,
-                @Nonnull List<String> explicitParentScopes,
-                boolean isExplicitParent,
-                boolean isGlobalScope,
-                boolean isDummyScope // no ScopeKey internal scope registrations
+            @Nullable Object key, // key is null if global scope
+            @Nonnull String scopeTag,
+            @Nonnull List<String> explicitParentScopes,
+            boolean isExplicitParent,
+            boolean isGlobalScope,
+            boolean isDummyScope // no ScopeKey internal scope registrations
         ) {
 
             //noinspection ConstantConditions
@@ -255,12 +295,18 @@ class ScopeManager {
         @Nonnull
         @Override
         public String toString() {
-            return "ScopeRegistration[scopeTag=[" + scopeTag + "], explicitParents=[" + Arrays.toString(explicitParentScopes.toArray()) + "]]";
+            return "ScopeRegistration[scopeTag=[" + scopeTag + "], explicitParents=[" + Arrays.toString(
+                explicitParentScopes.toArray()) + "]]";
         }
     }
 
     private static final String GLOBAL_SCOPE_TAG = GlobalServices.SCOPE_TAG;
-    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null, GLOBAL_SCOPE_TAG, Collections.<String>emptyList(), true, true, false);
+    private final ScopeRegistration globalScopeRegistration = new ScopeRegistration(null,
+                                                                                    GLOBAL_SCOPE_TAG,
+                                                                                    Collections.<String>emptyList(),
+                                                                                    true,
+                                                                                    true,
+                                                                                    false);
 
     private static final GlobalServices EMPTY_GLOBAL_SERVICES = GlobalServices.builder().build();
 
@@ -286,12 +332,12 @@ class ScopeManager {
     }
 
     static class AssertingScopedServices
-            implements ScopedServices {
+        implements ScopedServices {
 
         @Override
         public void bindServices(@Nonnull ServiceBinder serviceBinder) {
             throw new IllegalStateException(
-                    "No scoped services are defined. To create scoped services, an instance of ScopedServices must be provided to configure the services that are available in a given scope.");
+                "No scoped services are defined. To create scoped services, an instance of ScopedServices must be provided to configure the services that are available in a given scope.");
         }
 
     }
@@ -333,15 +379,17 @@ class ScopeManager {
             if(globalServiceFactory != null) {
                 globalServices = globalServiceFactory.create(backstack);
 
-                for(Map.Entry<String, Object> entry: globalServices.services()) {
+                for(Map.Entry<String, Object> entry : globalServices.services()) {
                     if(entry.getValue() == backstack) {
-                        throw new IllegalArgumentException("The root backstack should not be added as a service, as it would cause a circular save-state loop. Adding it as an alias would work, but should typically not be necessary because of `serviceBinder.getBackstack()`.");
+                        throw new IllegalArgumentException(
+                            "The root backstack should not be added as a service, as it would cause a circular save-state loop. Adding it as an alias would work, but should typically not be necessary because of `serviceBinder.getBackstack()`.");
                     }
                 }
             }
 
             ScopeNode scope = globalServices.getScope();
-            scopes.put(globalScopeRegistration, scope);
+            scopes.put(globalScopeRegistration,
+                       new ScopeRegistrations.ScopeInternals(scope, new AheadOfTimeBackCallbackRegistry()));
 
             restoreAndNotifyServices(GLOBAL_SCOPE_TAG, scope);
         }
@@ -353,19 +401,29 @@ class ScopeManager {
             throw new IllegalArgumentException("Scope tag provided by scope key cannot be null!");
         }
         if(!scopes.containsKey(scopeTag)) {
-            ScopeNode scope = new ScopeNode();
-            scopes.putKey(key, scopeTag, scope, isExplicitParent, false, isDummyScope);
+            ScopeRegistrations.ScopeInternals scopeInternals = new ScopeRegistrations.ScopeInternals(
+                new ScopeNode(),
+                new AheadOfTimeBackCallbackRegistry()
+            );
+            scopes.putKey(key, scopeTag, scopeInternals, isExplicitParent, false, isDummyScope);
+
+            scopeInternals.aheadOfTimeBackCallbackRegistry.addEnabledChangedListener(innerEnabledChangedListener);
 
             if(!isDummyScope) {
-                scopedServices.bindServices(new ServiceBinder(this, key, scopeTag, scope));
+                scopedServices.bindServices(new ServiceBinder(this,
+                                                              key,
+                                                              scopeTag,
+                                                              scopeInternals.scopeNode,
+                                                              scopeInternals.aheadOfTimeBackCallbackRegistry));
 
-                for(Map.Entry<String, Object> entry: scope.services()) {
+                for(Map.Entry<String, Object> entry : scopeInternals.scopeNode.services()) {
                     if(entry.getValue() == backstack) {
-                        throw new IllegalArgumentException("The root backstack should not be added as a service, as it would cause a circular save-state loop. Adding it as an alias would work, but should typically not be necessary because of `serviceBinder.getBackstack()`.");
+                        throw new IllegalArgumentException(
+                            "The root backstack should not be added as a service, as it would cause a circular save-state loop. Adding it as an alias would work, but should typically not be necessary because of `serviceBinder.getBackstack()`.");
                     }
                 }
 
-                restoreAndNotifyServices(scopeTag, scope);
+                restoreAndNotifyServices(scopeTag, scopeInternals.scopeNode);
             }
         }
     }
@@ -396,6 +454,7 @@ class ScopeManager {
         }
     }
 
+    // EventBubbling Mode
     public boolean dispatchBack(@Nonnull Object currentTop) {
         backDispatchedServices.clear();
 
@@ -403,8 +462,8 @@ class ScopeManager {
 
         try {
             for(String scopeTag : scopeTags) {
-                ScopeNode scopeNode = scopes.get(scopeTag);
                 //noinspection ConstantConditions
+                ScopeNode scopeNode = scopes.get(scopeTag).scopeNode;
                 List<Map.Entry<String, Object>> services = new ArrayList<>(scopeNode.services());
                 for(int i = services.size() - 1; i >= 0; i--) {
                     Object service = services.get(i).getValue();
@@ -428,6 +487,58 @@ class ScopeManager {
         } finally {
             backDispatchedServices.clear();
         }
+    }
+
+    public boolean willHandleAheadOfTimeBackEvent() {
+        return willHandleAheadOfTimeBackEvent;
+    }
+
+    private void updateWillHandleAheadOfTimeBackEventAndNotifyListeners(boolean willHandleAheadOfTimeBackEvent) {
+        boolean previousWillHandleAheadOfTimeBackEvent = this.willHandleAheadOfTimeBackEvent;
+        this.willHandleAheadOfTimeBackEvent = willHandleAheadOfTimeBackEvent;
+
+        if(previousWillHandleAheadOfTimeBackEvent != willHandleAheadOfTimeBackEvent) {
+            notifyWillHandleAheadOfTimeChangedListeners(willHandleAheadOfTimeBackEvent);
+        }
+    }
+
+    private void notifyWillHandleAheadOfTimeChangedListeners(boolean willHandleAheadOfTimeBackEvent) {
+        List<AheadOfTimeWillHandleBackChangedListener> copy = new ArrayList<>(aheadOfTimeWillHandleBackChangedListeners);
+        for(AheadOfTimeWillHandleBackChangedListener listener : copy) {
+            listener.willHandleBackChanged(willHandleAheadOfTimeBackEvent);
+        }
+    }
+
+    // AheadOfTime Mode
+    public void updateWillHandleAheadOfTimeBackEvent(@Nonnull Object keyWithAssociatedScope) {
+        List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(keyWithAssociatedScope, true));
+
+        for(String scopeTag : scopeTags) {
+            //noinspection ConstantConditions
+            AheadOfTimeBackCallbackRegistry aheadOfTimeBackCallbackRegistry = scopes.get(scopeTag).aheadOfTimeBackCallbackRegistry;
+            if(aheadOfTimeBackCallbackRegistry.isEnabled()) {
+                updateWillHandleAheadOfTimeBackEventAndNotifyListeners(true);
+                return;
+            }
+        }
+
+        updateWillHandleAheadOfTimeBackEventAndNotifyListeners(false);
+    }
+
+    public void handleAheadOfTimeBackEvent(@Nonnull Object currentTop) {
+        List<String> scopeTags = new ArrayList<>(scopes.findScopesForKey(currentTop, true));
+
+        for(String scopeTag : scopeTags) {
+            //noinspection ConstantConditions
+            AheadOfTimeBackCallbackRegistry aheadOfTimeBackCallbackRegistry = scopes.get(scopeTag).aheadOfTimeBackCallbackRegistry;
+            if(aheadOfTimeBackCallbackRegistry.isEnabled()) {
+                aheadOfTimeBackCallbackRegistry.onBackReceived();
+                return;
+            }
+        }
+
+        throw new AheadOfTimeBackProcessingContractViolationException(
+            "ScopeManager attempted to dispatch back, even though no enabled registration was present. This is most likely an error, and shouldn't have happened.");
     }
 
     private boolean isServiceNotRegistered(Object service) {
@@ -554,8 +665,11 @@ class ScopeManager {
 
     void destroyScope(String scopeTag) {
         if(scopes.containsKey(scopeTag)) {
-            ScopeNode scopeNode = scopes.remove(scopeTag);
-            destroyServicesAndRemoveState(scopeTag, scopeNode);
+            ScopeRegistrations.ScopeInternals scopeInternals = scopes.remove(scopeTag);
+            // noinspection ConstantConditions
+            destroyServicesAndRemoveState(scopeTag, scopeInternals.scopeNode);
+
+            scopeInternals.aheadOfTimeBackCallbackRegistry.removeEnabledChangedListener(innerEnabledChangedListener);
         }
     }
 
@@ -596,25 +710,28 @@ class ScopeManager {
         for(String newScopeTag : scopesToActivate) {
             if(!scopes.containsKey(newScopeTag)) {
                 throw new AssertionError(
-                        "The new scope [" + newScopeTag + "] should exist, but it doesn't exist in [" + Arrays.toString(scopes.keySet().toArray()) + "]" +"! This shouldn't happen. If you see this error, this functionality is broken.");
+                    "The new scope [" + newScopeTag + "] should exist, but it doesn't exist in [" + Arrays.toString(
+                        scopes.keySet().toArray()) + "]" + "! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
-            ScopeNode newScope = scopes.get(newScopeTag);
-            notifyScopeActivation(newScopeTag, newScope);
+            ScopeRegistrations.ScopeInternals newScope = scopes.get(newScopeTag);
+            //noinspection ConstantConditions
+            notifyScopeActivation(newScopeTag, newScope.scopeNode);
         }
 
         for(String previousScopeTag : scopesToDeactivate) {
             if(!scopes.containsKey(previousScopeTag)) {
                 throw new AssertionError(
-                        "The previous scope [" + previousScopeTag + "] should exist in [" + Arrays.toString(scopes.keySet().toArray()) + "]" +"! This shouldn't happen. If you see this error, this functionality is broken.");
+                    "The previous scope [" + previousScopeTag + "] should exist in [" + Arrays.toString(scopes.keySet().toArray()) + "]" + "! This shouldn't happen. If you see this error, this functionality is broken.");
             }
 
-            ScopeNode previousScopeNode = scopes.get(previousScopeTag);
-            notifyScopeDeactivation(previousScopeTag, previousScopeNode);
+            ScopeRegistrations.ScopeInternals previousScopeNode = scopes.get(previousScopeTag);
+            //noinspection ConstantConditions
+            notifyScopeDeactivation(previousScopeTag, previousScopeNode.scopeNode);
         }
     }
 
-    private void notifyScopeActivation(String newScopeTag, ScopeNode newScope) {
+    private void notifyScopeActivation(@Nonnull String newScopeTag, @Nonnull ScopeNode newScope) {
         for(Map.Entry<String, Object> entry : newScope.services()) {
             Object service = entry.getValue();
 
@@ -644,8 +761,8 @@ class ScopeManager {
             }
 
             if(isServiceNotActivated(service)
-                    && service instanceof ScopedServices.Activated
-                    && !untrackEventInvocationTracker.containsKey(service)
+                && service instanceof ScopedServices.Activated
+                && !untrackEventInvocationTracker.containsKey(service)
             ) {
                 untrackEventInvocationTracker.put(service, 1);
                 ((ScopedServices.Activated) service).onServiceInactive();
@@ -657,9 +774,10 @@ class ScopeManager {
 
     StateBundle saveStates() {
         StateBundle rootBundle = new StateBundle();
-        for(Map.Entry<String, ScopeNode> scopeSet : scopes.entrySet()) {
+        for(Map.Entry<String, ScopeRegistrations.ScopeInternals> scopeSet : scopes.entrySet()) {
             String scopeKey = scopeSet.getKey();
-            ScopeNode services = scopeSet.getValue();
+            ScopeRegistrations.ScopeInternals scopeInternals = scopeSet.getValue();
+            ScopeNode services = scopeInternals.scopeNode;
 
             StateBundle scopeBundle = new StateBundle();
             for(Map.Entry<String, Object> serviceEntry : services.services()) {
@@ -688,8 +806,8 @@ class ScopeManager {
             return false;
         }
 
-        ScopeNode services = scopes.get(scopeTag);
-        return services.hasService(serviceTag);
+        ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scopeTag);
+        return scopeInternals != null && scopeInternals.scopeNode.hasService(serviceTag);
     }
 
     @Nonnull
@@ -701,11 +819,12 @@ class ScopeManager {
             throw new IllegalArgumentException("The specified scope with tag [" + scopeTag + "] does not exist!");
         }
 
-        ScopeNode services = scopes.get(scopeTag);
-        if(!services.hasService(serviceTag)) {
+        ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scopeTag);
+        //noinspection ConstantConditions
+        if(!scopeInternals.scopeNode.hasService(serviceTag)) {
             throw new IllegalArgumentException("The specified service with tag [" + serviceTag + "] does not exist in scope [" + scopeTag + "]! Did you accidentally try to use the same scope tag with different services?");
         }
-        return services.getService(serviceTag);
+        return scopeInternals.scopeNode.getService(serviceTag);
     }
 
     boolean hasScope(@Nonnull String scopeTag) {
@@ -781,8 +900,8 @@ class ScopeManager {
         Set<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
-            ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasService(identifier)) {
+            ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scope);
+            if(scopeInternals != null && scopeInternals.scopeNode.hasService(identifier)) {
                 return true;
             }
         }
@@ -803,8 +922,8 @@ class ScopeManager {
         LinkedHashSet<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
-            ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasService(identifier)) {
+            ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scope);
+            if(scopeInternals != null && scopeInternals.scopeNode.hasService(identifier)) {
                 return true;
             }
         }
@@ -831,9 +950,9 @@ class ScopeManager {
         LinkedHashSet<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, true);
 
         for(String scope : activeScopes) {
-            ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasService(identifier)) {
-                return scopeNode.getService(identifier);
+            ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scope);
+            if(scopeInternals != null && scopeInternals.scopeNode.hasService(identifier)) {
+                return scopeInternals.scopeNode.getService(identifier);
             }
         }
 
@@ -842,7 +961,7 @@ class ScopeManager {
         }
 
         throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
-                activeScopes.toArray()) + "]!");
+            activeScopes.toArray()) + "]!");
     }
 
     <T> T lookupFromScopeAll(String scopeTag, String identifier) {
@@ -851,9 +970,9 @@ class ScopeManager {
         LinkedHashSet<String> activeScopes = scopes.findScopesForScopeTag(scopeTag, false);
 
         for(String scope : activeScopes) {
-            ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasService(identifier)) {
-                return scopeNode.getService(identifier);
+            ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scope);
+            if(scopeInternals != null && scopeInternals.scopeNode.hasService(identifier)) {
+                return scopeInternals.scopeNode.getService(identifier);
             }
         }
 
@@ -862,15 +981,15 @@ class ScopeManager {
         }
 
         throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
-                activeScopes.toArray()) + "]!");
+            activeScopes.toArray()) + "]!");
     }
 
     boolean canFindService(@Nonnull String identifier) {
         checkServiceTag(identifier);
         List<String> activeScopes = scopes.getScopeTagsInTraversalOrder();
         for(String scope : activeScopes) {
-            ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasService(identifier)) {
+            ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scope);
+            if(scopeInternals != null && scopeInternals.scopeNode.hasService(identifier)) {
                 return true;
             }
         }
@@ -887,9 +1006,9 @@ class ScopeManager {
         List<String> activeScopes = scopes.getScopeTagsInTraversalOrder();
 
         for(String scope : activeScopes) {
-            ScopeNode scopeNode = scopes.get(scope);
-            if(scopeNode != null && scopeNode.hasService(identifier)) {
-                return scopeNode.getService(identifier);
+            ScopeRegistrations.ScopeInternals scopeInternals = scopes.get(scope);
+            if(scopeInternals != null && scopeInternals.scopeNode.hasService(identifier)) {
+                return scopeInternals.scopeNode.getService(identifier);
             }
         }
 
@@ -897,11 +1016,12 @@ class ScopeManager {
             return globalServices.getService(identifier);
         }
 
-        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scopes, which are " + Arrays.toString(activeScopes.toArray()) + "! " +
-                "Is the scope tag registered via a ScopeKey? " +
-                "If yes, make sure the StateChanger has been set by this time, " +
-                "and that you've bound and are trying to lookup the service with the correct service tag. " +
-                "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scopes, which are " + Arrays.toString(
+            activeScopes.toArray()) + "! " +
+                                            "Is the scope tag registered via a ScopeKey? " +
+                                            "If yes, make sure the StateChanger has been set by this time, " +
+                                            "and that you've bound and are trying to lookup the service with the correct service tag. " +
+                                            "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
     }
 
     private void verifyStackIsInitialized() {

@@ -43,12 +43,12 @@ import javax.annotation.Nullable;
  * The backstack is initialized with {@link Backstack#setup(List)}, and {@link Backstack#setStateChanger(StateChanger)}.
  */
 public class Backstack
-        implements Bundleable {
+    implements Bundleable {
     private final long threadId = Thread.currentThread().getId();
 
     /**
      * Retrieves the key from the provided Context. This relies on that within the base context chain, there is at least one {@link KeyContextWrapper}.
-     *
+     * <p>
      * The {@link KeyContextWrapper} is generally created via {@link StateChange#createContext(Context, Object)}.
      *
      * @param context the context
@@ -94,7 +94,7 @@ public class Backstack
         return RETAINED_OBJECT_STATES_TAG;
     }
 
-    private Object previousTopKeyWithAssociatedScope = null;
+    Object previousTopKeyWithAssociatedScope = null;
 
     private final StateChanger managedStateChanger = new StateChanger() {
         @Override
@@ -179,6 +179,8 @@ public class Backstack
                 // scope eviction + scoped + re-order scope hierarchy
                 scopeManager.cleanupScopesBy(newState);
 
+                scopeManager.updateWillHandleAheadOfTimeBackEvent(newTopKeyWithAssociatedScope); // we should handle back in the current active scope chain.
+
                 if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
                     core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
                 }
@@ -186,13 +188,63 @@ public class Backstack
         }
     };
 
+    private boolean willHandleAheadOfTimeBackEvent = false;
+
+    private void updateWillHandleAheadOfTimeBackEvent(boolean willHandleAheadOfTimeBackEvent) {
+        boolean previousWillHandleAheadOfTimeBackEvent = this.willHandleAheadOfTimeBackEvent;
+        this.willHandleAheadOfTimeBackEvent = willHandleAheadOfTimeBackEvent;
+
+        if(previousWillHandleAheadOfTimeBackEvent != willHandleAheadOfTimeBackEvent) {
+            notifyWillHandleAheadOfTimeChangedListeners(willHandleAheadOfTimeBackEvent);
+        }
+    }
+
+    private void notifyWillHandleAheadOfTimeChangedListeners(boolean willHandleAheadOfTimeBackEvent) {
+        List<AheadOfTimeWillHandleBackChangedListener> copy = new ArrayList<>(aheadOfTimeWillHandleBackChangedListeners);
+        for(AheadOfTimeWillHandleBackChangedListener listener : copy) {
+            listener.willHandleBackChanged(willHandleAheadOfTimeBackEvent);
+        }
+    }
+
+    private BackHandlingModel backHandlingModel = BackHandlingModel.EVENT_BUBBLING;
+
+    /**
+     * Returns the currently set {@link BackHandlingModel}.
+     *
+     * @return the current back handling model.
+     */
+    BackHandlingModel getBackHandlingModel() {
+        return backHandlingModel;
+    }
+
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
 
     /**
-     * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
+     * Specifies the {@link BackHandlingModel}. This allows switching between back handling models.
+     * <p>
+     * In Android 14, the event bubbling model is intended to be replaced with the ahead-of-time model, which is enabled via `android:enableOnBackInvokedCallback`.
+     * <p>
+     * {@link BackHandlingModel#EVENT_BUBBLING} is used with onBackPressed()/{@link ScopedServices.HandlesBack}.
+     * <p>
+     * {@link BackHandlingModel#AHEAD_OF_TIME} is used with onBackPressedDispatcher/{@link AheadOfTimeBackCallbackRegistry} and {@link Backstack#addAheadOfTimeWillHandleBackChangedListener(AheadOfTimeWillHandleBackChangedListener)}}.
      *
+     * @param backHandlingModel the back handling model
+     */
+    public void setBackHandlingModel(@Nonnull BackHandlingModel backHandlingModel) {
+        if(core != null) {
+            throw new IllegalStateException("Back handling model should be set before calling `setup()`");
+        }
+        if(backHandlingModel == null) {
+            throw new IllegalArgumentException("The back handling model cannot be null!");
+        }
+        this.backHandlingModel = backHandlingModel;
+    }
+
+    /**
+     * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
+     * <p>
      * If used, this method must be called before {@link Backstack#setup(List)} .
      *
      * @param keyFilter The custom {@link KeyFilter}.
@@ -209,7 +261,7 @@ public class Backstack
 
     /**
      * Specifies a custom {@link KeyParceler}, allowing key parcellation strategies to be used for turning a key into Parcelable.
-     *
+     * <p>
      * If used, this method must be called before {@link Backstack#setup(List)} .
      *
      * @param keyParceler The custom {@link KeyParceler}.
@@ -227,7 +279,7 @@ public class Backstack
     /**
      * Specifies a custom {@link StateClearStrategy}, allowing a custom strategy for clearing the retained state of keys.
      * The {@link DefaultStateClearStrategy} clears the {@link SavedState} for keys that are not found in the new state.
-     *
+     * <p>
      * If used, this method must be called before {@link Backstack#setup(List)} .
      *
      * @param stateClearStrategy The custom {@link StateClearStrategy}.
@@ -272,9 +324,9 @@ public class Backstack
 
     /**
      * Specifies a {@link GlobalServices} that describes the services of the global scope.
-     *
+     * <p>
      * Must be called before the initial state change. Call {@link Backstack#canSetScopeProviders()} to see if it's allowed.
-     *
+     * <p>
      * Please note that setting a {@link GlobalServices.Factory} overrides this configuration option.
      *
      * @param globalServices the {@link GlobalServices}.
@@ -291,13 +343,13 @@ public class Backstack
 
     /**
      * Specifies a {@link GlobalServices.Factory} that describes the services of the global scope that are deferred until first creation.
-     *
+     * <p>
      * Must be called before the initial state change. Call {@link Backstack#canSetScopeProviders()} to see if it's allowed.
-     *
+     * <p>
      * Please note that a strong reference is kept to the factory, and the {@link Backstack} is typically preserved across configuration change.
      * It is recommended that it is NOT an anonymous inner class or normal inner class in an Activity,
      * because that could cause memory leaks.
-     *
+     * <p>
      * Instead, it should be a class, or a static inner class.
      *
      * @param globalServiceFactory the {@link GlobalServices.Factory}.
@@ -317,8 +369,106 @@ public class Backstack
     Map<Object, SavedState> keyStateMap = new HashMap<>();
     ScopeManager scopeManager = new ScopeManager();
 
+    private List<AheadOfTimeWillHandleBackChangedListener> aheadOfTimeWillHandleBackChangedListeners = new ArrayList<>();
+
+    /**
+     * Adds an {@link AheadOfTimeWillHandleBackChangedListener}. It will be called when {@link #willHandleAheadOfTimeBack()} changes.
+     *
+     * @param aheadOfTimeWillHandleBackChangedListener the listener
+     */
+    public void addAheadOfTimeWillHandleBackChangedListener(@Nonnull AheadOfTimeWillHandleBackChangedListener aheadOfTimeWillHandleBackChangedListener) {
+        if(backHandlingModel != BackHandlingModel.AHEAD_OF_TIME) {
+            throw new IllegalStateException(
+                "Calling `addAheadOfTimeWillHandleBackChangedListener` is only supported when using the ahead-of-time back handling model.");
+        }
+
+        if(aheadOfTimeWillHandleBackChangedListener == null) {
+            throw new IllegalArgumentException("aheadOfTimeWillHandleBackChangedListener should not be null!");
+        }
+
+        aheadOfTimeWillHandleBackChangedListeners.add(aheadOfTimeWillHandleBackChangedListener);
+    }
+
+    /**
+     * Removes an {@link AheadOfTimeWillHandleBackChangedListener}. It will no longer be called when {@link #willHandleAheadOfTimeBack()} changes.
+     *
+     * @param aheadOfTimeWillHandleBackChangedListener the listener
+     */
+    public void removeAheadOfTimeWillHandleBackChangedListener(@Nonnull AheadOfTimeWillHandleBackChangedListener aheadOfTimeWillHandleBackChangedListener) {
+        if(backHandlingModel != BackHandlingModel.AHEAD_OF_TIME) {
+            throw new IllegalStateException(
+                "Calling `removeAheadOfTimeWillHandleBackChangedListener` is only supported when using the ahead-of-time back handling model.");
+        }
+
+        if(aheadOfTimeWillHandleBackChangedListener == null) {
+            throw new IllegalArgumentException("aheadOfTimeWillHandleBackChangedListener should not be null!");
+        }
+
+        aheadOfTimeWillHandleBackChangedListeners.remove(aheadOfTimeWillHandleBackChangedListener);
+    }
+
+    private final AheadOfTimeBackCallback internalCoreAheadOfTimeBackCallback =
+        new AheadOfTimeBackCallback(false) {
+            @Override
+            public void onBackReceived() {
+                boolean result = core.goBack();
+
+                if(!result) {
+                    throw new AheadOfTimeBackProcessingContractViolationException(
+                        "Unexpected back handling in ahead-of-time back handling model. This should never happen, please report it if you see this exception.");
+                }
+            }
+        };
+
+    private final AheadOfTimeBackCallback internalScopeManagerAheadOfTimeBackCallback =
+        new AheadOfTimeBackCallback(false) {
+            @Override
+            public void onBackReceived() {
+                boolean willHandleBack = scopeManager.willHandleAheadOfTimeBackEvent();
+
+                if(!willHandleBack) {
+                    throw new AheadOfTimeBackProcessingContractViolationException(
+                        "Scope manager callback was enabled even though it won't process back. This should never happen, please report it if you see this exception.");
+                }
+
+                scopeManager.handleAheadOfTimeBackEvent(previousTopKeyWithAssociatedScope);
+            }
+        };
+
+    private final AheadOfTimeWillHandleBackChangedListener internalCoreAheadOfTimeWillHandleBackChangedListener =
+        new AheadOfTimeWillHandleBackChangedListener() {
+            @Override
+            public void willHandleBackChanged(boolean willHandleBack) {
+                internalCoreAheadOfTimeBackCallback.setEnabled(willHandleBack);
+            }
+        };
+
+    private final AheadOfTimeWillHandleBackChangedListener internalScopeManagerAheadOfTimeWillHandleBackChangedListener =
+        new AheadOfTimeWillHandleBackChangedListener() {
+            @Override
+            public void willHandleBackChanged(boolean willHandleBack) {
+                internalScopeManagerAheadOfTimeBackCallback.setEnabled(willHandleBack);
+            }
+        };
+
     /* init */ {
         scopeManager.setBackstack(this);
+        scopeManager.addAheadOfTimeWillHandleBackChangedListener(
+            internalScopeManagerAheadOfTimeWillHandleBackChangedListener);
+
+        internalCoreAheadOfTimeBackCallback.addEnabledChangedListener(new AheadOfTimeBackCallback.EnabledChangedListener() {
+            @Override
+            public void onEnabledChanged(boolean isEnabled) {
+                updateWillHandleAheadOfTimeBackEvent(isEnabled || internalScopeManagerAheadOfTimeBackCallback.isEnabled());
+            }
+        });
+
+        internalScopeManagerAheadOfTimeBackCallback.addEnabledChangedListener(new AheadOfTimeBackCallback.EnabledChangedListener() {
+            @Override
+            public void onEnabledChanged(boolean isEnabled) {
+                updateWillHandleAheadOfTimeBackEvent(isEnabled || internalCoreAheadOfTimeBackCallback.isEnabled());
+            }
+        });
     }
 
     StateChanger stateChanger;
@@ -333,9 +483,16 @@ public class Backstack
      * @param initialKeys the initial keys of the backstack
      */
     public void setup(@Nonnull List<?> initialKeys) {
+        if(core != null) {
+            core.removeCompletionListener(managedStateChangerCompletionListener); // shouldn't ever really happen, but
+            core.unregisterAheadOfTimeWillHandleBackChangedListener(internalCoreAheadOfTimeWillHandleBackChangedListener); // shouldn't ever really happen, but
+            finalizeScopes();
+        }
+
         core = new NavigationCore(initialKeys);
         core.setBackstack(this);
         core.addCompletionListener(managedStateChangerCompletionListener); // fix #220
+        core.registerAheadOfTimeWillHandleBackChangedListener(internalCoreAheadOfTimeWillHandleBackChangedListener);
     }
 
     /**
@@ -396,9 +553,9 @@ public class Backstack
 
     /**
      * Typically called when Activity is finishing, and the remaining scopes should be destroyed for proper clean-up.
-     *
+     * <p>
      * Note that if you use {@link BackstackDelegate} or {@link com.zhuinden.simplestack.navigator.Navigator}, then there is no need to call this method manually.
-     *
+     * <p>
      * If the scopes are already finalized, then calling this method has no effect (until scopes are re-built by any future navigation events).
      */
     public void finalizeScopes() {
@@ -422,7 +579,8 @@ public class Backstack
 
             List<String> scopesToDeactivateList = new ArrayList<>(scopesToDeactivate);
             Collections.reverse(scopesToDeactivateList);
-            scopeManager.dispatchActivation(new LinkedHashSet<>(scopesToDeactivateList), Collections.<String>emptySet());
+            scopeManager.dispatchActivation(new LinkedHashSet<>(scopesToDeactivateList),
+                                            Collections.<String>emptySet());
         }
 
         scopeManager.deactivateGlobalScope();
@@ -567,7 +725,7 @@ public class Backstack
 
     /**
      * Returns a list of the scopes accessible from the given key.
-     *
+     * <p>
      * The order of the scopes is that the 0th index is the current scope (if available), followed by parents.
      *
      * @param key        the key
@@ -618,10 +776,10 @@ public class Backstack
      */
     @Nonnull
     public SavedState getSavedState(@Nonnull Object key) {
-        if (key == null) {
+        if(key == null) {
             throw new IllegalArgumentException("Key cannot be null!");
         }
-        if (!keyStateMap.containsKey(key)) {
+        if(!keyStateMap.containsKey(key)) {
             keyStateMap.put(key, SavedState.builder().setKey(key).build());
         }
         return keyStateMap.get(key);
@@ -655,7 +813,7 @@ public class Backstack
     public <T> T getRetainedObject(@Nonnull String objectTag) {
         assertCorrectThread();
 
-        if (!retainedObjects.containsKey(objectTag)) {
+        if(!retainedObjects.containsKey(objectTag)) {
             throw new IllegalArgumentException("Retained object with tag [" + objectTag + "] was not found.!");
         }
 
@@ -675,23 +833,23 @@ public class Backstack
      */
     public void addRetainedObject(@Nonnull String objectTag, @Nonnull Object retainedObject) {
         //noinspection ConstantConditions
-        if (objectTag == null) {
+        if(objectTag == null) {
             throw new NullPointerException("objectTag cannot be null!");
         }
 
         //noinspection ConstantConditions
-        if (retainedObject == null) {
+        if(retainedObject == null) {
             throw new NullPointerException("retainedObject cannot be null!");
         }
 
         assertCorrectThread();
 
-        if (retainedObjects.containsKey(objectTag)) {
+        if(retainedObjects.containsKey(objectTag)) {
             throw new IllegalArgumentException("A retained object is already added with the object tag [" + objectTag + "]");
         }
 
-        if (pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
-            if (!(retainedObject instanceof Bundleable)) {
+        if(pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
+            if(!(retainedObject instanceof Bundleable)) {
                 throw new IllegalStateException("State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
             }
 
@@ -712,7 +870,7 @@ public class Backstack
     @Nullable
     public <T> T removeRetainedObject(@Nonnull String objectTag) {
         //noinspection ConstantConditions
-        if (objectTag == null) {
+        if(objectTag == null) {
             throw new NullPointerException("objectTag cannot be null!");
         }
 
@@ -734,15 +892,15 @@ public class Backstack
     public void persistViewToState(@Nullable View view) {
         assertCorrectThread();
 
-        if (view != null) {
+        if(view != null) {
             Object key = KeyContextWrapper.getKey(view.getContext());
-            if (key == null) {
+            if(key == null) {
                 throw new IllegalArgumentException("The view [" + view + "] contained no key in its context hierarchy. The view or its parent hierarchy should be inflated by a layout inflater from `stateChange.createContext(baseContext, key)`, or a KeyContextWrapper.");
             }
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             view.saveHierarchyState(viewHierarchyState);
             StateBundle bundle = null;
-            if (view instanceof Bundleable) {
+            if(view instanceof Bundleable) {
                 bundle = ((Bundleable) view).toBundle();
             }
             SavedState previousSavedState = getSavedState(key);
@@ -759,24 +917,24 @@ public class Backstack
     public void restoreViewFromState(@Nonnull View view) {
         assertCorrectThread();
 
-        if (view == null) {
+        if(view == null) {
             throw new IllegalArgumentException("You cannot restore state into null view!");
         }
         Object newKey = KeyContextWrapper.getKey(view.getContext());
         SavedState savedState = getSavedState(newKey);
         view.restoreHierarchyState(savedState.getViewHierarchyState());
-        if (view instanceof Bundleable) {
+        if(view instanceof Bundleable) {
             ((Bundleable) view).fromBundle(savedState.getViewBundle());
         }
     }
 
     /**
      * Allows adding a {@link Backstack.CompletionListener} to the internal {@link Backstack} that is called when the state change is completed, but before the state is cleared.
-     *
+     * <p>
      * Please note that a strong reference is kept to the listener, and the {@link Backstack} is typically preserved across configuration change.
      * It is recommended that it is NOT an anonymous inner class or normal inner class in an Activity,
      * because that could cause memory leaks.
-     *
+     * <p>
      * Instead, it should be a class, or a static inner class.
      *
      * @param stateChangeCompletionListener the state change completion listener.
@@ -824,11 +982,11 @@ public class Backstack
 
         assertCorrectThread();
 
-        if (stateBundle != null) {
+        if(stateBundle != null) {
             List<Object> keys = new ArrayList<>();
             List<Parcelable> parcelledKeys = stateBundle.getParcelableArrayList(getHistoryTag());
-            if (parcelledKeys != null) {
-                for (Parcelable parcelledKey : parcelledKeys) {
+            if(parcelledKeys != null) {
+                for(Parcelable parcelledKey : parcelledKeys) {
                     keys.add(keyParceler.fromParcelable(parcelledKey));
                 }
             }
@@ -847,10 +1005,10 @@ public class Backstack
                         continue;
                     }
                     SavedState savedState = SavedState.builder().setKey(key)
-                            .setViewHierarchyState(parcelledState.viewHierarchyState)
-                            .setBundle(parcelledState.bundle)
-                            .setViewBundle(parcelledState.viewBundle)
-                            .build();
+                        .setViewHierarchyState(parcelledState.viewHierarchyState)
+                        .setBundle(parcelledState.bundle)
+                        .setViewBundle(parcelledState.viewBundle)
+                        .build();
                     keyStateMap.put(savedState.getKey(), savedState);
                 }
             }
@@ -858,15 +1016,15 @@ public class Backstack
             scopeManager.setRestoredStates(stateBundle.getBundle(SCOPES_TAG));
 
             StateBundle retainedStates = stateBundle.getBundle(RETAINED_OBJECT_STATES_TAG);
-            if (retainedStates != null) {
+            if(retainedStates != null) {
                 pendingRestoredRetainedObjectStates.putAll(retainedStates);
 
-                for (Map.Entry<String, Object> retainedEntry : retainedObjects.entrySet()) {
+                for(Map.Entry<String, Object> retainedEntry : retainedObjects.entrySet()) {
                     String objectTag = retainedEntry.getKey();
                     Object retainedObject = retainedEntry.getValue();
 
-                    if (pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
-                        if (!(retainedObject instanceof Bundleable)) {
+                    if(pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
+                        if(!(retainedObject instanceof Bundleable)) {
                             throw new IllegalStateException("State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
                         }
                         ((Bundleable) retainedObject).fromBundle(pendingRestoredRetainedObjectStates.getBundle(objectTag));
@@ -878,14 +1036,14 @@ public class Backstack
     }
 
     private void assertCorrectThread() {
-        if (Thread.currentThread().getId() != threadId) {
+        if(Thread.currentThread().getId() != threadId) {
             throw new IllegalStateException(
-                    "The backstack is not thread-safe, and must be manipulated only from the thread where it was originally created.");
+                "The backstack is not thread-safe, and must be manipulated only from the thread where it was originally created.");
         }
     }
 
     private void checkBackstack(String message) {
-        if (core == null) {
+        if(core == null) {
             throw new IllegalStateException(message);
         }
     }
@@ -902,13 +1060,13 @@ public class Backstack
 
         StateBundle stateBundle = new StateBundle();
         ArrayList<Parcelable> history = new ArrayList<>();
-        for (Object key : getHistory()) {
+        for(Object key : getHistory()) {
             history.add(keyParceler.toParcelable(key));
         }
         stateBundle.putParcelableArrayList(getHistoryTag(), history);
 
         ArrayList<ParcelledState> parcelledStates = new ArrayList<>();
-        for (SavedState savedState : keyStateMap.values()) {
+        for(SavedState savedState : keyStateMap.values()) {
             ParcelledState parcelledState = new ParcelledState();
             parcelledState.parcelableKey = keyParceler.toParcelable(savedState.getKey());
             parcelledState.viewHierarchyState = savedState.getViewHierarchyState();
@@ -921,11 +1079,11 @@ public class Backstack
         stateBundle.putParcelable(getScopesTag(), scopeManager.saveStates());
 
         StateBundle retainedObjectStates = new StateBundle();
-        for (Map.Entry<String, Object> entry : retainedObjects.entrySet()) {
+        for(Map.Entry<String, Object> entry : retainedObjects.entrySet()) {
             final String objectTag = entry.getKey();
             final Object retainedObject = entry.getValue();
 
-            if (retainedObject instanceof Bundleable) {
+            if(retainedObject instanceof Bundleable) {
                 StateBundle retainedBundle = ((Bundleable) retainedObject).toBundle();
                 retainedObjectStates.putParcelable(objectTag, retainedBundle);
             }
@@ -989,7 +1147,7 @@ public class Backstack
      * Replaces the current top with the provided key.
      * This means removing the current last element, and then adding the new element.
      *
-     * @param newTop the new top key
+     * @param newTop    the new top key
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
     // @MainThread // removed android.support.annotation
@@ -1002,7 +1160,7 @@ public class Backstack
      * Goes "up" to the provided element.
      * This means that if the provided element is found anywhere in the history, then the history goes to it.
      * If not found, then the current top is replaced with the provided element.
-     *
+     * <p>
      * Going up occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param newKey the new key to go up to
@@ -1017,10 +1175,10 @@ public class Backstack
      * Goes "up" to the provided element.
      * This means that if the provided element is found anywhere in the history, then the history goes to it (unless specified otherwise).
      * If not found, then the current top is replaced with the provided element.
-     *
+     * <p>
      * Going up occurs in {@link StateChange#BACKWARD} direction.
      *
-     * @param newKey the new key to go up to
+     * @param newKey         the new key to go up to
      * @param fallbackToBack specifies that if the key is found in the backstack, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
      */
     // @MainThread // removed android.support.annotation
@@ -1033,7 +1191,7 @@ public class Backstack
      * Moves the provided new key to the top of the backstack.
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
-     *
+     * <p>
      * The used direction is {@link StateChange#FORWARD}.
      *
      * @param newKey the new key
@@ -1049,7 +1207,7 @@ public class Backstack
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
      *
-     * @param newKey the new key
+     * @param newKey    the new key
      * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
      */
     // @MainThread // removed android.support.annotation
@@ -1060,7 +1218,7 @@ public class Backstack
 
     /**
      * Jumps to the root of the backstack.
-     *
+     * <p>
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
     // @MainThread // removed android.support.annotation
@@ -1085,7 +1243,7 @@ public class Backstack
      * If the chain of parents is found as previous elements, then it works as back navigation to that chain,, removing all other elements on top of it.
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
      * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
-     *
+     * <p>
      * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param parentChain the chain of parents, from oldest to newest.
@@ -1099,10 +1257,9 @@ public class Backstack
     /**
      * Exits the provided scope, removing all keys that exist that include the given scope.
      *
-     * @throws IllegalArgumentException when the scope does not exist.
-     * @throws IllegalStateException when the backstack is still empty.
-     *
      * @param scopeTag the scope to exit from
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException    when the backstack is still empty.
      */
     public void exitScope(@Nonnull String scopeTag) {
         exitScope(scopeTag, StateChange.BACKWARD);
@@ -1110,14 +1267,13 @@ public class Backstack
 
     /**
      * Exits the provided scope, removing all keys that exist that include the given scope.
-     *
+     * <p>
      * If the scope is provided by the first key in the history, then it works as {@link Backstack#jumpToRoot(int direction)}.
      *
-     * @throws IllegalArgumentException when the scope does not exist.
-     * @throws IllegalStateException when the backstack is still empty.
-     *
-     * @param scopeTag the scope to exit from
+     * @param scopeTag  the scope to exit from
      * @param direction the direction
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException    when the backstack is still empty.
      */
     public void exitScope(@Nonnull String scopeTag, @StateChange.StateChangeDirection int direction) {
         checkBackstack("A backstack must be set up before navigation.");
@@ -1125,13 +1281,13 @@ public class Backstack
         assertCorrectThread();
 
         //noinspection ConstantConditions
-        if (scopeTag == null) {
+        if(scopeTag == null) {
             throw new NullPointerException("scopeTag must not be null!");
         }
 
         History<Object> keys = getHistory();
 
-        if (keys.isEmpty()) {
+        if(keys.isEmpty()) {
             throw new IllegalStateException("Cannot exit scope [" + scopeTag + "] within an empty backstack.");
         }
 
@@ -1141,7 +1297,7 @@ public class Backstack
 
         Object candidateKey = keys.get(0);
 
-        for(Object key: keys) {
+        for(Object key : keys) {
             if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
                 break;
             }
@@ -1156,12 +1312,11 @@ public class Backstack
      * Exits the provided scope, removing all keys that exist that include the given scope.
      * During the exit, the provided new key will be appended to the history if it's not yet added, otherwise, it'll go to it.
      *
-     * @throws IllegalArgumentException when the scope does not exist.
-     * @throws IllegalStateException when the backstack is still empty.
-     *
-     * @param scopeTag the scope to exit from
+     * @param scopeTag  the scope to exit from
      * @param targetKey the key to exit to, inclusive if found, appended if not found
      * @param direction the direction
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException    when the backstack is still empty.
      */
     public void exitScopeTo(@Nonnull String scopeTag, @Nonnull Object targetKey, @StateChange.StateChangeDirection int direction) {
         checkBackstack("A backstack must be set up before navigation.");
@@ -1188,7 +1343,7 @@ public class Backstack
 
         Object candidateKey = keys.get(0);
 
-        for(Object key: keys) {
+        for(Object key : keys) {
             if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
                 break;
             }
@@ -1216,10 +1371,10 @@ public class Backstack
      * If the chain of parents is found as previous elements, then it works as back navigation to that chain, removing all other elements on top of it (unless specified otherwise).
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
      * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
-     *
+     * <p>
      * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
      *
-     * @param parentChain the chain of parents, from oldest to newest.
+     * @param parentChain    the chain of parents, from oldest to newest.
      * @param fallbackToBack determines that if the chain is fully found in the backstack, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
      */
     // @MainThread // removed android.support.annotation
@@ -1229,13 +1384,31 @@ public class Backstack
     }
 
     /**
+     * Specifies if the Backstack will successfully handle back if {@link Backstack#goBack())} is invoked.
+     * <p>
+     * Used only in ahead-of-time back handling, see {@link BackHandlingModel#AHEAD_OF_TIME}.
+     * <p>
+     * Trying to call this function when using {@link BackHandlingModel#EVENT_BUBBLING} will throw an exception.
+     *
+     * @return whether back will be handled
+     */
+    public boolean willHandleAheadOfTimeBack() {
+        if(backHandlingModel != BackHandlingModel.AHEAD_OF_TIME) {
+            throw new IllegalStateException(
+                "Calling `willHandleAheadOfTimeBack` is only supported when using the ahead-of-time back handling model.");
+        }
+
+        return willHandleAheadOfTimeBackEvent;
+    }
+
+    /**
      * Goes back in the history.
-     * If the key is found, then it goes backward to the existing key.
-     * If the key is not found, then it goes forward to the newly added key.
+     * <p>
+     * When using {@link BackHandlingModel#EVENT_BUBBLING}, before navigating back in the history, it attempts to dispatch {@link ScopedServices.HandlesBack#onBackEvent()} to scoped services in the active scope chain.
+     * <p>
+     * When using {@link BackHandlingModel#AHEAD_OF_TIME}, it will dispatch
      *
-     * Before navigating back in the history, it attempts to dispatch {@link ScopedServices.HandlesBack#onBackEvent()} to scoped services in the active scope chain.
-     *
-     * @return true if the back event was handled, false if there is only one key left.
+     * @return true if the back event was handled. When using {@link BackHandlingModel#EVENT_BUBBLING}, return false otherwise. When using {@link BackHandlingModel#AHEAD_OF_TIME}
      */
     // @MainThread // removed android.support.annotation
     public boolean goBack() {
@@ -1245,26 +1418,51 @@ public class Backstack
             return true;
         }
 
-        Object topKey = getHistory().top();
+        if(backHandlingModel == BackHandlingModel.EVENT_BUBBLING) {
+            Object topKey = getHistory().top();
 
-        if(topKey == null) {
-            return false;
+            if(topKey == null) {
+                return false;
+            }
+
+            boolean handled = scopeManager.dispatchBack(topKey);
+
+            if(handled) {
+                return true;
+            }
+
+            return core.goBack();
+        } else if(backHandlingModel == BackHandlingModel.AHEAD_OF_TIME) {
+            Object topKey = getHistory().top();
+
+            if(topKey == null) {
+                throw new AheadOfTimeBackProcessingContractViolationException(
+                    "`goBack()` in AHEAD_OF_TIME mode should not be called when the backstack will not handle back. No top key found.");
+            }
+
+            if(internalScopeManagerAheadOfTimeBackCallback.isEnabled()) {
+                internalScopeManagerAheadOfTimeBackCallback.onBackReceived();
+
+                scopeManager.updateWillHandleAheadOfTimeBackEvent(previousTopKeyWithAssociatedScope); // when scoped service intercepts back, the managed state changer doesn't run, we have to do it here too
+                return true;
+            }
+
+            if(internalCoreAheadOfTimeBackCallback.isEnabled()) {
+                internalCoreAheadOfTimeBackCallback.onBackReceived(); // this will update the scope manager once scopes are cleaned up
+                return true;
+            }
+
+            throw new AheadOfTimeBackProcessingContractViolationException(
+                "`goBack()` in AHEAD_OF_TIME mode should not be called when the backstack will not handle back. No enabled callbacks found.");
         }
-
-        boolean handled = scopeManager.dispatchBack(topKey);
-
-        if(handled) {
-            return true;
-        }
-
-        return core.goBack();
+        throw new IllegalStateException("Unhandled back handling model: " + backHandlingModel.name());
     }
 
     /**
      * Immediately clears the backstack, it is NOT enqueued as a state change.
-     *
+     * <p>
      * If there are pending state changes, then it throws an exception.
-     *
+     * <p>
      * You should generally not need to use this method.
      */
     // @MainThread // removed android.support.annotation
@@ -1292,10 +1490,9 @@ public class Backstack
     /**
      * Returns the root (first) element of this history, or null if the history is empty.
      *
-     * @throws IllegalStateException if the history doesn't contain any elements yet.
-     *
      * @param <K> the type of the key
      * @return the root (first) key
+     * @throws IllegalStateException if the history doesn't contain any elements yet.
      */
     @Nonnull
     public <K> K root() {
@@ -1306,10 +1503,9 @@ public class Backstack
     /**
      * Returns the last element in the list, or null if the history is empty.
      *
-     * @throws IllegalStateException if the history doesn't contain any elements yet.
-     *
      * @param <K> the type of the key
      * @return the top key
+     * @throws IllegalStateException if the history doesn't contain any elements yet.
      */
     @Nonnull
     public <K> K top() {
@@ -1319,18 +1515,17 @@ public class Backstack
 
     /**
      * Returns the element indexed from the top.
-     *
+     * <p>
      * Offset value `0` behaves the same as {@link History#top()}, while `1` returns the one before it.
      * Negative indices are wrapped around, for example `-1` is the first element of the stack, `-2` the second, and so on.
-     *
+     * <p>
      * Accepted values are in range of [-size, size).
      *
-     * @throws IllegalStateException if the history doesn't contain any elements yet.
-     * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
-     *
      * @param offset the offset from the top
-     * @param <K> the type of the key
+     * @param <K>    the type of the key
      * @return the key from the top with offset
+     * @throws IllegalStateException    if the history doesn't contain any elements yet.
+     * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
      */
     @Nonnull
     public <K> K fromTop(int offset) {
@@ -1374,7 +1569,6 @@ public class Backstack
      * Registers the {@link Backstack.CompletionListener}.
      *
      * @param completionListener The non-null completion listener to be registered.
-     *
      * @deprecated use {@link Backstack#addStateChangeCompletionListener(CompletionListener)}.
      */
     @Deprecated
@@ -1386,7 +1580,6 @@ public class Backstack
      * Unregisters the {@link Backstack.CompletionListener}.
      *
      * @param completionListener The non-null completion listener to be unregistered.
-     *
      * @deprecated use {@link Backstack#removeStateChangeCompletionListener(CompletionListener)}.
      */
     @Deprecated

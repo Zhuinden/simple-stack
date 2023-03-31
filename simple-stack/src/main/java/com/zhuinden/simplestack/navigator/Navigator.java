@@ -23,6 +23,10 @@ import android.content.ContextWrapper;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zhuinden.simplestack.AheadOfTimeBackCallback;
+import com.zhuinden.simplestack.AheadOfTimeBackCallbackRegistry;
+import com.zhuinden.simplestack.AheadOfTimeWillHandleBackChangedListener;
+import com.zhuinden.simplestack.BackHandlingModel;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.DefaultKeyFilter;
 import com.zhuinden.simplestack.DefaultKeyParceler;
@@ -59,6 +63,7 @@ public class Navigator {
     @TargetApi(11)
     public static class Installer {
         StateChanger stateChanger;
+        BackHandlingModel backHandlingModel = BackHandlingModel.EVENT_BUBBLING;
         KeyFilter keyFilter = new DefaultKeyFilter();
         KeyParceler keyParceler = new DefaultKeyParceler();
         Backstack.StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
@@ -83,6 +88,25 @@ public class Navigator {
                 throw new IllegalArgumentException("If set, StateChanger cannot be null!");
             }
             this.stateChanger = stateChanger;
+            return this;
+        }
+
+        /**
+         * Specifies the {@link BackHandlingModel}. This allows switching between back handling models.
+         * <p>
+         * {@link BackHandlingModel#EVENT_BUBBLING} is used with onBackPressed()/{@link ScopedServices.HandlesBack}.
+         * <p>
+         * {@link BackHandlingModel#AHEAD_OF_TIME} is used with onBackPressedDispatcher/{@link AheadOfTimeBackCallbackRegistry} and {@link Backstack#addAheadOfTimeWillHandleBackChangedListener(AheadOfTimeWillHandleBackChangedListener)}}.
+         *
+         * @param backHandlingModel the back handling model
+         * @return the installer
+         */
+        @Nonnull
+        public Installer setBackHandlingModel(@Nonnull BackHandlingModel backHandlingModel) {
+            if(backHandlingModel == null) {
+                throw new IllegalArgumentException("If set, BackHandlingModel cannot be null!");
+            }
+            this.backHandlingModel = backHandlingModel;
             return this;
         }
 
@@ -276,6 +300,7 @@ public class Navigator {
             activity.getFragmentManager().executePendingTransactions();
         }
         backstackHost.stateChanger = installer.stateChanger;
+        backstackHost.backHandlingModel = installer.backHandlingModel;
         backstackHost.keyFilter = installer.keyFilter;
         backstackHost.keyParceler = installer.keyParceler;
         backstackHost.stateClearStrategy = installer.stateClearStrategy;
@@ -303,9 +328,12 @@ public class Navigator {
     /**
      * Delegates back press call to the backstack of the navigator.
      *
+     * @deprecated Same behavior as calling {@link Backstack#goBack()} on {@link #getBackstack(Context)}, but as Activity's onBackPressed is deprecated, so is this.
+     *
      * @param context the Context that belongs to an Activity which hosts the backstack.
      * @return true if a state change was handled or is in progress, false otherwise
      */
+    @Deprecated
     public static boolean onBackPressed(@Nonnull Context context) {
         return getBackstack(context).goBack();
     }

@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.StateChange
-import com.zhuinden.simplestack.StateChanger
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestacktutorials.databinding.ActivityStep1Binding
 import com.zhuinden.simplestacktutorials.utils.hide
@@ -19,16 +16,14 @@ import kotlinx.parcelize.Parcelize
 class Step1Activity : AppCompatActivity(), StateChanger {
     private lateinit var backstack: Backstack
 
-
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!backstack.goBack()) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@Step1Activity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
     }
 
     sealed class Screens : Parcelable { // a screen should be Parcelable so they can be put to Bundle.
@@ -49,6 +44,7 @@ class Step1Activity : AppCompatActivity(), StateChanger {
         @Suppress("DEPRECATION") // don't worry, Navigator will handle it in step 2
         backstack = lastCustomNonConfigurationInstance?.let { it as Backstack }
             ?: Backstack().also { backstack ->
+                backstack.setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
                 backstack.setup(History.of(Screens.First))
 
                 savedInstanceState?.let { bundle ->
@@ -59,6 +55,9 @@ class Step1Activity : AppCompatActivity(), StateChanger {
         onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
 
         backstack.setStateChanger(this) // handle navigation in this class
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {
@@ -107,6 +106,8 @@ class Step1Activity : AppCompatActivity(), StateChanger {
     }
 
     override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+
         backstack.executePendingStateChange()
 
         if (isFinishing) {

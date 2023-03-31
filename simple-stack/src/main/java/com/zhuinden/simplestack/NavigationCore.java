@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * When a {@link StateChanger} is available, it attempts to execute the queued {@link StateChange}s.
  * A {@link StateChanger} can be either set to {@link NavigationCore#INITIALIZE}, or to {@link NavigationCore#REATTACH}.
  * {@link NavigationCore#INITIALIZE} begins an initializing {@link StateChange} to set up initial state, {@link NavigationCore#REATTACH} does not.
- *
+ * <p>
  * Please note that {@link StateChange#getBackstack()} can only return a {@link Backstack} if navigation occurs through {@link Backstack},
  * because it must be set via {@link NavigationCore#setBackstack(Backstack)}.
  */
@@ -64,6 +64,10 @@ class NavigationCore {
     }
 
     private final long threadId = Thread.currentThread().getId();
+
+    private boolean willHandleBack = false;
+
+    private List<AheadOfTimeWillHandleBackChangedListener> willHandleBackChangedListeners = new ArrayList<>();
 
     /**
      * Creates the NavigationCore with the provided initial keys.
@@ -195,7 +199,7 @@ class NavigationCore {
      * Replaces the current top with the provided key.
      * This means removing the current last element, and then adding the new element.
      *
-     * @param newTop the new top key
+     * @param newTop    the new top key
      * @param direction The direction of the {@link StateChange}: {@link StateChange#BACKWARD}, {@link StateChange#FORWARD} or {@link StateChange#REPLACE}.
      */
     // @MainThread // removed android.support.annotation
@@ -216,7 +220,7 @@ class NavigationCore {
      * Goes "up" to the provided element.
      * This means that if the provided element is found anywhere in the history, then the history goes to it.
      * If not found, then the current top is replaced with the provided element.
-     *
+     * <p>
      * Going up occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param newKey the new key to go up to
@@ -230,10 +234,10 @@ class NavigationCore {
      * Goes "up" to the provided element.
      * This means that if the provided element is found anywhere in the history, then the history goes to it (unless specified otherwise).
      * If not found, then the current top is replaced with the provided element.
-     *
+     * <p>
      * Going up occurs in {@link StateChange#BACKWARD} direction.
      *
-     * @param newKey the new key to go up to
+     * @param newKey         the new key to go up to
      * @param fallbackToBack specifies that if the key is found in the NavigationCore, then the navigation defaults to going back to previous, instead of clearing all keys on top of it to the target.
      */
     // @MainThread // removed android.support.annotation
@@ -251,7 +255,10 @@ class NavigationCore {
         }
         if(activeHistory.contains(newKey)) {
             if(fallbackToBack) {
-                executeOrConsumeNavigationOp(History.builderFrom(activeHistory).removeLast().build(), StateChange.BACKWARD, true, false);
+                executeOrConsumeNavigationOp(History.builderFrom(activeHistory).removeLast().build(),
+                                             StateChange.BACKWARD,
+                                             true,
+                                             false);
             } else {
                 goTo(newKey);
             }
@@ -265,7 +272,7 @@ class NavigationCore {
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
      *
-     * @param newKey the new key
+     * @param newKey    the new key
      * @param asReplace specifies if the direction is {@link StateChange#REPLACE} or {@link StateChange#FORWARD}.
      */
     // @MainThread // removed android.support.annotation
@@ -289,7 +296,7 @@ class NavigationCore {
      * Moves the provided new key to the top of the NavigationCore.
      * If the key already exists, then it is first removed, and added as the last element.
      * If it doesn't exist, then it is just added as the last element.
-     *
+     * <p>
      * The used direction is {@link StateChange#FORWARD}.
      *
      * @param newKey the new key
@@ -301,7 +308,7 @@ class NavigationCore {
 
     /**
      * Jumps to the root of the NavigationCore.
-     *
+     * <p>
      * This operation counts as a {@link StateChange#BACKWARD} navigation.
      */
     // @MainThread // removed android.support.annotation
@@ -328,7 +335,7 @@ class NavigationCore {
      * If the chain of parents is found as previous elements, then it works as back navigation to that chain,, removing all other elements on top of it.
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
      * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
-     *
+     * <p>
      * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
      *
      * @param parentChain the chain of parents, from oldest to newest.
@@ -343,10 +350,10 @@ class NavigationCore {
      * If the chain of parents is found as previous elements, then it works as back navigation to that chain, removing all other elements on top of it (unless specified otherwise).
      * If the whole chain is not found, but at least one element of it is found, then the history is kept up to that point, then the chain is added, any duplicate element in the chain is added to the end as part of the chain.
      * If no element of the chain is found in the history, then the current top is removed, and the provided parent chain is added in its place.
-     *
+     * <p>
      * Going up the chain occurs in {@link StateChange#BACKWARD} direction.
      *
-     * @param parentChain the chain of parents, from oldest to newest.
+     * @param parentChain    the chain of parents, from oldest to newest.
      * @param fallbackToBack determines that if the chain is fully found in the NavigationCore, then the navigation will default to regular "back" to the previous element, instead of clearing the top elements.
      */
     // @MainThread // removed android.support.annotation
@@ -373,7 +380,7 @@ class NavigationCore {
                 executeOrConsumeNavigationOp(historyBuilder.build(), StateChange.BACKWARD, true, false);
             } else {
                 // we clear all on top of it and go back to the chain
-                goTo(parentChain.get(parentChainSize-1));
+                goTo(parentChain.get(parentChainSize - 1));
             }
             //noinspection UnnecessaryReturnStatement
             return;
@@ -414,6 +421,17 @@ class NavigationCore {
     }
 
     /**
+     * Determines if back will be handled.
+     *
+     * @return if back will be handled
+     */
+    public boolean willHandleBack() {
+        assertCorrectThread();
+
+        return willHandleBack;
+    }
+
+    /**
      * Goes back in the history.
      * If the key is found, then it goes backward to the existing key.
      * If the key is not found, then it goes forward to the newly added key.
@@ -445,9 +463,9 @@ class NavigationCore {
 
     /**
      * Immediately clears the NavigationCore, it is NOT enqueued as a state change.
-     *
+     * <p>
      * If there are pending state changes, then it throws an exception.
-     *
+     * <p>
      * You generally don't need to use this method.
      */
     // @MainThread // removed android.support.annotation
@@ -476,8 +494,11 @@ class NavigationCore {
         checkNewHistory(newHistory);
         assertCorrectThread();
 
-        if(!queuedStateChanges.isEmpty() && (queuedStateChanges.peekLast().isTerminal && !isForceEnqueued)) {
-            return; // eliminate ability to create inconsistent nav history by consuming changes [A,B] -> [A,B,D] vs [A,B] -> [A] -> [A,D] with fast taps
+        if(!queuedStateChanges.isEmpty()) {
+            PendingStateChange pendingLast = queuedStateChanges.peekLast();
+            if(pendingLast != null && pendingLast.isTerminal && !isForceEnqueued) {
+                return; // eliminate ability to create inconsistent nav history by consuming changes [A,B] -> [A,B,D] vs [A,B] -> [A] -> [A,D] with fast taps
+            }
         }
         enqueueStateChange(newHistory, direction, false, isTerminal, isForceEnqueued);
     }
@@ -485,10 +506,9 @@ class NavigationCore {
     /**
      * Returns the root (first) element of this history, or null if the history is empty.
      *
-     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
-     *
      * @param <K> the type of the key
      * @return the root (first) key
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
      */
     @Nonnull
     public <K> K root() {
@@ -502,10 +522,9 @@ class NavigationCore {
     /**
      * Returns the last element in the list, or null if the history is empty.
      *
-     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
-     *
      * @param <K> the type of the key
      * @return the top key
+     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
      */
     @Nonnull
     public <K> K top() {
@@ -518,18 +537,17 @@ class NavigationCore {
 
     /**
      * Returns the element indexed from the top.
-     *
+     * <p>
      * Offset value `0` behaves the same as {@link NavigationCore#top()}, while `1` returns the one before it.
      * Negative indices are wrapped around, for example `-1` is the first element of the stack, `-2` the second, and so on.
-     *
+     * <p>
      * Accepted values are in range of [-size, size).
      *
-     * @throws IllegalStateException if the NavigationCore history doesn't contain any elements yet.
-     * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
-     *
      * @param offset the offset from the top
-     * @param <K> the type of the key
+     * @param <K>    the type of the key
      * @return the key from the top with offset
+     * @throws IllegalStateException    if the NavigationCore history doesn't contain any elements yet.
+     * @throws IllegalArgumentException if the provided offset is outside the range of [-size, size).
      */
     @Nonnull
     public <K> K fromTop(int offset) {
@@ -591,7 +609,11 @@ class NavigationCore {
     }
 
     private void enqueueStateChange(List<?> newHistory, int direction, boolean initialization, boolean isTerminal, boolean isForceEnqueued) {
-        PendingStateChange pendingStateChange = new PendingStateChange(newHistory, direction, initialization, isTerminal, isForceEnqueued);
+        PendingStateChange pendingStateChange = new PendingStateChange(newHistory,
+                                                                       direction,
+                                                                       initialization,
+                                                                       isTerminal,
+                                                                       isForceEnqueued);
         queuedStateChanges.add(pendingStateChange);
         beginStateChangeIfPossible();
     }
@@ -607,6 +629,8 @@ class NavigationCore {
     }
 
     private boolean beginStateChangeIfPossible() {
+        updateWillHandleBack();
+
         if(hasStateChanger() && isStateChangePending()) {
             PendingStateChange pendingStateChange = queuedStateChanges.getFirst();
             if(pendingStateChange.getStatus() == PendingStateChange.Status.ENQUEUED) {
@@ -629,10 +653,12 @@ class NavigationCore {
         } else {
             previousState = new ArrayList<>(stack);
         }
-        final StateChange stateChange = new StateChange(backstack,
-                Collections.unmodifiableList(previousState),
-                Collections.unmodifiableList(newHistory),
-                direction);
+        final StateChange stateChange = new StateChange(
+            backstack,
+            Collections.unmodifiableList(previousState),
+            Collections.unmodifiableList(newHistory),
+            direction
+        );
         StateChanger.Callback completionCallback = new StateChanger.Callback() {
             @Override
             public void stateChangeComplete() {
@@ -660,7 +686,66 @@ class NavigationCore {
         PendingStateChange pendingStateChange = queuedStateChanges.removeFirst();
         pendingStateChange.setStatus(PendingStateChange.Status.COMPLETED);
         notifyCompletionListeners(stateChange);
+
         beginStateChangeIfPossible();
+    }
+
+    private void notifyWillHandleBackChangedListeners(final boolean newValue) {
+        for(int i = willHandleBackChangedListeners.size() - 1; i >= 0; i--) {
+            AheadOfTimeWillHandleBackChangedListener listener = willHandleBackChangedListeners.get(i);
+            listener.willHandleBackChanged(newValue);
+        }
+    }
+
+    public void registerAheadOfTimeWillHandleBackChangedListener(AheadOfTimeWillHandleBackChangedListener listener) {
+        assertCorrectThread();
+
+        willHandleBackChangedListeners.add(listener);
+    }
+
+    public void unregisterAheadOfTimeWillHandleBackChangedListener(AheadOfTimeWillHandleBackChangedListener listener) {
+        assertCorrectThread();
+
+        willHandleBackChangedListeners.remove(listener);
+    }
+
+    private void updateWillHandleBack() {
+        assertCorrectThread();
+
+        final boolean oldWillHandleBack = willHandleBack;
+
+        if(stack != null && stack.size() >= 2) {
+            willHandleBack = true;
+
+            if(!oldWillHandleBack) {
+                notifyWillHandleBackChangedListeners(true);
+            }
+            return;
+        }
+        if(!queuedStateChanges.isEmpty() &&
+            (queuedStateChanges.getFirst().getStatus() == PendingStateChange.Status.IN_PROGRESS
+                || queuedStateChanges.getFirst().getStatus() == PendingStateChange.Status.ENQUEUED)
+        ) {
+            willHandleBack = true;
+
+            if(!oldWillHandleBack) {
+                notifyWillHandleBackChangedListeners(true);
+            }
+            return;
+        }
+        if(hasStateChanger() && isStateChangePending()) {
+            willHandleBack = true;
+
+            if(!oldWillHandleBack) {
+                notifyWillHandleBackChangedListeners(true);
+            }
+            return;
+        }
+        willHandleBack = false;
+
+        if(oldWillHandleBack) {
+            notifyWillHandleBackChangedListeners(false);
+        }
     }
 
     // completion listeners
@@ -753,14 +838,14 @@ class NavigationCore {
     private void assertNoStateChange() {
         if(isStateChangePending()) {
             throw new IllegalStateException(
-                    "This operation is not allowed while there are enqueued state changes.");
+                "This operation is not allowed while there are enqueued state changes.");
         }
     }
 
     private void assertCorrectThread() {
         if(Thread.currentThread().getId() != threadId) {
             throw new IllegalStateException(
-                    "The backstack is not thread-safe, and must be manipulated only from the thread where it was originally created.");
+                "The backstack is not thread-safe, and must be manipulated only from the thread where it was originally created.");
         }
     }
 }

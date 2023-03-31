@@ -3,9 +3,7 @@ package com.zhuinden.simplestackextensionsample.app
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.SimpleStateChanger
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
 import com.zhuinden.simplestackextensions.servicesktx.get
@@ -18,15 +16,16 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
     private lateinit var authenticationManager: AuthenticationManager
 
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +45,8 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         authenticationManager = globalServices.get()
 
-        Navigator.configure()
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
             .setStateChanger(SimpleStateChanger(this))
             .setScopedServices(ServiceProvider())
             .setGlobalServices(globalServices)
@@ -55,8 +55,12 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
                     when {
                         authenticationManager.isAuthenticated() -> ProfileKey(authenticationManager.getAuthenticatedUser())
                         else -> LoginKey
-                }
-            ))
+                    }
+                )
+            )
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {
@@ -64,6 +68,8 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     }
 
     override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+
         if (isFinishing) {
             authenticationManager.clearRegistration() // just for sample repeat sake
         }
