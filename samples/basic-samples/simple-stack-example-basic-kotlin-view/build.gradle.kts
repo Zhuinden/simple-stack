@@ -63,7 +63,7 @@ dependencies {
     }
 
     implementation("androidx.core:core:1.9.0")
-    implementation("androidx.activity:activity:1.6.1")
+    implementation("androidx.activity:activity:1.7.0")
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test:runner:1.5.2")

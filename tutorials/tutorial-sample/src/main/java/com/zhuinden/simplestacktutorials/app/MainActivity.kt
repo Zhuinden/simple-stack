@@ -1,6 +1,7 @@
 package com.zhuinden.simplestacktutorials.app
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestacktutorials.databinding.ActivityMainBinding
 import com.zhuinden.simplestacktutorials.steps.step_1.Step1Activity
@@ -16,8 +17,15 @@ import com.zhuinden.simplestacktutorials.utils.onClick
 import com.zhuinden.simplestacktutorials.utils.startActivity
 
 class MainActivity : AppCompatActivity() {
+    private val onBackCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(onBackCallback)
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
