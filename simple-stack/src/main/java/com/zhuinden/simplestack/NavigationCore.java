@@ -653,10 +653,12 @@ class NavigationCore {
         } else {
             previousState = new ArrayList<>(stack);
         }
-        final StateChange stateChange = new StateChange(backstack,
-                                                        Collections.unmodifiableList(previousState),
-                                                        Collections.unmodifiableList(newHistory),
-                                                        direction);
+        final StateChange stateChange = new StateChange(
+            backstack,
+            Collections.unmodifiableList(previousState),
+            Collections.unmodifiableList(newHistory),
+            direction
+        );
         StateChanger.Callback completionCallback = new StateChanger.Callback() {
             @Override
             public void stateChangeComplete() {
