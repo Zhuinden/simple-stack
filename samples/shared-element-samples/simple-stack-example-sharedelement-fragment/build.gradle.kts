@@ -34,28 +34,31 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.0") {
+        exclude(module = "simple-stack")
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("com.google.dagger:dagger:2.44")
-    annotationProcessor("com.google.dagger:dagger-compiler:2.44")
+    implementation("com.google.dagger:dagger:2.45")
+    annotationProcessor("com.google.dagger:dagger-compiler:2.45")
 }

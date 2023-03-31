@@ -6,6 +6,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestacktutorials.databinding.ActivityStep3Binding
 import com.zhuinden.simplestacktutorials.utils.hide
 import com.zhuinden.simplestacktutorials.utils.onClick
@@ -47,12 +48,9 @@ class Step3Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
             .install(this, binding.step3Root, History.of(Step3FirstScreen()))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-    }
-
-    override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-        super.onDestroy()
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

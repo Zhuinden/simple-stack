@@ -6,6 +6,8 @@
 - ***MAJOR FEATURE ADDITION***: Added `Backstack.setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)` to
   support `android:enableBackInvokedCallback="true"` on Android 14 for predictive back gesture support.
 
+- This also comes with a new artifact in `simple-stack-extensions 2.3.0` called `lifecycle-ktx`.
+
 With this, `Navigator.Installer.setBackHandlingModel()`, `BackstackDelegate.setBackHandlingModel()`,
 and `Backstack.setBackHandlingModel()` are added.
 
@@ -113,16 +115,33 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         super.onDestroy()
     }
 
-    override fun onNavigationEvent(stateChange: StateChange) {
-        fragmentStateChanger.handleStateChange(stateChange)
-    }
+  override fun onNavigationEvent(stateChange: StateChange) {
+    fragmentStateChanger.handleStateChange(stateChange)
+  }
 }
 ```
 
 Please make sure to remove the `AheadOfTimeWillHandleBackChangedListener` in `onDestroy` (Activity) or `onDestroyView` (
 Fragment), because the listener staying registered would be a memory leak.
 
-A "lifecycle-aware" callback *might* be added to `simple-stack-extensions` later.
+With the new `lifecycle-ktx` in `simple-stack-extensions` 2.3.0, this:
+
+```kotlin
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback) // <-- !
+}
+
+override fun onDestroy() {
+backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback); // <-- !
+```
+
+can be turned into this:
+
+```kotlin
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) { backPressedCallback.isEnabled = it } 
+    }
+```
 
 If you can't update to the `AHEAD_OF_TIME` back handling model, then don't worry, as backwards compatibility has been
 preserved with the previous behavior.
@@ -132,7 +151,7 @@ might have had something like this:
 
 ```kotlin
 class FragmentStackHost(
-    initialKey: Any
+  initialKey: Any
 ) : Bundleable, ScopedServices.HandlesBack {
     var isActiveForBack: Boolean = false
     

@@ -39,14 +39,14 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.5.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.fragment:fragment:1.5.5")
+    implementation("androidx.fragment:fragment:1.5.6")
     implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.0") {
         exclude(module = "simple-stack")
     }
 

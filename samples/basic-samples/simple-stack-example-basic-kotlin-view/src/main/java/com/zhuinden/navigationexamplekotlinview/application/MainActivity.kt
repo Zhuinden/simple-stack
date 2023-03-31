@@ -14,6 +14,7 @@ import com.zhuinden.simplestack.BackHandlingModel
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.navigator.Navigator
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestackextensions.navigatorktx.backstack
 
 class MainActivity : AppCompatActivity() {
@@ -60,11 +61,8 @@ class MainActivity : AppCompatActivity() {
             .install(this, binding.container, History.single(HomeKey))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-    }
-
-    override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-        super.onDestroy()
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 }

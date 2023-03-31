@@ -8,6 +8,7 @@ import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackbottomnavfragmentexample.R
 import com.zhuinden.simplestackbottomnavfragmentexample.features.initial.InitialScreen
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
@@ -40,12 +41,9 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(this, findViewById(R.id.container), History.of(InitialScreen()))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-    }
-
-    override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-        super.onDestroy()
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

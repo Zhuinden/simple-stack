@@ -71,12 +71,12 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 // build.gradle.kts
 implementation("com.github.Zhuinden:simple-stack:2.7.0")
 
-implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5")
-implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5")
-implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.5")
-implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.5")
-implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.5")
-implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5")
+implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.0")
+implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.0")
+implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.0")
+implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.0")
+implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.0")
+implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.0")
 ```
 
 or
@@ -85,12 +85,12 @@ or
 // build.gradle
 implementation 'com.github.Zhuinden:simple-stack:2.7.0'
 
-implementation 'com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5'
-implementation 'com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5'
-implementation 'com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.5'
-implementation 'com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.5'
-implementation 'com.github.Zhuinden.simple-stack-extensions:services:2.2.5'
-implementation 'com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5'
+implementation 'com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.0'
+implementation 'com.github.Zhuinden.simple-stack-extensions:fragments:2.3.0'
+implementation 'com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.0'
+implementation 'com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.0'
+implementation 'com.github.Zhuinden.simple-stack-extensions:services:2.3.0'
+implementation 'com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.0'
 ```
 
 ## How do I use it?
@@ -103,6 +103,40 @@ simple examples.
 
 With Fragments, in `AHEAD_OF_TIME` back handling mode to support predictive back gesture (along
 with `android:enableBackInvokedCallback`), the Activity code looks like this:
+
+- **With** simple-stack-extensions:lifecycle-ktx
+
+```kotlin
+    private lateinit var backstack: Backstack
+
+private val backPressedCallback = object : OnBackPressedCallback(false) { // <-- !
+    override fun handleOnBackPressed() {
+        backstack.goBack()
+    }
+}
+
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    setContentView(R.layout.main_activity)
+
+    onBackPressedDispatcher.addCallback(backPressedCallback) // <-- !
+
+    fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.container)
+
+    backstack = Navigator.configure()
+        .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME) // <-- !
+        .setStateChanger(SimpleStateChanger(this))
+        .install(this, binding.container, History.single(HomeKey))
+
+    backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+    backstack.observeAheadOfTimeWillHandleBackChanged(this) { // <-- ! from lifecycle-ktx
+        backPressedCallback = it
+    }
+}
+```
+
+- **Without** simple-stack-extensions:lifecycle-ktx
 
 ```kotlin
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {

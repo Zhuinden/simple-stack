@@ -10,6 +10,7 @@ import com.zhuinden.simplestackexamplescoping.databinding.ActivityMainBinding
 import com.zhuinden.simplestackexamplescoping.features.words.WordListKey
 import com.zhuinden.simplestackexamplescoping.utils.viewBinding
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 
 /**
@@ -47,12 +48,9 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(this, binding.container, History.of(WordListKey))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-    }
-
-    override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-        super.onDestroy()
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

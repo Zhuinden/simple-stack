@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestacktutorials.R
 import com.zhuinden.simplestacktutorials.databinding.ActivityStep9Binding
 import com.zhuinden.simplestacktutorials.steps.step_9.features.login.LoginKey
@@ -58,7 +59,9 @@ class Step9Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
             )
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {
@@ -66,8 +69,6 @@ class Step9Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
     }
 
     override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-
         if (isFinishing) {
             AuthenticationManager.clearRegistration(appContext) // just for sample repeat sake
         }

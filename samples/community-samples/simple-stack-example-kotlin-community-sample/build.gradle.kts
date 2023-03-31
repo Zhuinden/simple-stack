@@ -58,31 +58,34 @@ dependencies {
 
     implementation(project(":simple-stack"))
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.0") {
+        exclude(module = "simple-stack")
+    }
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.0") {
         exclude(module = "simple-stack")
     }
 
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    implementation("com.google.dagger:dagger:2.44")
+    implementation("com.google.dagger:dagger:2.45")
 
-    kapt("com.google.dagger:dagger-compiler:2.44")
+    kapt("com.google.dagger:dagger-compiler:2.45")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0") {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import

@@ -16,6 +16,7 @@ import com.zhuinden.simplestackexamplemvvm.features.statistics.StatisticsKey
 import com.zhuinden.simplestackexamplemvvm.features.tasks.TasksKey
 import com.zhuinden.simplestackexamplemvvm.util.showSnackbar
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestackextensions.navigatorktx.backstack
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 import com.zhuinden.simplestackextensions.servicesktx.get
@@ -79,12 +80,9 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(this, binding.contentFrame, History.of(TasksKey))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-    }
-
-    override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-        super.onDestroy()
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 
     fun toggleLeftDrawer() {

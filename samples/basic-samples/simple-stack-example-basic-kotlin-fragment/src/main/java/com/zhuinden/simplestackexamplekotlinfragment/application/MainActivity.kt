@@ -12,6 +12,7 @@ import com.zhuinden.simplestackexamplekotlinfragment.screens.HomeKey
 import com.zhuinden.simplestackexamplekotlinfragment.screens.NotificationKey
 import com.zhuinden.simplestackexamplekotlinfragment.utils.replaceHistory
 import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestackextensions.navigatorktx.backstack
 
 /**
@@ -62,12 +63,9 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(this, binding.container, History.single(HomeKey))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-    }
-
-    override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
-        super.onDestroy()
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

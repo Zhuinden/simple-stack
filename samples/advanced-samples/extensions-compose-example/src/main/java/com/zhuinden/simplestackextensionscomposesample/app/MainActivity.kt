@@ -5,8 +5,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
+import com.zhuinden.simplestackextensions.lifecyclektx.observeAheadOfTimeWillHandleBackChanged
 import com.zhuinden.simplestackextensions.navigatorktx.androidContentFrame
-import com.zhuinden.simplestackextensions.navigatorktx.backstack
 import com.zhuinden.simplestackextensions.servicesktx.get
 import com.zhuinden.simplestackextensionscomposesample.R
 import com.zhuinden.simplestackextensionscomposesample.core.FragmentStateChanger
@@ -59,7 +59,9 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             )
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
+            backPressedCallback.isEnabled = it
+        }
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {
@@ -67,8 +69,6 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     }
 
     override fun onDestroy() {
-        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback);
-
         if (isFinishing) {
             authenticationManager.clearRegistration() // just for sample repeat sake
         }
