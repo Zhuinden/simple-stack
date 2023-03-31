@@ -9,7 +9,7 @@ import java.util.List;
 public abstract class AheadOfTimeBackCallback {
     private final long threadId = Thread.currentThread().getId();
 
-    private List<EnabledChangedListener> enabledChangedListeners = new ArrayList<>();
+    private final List<EnabledChangedListener> enabledChangedListeners = new ArrayList<>();
 
     /**
      * Allows registering for when a {@link AheadOfTimeBackCallback}'s enabled status has changed.

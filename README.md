@@ -151,50 +151,6 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 }
 ```
 
-*Note: Before supporting predictive back gestures and using `EVENT_BUBBLING` back handling model, the code that interops
-with OnBackPressedDispatcher looked like this:*
-
-``` kotlin
-class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
-    private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
-
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object: OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove() 
-                onBackPressed() // this is the reliable way to handle back for now 
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
-            }
-        }
-    }
-    
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
-
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        
-        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.container)
-        
-        Navigator.configure()
-            .setStateChanger(SimpleStateChanger(this))
-            .install(this, binding.container, History.single(HomeKey))
-    }
-
-    override fun onNavigationEvent(stateChange: StateChange) {
-        fragmentStateChanger.handleStateChange(stateChange)
-    }
-}
-```
-
-Originally, handling back was simpler, as all you had to do is override `onBackPressed()` (then
-call `backstack.goBack()`, if it returned `true` then you would not call `super.onBackPressed()`) , but in order to
-support `BackHandler` in Compose, or Fragments that use `OnBackPressedDispatcher` internally, you cannot
-override `onBackPressed` anymore in a reliable manner.
-
 With targetSdkVersion 34 and with `android:enableOnBackInvokedCallback="true"` enabled, `onBackPressed` (
 and `KEYCODE_BACK`) will no longer be called. In that case, the `AHEAD_OF_TIME` back handling model should be preferred.
 
@@ -351,24 +307,85 @@ override fun onNavigationEvent(stateChange: StateChange) { // using SimpleStateC
 }
 ```
 
-Whether you navigate forward or backward, or you rotate the screen, or you come back after low memory condition - it's irrelevant. The `StateChanger` will ***always*** handle the scenario in a predictable way.
+Whether you navigate forward or backward, or you rotate the screen, or you come back after low memory condition - it's
+irrelevant. The `StateChanger` will ***always*** handle the scenario in a predictable way.
 
+## Dev Talk about Simple-Stack
+
+For an overview of the "why" and the "what" of what Simple-Stack offers, you can check
+out [this talk called `Simplified Single-Activity Apps using Simple-Stack`](https://www.youtube.com/watch?v=5ACcin1Z2HQ)
+.
+
+## Tutorial by Ryan Kay
+
+For a quick tutorial on how to set up dependency injection, model lifecycles, and reactive state management using
+Simple-Stack, you can look at the tutorial by Ryan Michael Kay [**here, by clicking this
+link**](https://youtu.be/yRVt6sALB-g?t=2600).)
 
 ## More information
 
 For more information, check the [wiki page](https://github.com/Zhuinden/simple-stack/wiki).
 
-## Talk
-
-For an overview of the "why" and the "what" of what Simple-Stack offers, you can check out [this talk called `Simplified Single-Activity Apps using Simple-Stack`](https://www.youtube.com/watch?v=5ACcin1Z2HQ).
-
 ## What about Jetpack Compose?
 
 See https://github.com/Zhuinden/simple-stack-compose-integration/ for a default way to use composables as screens.
 
-This however is only required if ONLY composables are used, and NO fragments. When using Fragments, refer to the official [Fragment Compose interop](https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments) guide.
+This however is only required if ONLY composables are used, and NO fragments. When using Fragments, refer to the
+official [Fragment Compose interop](https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments)
+guide.
 
-For Fragment + Simple-Stack + Compose integration, you can also check [the corresponding sample](https://github.com/Zhuinden/simple-stack/tree/ced6d11e711fa2dda85e3bd7813cb2a192f10396/samples/advanced-samples/extensions-compose-example).
+For Fragment + Simple-Stack + Compose integration, you can also
+check [the corresponding sample](https://github.com/Zhuinden/simple-stack/tree/ced6d11e711fa2dda85e3bd7813cb2a192f10396/samples/advanced-samples/extensions-compose-example)
+.
+
+## About the event-bubbling back handling model
+
+Note: Before supporting predictive back gestures and using `EVENT_BUBBLING` back handling model, the code that interops
+with OnBackPressedDispatcher looks like this:
+
+``` kotlin
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
+
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@MainActivity)) {
+                this.remove() 
+                onBackPressed() // this is the reliable way to handle back for now 
+                this@MainActivity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
+
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.container)
+        
+        Navigator.configure()
+            .setStateChanger(SimpleStateChanger(this))
+            .install(this, binding.container, History.single(HomeKey))
+    }
+
+    override fun onNavigationEvent(stateChange: StateChange) {
+        fragmentStateChanger.handleStateChange(stateChange)
+    }
+}
+```
+
+Originally, handling back was simpler, as all you had to do is override `onBackPressed()` (then
+call `backstack.goBack()`, if it returned `true` then you would not call `super.onBackPressed()`) , but in order to
+support `BackHandler` in Compose, or Fragments that use `OnBackPressedDispatcher` internally, you cannot
+override `onBackPressed` anymore in a reliable manner.
+
+Now, either this should be used (if cannot migrate to `AHEAD_OF_TIME` back handling model), or migrate
+to `AHEAD_OF_TIME` back handling model and `AheadOfTimeBackCallback`.
 
 ## License
 

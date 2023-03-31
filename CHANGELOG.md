@@ -183,18 +183,24 @@ class FragmentStackHost(
         backstack.addAheadOfTimeWillHandleBackChangedListener(willHandleBackChangedListener)
     }
 
-    override fun onServiceRegistered() {
-        aheadOfTimeBackCallbackRegistry.registerAheadOfTimeBackCallback(backCallback)
-    }
+  override fun onServiceRegistered() {
+    aheadOfTimeBackCallbackRegistry.registerAheadOfTimeBackCallback(backCallback)
+  }
 
-    override fun onServiceUnregistered() {
-        aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeCallback(backCallback)
-    }
+  override fun onServiceUnregistered() {
+    aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeCallback(backCallback)
+  }
 }
 ```
 
-Meaning, whether back will be handled needs to be propagated up, and manage the enabled state of
+Where `FragmentStackHost` gets the `AheadOfTimeBackCallbackRegistry`
+from `serviceBinder.getAheadOfTimeBackCallbackRegistry()`.
+
+So in this snippet, whether back will be handled needs to be propagated up, and manage the enabled state of
 the `AheadOfTimeBackCallback` to intercept back if needed.
+
+While this might seem a bit tricky, this is how Google does it in their own micromanagement of communicating with
+the `onBackPressedDispatcher` as well, so evaluating ahead of time who will want to handle back later is unavoidable.
 
 - DEPRECATED: `BackstackDelegate.onBackPressed()` and `Navigator.onBackPressed()`. Not only are they the same
   as `backstack.goBack()` and merely managed to confuse people historically, but this deprecation mirros the deprecation
