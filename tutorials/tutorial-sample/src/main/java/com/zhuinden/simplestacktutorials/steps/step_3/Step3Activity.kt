@@ -4,10 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.zhuinden.simplestack.Backstack
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.SimpleStateChanger
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestacktutorials.databinding.ActivityStep3Binding
 import com.zhuinden.simplestacktutorials.utils.hide
@@ -19,15 +16,16 @@ private val Activity.backstack: Backstack
     get() = Navigator.getBackstack(this)
 
 class Step3Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@Step3Activity)) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@Step3Activity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
     }
 
     private lateinit var binding: ActivityStep3Binding
@@ -43,9 +41,18 @@ class Step3Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
             backstack.goBack()
         }
 
-        Navigator.configure()
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
             .setStateChanger(SimpleStateChanger(this))
             .install(this, binding.step3Root, History.of(Step3FirstScreen()))
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+    }
+
+    override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+        super.onDestroy()
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

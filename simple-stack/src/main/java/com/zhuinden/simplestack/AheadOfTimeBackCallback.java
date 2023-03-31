@@ -12,7 +12,7 @@ public abstract class AheadOfTimeBackCallback {
     private List<EnabledChangedListener> enabledChangedListeners = new ArrayList<>();
 
     /**
-     * Allows registering for when a callback's enabled status has changed.
+     * Allows registering for when a {@link AheadOfTimeBackCallback}'s enabled status has changed.
      */
     public interface EnabledChangedListener {
         /**

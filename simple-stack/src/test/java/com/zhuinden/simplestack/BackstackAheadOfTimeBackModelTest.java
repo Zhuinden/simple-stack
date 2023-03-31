@@ -206,7 +206,7 @@ public class BackstackAheadOfTimeBackModelTest {
 
             @Override
             public void onServiceUnregistered() {
-                aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeCallback(aheadOfTimeBackCallback);
+                aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeBackCallback(aheadOfTimeBackCallback);
             }
         }
 
@@ -280,7 +280,7 @@ public class BackstackAheadOfTimeBackModelTest {
 
             @Override
             public void onServiceUnregistered() {
-                aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeCallback(aheadOfTimeBackCallback);
+                aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeBackCallback(aheadOfTimeBackCallback);
             }
         }
 
@@ -363,7 +363,7 @@ public class BackstackAheadOfTimeBackModelTest {
 
             @Override
             public void onServiceUnregistered() {
-                aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeCallback(aheadOfTimeBackCallback);
+                aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeBackCallback(aheadOfTimeBackCallback);
             }
         }
 

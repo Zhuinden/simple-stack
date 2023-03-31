@@ -8,9 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.zhuinden.liveevent.observe
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.SimpleStateChanger
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackexamplemvvm.R
 import com.zhuinden.simplestackexamplemvvm.databinding.MainActivityBinding
@@ -27,15 +25,16 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var snackbarTextEmitter: SnackbarTextEmitter
     private lateinit var binding: MainActivityBinding
 
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove()
-                onBackPressed()  // this is the reliable way to handle back for now
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,11 +71,20 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             showSnackbar(binding.root, getString(textRes))
         }
 
-        Navigator.configure()
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
             .setStateChanger(SimpleStateChanger(this))
             .setGlobalServices(globalServices)
             .setScopedServices(DefaultServiceProvider())
             .install(this, binding.contentFrame, History.of(TasksKey))
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+    }
+
+    override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+        super.onDestroy()
     }
 
     fun toggleLeftDrawer() {

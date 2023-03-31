@@ -25,9 +25,9 @@ class RootScreen : DefaultFragmentKey(), DefaultServiceProvider.HasServices {
 
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(FragmentStackHost(First1Screen()), FIRST_STACK)
-            add(FragmentStackHost(SecondScreen()), SECOND_STACK)
-            add(FragmentStackHost(ThirdScreen()), THIRD_STACK)
+            add(FragmentStackHost(First1Screen(), serviceBinder.aheadOfTimeBackCallbackRegistry), FIRST_STACK)
+            add(FragmentStackHost(SecondScreen(), serviceBinder.aheadOfTimeBackCallbackRegistry), SECOND_STACK)
+            add(FragmentStackHost(ThirdScreen(), serviceBinder.aheadOfTimeBackCallbackRegistry), THIRD_STACK)
         }
     }
 }

@@ -7,6 +7,8 @@ import com.zhuinden.navigationexampleview.databinding.ActivityMainBinding;
 import com.zhuinden.navigationexampleview.screens.DashboardKey;
 import com.zhuinden.navigationexampleview.screens.HomeKey;
 import com.zhuinden.navigationexampleview.screens.NotificationKey;
+import com.zhuinden.simplestack.AheadOfTimeWillHandleBackChangedListener;
+import com.zhuinden.simplestack.BackHandlingModel;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.History;
 import com.zhuinden.simplestack.StateChange;
@@ -19,22 +21,21 @@ public class MainActivity
     extends AppCompatActivity {
     private ActivityMainBinding binding;
 
-    @SuppressWarnings("DEPRECATION")
-    private final OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
+    private Backstack backstack;
+
+    private OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(false) {
         @Override
         public void handleOnBackPressed() {
-            if(!Navigator.onBackPressed(MainActivity.this)) {
-                this.remove();
-                onBackPressed(); // this is the reliable way to handle back for now
-                MainActivity.this.getOnBackPressedDispatcher().addCallback(this);
-            }
+            backstack.goBack();
         }
     };
 
-    @Override
-    public final void onBackPressed() { // you cannot use `onBackPressed()` if you use `OnBackPressedDispatcher`
-        super.onBackPressed();
-    }
+    private AheadOfTimeWillHandleBackChangedListener updateBackPressedCallback = new AheadOfTimeWillHandleBackChangedListener() {
+        @Override
+        public void willHandleBackChanged(boolean willHandleBack) {
+            backPressedCallback.setEnabled(willHandleBack);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,17 @@ public class MainActivity
 
         getOnBackPressedDispatcher().addCallback(backPressedCallback); // this is the reliable way to handle back for now
 
-        Navigator.install(this, binding.container, History.single(HomeKey.create()));
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
+            .install(this, binding.container, History.single(HomeKey.create()));
+
+        backPressedCallback.setEnabled(backstack.willHandleAheadOfTimeBack());
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback);
+    }
+
+    @Override
+    protected void onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback);
+        super.onDestroy();
     }
 }

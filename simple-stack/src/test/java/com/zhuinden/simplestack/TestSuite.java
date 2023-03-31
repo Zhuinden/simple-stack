@@ -24,11 +24,11 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        StateChangerTest.class,
-        FlowTest.class,
-        ReentranceTest.class,
-        BackstackCoreTest.class,
-        HistoryBuilderTest.class,
+    StateChangerTest.class,
+    FlowTest.class,
+    ReentranceTest.class,
+    BackstackCoreTest.class,
+    HistoryBuilderTest.class,
     BackstackDelegateTest.class,
     BackstackTest.class,
     HistoryTest.class,

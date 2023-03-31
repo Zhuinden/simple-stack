@@ -69,7 +69,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.6.5")
+implementation("com.github.Zhuinden:simple-stack:2.7.0")
 
 implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5")
 implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5")
@@ -83,7 +83,7 @@ or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.6.5'
+implementation 'com.github.Zhuinden:simple-stack:2.7.0'
 
 implementation 'com.github.Zhuinden.simple-stack-extensions:core-ktx:2.2.5'
 implementation 'com.github.Zhuinden.simple-stack-extensions:fragments:2.2.5'
@@ -95,11 +95,64 @@ implementation 'com.github.Zhuinden.simple-stack-extensions:services-ktx:2.2.5'
 
 ## How do I use it?
 
-You can check out [**the tutorials**](https://github.com/Zhuinden/simple-stack/tree/611e8c7db738a776156b8f709db22b8e37413221/tutorials) for simple examples.
+You can check out [**the
+tutorials**](https://github.com/Zhuinden/simple-stack/tree/611e8c7db738a776156b8f709db22b8e37413221/tutorials) for
+simple examples.
 
 ## Fragments
 
-With Fragments, the Activity code looks like this:
+With Fragments, in `AHEAD_OF_TIME` back handling mode to support predictive back gesture (along
+with `android:enableBackInvokedCallback`), the Activity code looks like this:
+
+```kotlin
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private lateinit var fragmentStateChanger: FragmentStateChanger
+
+    private lateinit var authenticationManager: AuthenticationManager
+
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) { // <-- !
+        override fun handleOnBackPressed() {
+            backstack.goBack()
+        }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener { // <-- !
+        backPressedCallback.isEnabled = it // <-- !
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.main_activity)
+
+        onBackPressedDispatcher.addCallback(backPressedCallback) // <-- !
+
+        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.container)
+
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME) // <-- !
+            .setStateChanger(SimpleStateChanger(this))
+            .install(this, binding.container, History.single(HomeKey))
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback) // <-- !
+    }
+
+    override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback); // <-- !
+        super.onDestroy()
+    }
+
+    override fun onNavigationEvent(stateChange: StateChange) {
+        fragmentStateChanger.handleStateChange(stateChange)
+    }
+}
+```
+
+*Note: Before supporting predictive back gestures and using `EVENT_BUBBLING` back handling model, the code that interops
+with OnBackPressedDispatcher looked like this:*
 
 ``` kotlin
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
@@ -142,8 +195,8 @@ call `backstack.goBack()`, if it returned `true` then you would not call `super.
 support `BackHandler` in Compose, or Fragments that use `OnBackPressedDispatcher` internally, you cannot
 override `onBackPressed` anymore in a reliable manner.
 
-With targetSdkVersion 34, `onBackPressed` will no longer be called. Simple-Stack does not yet
-support `targetSdkVersion 34`, it is tracked in issue #259.
+With targetSdkVersion 34 and with `android:enableOnBackInvokedCallback="true"` enabled, `onBackPressed` (
+and `KEYCODE_BACK`) will no longer be called. In that case, the `AHEAD_OF_TIME` back handling model should be preferred.
 
 ## Screens
 

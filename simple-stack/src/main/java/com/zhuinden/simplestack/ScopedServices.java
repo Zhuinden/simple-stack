@@ -66,7 +66,7 @@ public interface ScopedServices {
      * <p>
      * Only supported in {@link BackHandlingModel#EVENT_BUBBLING} back handling model.
      * <p>
-     * If using {@link BackHandlingModel#AHEAD_OF_TIME}, {@link AheadOfTimeBackCallback} should be used instead.
+     * If using {@link BackHandlingModel#AHEAD_OF_TIME}, {@link ServiceBinder#getAheadOfTimeBackCallbackRegistry()} and {@link AheadOfTimeBackCallback} should be used instead.
      */
     public static interface HandlesBack {
         /**

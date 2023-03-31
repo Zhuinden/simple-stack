@@ -122,11 +122,79 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 Please make sure to remove the `AheadOfTimeWillHandleBackChangedListener` in `onDestroy` (Activity) or `onDestroyView` (
 Fragment), because the listener staying registered would be a memory leak.
 
-A "lifecycle-aware" callback *might* be added to `simple-stack-extensions`, but isn't really considered a priority at
-this time (removing a listener isn't hard).
+A "lifecycle-aware" callback *might* be added to `simple-stack-extensions` later.
 
 If you can't update to the `AHEAD_OF_TIME` back handling model, then don't worry, as backwards compatibility has been
 preserved with the previous behavior.
+
+When using `AHEAD_OF_TIME` back handling model, `ScopedServices.HandlesBack` is no longer called. To replace this, you
+might have had something like this:
+
+```kotlin
+class FragmentStackHost(
+    initialKey: Any
+) : Bundleable, ScopedServices.HandlesBack {
+    var isActiveForBack: Boolean = false
+    
+    // ...
+    
+    override fun onBackEvent(): Boolean {
+        if (isActiveForBack) {
+            return backstack.goBack()
+        } else {
+            return false
+        }
+    }
+}
+```
+
+This is replaced like so:
+
+```kotlin
+class FragmentStackHost(
+    initialKey: Any,
+    private val aheadOfTimeBackCallbackRegistry: AheadOfTimeBackCallbackRegistry,
+) : Bundleable, ScopedServices.Registered {
+    var isActiveForBack: Boolean = false
+        set(value) {
+            field = value
+            backCallback.isEnabled = value && backstackWillHandleBack
+        }
+
+    private var backstackWillHandleBack = false
+        set(value) {
+            field = value
+            backCallback.isEnabled = isActiveForBack && value
+        }
+
+    private val backCallback = object : AheadOfTimeBackCallback(false) {
+        override fun onBackReceived() {
+            backstack.goBack()
+        }
+    }
+
+    private val willHandleBackChangedListener = AheadOfTimeWillHandleBackChangedListener {
+        backstackWillHandleBack = it
+    }
+
+    init {
+        // ...
+        backstackWillHandleBack = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(willHandleBackChangedListener)
+    }
+
+    override fun onServiceRegistered() {
+        aheadOfTimeBackCallbackRegistry.registerAheadOfTimeBackCallback(backCallback)
+    }
+
+    override fun onServiceUnregistered() {
+        aheadOfTimeBackCallbackRegistry.unregisterAheadOfTimeCallback(backCallback)
+    }
+}
+```
+
+Meaning, whether back will be handled needs to be propagated up, and manage the enabled state of
+the `AheadOfTimeBackCallback` to intercept back if needed.
 
 - DEPRECATED: `BackstackDelegate.onBackPressed()` and `Navigator.onBackPressed()`. Not only are they the same
   as `backstack.goBack()` and merely managed to confuse people historically, but this deprecation mirros the deprecation

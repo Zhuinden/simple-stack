@@ -9,20 +9,24 @@ import com.zhuinden.navigationexamplekotlinview.screens.DashboardKey
 import com.zhuinden.navigationexamplekotlinview.screens.HomeKey
 import com.zhuinden.navigationexamplekotlinview.screens.NotificationKey
 import com.zhuinden.navigationexamplekotlinview.utils.replaceHistory
+import com.zhuinden.simplestack.AheadOfTimeWillHandleBackChangedListener
+import com.zhuinden.simplestack.BackHandlingModel
+import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.navigatorktx.backstack
 
 class MainActivity : AppCompatActivity() {
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +55,16 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        Navigator.install(this, binding.container, History.single(HomeKey))
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
+            .install(this, binding.container, History.single(HomeKey))
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+    }
+
+    override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+        super.onDestroy()
     }
 }

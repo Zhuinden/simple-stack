@@ -3,9 +3,7 @@ package com.zhuinden.simplestackbottomnavfragmentexample.application
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.SimpleStateChanger
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackbottomnavfragmentexample.R
 import com.zhuinden.simplestackbottomnavfragmentexample.features.initial.InitialScreen
@@ -13,15 +11,16 @@ import com.zhuinden.simplestackextensions.fragments.DefaultFragmentStateChanger
 import com.zhuinden.simplestackextensions.services.DefaultServiceProvider
 
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
     }
 
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
@@ -30,14 +29,23 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
+        onBackPressedDispatcher.addCallback(backPressedCallback)
 
         fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.container)
 
-        Navigator.configure()
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
             .setScopedServices(DefaultServiceProvider())
             .setStateChanger(SimpleStateChanger(this))
             .install(this, findViewById(R.id.container), History.of(InitialScreen()))
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+    }
+
+    override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
+        super.onDestroy()
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {
