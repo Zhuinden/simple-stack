@@ -1,5 +1,137 @@
 # Change log
 
+-Simple Stack 2.7.0 (2023-03-31)
+--------------------------------
+
+- ***MAJOR FEATURE ADDITION***: Added `Backstack.setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)` to
+  support `android:enableBackInvokedCallback="true"` on Android 14 for predictive back gesture support.
+
+With this, `Navigator.Installer.setBackHandlingModel()`, `BackstackDelegate.setBackHandlingModel()`,
+and `Backstack.setBackHandlingModel()` are added.
+
+Also, `ServiceBinder.getAheadOfTimeBackCallbackRegistry()` is added as a replacement for `ScopedServices.HandlesBack`.
+Please note that using it requires `AHEAD_OF_TIME` mode, and without it, trying to
+use `ServiceBinder.getAheadOfTimeBackCallbackRegistry()` throws an exception.
+
+Also, `Backstack.willHandleAheadOfTimeBack()`, `Backstack.addAheadOfTimeWillHandleBackChangedListener()`
+and `Backstack.removeAheadOfTimeWillHandleBackChangedListener()` are added.
+
+**IMPORTANT**:
+
+The `AHEAD_OF_TIME` back handling model must be enabled similarly to how `setScopedServices()` or other similar configs
+must be called before `backstack.setup()`, `Navigator.install()`, or `BackstackDelegate.onCreate()`.
+
+When `AHEAD_OF_TIME` is set, the behavior of `goBack()` changes. Calling `goBack()` when `willHandleAheadOfTimeBack()`
+returns false throws an exception.
+
+When `AHEAD_OF_TIME` is set, `ScopedServices.HandlesBack` will **no longer be called** (as it cannot return whether a
+service WILL handle back or not), and should be replaced with registrations to the `AheadOfTimeBackCallbackRegistry`.
+
+When `AHEAD_OF_TIME` is NOT set (and therefore the default, `EVENT_BUBBLING` is set),
+calling `willHandleAheadOfTimeBack` or `addAheadOfTimeWillHandleBackChangedListener`
+or `removeAheadOfTimeWillHandleBackChangedListener` throws an exception.
+
+To migrate to use the ahead-of-time back handling model, then you might have the previous
+somewhat `onBackPressedDispatcher`-compatible (but not predictive-back-gesture compatible) code:
+
+``` kotlin
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
+
+    @Suppress("DEPRECATION")
+    private val backPressedCallback = object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!Navigator.onBackPressed(this@MainActivity)) {
+                this.remove() 
+                onBackPressed() // this is the reliable way to handle back for now 
+                this@MainActivity.onBackPressedDispatcher.addCallback(this)
+            }
+        }
+    }
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
+
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        fragmentStateChanger = DefaultFragmentStateChanger(supportFragmentManager, R.id.container)
+        
+        Navigator.configure()
+            .setStateChanger(SimpleStateChanger(this))
+            .install(this, binding.container, History.single(HomeKey))
+    }
+
+    override fun onNavigationEvent(stateChange: StateChange) {
+        fragmentStateChanger.handleStateChange(stateChange)
+    }
+}
+```
+
+This code changes to the following in order to support predictive back gesture using ahead-of-time model:
+
+```kotlin
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private lateinit var fragmentStateChanger: FragmentStateChanger
+
+    private lateinit var authenticationManager: AuthenticationManager
+
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) { // <-- !
+        override fun handleOnBackPressed() {
+            backstack.goBack()
+        }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener { // <-- !
+        backPressedCallback.isEnabled = it // <-- !
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.main_activity)
+
+        onBackPressedDispatcher.addCallback(backPressedCallback) // <-- !
+
+        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.container)
+
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME) // <-- !
+            .setStateChanger(SimpleStateChanger(this))
+            .install(this, binding.container, History.single(HomeKey))
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback) // <-- !
+    }
+
+    override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback); // <-- !
+        super.onDestroy()
+    }
+
+    override fun onNavigationEvent(stateChange: StateChange) {
+        fragmentStateChanger.handleStateChange(stateChange)
+    }
+}
+```
+
+Please make sure to remove the `AheadOfTimeWillHandleBackChangedListener` in `onDestroy` (Activity) or `onDestroyView` (
+Fragment), because the listener staying registered would be a memory leak.
+
+A "lifecycle-aware" callback *might* be added to `simple-stack-extensions`, but isn't really considered a priority at
+this time (removing a listener isn't hard).
+
+If you can't update to the `AHEAD_OF_TIME` back handling model, then don't worry, as backwards compatibility has been
+preserved with the previous behavior.
+
+- DEPRECATED: `BackstackDelegate.onBackPressed()` and `Navigator.onBackPressed()`. Not only are they the same
+  as `backstack.goBack()` and merely managed to confuse people historically, but this deprecation mirros the deprecation
+  of `onBackPressed` in compileSdk 33, to push towards using predictive back.
+
 -Simple Stack 2.6.5 (2022-11-11)
 --------------------------------
 

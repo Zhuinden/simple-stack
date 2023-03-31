@@ -19,22 +19,42 @@ import javax.annotation.Nonnull;
 
 /**
  * The {@link ServiceBinder} allows binding services to a given scope, when that scope is created for the first time.
- *
+ * <p>
  * Please note that the service binder is only called when the scope is created, but not called if the scope already exists.
  */
 public class ServiceBinder {
     private final ScopeManager scopeManager;
 
+    private final Backstack backstack;
+
     private final Object key;
     private final String scopeTag;
     private final ScopeNode scope;
+    private final AheadOfTimeBackCallbackRegistry aheadOfTimeBackCallbackRegistry;
 
-    ServiceBinder(ScopeManager scopeManager, Object key, String scopeTag, ScopeNode scope) {
+    ServiceBinder(ScopeManager scopeManager, Object key, String scopeTag, ScopeNode scope, AheadOfTimeBackCallbackRegistry aheadOfTimeBackCallbackRegistry) {
         this.scopeManager = scopeManager;
+
+        this.backstack = scopeManager.getBackstack();
 
         this.key = key;
         this.scopeTag = scopeTag;
         this.scope = scope;
+        this.aheadOfTimeBackCallbackRegistry = aheadOfTimeBackCallbackRegistry;
+    }
+
+    /**
+     * The ahead-of-time back callback registry can be used to register ahead-of-time back events within a given scope.
+     *
+     * The callback can be enabled to receive back events.
+     */
+    @Nonnull
+    public AheadOfTimeBackCallbackRegistry getAheadOfTimeBackCallbackRegistry() {
+        if(backstack.getBackHandlingModel() != BackHandlingModel.AHEAD_OF_TIME) {
+            throw new IllegalStateException(
+                "Using the ahead-of-time back callback registry is only allowed in AHEAD_OF_TIME back handling mode.");
+        }
+        return aheadOfTimeBackCallbackRegistry;
     }
 
     /**
@@ -156,6 +176,6 @@ public class ServiceBinder {
      */
     @Nonnull
     public Backstack getBackstack() {
-        return scopeManager.getBackstack();
+        return backstack;
     }
 }

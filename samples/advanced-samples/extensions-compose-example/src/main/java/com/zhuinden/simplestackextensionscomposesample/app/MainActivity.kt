@@ -3,11 +3,10 @@ package com.zhuinden.simplestackextensionscomposesample.app
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.zhuinden.simplestack.History
-import com.zhuinden.simplestack.SimpleStateChanger
-import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.simplestackextensions.navigatorktx.androidContentFrame
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
 import com.zhuinden.simplestackextensions.servicesktx.get
 import com.zhuinden.simplestackextensionscomposesample.R
 import com.zhuinden.simplestackextensionscomposesample.core.FragmentStateChanger
@@ -19,15 +18,16 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
     private lateinit var authenticationManager: AuthenticationManager
 
-    @Suppress("DEPRECATION")
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
+    private lateinit var backstack: Backstack
+
+    private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!Navigator.onBackPressed(this@MainActivity)) {
-                this.remove()
-                onBackPressed() // this is the reliable way to handle back for now
-                this@MainActivity.onBackPressedDispatcher.addCallback(this)
-            }
+            backstack.goBack()
         }
+    }
+
+    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
+        backPressedCallback.isEnabled = it
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         setContentView(R.layout.main_activity)
 
-        onBackPressedDispatcher.addCallback(backPressedCallback) // this is the reliable way to handle back for now
+        onBackPressedDispatcher.addCallback(backPressedCallback)
 
         val app = application as CustomApplication
         val globalServices = app.globalServices
@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 
         fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.container)
 
-        Navigator.configure()
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME)
             .setStateChanger(SimpleStateChanger(this))
             .setScopedServices(ServiceProvider())
             .setGlobalServices(globalServices)
@@ -56,6 +57,9 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
                     }
                 )
             )
+
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
+        backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback)
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {
@@ -63,6 +67,8 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     }
 
     override fun onDestroy() {
+        backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback);
+
         if (isFinishing) {
             authenticationManager.clearRegistration() // just for sample repeat sake
         }

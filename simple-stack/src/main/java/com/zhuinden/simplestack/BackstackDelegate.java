@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
@@ -45,8 +46,27 @@ public class BackstackDelegate {
     private boolean activityWasDestroyed = false;
 
     /**
-     * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
+     * Specifies the {@link BackHandlingModel}. This allows switching between back handling models.
+     * <p>
+     * {@link BackHandlingModel#EVENT_BUBBLING} is used with onBackPressed()/{@link ScopedServices.HandlesBack}.
+     * <p>
+     * {@link BackHandlingModel#AHEAD_OF_TIME} is used with onBackPressedDispatcher/{@link AheadOfTimeBackCallbackRegistry} and {@link Backstack#addAheadOfTimeWillHandleBackChangedListener(AheadOfTimeWillHandleBackChangedListener)}}.
      *
+     * @param backHandlingModel the back handling model
+     */
+    public void setBackHandlingModel(@Nonnull BackHandlingModel backHandlingModel) {
+        if(backstack != null && backstack.isInitialized()) {
+            throw new IllegalStateException("If set, back handling model must be set before calling `onCreate()`");
+        }
+        if(keyFilter == null) {
+            throw new IllegalArgumentException("Specified back handling model should not be null!");
+        }
+        this.backHandlingModel = backHandlingModel;
+    }
+
+    /**
+     * Specifies a custom {@link KeyFilter}, allowing keys to be filtered out if they should not be restored after process death.
+     * <p>
      * If used, this method must be called before {@link BackstackDelegate#onCreate(Bundle, Object, List)}.
      *
      * @param keyFilter The custom {@link KeyFilter}.
@@ -185,6 +205,7 @@ public class BackstackDelegate {
 
     private StateChanger stateChanger;
 
+    private BackHandlingModel backHandlingModel = BackHandlingModel.EVENT_BUBBLING;
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private ScopedServices scopedServices = null;
@@ -382,8 +403,11 @@ public class BackstackDelegate {
      * The onBackPressed() delegate for the Activity.
      * The call is delegated to {@link Backstack#goBack()}'.
      *
+     * @deprecated Same behavior as calling {@link Backstack#goBack()} on {@link #getBackstack()}, but as Activity's onBackPressed is deprecated, so is this.
+     *
      * @return true if the {@link Backstack} handled the back press
      */
+    @Deprecated
     public boolean onBackPressed() {
         return getBackstack().goBack();
     }

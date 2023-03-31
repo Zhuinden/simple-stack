@@ -20,6 +20,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
+import com.zhuinden.simplestack.BackHandlingModel;
 import com.zhuinden.simplestack.Backstack;
 import com.zhuinden.simplestack.GlobalServices;
 import com.zhuinden.simplestack.KeyFilter;
@@ -43,6 +44,7 @@ public final class BackstackHost
     }
 
     StateChanger stateChanger;
+    BackHandlingModel backHandlingModel;
     KeyFilter keyFilter;
     KeyParceler keyParceler;
     Backstack.StateClearStrategy stateClearStrategy;
@@ -69,6 +71,7 @@ public final class BackstackHost
     Backstack initialize(boolean isInitializeDeferred) {
         if(backstack == null) {
             backstack = new Backstack();
+            backstack.setBackHandlingModel(backHandlingModel);
             backstack.setKeyFilter(keyFilter);
             backstack.setKeyParceler(keyParceler);
             backstack.setStateClearStrategy(stateClearStrategy);
