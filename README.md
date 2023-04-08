@@ -131,7 +131,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
     backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
     backstack.observeAheadOfTimeWillHandleBackChanged(this) { // <-- ! from lifecycle-ktx
-        backPressedCallback = it
+        backPressedCallback.isEnabled = it
     }
 }
 ```
