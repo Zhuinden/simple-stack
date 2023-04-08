@@ -107,31 +107,38 @@ with `android:enableBackInvokedCallback`), the Activity code looks like this:
 - **With** simple-stack-extensions:lifecycle-ktx
 
 ```kotlin
+class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
+    private lateinit var fragmentStateChanger: FragmentStateChanger
     private lateinit var backstack: Backstack
 
-private val backPressedCallback = object : OnBackPressedCallback(false) { // <-- !
-    override fun handleOnBackPressed() {
-        backstack.goBack()
+    private val backPressedCallback = object : OnBackPressedCallback(false) { // <-- !
+        override fun handleOnBackPressed() {
+            backstack.goBack()
+        }
     }
-}
 
-override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    setContentView(R.layout.main_activity)
+        setContentView(R.layout.main_activity)
 
-    onBackPressedDispatcher.addCallback(backPressedCallback) // <-- !
+        onBackPressedDispatcher.addCallback(backPressedCallback) // <-- !
 
-    fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.container)
+        fragmentStateChanger = FragmentStateChanger(supportFragmentManager, R.id.container)
 
-    backstack = Navigator.configure()
-        .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME) // <-- !
-        .setStateChanger(SimpleStateChanger(this))
-        .install(this, binding.container, History.single(HomeKey))
+        backstack = Navigator.configure()
+            .setBackHandlingModel(BackHandlingModel.AHEAD_OF_TIME) // <-- !
+            .setStateChanger(SimpleStateChanger(this))
+            .install(this, binding.container, History.single(HomeKey))
 
-    backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
-    backstack.observeAheadOfTimeWillHandleBackChanged(this) { // <-- ! from lifecycle-ktx
-        backPressedCallback.isEnabled = it
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+        backstack.observeAheadOfTimeWillHandleBackChanged(this) { // <-- ! from lifecycle-ktx
+            backPressedCallback.isEnabled = it
+        }
+    }
+    
+    override fun onNavigationEvent(stateChange: StateChange) {
+        fragmentStateChanger.handleStateChange(stateChange)
     }
 }
 ```
@@ -141,9 +148,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
 ```kotlin
 class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
     private lateinit var fragmentStateChanger: FragmentStateChanger
-
-    private lateinit var authenticationManager: AuthenticationManager
-
     private lateinit var backstack: Backstack
 
     private val backPressedCallback = object : OnBackPressedCallback(false) { // <-- !
