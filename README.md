@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/github/license/Zhuinden/simple-stack.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://jitpack.io/v/Zhuinden/simple-stack.svg)](https://jitpack.io/#Zhuinden/simple-stack)
 
-![simple-stack](https://user-images.githubusercontent.com/11718392/138650683-c09952fa-b9dd-4c7e-87b2-31ca542e2f69.png)
+![simple-stack](.\simple-stack-logo.png)
 
 # Simple Stack
 
