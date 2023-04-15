@@ -49,19 +49,19 @@ kotlin.sourceSets.all {
 dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":simple-stack"))
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.2") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.2") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.2") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.2") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.1") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.2") {
         exclude(module = "simple-stack")
     }
 
