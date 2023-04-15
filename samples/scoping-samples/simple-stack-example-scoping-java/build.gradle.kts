@@ -42,10 +42,10 @@ dependencies {
     implementation("com.google.android.material:material:1.8.0")
     testImplementation("junit:junit:4.13.2")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.1") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.0") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.1") {
         exclude(module = "simple-stack")
     }
 
