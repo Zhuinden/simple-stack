@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.community.simplestackkotlindaggerexample"
         minSdk = 16
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
 
@@ -52,9 +52,9 @@ dependencies {
     //implementation(mapOf("dir" to "libs", "include" to listOf("*.jar")))
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core:1.9.0")
-    implementation("androidx.activity:activity:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.6")
+    implementation("androidx.core:core:1.10.1")
+    implementation("androidx.activity:activity:1.7.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.0")
 
     implementation(project(":simple-stack"))
 
@@ -81,11 +81,11 @@ dependencies {
     }
 
     implementation("androidx.recyclerview:recyclerview:1.3.0")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    implementation("com.google.dagger:dagger:2.45")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation("com.google.dagger:dagger:2.46.1")
 
-    kapt("com.google.dagger:dagger-compiler:2.45")
+    kapt("com.google.dagger:dagger-compiler:2.46.1")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0") {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import

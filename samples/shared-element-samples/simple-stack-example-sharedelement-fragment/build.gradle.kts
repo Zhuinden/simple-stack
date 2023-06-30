@@ -13,9 +13,11 @@ android {
     defaultConfig {
         applicationId = "com.example.fragmenttransitions"
         minSdk = 16
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
+
+        multiDexEnabled = true
     }
 
     buildTypes {

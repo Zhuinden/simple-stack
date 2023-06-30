@@ -51,15 +51,15 @@ dependencies {
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.activity:activity-ktx:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.6")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.activity:activity-ktx:1.7.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.0")
+    implementation("com.google.android.material:material:1.9.0")
     testImplementation("junit:junit:4.13.2")
 
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.2") {
         exclude(module = "simple-stack")
@@ -91,8 +91,8 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     implementation("androidx.multidex:multidex:2.0.1")
 

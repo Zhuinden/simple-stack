@@ -11,10 +11,12 @@ android {
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplekotlinfragment"
         minSdk = 16
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled = true
     }
 
     kotlinOptions {
@@ -69,11 +71,11 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.5.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.core:core:1.9.0")
-    implementation("androidx.activity:activity:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.6")
+    implementation("androidx.core:core:1.10.1")
+    implementation("androidx.activity:activity:1.7.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.0")
 
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("com.google.android.material:material:1.9.0")
     testImplementation("junit:junit:4.13.2")
 
 

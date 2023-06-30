@@ -1,5 +1,7 @@
 plugins {
     id("com.android.application")
+    kotlin("android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -13,11 +15,13 @@ android {
     defaultConfig {
         applicationId = "com.zhuinden.navigationexamplefrag"
         minSdk = 16
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -39,8 +43,8 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.5.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.fragment:fragment:1.5.6")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.fragment:fragment:1.6.0")
+    implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
 
     implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.2") {

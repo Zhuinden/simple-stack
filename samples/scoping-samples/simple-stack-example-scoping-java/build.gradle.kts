@@ -1,5 +1,7 @@
 plugins {
     id("com.android.application")
+    kotlin("android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -8,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.zhuinden.simplestackexamplescopingjava"
         minSdk = 16
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -39,7 +41,7 @@ dependencies {
 
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("com.google.android.material:material:1.9.0")
     testImplementation("junit:junit:4.13.2")
 
     implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.2") {
@@ -51,7 +53,7 @@ dependencies {
 
     implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.2")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
 
     annotationProcessor("frankiesardo:auto-parcel:1.0.3")
 
