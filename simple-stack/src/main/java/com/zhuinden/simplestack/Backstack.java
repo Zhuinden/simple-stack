@@ -179,7 +179,8 @@ public class Backstack
                 // scope eviction + scoped + re-order scope hierarchy
                 scopeManager.cleanupScopesBy(newState);
 
-                scopeManager.updateWillHandleAheadOfTimeBackEvent(newTopKeyWithAssociatedScope); // we should handle back in the current active scope chain.
+                scopeManager.updateWillHandleAheadOfTimeBackEvent(
+                    newTopKeyWithAssociatedScope); // we should handle back in the current active scope chain.
 
                 if(isStateChangerAttached) { // ensure enqueue behavior during activation dispatch, #215
                     core.setStateChanger(managedStateChanger, NavigationCore.REATTACH);
@@ -220,6 +221,47 @@ public class Backstack
     private KeyFilter keyFilter = new DefaultKeyFilter();
     private KeyParceler keyParceler = new DefaultKeyParceler();
     private StateClearStrategy stateClearStrategy = new DefaultStateClearStrategy();
+
+    private Backstack parentServices = null;
+    private String parentScopeTag = null;
+
+    /**
+     * Specifies the parent {@link Backstack} in which {@link Backstack#lookupService(String)} will happen if the service is not found in the current stack.
+     *
+     * @param parentServices the parent backstack to lookup services from if not found in current backstack
+     */
+    public void setParentServices(@Nullable Backstack parentServices) {
+        setParentServices(parentServices, null);
+    }
+
+    /**
+     * Specifies the parent {@link Backstack} in which {@link Backstack#lookupService(String)} will happen if the service is not found in the current stack.
+     * <p>
+     * When a parent scope tag is provided, it will be used with {@link Backstack#lookupFromScope(String, String)} instead.
+     * <p>
+     * Must be called before calling {@link Backstack#setup(List)}.
+     *
+     * @param parentServices the parent backstack to lookup services from if not found in current backstack
+     * @param parentScopeTag optional scope tag used to initiate the service lookup in the parent
+     */
+    public void setParentServices(@Nullable Backstack parentServices, @Nullable String parentScopeTag) {
+        if(core != null) {
+            throw new IllegalStateException("Parent services should be set before calling `setup()`");
+        }
+
+        this.parentServices = parentServices;
+        this.parentScopeTag = parentScopeTag;
+    }
+
+    /**
+     * Returns the currently set parent services.
+     *
+     * @return the parent services
+     */
+    @Nullable
+    public Backstack getParentServices() {
+        return parentServices;
+    }
 
     /**
      * Specifies the {@link BackHandlingModel}. This allows switching between back handling models.
@@ -485,7 +527,8 @@ public class Backstack
     public void setup(@Nonnull List<?> initialKeys) {
         if(core != null) {
             core.removeCompletionListener(managedStateChangerCompletionListener); // shouldn't ever really happen, but
-            core.unregisterAheadOfTimeWillHandleBackChangedListener(internalCoreAheadOfTimeWillHandleBackChangedListener); // shouldn't ever really happen, but
+            core.unregisterAheadOfTimeWillHandleBackChangedListener(
+                internalCoreAheadOfTimeWillHandleBackChangedListener); // shouldn't ever really happen, but
             finalizeScopes();
         }
 
@@ -580,7 +623,7 @@ public class Backstack
             List<String> scopesToDeactivateList = new ArrayList<>(scopesToDeactivate);
             Collections.reverse(scopesToDeactivateList);
             scopeManager.dispatchActivation(new LinkedHashSet<>(scopesToDeactivateList),
-                                            Collections.<String>emptySet());
+                Collections.<String>emptySet());
         }
 
         scopeManager.deactivateGlobalScope();
@@ -673,6 +716,18 @@ public class Backstack
         return scopeManager.hasScope(scopeTag);
     }
 
+    private boolean attemptCanFindInParentServicesIfSet(String serviceTag) {
+        if(parentServices != null) {
+            if(parentScopeTag != null) {
+                return parentServices.canFindFromScope(parentScopeTag, serviceTag);
+            } else {
+                return parentServices.canFindService(serviceTag);
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Attempts to look-up the service in all currently existing scopes, starting from the last added scope.
      * Returns whether the service exists in any scopes.
@@ -681,7 +736,13 @@ public class Backstack
      * @return whether the service exists in any active scopes
      */
     public boolean canFindService(@Nonnull String serviceTag) {
-        return scopeManager.canFindService(serviceTag);
+        boolean didFind = scopeManager.canFindService(serviceTag);
+
+        if(didFind) {
+            return didFind;
+        }
+
+        return attemptCanFindInParentServicesIfSet(serviceTag);
     }
 
     /**
@@ -693,7 +754,13 @@ public class Backstack
      * @return whether the service exists in any scopes from the current scope or its parents
      */
     public boolean canFindFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag) {
-        return scopeManager.canFindFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
+        boolean didFind = scopeManager.canFindFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
+
+        if(didFind) {
+            return didFind;
+        }
+
+        return attemptCanFindInParentServicesIfSet(serviceTag);
     }
 
     /**
@@ -706,7 +773,13 @@ public class Backstack
      * @return whether the service exists in any scopes from the current scope or its parents
      */
     public boolean canFindFromScope(@Nonnull String scopeTag, @Nonnull String serviceTag, @Nonnull ScopeLookupMode lookupMode) {
-        return scopeManager.canFindFromScope(scopeTag, serviceTag, lookupMode);
+        boolean didFind = scopeManager.canFindFromScope(scopeTag, serviceTag, lookupMode);
+
+        if(didFind) {
+            return didFind;
+        }
+
+        return attemptCanFindInParentServicesIfSet(serviceTag);
     }
 
     /**
@@ -720,13 +793,35 @@ public class Backstack
      */
     @Nonnull
     public <T> T lookupService(@Nonnull String serviceTag) {
-        return scopeManager.lookupService(serviceTag);
+        if(parentServices == null) {
+            return scopeManager.lookupService(serviceTag);
+        } else {
+            boolean didFind = scopeManager.canFindService(serviceTag);
+            if(didFind) {
+                return scopeManager.lookupService(serviceTag);
+            }
+
+            boolean didFindInParentService = attemptCanFindInParentServicesIfSet(serviceTag);
+            if(didFindInParentService) {
+                if(parentScopeTag != null) {
+                    return parentServices.lookupFromScope(parentScopeTag, serviceTag);
+                } else {
+                    return parentServices.lookupService(serviceTag);
+                }
+            }
+
+            throw new IllegalStateException(
+                "Attempt to find service [" + serviceTag + "] in scope hierarchy failed. " + scopeManager.createErrorMessageForScopeLookup(
+                    serviceTag, null));
+        }
     }
 
     /**
      * Returns a list of the scopes accessible from the given key.
      * <p>
      * The order of the scopes is that the 0th index is the current scope (if available), followed by parents.
+     * <p>
+     * This function does not include the scope tags checked in the parent services set by {@link Backstack#setParentServices(Backstack)} or {@link Backstack#setParentServices(Backstack, String)}.
      *
      * @param key        the key
      * @param lookupMode determine what type of parents are checked during the lookup
@@ -749,7 +844,7 @@ public class Backstack
      */
     @Nonnull
     public <T> T lookupFromScope(String scopeTag, String serviceTag) {
-        return scopeManager.lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
+        return lookupFromScope(scopeTag, serviceTag, ScopeLookupMode.ALL);
     }
 
     /**
@@ -764,7 +859,26 @@ public class Backstack
      */
     @Nonnull
     public <T> T lookupFromScope(String scopeTag, String serviceTag, ScopeLookupMode lookupMode) {
-        return scopeManager.lookupFromScope(scopeTag, serviceTag, lookupMode);
+        if(parentServices == null) {
+            return scopeManager.lookupFromScope(scopeTag, serviceTag, lookupMode);
+        } else {
+            if(scopeManager.canFindFromScope(scopeTag, serviceTag, lookupMode)) {
+                return scopeManager.lookupFromScope(scopeTag, serviceTag, lookupMode);
+            }
+
+            boolean didFindInParentService = attemptCanFindInParentServicesIfSet(serviceTag);
+            if(didFindInParentService) {
+                if(parentScopeTag != null) {
+                    return parentServices.lookupFromScope(parentScopeTag, serviceTag);
+                } else {
+                    return parentServices.lookupService(serviceTag);
+                }
+            }
+
+            throw new IllegalStateException(
+                "Attempt to find service [" + serviceTag + "] in scope hierarchy failed. " + scopeManager.createErrorMessageForServiceLookupFromScope(
+                    scopeTag, serviceTag, null));
+        }
     }
 
     /**
@@ -850,7 +964,8 @@ public class Backstack
 
         if(pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
             if(!(retainedObject instanceof Bundleable)) {
-                throw new IllegalStateException("State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
+                throw new IllegalStateException(
+                    "State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
             }
 
             ((Bundleable) retainedObject).fromBundle(pendingRestoredRetainedObjectStates.getBundle(objectTag));
@@ -895,7 +1010,8 @@ public class Backstack
         if(view != null) {
             Object key = KeyContextWrapper.getKey(view.getContext());
             if(key == null) {
-                throw new IllegalArgumentException("The view [" + view + "] contained no key in its context hierarchy. The view or its parent hierarchy should be inflated by a layout inflater from `stateChange.createContext(baseContext, key)`, or a KeyContextWrapper.");
+                throw new IllegalArgumentException(
+                    "The view [" + view + "] contained no key in its context hierarchy. The view or its parent hierarchy should be inflated by a layout inflater from `stateChange.createContext(baseContext, key)`, or a KeyContextWrapper.");
             }
             SparseArray<Parcelable> viewHierarchyState = new SparseArray<>();
             view.saveHierarchyState(viewHierarchyState);
@@ -1025,7 +1141,8 @@ public class Backstack
 
                     if(pendingRestoredRetainedObjectStates.containsKey(objectTag)) {
                         if(!(retainedObject instanceof Bundleable)) {
-                            throw new IllegalStateException("State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
+                            throw new IllegalStateException(
+                                "State restoration mismatch: expected [" + objectTag + "] to be restored, but was not actually Bundleable anymore.");
                         }
                         ((Bundleable) retainedObject).fromBundle(pendingRestoredRetainedObjectStates.getBundle(objectTag));
                         pendingRestoredRetainedObjectStates.remove(objectTag);
@@ -1443,7 +1560,8 @@ public class Backstack
             if(internalScopeManagerAheadOfTimeBackCallback.isEnabled()) {
                 internalScopeManagerAheadOfTimeBackCallback.onBackReceived();
 
-                scopeManager.updateWillHandleAheadOfTimeBackEvent(previousTopKeyWithAssociatedScope); // when scoped service intercepts back, the managed state changer doesn't run, we have to do it here too
+                scopeManager.updateWillHandleAheadOfTimeBackEvent(
+                    previousTopKeyWithAssociatedScope); // when scoped service intercepts back, the managed state changer doesn't run, we have to do it here too
                 return true;
             }
 

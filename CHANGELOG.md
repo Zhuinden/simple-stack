@@ -1,5 +1,18 @@
 # Change log
 
+-Simple Stack 2.8.0 (2023-07-03)
+--------------------------------
+
+- ADDED: `Backstack.setParentServices(Backstack parentServices)`
+  , `Backstack.setParentServices(Backstack parentServices, String parentScopeTag)` and `Backstack.getParentServices()` (as per #239).
+
+When using `backstack.lookupService()`, `backstack.canFindService()`, `backstack.canFindFromScope()` and `backstack.lookupFromScope()`, then
+if parent services are set, it will attempt to lookup the service with ALL from either the full scope hierarchy, or from the scope provided
+as the `parentScopeTag`.
+
+Please note that `findScopesForKey()` is NOT affected, as it would drastically alter behavior. If you need this, you can collect it from the
+parent manually (which is partly why `getParentServices()` was added).
+
 -Simple Stack 2.7.0 (2023-03-31)
 --------------------------------
 

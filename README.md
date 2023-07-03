@@ -69,7 +69,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.7.0")
+implementation("com.github.Zhuinden:simple-stack:2.8.0")
 
 implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.2")
 implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.2")
@@ -84,7 +84,7 @@ or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.7.0'
+implementation 'com.github.Zhuinden:simple-stack:2.8.0'
 
 implementation 'com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.2'
 implementation 'com.github.Zhuinden.simple-stack-extensions:fragments:2.3.2'
@@ -380,7 +380,10 @@ check [the corresponding sample](https://github.com/Zhuinden/simple-stack/tree/c
 
 ## About the event-bubbling back handling model
 
-Note: Before supporting predictive back gestures and using `EVENT_BUBBLING` back handling model, the code that interops
+This section is provided for those who are transitioning from event-bubbling to the ahead-of-time back handling
+model (`OnBackPressedDispatcher`), but cannot use the ahead-of-time model yet (due to relying on `onBackPressed()` or `KEYCODE_BACK`).
+
+**Note:** Before supporting predictive back gestures and using `EVENT_BUBBLING` back handling model, the code that interops
 with OnBackPressedDispatcher looks like this:
 
 ``` kotlin
@@ -419,13 +422,13 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
 }
 ```
 
-Originally, handling back was simpler, as all you had to do is override `onBackPressed()` (then
+To handle back previously, what you had to do is override `onBackPressed()` (then
 call `backstack.goBack()`, if it returned `true` then you would not call `super.onBackPressed()`) , but in order to
 support `BackHandler` in Compose, or Fragments that use `OnBackPressedDispatcher` internally, you cannot
 override `onBackPressed` anymore in a reliable manner.
 
 Now, either this should be used (if cannot migrate to `AHEAD_OF_TIME` back handling model), or migrate
-to `AHEAD_OF_TIME` back handling model and `AheadOfTimeBackCallback`.
+to `AHEAD_OF_TIME` back handling model and `AheadOfTimeBackCallback` (see example at the start of this readme).
 
 ## License
 

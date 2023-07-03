@@ -18,6 +18,7 @@ package com.zhuinden.simplestack;
 import android.app.Activity;
 import android.os.Parcel;
 
+import com.zhuinden.simplestack.helpers.HasParentServices;
 import com.zhuinden.simplestack.helpers.HasServices;
 import com.zhuinden.simplestack.helpers.ServiceProvider;
 import com.zhuinden.simplestack.helpers.TestKey;
@@ -51,7 +52,7 @@ public class ScopingTest {
     }
 
     private static class Service
-            implements Bundleable, ScopedServices.Registered {
+        implements Bundleable, ScopedServices.Registered {
         int blah = 2;
 
         boolean didServiceRegister = false;
@@ -91,8 +92,8 @@ public class ScopingTest {
     };
 
     private static class TestKeyWithScope
-            extends TestKey
-            implements ScopeKey, HasServices {
+        extends TestKey
+        implements ScopeKey, HasServices {
         TestKeyWithScope(String name) {
             super(name);
         }
@@ -401,7 +402,8 @@ public class ScopingTest {
         StateBundle stateBundle = backstack.toBundle();
 
         //noinspection ConstantConditions
-        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah")).isEqualTo(5); // backstack.getScopesTag() is internal
+        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG)
+            .getInt("blah")).isEqualTo(5); // backstack.getScopesTag() is internal
     }
 
     @Test
@@ -439,7 +441,8 @@ public class ScopingTest {
         StateBundle stateBundle = backstack.toBundle();
 
         //noinspection ConstantConditions
-        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG).getInt("blah")).isEqualTo(5); // backstack.getScopesTag() is internal
+        assertThat(stateBundle.getBundle(Backstack.getScopesTag()).getBundle(testKeyWithScope.getScopeTag()).getBundle(SERVICE_TAG)
+            .getInt("blah")).isEqualTo(5); // backstack.getScopesTag() is internal
     }
 
     @Test
@@ -619,7 +622,7 @@ public class ScopingTest {
             backstack.lookupService(SERVICE_TAG);
             Assert.fail();
         } catch(IllegalStateException e) {
-            assertThat(e.getMessage()).contains("does not exist in any scope");
+            assertThat(e.getMessage()).contains("does not exist in any accessible scope");
             // OK!
         }
     }
@@ -685,7 +688,7 @@ public class ScopingTest {
             backstack.lookupService(SERVICE_TAG);
             Assert.fail();
         } catch(IllegalStateException e) {
-            assertThat(e.getMessage()).contains("does not exist in any scope");
+            assertThat(e.getMessage()).contains("does not exist in any accessible scope");
             // OK!
         }
     }
@@ -852,7 +855,8 @@ public class ScopingTest {
         final List<Object> serviceRegistered = new ArrayList<>();
         final List<Object> serviceUnregistered = new ArrayList<>();
 
-        class MyService implements ScopedServices.Registered {
+        class MyService
+            implements ScopedServices.Registered {
             @Override
             public void onServiceRegistered() {
                 serviceRegistered.add(this);
@@ -922,7 +926,8 @@ public class ScopingTest {
         final List<Object> serviceRegistered = new ArrayList<>();
         final List<Object> serviceUnregistered = new ArrayList<>();
 
-        class MyService implements ScopedServices.Registered {
+        class MyService
+            implements ScopedServices.Registered {
             @Override
             public void onServiceRegistered() {
                 serviceRegistered.add(this);
@@ -1013,7 +1018,7 @@ public class ScopingTest {
         final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             @Override
             public void onServiceActive() {
                 activatedServices.add(this);
@@ -1089,7 +1094,7 @@ public class ScopingTest {
         final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             @Override
             public void onServiceActive() {
                 activatedServices.add(this);
@@ -1164,7 +1169,7 @@ public class ScopingTest {
         final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             @Override
             public void onServiceActive() {
             }
@@ -1242,7 +1247,7 @@ public class ScopingTest {
         final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             @Override
             public void onServiceActive() {
                 activatedServices.add(this);
@@ -1294,7 +1299,7 @@ public class ScopingTest {
         final List<Object> deactivatedServices = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             @Override
             public void onServiceActive() {
                 activatedServices.add(this);
@@ -1364,7 +1369,7 @@ public class ScopingTest {
         };
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             @Override
             public void onServiceActive() {
                 activatedServices.add(this);
@@ -1444,7 +1449,7 @@ public class ScopingTest {
         Mockito.when(activity.isFinishing()).thenReturn(true);
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             boolean didServiceActivate = false;
             boolean didScopeDeactivate = false;
 
@@ -1532,7 +1537,7 @@ public class ScopingTest {
             }
             Pair<?, ?> pair = (Pair<?, ?>) o;
             return Objects.equals(first, pair.first) &&
-                    Objects.equals(second, pair.second);
+                Objects.equals(second, pair.second);
         }
 
         @Override
@@ -1543,9 +1548,9 @@ public class ScopingTest {
         @Override
         public String toString() {
             return "Pair{" +
-                    "first=" + first +
-                    ", second=" + second +
-                    '}';
+                "first=" + first +
+                ", second=" + second +
+                '}';
         }
     }
 
@@ -1557,7 +1562,7 @@ public class ScopingTest {
         backstack.setScopedServices(new ServiceProvider());
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Registered {
+            implements ScopedServices.Activated, ScopedServices.Registered {
             private int id = 0;
 
             MyService(int id) {
@@ -1587,8 +1592,8 @@ public class ScopingTest {
             @Override
             public String toString() {
                 return "MyService{" +
-                        "id=" + id +
-                        '}';
+                    "id=" + id +
+                    '}';
             }
         }
 
@@ -1670,42 +1675,42 @@ public class ScopingTest {
         backstack.setHistory(History.of(bye), StateChange.REPLACE);
 
         assertThat(events).containsExactly(
-                Pair.of(service1, ServiceEvent.CREATE),
-                Pair.of(service2, ServiceEvent.CREATE),
-                Pair.of(service3, ServiceEvent.CREATE),
-                Pair.of(service4, ServiceEvent.CREATE),
-                Pair.of(service5, ServiceEvent.CREATE),
-                Pair.of(service6, ServiceEvent.CREATE),
-                Pair.of(service4, ServiceEvent.ACTIVE),
-                Pair.of(service5, ServiceEvent.ACTIVE),
-                Pair.of(service6, ServiceEvent.ACTIVE),
-                Pair.of(service7, ServiceEvent.CREATE),
-                Pair.of(service8, ServiceEvent.CREATE),
-                Pair.of(service9, ServiceEvent.CREATE),
-                Pair.of(service7, ServiceEvent.ACTIVE),
-                Pair.of(service8, ServiceEvent.ACTIVE),
-                Pair.of(service9, ServiceEvent.ACTIVE),
-                Pair.of(service6, ServiceEvent.INACTIVE),
-                Pair.of(service5, ServiceEvent.INACTIVE),
-                Pair.of(service4, ServiceEvent.INACTIVE),
-                Pair.of(service4, ServiceEvent.ACTIVE),
-                Pair.of(service5, ServiceEvent.ACTIVE),
-                Pair.of(service6, ServiceEvent.ACTIVE),
-                Pair.of(service9, ServiceEvent.INACTIVE),
-                Pair.of(service8, ServiceEvent.INACTIVE),
-                Pair.of(service7, ServiceEvent.INACTIVE),
-                Pair.of(service9, ServiceEvent.DESTROY),
-                Pair.of(service8, ServiceEvent.DESTROY),
-                Pair.of(service7, ServiceEvent.DESTROY),
-                Pair.of(service6, ServiceEvent.INACTIVE),
-                Pair.of(service5, ServiceEvent.INACTIVE),
-                Pair.of(service4, ServiceEvent.INACTIVE),
-                Pair.of(service6, ServiceEvent.DESTROY),
-                Pair.of(service5, ServiceEvent.DESTROY),
-                Pair.of(service4, ServiceEvent.DESTROY),
-                Pair.of(service3, ServiceEvent.DESTROY),
-                Pair.of(service2, ServiceEvent.DESTROY),
-                Pair.of(service1, ServiceEvent.DESTROY)
+            Pair.of(service1, ServiceEvent.CREATE),
+            Pair.of(service2, ServiceEvent.CREATE),
+            Pair.of(service3, ServiceEvent.CREATE),
+            Pair.of(service4, ServiceEvent.CREATE),
+            Pair.of(service5, ServiceEvent.CREATE),
+            Pair.of(service6, ServiceEvent.CREATE),
+            Pair.of(service4, ServiceEvent.ACTIVE),
+            Pair.of(service5, ServiceEvent.ACTIVE),
+            Pair.of(service6, ServiceEvent.ACTIVE),
+            Pair.of(service7, ServiceEvent.CREATE),
+            Pair.of(service8, ServiceEvent.CREATE),
+            Pair.of(service9, ServiceEvent.CREATE),
+            Pair.of(service7, ServiceEvent.ACTIVE),
+            Pair.of(service8, ServiceEvent.ACTIVE),
+            Pair.of(service9, ServiceEvent.ACTIVE),
+            Pair.of(service6, ServiceEvent.INACTIVE),
+            Pair.of(service5, ServiceEvent.INACTIVE),
+            Pair.of(service4, ServiceEvent.INACTIVE),
+            Pair.of(service4, ServiceEvent.ACTIVE),
+            Pair.of(service5, ServiceEvent.ACTIVE),
+            Pair.of(service6, ServiceEvent.ACTIVE),
+            Pair.of(service9, ServiceEvent.INACTIVE),
+            Pair.of(service8, ServiceEvent.INACTIVE),
+            Pair.of(service7, ServiceEvent.INACTIVE),
+            Pair.of(service9, ServiceEvent.DESTROY),
+            Pair.of(service8, ServiceEvent.DESTROY),
+            Pair.of(service7, ServiceEvent.DESTROY),
+            Pair.of(service6, ServiceEvent.INACTIVE),
+            Pair.of(service5, ServiceEvent.INACTIVE),
+            Pair.of(service4, ServiceEvent.INACTIVE),
+            Pair.of(service6, ServiceEvent.DESTROY),
+            Pair.of(service5, ServiceEvent.DESTROY),
+            Pair.of(service4, ServiceEvent.DESTROY),
+            Pair.of(service3, ServiceEvent.DESTROY),
+            Pair.of(service2, ServiceEvent.DESTROY),
+            Pair.of(service1, ServiceEvent.DESTROY)
         );
     }
 
@@ -1717,7 +1722,7 @@ public class ScopingTest {
         backstack.setScopedServices(new ServiceProvider());
 
         class MyService
-                implements ScopedServices.Activated {
+            implements ScopedServices.Activated {
             private final Backstack backstack;
 
             public MyService(Backstack backstack) {
@@ -1738,8 +1743,8 @@ public class ScopingTest {
         final MyService service = new MyService(backstack);
 
         TestKeyWithOnlyParentServices beep = new TestKeyWithOnlyParentServices("beep",
-                History.of(
-                        "registration")) {
+            History.of(
+                "registration")) {
             @Override
             public void bindServices(ServiceBinder serviceBinder) {
                 if(serviceBinder.getScopeTag().equals("registration")) {
@@ -1775,8 +1780,8 @@ public class ScopingTest {
         final Object service3 = new Object();
 
         class Key1
-                extends TestKey
-                implements HasServices {
+            extends TestKey
+            implements HasServices {
             Key1(String name) {
                 super(name);
             }
@@ -1809,8 +1814,8 @@ public class ScopingTest {
         }
 
         class Key2
-                extends TestKey
-                implements HasServices {
+            extends TestKey
+            implements HasServices {
             Key2(String name) {
                 super(name);
             }
@@ -1871,7 +1876,7 @@ public class ScopingTest {
         final List<Object> unregistered = new ArrayList<>();
 
         class MyService
-                implements ScopedServices.Activated, ScopedServices.Registered {
+            implements ScopedServices.Activated, ScopedServices.Registered {
 
             @Override
             public void onServiceActive() {
@@ -2042,7 +2047,9 @@ public class ScopingTest {
             }
         });
 
-        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+        class TestKeyWithExplicitParent
+            extends TestKeyWithScope
+            implements ScopeKey.Child {
             private String[] parentScopes;
 
             TestKeyWithExplicitParent(String name, String... parentScopes) {
@@ -2095,7 +2102,7 @@ public class ScopingTest {
         assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.ALL)).isEmpty();
         assertThat(backstack.findScopesForKey(scopeKey3, ScopeLookupMode.ALL)).containsExactly("kappa", "hello");
         assertThat(backstack.findScopesForKey(scopeKey4, ScopeLookupMode.ALL)).containsExactly(
-                "hello");
+            "hello");
 
         assertThat(backstack.findScopesForKey(scopeKey1, ScopeLookupMode.EXPLICIT)).containsExactly("hello");
         assertThat(backstack.findScopesForKey(scopeKey2, ScopeLookupMode.EXPLICIT)).isEmpty();
@@ -2128,7 +2135,9 @@ public class ScopingTest {
         });
 
 
-        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+        class TestKeyWithExplicitParent
+            extends TestKeyWithScope
+            implements ScopeKey.Child {
             private String[] parentScopes;
 
             TestKeyWithExplicitParent(String name, String... parentScopes) {
@@ -2254,7 +2263,9 @@ public class ScopingTest {
         });
 
 
-        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+        class TestKeyWithExplicitParent
+            extends TestKeyWithScope
+            implements ScopeKey.Child {
             private String[] parentScopes;
 
             TestKeyWithExplicitParent(String name, String... parentScopes) {
@@ -2340,7 +2351,9 @@ public class ScopingTest {
         });
 
 
-        class TestKeyWithExplicitParent extends TestKeyWithScope implements ScopeKey.Child {
+        class TestKeyWithExplicitParent
+            extends TestKeyWithScope
+            implements ScopeKey.Child {
             private String[] parentScopes;
 
             TestKeyWithExplicitParent(String name, String... parentScopes) {
@@ -2360,7 +2373,9 @@ public class ScopingTest {
         }
 
 
-        class TestKeyWithOnlyExplicitParent extends TestKey implements ScopeKey.Child {
+        class TestKeyWithOnlyExplicitParent
+            extends TestKey
+            implements ScopeKey.Child {
             private String[] parentScopes;
 
             TestKeyWithOnlyExplicitParent(String name, String... parentScopes) {
@@ -2467,5 +2482,347 @@ public class ScopingTest {
         backstack.setHistory(History.of(key3), StateChange.REPLACE);
 
         backstack.setStateChanger(stateChanger); // <-- crash
+    }
+
+    @Test
+    public void parentServicesWithoutExplicitScopeTagAllowRetrievingServicesFromParentBackstackFromAll() {
+        abstract class TestKeyWithScope
+            extends TestKey
+            implements HasServices {
+            TestKeyWithScope(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithScope(Parcel in) {
+                super(in);
+            }
+
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+        }
+
+        Backstack parentBackstack = new Backstack();
+        parentBackstack.setScopedServices(new ServiceProvider());
+
+        class MyService {
+            private final String id;
+
+            MyService(String id) {
+                this.id = id;
+            }
+
+            @Override
+            public String toString() {
+                return "MyService{" +
+                    "id=" + id +
+                    '}';
+            }
+        }
+
+        final Object service0 = new MyService("service0");
+        final Object serviceP1 = new MyService("serviceP1");
+        final Object serviceP2 = new MyService("serviceP2");
+        final Object serviceP3 = new MyService("serviceP3");
+
+        final Object service1 = new MyService("serviceBeep");
+        final Object service2 = new MyService("serviceBoop");
+        final Object service3 = new MyService("serviceBraap");
+
+        parentBackstack.setGlobalServices(GlobalServices.builder()
+            .addService("service0", service0)
+            .build());
+
+        TestKeyWithScope beep = new TestKeyWithScope("scope1") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service1", service1);
+            }
+        };
+
+        abstract class TestKeyWithExplicitParent
+            extends TestKeyWithScope
+            implements HasParentServices {
+            TestKeyWithExplicitParent(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public final void bindServices(ServiceBinder serviceBinder) {
+                if(name.equals(serviceBinder.getScopeTag())) {
+                    bindOwnServices(serviceBinder);
+                } else {
+                    bindParentServices(serviceBinder);
+                }
+            }
+
+            public void bindParentServices(ServiceBinder serviceBinder) {
+                if(serviceBinder.getScopeTag().equals("parent1")) {
+                    serviceBinder.addService("serviceP1", serviceP1);
+                } else if(serviceBinder.getScopeTag().equals("parent2")) {
+                    serviceBinder.addService("serviceP2", serviceP2);
+                } else if(serviceBinder.getScopeTag().equals("parent3")) {
+                    serviceBinder.addService("serviceP3", serviceP3);
+                }
+            }
+
+            abstract void bindOwnServices(ServiceBinder serviceBinder);
+        }
+
+        TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent2");
+            }
+
+            @Override
+            void bindOwnServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service2", service2);
+            }
+        };
+
+        TestKeyWithExplicitParent braap = new TestKeyWithExplicitParent("scope3") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent3");
+            }
+
+            @Override
+            void bindOwnServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service3", service3);
+            }
+        };
+
+        /*                      GLOBAL
+         *                                PARENT1
+         *                        PARENT2        PARENT3
+         *   BEEP               BOOP                 BRAAP
+         */
+        parentBackstack.setup(History.of(beep, boop, braap));
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+        parentBackstack.setStateChanger(stateChanger);
+
+        TestKey newStackKey = new TestKey("newStackKey");
+        Backstack backstack = new Backstack();
+        assertThat(backstack.getParentServices()).isNull();
+        backstack.setParentServices(parentBackstack);
+        assertThat(backstack.getParentServices()).isSameAs(parentBackstack);
+        backstack.setup(History.of(newStackKey));
+        try {
+            backstack.setParentServices(parentBackstack);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+
+        assertThat(backstack.canFindService("service1")).isTrue();
+        assertThat(backstack.canFindService("service2")).isTrue();
+        assertThat(backstack.canFindService("service3")).isTrue();
+        assertThat(backstack.canFindService("serviceP1")).isTrue();
+        assertThat(backstack.canFindService("serviceP2")).isTrue();
+        assertThat(backstack.canFindService("serviceP3")).isTrue();
+        assertThat(backstack.canFindService("service0")).isTrue();
+
+        assertThat(backstack.lookupService("service1")).isSameAs(service1);
+        assertThat(backstack.lookupService("service2")).isSameAs(service2);
+        assertThat(backstack.lookupService("service3")).isSameAs(service3);
+        assertThat(backstack.lookupService("serviceP1")).isSameAs(serviceP1);
+        assertThat(backstack.lookupService("serviceP2")).isSameAs(serviceP2);
+        assertThat(backstack.lookupService("serviceP3")).isSameAs(serviceP3);
+        assertThat(backstack.lookupService("service0")).isSameAs(service0);
+
+        assertThat(backstack.canFindFromScope("aaa", "service0")).isTrue();
+        assertThat(backstack.canFindFromScope("aaa", "serviceP3")).isTrue();
+    }
+
+    @Test
+    public void parentServicesWithExplicitScopeTagAllowRetrievingServicesFromParentBackstackFromAll() {
+        abstract class TestKeyWithScope
+            extends TestKey
+            implements HasServices {
+            TestKeyWithScope(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithScope(Parcel in) {
+                super(in);
+            }
+
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+        }
+
+        Backstack parentBackstack = new Backstack();
+        parentBackstack.setScopedServices(new ServiceProvider());
+
+        class MyService {
+            private final String id;
+
+            MyService(String id) {
+                this.id = id;
+            }
+
+            @Override
+            public String toString() {
+                return "MyService{" +
+                    "id=" + id +
+                    '}';
+            }
+        }
+
+        final Object service0 = new MyService("service0");
+        final Object serviceP1 = new MyService("serviceP1");
+        final Object serviceP2 = new MyService("serviceP2");
+        final Object serviceP3 = new MyService("serviceP3");
+
+        final Object service1 = new MyService("serviceBeep");
+        final Object service2 = new MyService("serviceBoop");
+        final Object service3 = new MyService("serviceBraap");
+
+        parentBackstack.setGlobalServices(GlobalServices.builder()
+            .addService("service0", service0)
+            .build());
+
+        TestKeyWithScope beep = new TestKeyWithScope("scope1") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service1", service1);
+            }
+        };
+
+        abstract class TestKeyWithExplicitParent
+            extends TestKeyWithScope
+            implements HasParentServices {
+            TestKeyWithExplicitParent(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public final void bindServices(ServiceBinder serviceBinder) {
+                if(name.equals(serviceBinder.getScopeTag())) {
+                    bindOwnServices(serviceBinder);
+                } else {
+                    bindParentServices(serviceBinder);
+                }
+            }
+
+            public void bindParentServices(ServiceBinder serviceBinder) {
+                if(serviceBinder.getScopeTag().equals("parent1")) {
+                    serviceBinder.addService("serviceP1", serviceP1);
+                } else if(serviceBinder.getScopeTag().equals("parent2")) {
+                    serviceBinder.addService("serviceP2", serviceP2);
+                } else if(serviceBinder.getScopeTag().equals("parent3")) {
+                    serviceBinder.addService("serviceP3", serviceP3);
+                }
+            }
+
+            abstract void bindOwnServices(ServiceBinder serviceBinder);
+        }
+
+        TestKeyWithExplicitParent boop = new TestKeyWithExplicitParent("scope2") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent2");
+            }
+
+            @Override
+            void bindOwnServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service2", service2);
+            }
+        };
+
+        TestKeyWithExplicitParent braap = new TestKeyWithExplicitParent("scope3") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent3");
+            }
+
+            @Override
+            void bindOwnServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service3", service3);
+            }
+        };
+
+        /*                      GLOBAL
+         *                                PARENT1
+         *                        PARENT2        PARENT3
+         *   BEEP               BOOP                 BRAAP
+         */
+        parentBackstack.setup(History.of(beep, boop, braap));
+
+        StateChanger stateChanger = new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        };
+        parentBackstack.setStateChanger(stateChanger);
+
+        TestKey newStackKey = new TestKey("newStackKey");
+        Backstack backstack = new Backstack();
+        assertThat(backstack.getParentServices()).isNull();
+        backstack.setParentServices(parentBackstack, "scope2");
+        assertThat(backstack.getParentServices()).isSameAs(parentBackstack);
+        backstack.setup(History.of(newStackKey));
+        try {
+            backstack.setParentServices(parentBackstack);
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            // OK!
+        }
+
+        assertThat(backstack.canFindService("service1")).isTrue();
+        assertThat(backstack.canFindService("service2")).isTrue();
+        assertThat(backstack.canFindService("service3")).isFalse();
+        assertThat(backstack.canFindService("serviceP1")).isTrue();
+        assertThat(backstack.canFindService("serviceP2")).isTrue();
+        assertThat(backstack.canFindService("serviceP3")).isFalse();
+        assertThat(backstack.canFindService("service0")).isTrue();
+
+        assertThat(backstack.lookupService("service1")).isSameAs(service1);
+        assertThat(backstack.lookupService("service2")).isSameAs(service2);
+        try {
+            backstack.lookupService("service3");
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            assertThat(e.getMessage()).contains("does not exist in any accessible scope");
+            // OK!
+        }
+        assertThat(backstack.lookupService("serviceP1")).isSameAs(serviceP1);
+        assertThat(backstack.lookupService("serviceP2")).isSameAs(serviceP2);
+        try {
+            backstack.lookupService("serviceP3");
+            Assert.fail();
+        } catch(IllegalStateException e) {
+            assertThat(e.getMessage()).contains("does not exist in any accessible scope");
+            // OK!
+        }
+        assertThat(backstack.lookupService("service0")).isSameAs(service0);
+
+        assertThat(backstack.canFindFromScope("aaa", "service0")).isTrue();
+        assertThat(backstack.canFindFromScope("aaa", "serviceP3")).isFalse();
     }
 }

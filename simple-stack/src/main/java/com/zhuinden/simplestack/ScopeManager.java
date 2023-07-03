@@ -960,8 +960,7 @@ class ScopeManager {
             return globalServices.getService(identifier);
         }
 
-        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
-            activeScopes.toArray()) + "]!");
+        throw new IllegalStateException(createErrorMessageForServiceLookupFromScope(scopeTag, identifier, activeScopes));
     }
 
     <T> T lookupFromScopeAll(String scopeTag, String identifier) {
@@ -980,8 +979,13 @@ class ScopeManager {
             return globalServices.getService(identifier);
         }
 
-        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], scopes are [" + Arrays.toString(
-            activeScopes.toArray()) + "]!");
+        throw new IllegalStateException(createErrorMessageForServiceLookupFromScope(scopeTag, identifier, activeScopes));
+    }
+
+    String createErrorMessageForServiceLookupFromScope(String scopeTag, String identifier, LinkedHashSet<String> activeScopes) {
+        LinkedHashSet<String> as = activeScopes == null ? scopes.findScopesForScopeTag(scopeTag, false) : activeScopes;
+        return "The service [" + identifier + "] does not exist in any scope that is accessible from [" + scopeTag + "], the nearest scopes are [" + Arrays.toString(
+            as.toArray()) + "]!";
     }
 
     boolean canFindService(@Nonnull String identifier) {
@@ -1016,12 +1020,18 @@ class ScopeManager {
             return globalServices.getService(identifier);
         }
 
-        throw new IllegalStateException("The service [" + identifier + "] does not exist in any scopes, which are " + Arrays.toString(
-            activeScopes.toArray()) + "! " +
-                                            "Is the scope tag registered via a ScopeKey? " +
-                                            "If yes, make sure the StateChanger has been set by this time, " +
-                                            "and that you've bound and are trying to lookup the service with the correct service tag. " +
-                                            "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.");
+        throw new IllegalStateException(createErrorMessageForScopeLookup(identifier, activeScopes));
+    }
+
+    String createErrorMessageForScopeLookup(String serviceTag, List<String> activeScopes) {
+        List<String> as = activeScopes == null ? scopes.getScopeTagsInTraversalOrder() : activeScopes;
+
+        return "The service [" + serviceTag + "] does not exist in any accessible scopes, the nearest scopes are " + Arrays.toString(
+            as.toArray()) + "! " +
+            "Is the scope tag registered via a ScopeKey? " +
+            "If yes, make sure the StateChanger has been set by this time, " +
+            "and that you've bound and are trying to lookup the service with the correct service tag. " +
+            "Otherwise, it is likely that the scope you intend to inherit the service from does not exist.";
     }
 
     private void verifyStackIsInitialized() {
@@ -1029,7 +1039,6 @@ class ScopeManager {
             throw new IllegalStateException("Cannot lookup from an empty stack.");
         }
     }
-
 
     static private void checkKey(@Nonnull Object key) {
         //noinspection ConstantConditions
