@@ -70,14 +70,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 ``` kotlin
 // build.gradle.kts
 implementation("com.github.Zhuinden:simple-stack:2.8.0")
-
-implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.2")
-implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.2")
-implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.2")
-implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.2")
-implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.2")
-implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.2")
-implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.2")
+implementation("com.github.Zhuinden:simple-stack-extensions:2.3.3")
 ```
 
 or
@@ -85,14 +78,7 @@ or
 ``` groovy
 // build.gradle
 implementation 'com.github.Zhuinden:simple-stack:2.8.0'
-
-implementation 'com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.2'
-implementation 'com.github.Zhuinden.simple-stack-extensions:fragments:2.3.2'
-implementation 'com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.2'
-implementation 'com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.2'
-implementation 'com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.2'
-implementation 'com.github.Zhuinden.simple-stack-extensions:services:2.3.2'
-implementation 'com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.2'
+implementation 'com.github.Zhuinden:simple-stack-extensions:2.3.3'
 ```
 
 ## How do I use it?
