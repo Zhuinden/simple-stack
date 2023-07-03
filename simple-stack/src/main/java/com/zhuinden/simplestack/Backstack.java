@@ -227,6 +227,9 @@ public class Backstack
 
     /**
      * Specifies the parent {@link Backstack} in which {@link Backstack#lookupService(String)} will happen if the service is not found in the current stack.
+     * <p>
+     * Must be called before calling {@link Backstack#setup(List)}.
+     * <p>
      *
      * @param parentServices the parent backstack to lookup services from if not found in current backstack
      */
