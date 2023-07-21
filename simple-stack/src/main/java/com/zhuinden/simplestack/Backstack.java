@@ -1609,7 +1609,7 @@ public class Backstack
     }
 
     /**
-     * Returns the root (first) element of this history, or null if the history is empty.
+     * Returns the root (first) element of this history.
      *
      * @param <K> the type of the key
      * @return the root (first) key
@@ -1622,7 +1622,7 @@ public class Backstack
     }
 
     /**
-     * Returns the last element in the list, or null if the history is empty.
+     * Returns the last element in the list.
      *
      * @param <K> the type of the key
      * @return the top key
