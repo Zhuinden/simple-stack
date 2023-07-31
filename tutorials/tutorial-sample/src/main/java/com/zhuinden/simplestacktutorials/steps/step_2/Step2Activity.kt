@@ -28,10 +28,6 @@ class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         }
     }
 
-    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
-        backPressedCallback.isEnabled = it
-    }
-
     sealed class Screens : Parcelable {
         @Parcelize
         data object First : Screens()
@@ -56,9 +52,7 @@ class Step2Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
             .install(this, binding.step2Root, History.of(Screens.First)) // auto-install backstack
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
-            backPressedCallback.isEnabled = it
-        }
+        backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set)
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

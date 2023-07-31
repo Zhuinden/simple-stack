@@ -25,9 +25,6 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         }
     }
 
-    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
-        backPressedCallback.isEnabled = it
-    }
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
@@ -48,9 +45,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(this, binding.container, History.of(WordListKey))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
-            backPressedCallback.isEnabled = it
-        }
+        backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set)
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

@@ -53,7 +53,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.activity:activity-ktx:1.7.2")
-    implementation("androidx.fragment:fragment-ktx:1.6.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     testImplementation("junit:junit:4.13.2")
 
@@ -61,25 +61,25 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.3") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.3") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.3") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.3") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.3") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.3") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.2") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.3") {
         exclude(module = "simple-stack")
     }
 

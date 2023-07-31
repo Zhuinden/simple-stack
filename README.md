@@ -120,9 +120,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(this, binding.container, History.single(HomeKey))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) { // <-- ! from lifecycle-ktx
-            backPressedCallback.isEnabled = it
-        }
+        backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set) // <-- ! from lifecycle-ktx
     }
     
     override fun onNavigationEvent(stateChange: StateChange) {

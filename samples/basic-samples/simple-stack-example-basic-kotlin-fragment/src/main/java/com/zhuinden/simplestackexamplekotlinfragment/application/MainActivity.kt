@@ -29,10 +29,6 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
         }
     }
 
-    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
-        backPressedCallback.isEnabled = it
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,9 +59,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .install(this, binding.container, History.single(HomeKey))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
-            backPressedCallback.isEnabled = it
-        }
+        backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set)
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {

@@ -23,10 +23,6 @@ class Step1Activity : AppCompatActivity(), StateChanger {
         }
     }
 
-    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
-        backPressedCallback.isEnabled = it
-    }
-
     sealed class Screens : Parcelable { // a screen should be Parcelable so they can be put to Bundle.
         @Parcelize
         data object First : Screens()
@@ -58,9 +54,7 @@ class Step1Activity : AppCompatActivity(), StateChanger {
         backstack.setStateChanger(this) // handle navigation in this class
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
-            backPressedCallback.isEnabled = it
-        }
+        backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set)
     }
 
     override fun handleStateChange(stateChange: StateChange, completionCallback: StateChanger.Callback) {

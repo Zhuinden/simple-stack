@@ -140,20 +140,19 @@ Fragment), because the listener staying registered would be a memory leak.
 With the new `lifecycle-ktx` in `simple-stack-extensions` 2.3.0, this:
 
 ```kotlin
-        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
-backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback) // <-- !
+    backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+    backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback) // <-- !
 }
 
 override fun onDestroy() {
-backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback); // <-- !
+    backstack.removeAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback); // <-- !
 ```
 
 can be turned into this:
 
 ```kotlin
-        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) { backPressedCallback.isEnabled = it } 
-    }
+backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set)
 ```
 
 If you can't update to the `AHEAD_OF_TIME` back handling model, then don't worry, as backwards compatibility has been

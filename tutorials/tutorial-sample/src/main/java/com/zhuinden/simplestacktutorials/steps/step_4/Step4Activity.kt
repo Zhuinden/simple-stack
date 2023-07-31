@@ -20,10 +20,6 @@ class Step4Activity : AppCompatActivity() {
         }
     }
 
-    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
-        backPressedCallback.isEnabled = it
-    }
-
     private lateinit var binding: ActivityStep4Binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,8 +35,6 @@ class Step4Activity : AppCompatActivity() {
             .install(this, binding.step4Root, History.of(Step4FirstScreen()))
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
-            backPressedCallback.isEnabled = it
-        }
+        backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set)
     }
 }

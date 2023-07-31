@@ -22,10 +22,6 @@ class Step9Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
         }
     }
 
-    private val updateBackPressedCallback = AheadOfTimeWillHandleBackChangedListener {
-        backPressedCallback.isEnabled = it
-    }
-
     private lateinit var fragmentStateChanger: DefaultFragmentStateChanger
     private lateinit var appContext: Context
 
@@ -59,9 +55,7 @@ class Step9Activity : AppCompatActivity(), SimpleStateChanger.NavigationHandler 
             )
 
         backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack()
-        backstack.observeAheadOfTimeWillHandleBackChanged(this) {
-            backPressedCallback.isEnabled = it
-        }
+        backstack.observeAheadOfTimeWillHandleBackChanged(this, backPressedCallback::isEnabled::set)
     }
 
     override fun onNavigationEvent(stateChange: StateChange) {
