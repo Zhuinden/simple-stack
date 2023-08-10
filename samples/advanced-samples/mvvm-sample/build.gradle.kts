@@ -90,8 +90,8 @@ dependencies {
     implementation("com.github.lisawray.groupie:groupie-viewbinding:2.10.1")
 
     implementation("com.github.Zhuinden:live-event:1.3.0")
-    implementation("com.github.Zhuinden:livedata-combinetuple-kt:1.2.1")
-    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.2.1")
+    implementation("com.github.Zhuinden:livedata-combinetuple-kt:2.0.0")
+    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.3.0")
     implementation("com.github.Zhuinden:rx-validateby-kt:2.1.1")
 
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
