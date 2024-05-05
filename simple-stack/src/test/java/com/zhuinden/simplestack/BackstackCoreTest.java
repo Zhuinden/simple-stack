@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1343,6 +1344,18 @@ public class BackstackCoreTest {
                 completionCallback.stateChangeComplete();
             }
         });
+
+        try {
+            backstack.goAppendChain(null);
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
+
+        try {
+            backstack.goAppendChain(Collections.emptyList());
+        } catch(IllegalArgumentException e) {
+            // OK!
+        }
 
         backstack.goAppendChain(Arrays.asList(testKey2, testKey3, testKey4, testKey5));
 
