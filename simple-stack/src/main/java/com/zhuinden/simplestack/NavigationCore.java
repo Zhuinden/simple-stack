@@ -196,6 +196,51 @@ class NavigationCore {
     }
 
     /**
+     * Goes to the added keys, appending multiple keys at the end.
+     * <p>
+     * If any of the keys have already been added to the backstack previously, the keys are moved up in the history.
+     * <p>
+     * This functionality always moves forward (or replace), not back.
+     *
+     * @param newKeys   the target states.
+     * @param asReplace whether it should use {@link StateChange#REPLACE}.
+     */
+    public void goAppendChain(boolean asReplace, List<?> newKeys) {
+        assertCorrectThread();
+
+        if(newKeys == null) {
+            throw new IllegalArgumentException("New keys should not be null");
+        }
+
+        if(newKeys.isEmpty()) {
+            throw new IllegalArgumentException("New keys should not be empty");
+        }
+
+        for(Object key : newKeys) {
+            checkNewKey(key);
+        }
+
+        List<?> activeHistory = selectActiveHistory();
+        History.Builder historyBuilder = History.builderFrom(activeHistory);
+
+        for(Object key : newKeys) { // ensure that everything gets added to the end, no duplication allowed
+            if(historyBuilder.contains(key)) {
+                historyBuilder.remove(key);
+            }
+        }
+
+        for(Object key : newKeys) {
+            if(historyBuilder.contains(
+                key)) { // if new history contains any duplicates, they will be forced to append to the end regardless.
+                historyBuilder.remove(key); // so this is an intentional failsafe in case the list itself contains dupes.
+            }
+            historyBuilder.add(key);
+        }
+
+        setHistory(historyBuilder.build(), asReplace ? StateChange.REPLACE : StateChange.FORWARD); // always forward
+    }
+
+    /**
      * Replaces the current top with the provided key.
      * This means removing the current last element, and then adding the new element.
      *

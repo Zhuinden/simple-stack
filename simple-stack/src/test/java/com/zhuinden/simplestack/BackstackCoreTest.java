@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1319,5 +1320,42 @@ public class BackstackCoreTest {
         backstack.goTo(testKey2);
         backstack.goBack();
         backstack.setHistory(History.of(testKey2), StateChange.REPLACE);
+    }
+
+    @Test
+    public void goAppendChainWorks() {
+        TestKey testKey = new TestKey("a");
+        TestKey testKey2 = new TestKey("b");
+        TestKey testKey3 = new TestKey("c");
+        TestKey testKey4 = new TestKey("d");
+        TestKey testKey5 = new TestKey("e");
+
+        final Backstack backstack = new Backstack();
+        backstack.setup(History.of(testKey));
+
+        final AtomicReference<StateChange> lastStateChange = new AtomicReference<>();
+
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                lastStateChange.set(stateChange);
+
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        backstack.goAppendChain(Arrays.asList(testKey2, testKey3, testKey4, testKey5));
+
+        assertThat(backstack.getHistory()).containsExactly(testKey, testKey2, testKey3, testKey4, testKey5);
+        assertThat(lastStateChange.get().getDirection()).isEqualTo(StateChange.FORWARD);
+
+        backstack.goAppendChain(true, Arrays.asList(testKey4, testKey, testKey3, testKey5, testKey2));
+
+        assertThat(backstack.getHistory()).containsExactly(testKey4, testKey, testKey3, testKey5, testKey2);
+        assertThat(lastStateChange.get().getDirection()).isEqualTo(StateChange.REPLACE);
+
+        backstack.goAppendChain(false, Arrays.asList(testKey3, testKey3, testKey2, testKey3, testKey5));
+        assertThat(backstack.getHistory()).containsExactly(testKey4, testKey, testKey2, testKey3, testKey5);
+        assertThat(lastStateChange.get().getDirection()).isEqualTo(StateChange.FORWARD);
     }
 }

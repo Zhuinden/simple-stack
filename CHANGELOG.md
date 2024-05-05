@@ -1,5 +1,17 @@
 # Change log
 
+-Simple Stack X.X.X (XXXX-XX-XX)
+--------------------------------
+
+- Added: `Backstack.goAppendChain(newKeys)` and `Backstack.goAppendChain(asReplace, newKeys)` which appends the provided keys to the end of
+  the current history.
+
+If any duplicates are provided, they will also be added to the end. If a key already exists in the history, it gets removed from earlier and
+appended to the end.
+
+If there are implicit parents used as the reorder occurs, please make sure that the scope hierarchy can still be rebuilt from left-to-right
+order. It might be preferred top use `ScopeKey.Child` instead of `ScopeKey` in these cases.
+
 -Simple Stack 2.8.0 (2023-07-03)
 --------------------------------
 

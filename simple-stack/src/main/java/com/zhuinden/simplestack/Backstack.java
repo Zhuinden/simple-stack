@@ -1264,6 +1264,37 @@ public class Backstack
     }
 
     /**
+     * Goes to the added keys, appending multiple keys at the end.
+     * <p>
+     * If any of the keys have already been added to the backstack previously, the keys are moved up in the history.
+     * Please beware that this could result in implicit parents being "tangled" in their order, while shared explicit parents would continue to work as intended.
+     * This functionality always moves forward, not back.
+     *
+     * @param newKeys the target states.
+     */
+    // @MainThread // removed android.support.annotation
+    public void goAppendChain(@Nonnull List<?> newKeys) {
+        checkBackstack("A backstack must be set up before navigation.");
+        core.goAppendChain(false, newKeys);
+    }
+
+    /**
+     * Goes to the added keys, appending multiple keys at the end.
+     * <p>
+     * If any of the keys have already been added to the backstack previously, the keys are moved up in the history.
+     * Please beware that this could result in implicit parents being "tangled" in their order, while shared explicit parents would continue to work as intended.
+     * This functionality always moves forward (or replace), not back.
+     *
+     * @param newKeys   the target states.
+     * @param asReplace whether it should use {@link StateChange#REPLACE}.
+     */
+    // @MainThread // removed android.support.annotation
+    public void goAppendChain(boolean asReplace, @Nonnull List<?> newKeys) {
+        checkBackstack("A backstack must be set up before navigation.");
+        core.goAppendChain(asReplace, newKeys);
+    }
+
+    /**
      * Replaces the current top with the provided key.
      * This means removing the current last element, and then adding the new element.
      *
