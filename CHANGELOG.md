@@ -1,6 +1,6 @@
 # Change log
 
--Simple Stack X.X.X (XXXX-XX-XX)
+-Simple Stack 2.9.0 (2024-05-06)
 --------------------------------
 
 - ADDED: `Backstack.goAppendChain(newKeys)` and `Backstack.goAppendChain(asReplace, newKeys)` which appends the provided keys to the end of
