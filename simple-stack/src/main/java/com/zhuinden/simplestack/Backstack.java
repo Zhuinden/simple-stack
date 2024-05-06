@@ -23,6 +23,7 @@ import android.view.View;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -834,6 +835,61 @@ public class Backstack
     public List<String> findScopesForKey(@Nonnull Object key, @Nonnull ScopeLookupMode lookupMode) {
         Set<String> scopes = scopeManager.findScopesForKey(key, lookupMode);
         return Collections.unmodifiableList(new ArrayList<>(scopes));
+    }
+
+    /**
+     * Returns the services available from this backstack.
+     *
+     * @param searchMode mode to determine if parent services should be included
+     * @return the services accessible from the backstack
+     */
+    @Nonnull
+    public List<ServiceSearchResult> findServices(@Nonnull ServiceSearchMode searchMode) {
+        if(searchMode == null) {
+            throw new IllegalArgumentException("searchMode should not be null!");
+        }
+
+        List<ServiceSearchResult> localServices = new ArrayList<>(scopeManager.getAllServices());
+
+        if(searchMode == ServiceSearchMode.INCLUDE_PARENT_SERVICE && parentServices != null) {
+            if(parentScopeTag != null) {
+                localServices.addAll(parentServices.findServicesFromScope(parentScopeTag, searchMode));
+            } else {
+                localServices.addAll(parentServices.findServices(searchMode));
+            }
+        }
+
+        return Collections.unmodifiableList(localServices);
+    }
+
+    /**
+     * Returns the services available from this backstack from a given scope.
+     *
+     * @param scopeTag   the scope tag to find services from
+     * @param searchMode mode to determine if parent services should be included
+     * @return the services accessible from the backstack from the provided scope
+     */
+    @Nonnull
+    public List<ServiceSearchResult> findServicesFromScope(@Nonnull String scopeTag, @Nonnull ServiceSearchMode searchMode) {
+        if(scopeTag == null) {
+            throw new IllegalArgumentException("scopeTag should not be null!");
+        }
+
+        if(searchMode == null) {
+            throw new IllegalArgumentException("searchMode should not be null!");
+        }
+
+        List<ServiceSearchResult> localServices = new ArrayList<>(scopeManager.getAllServicesFromScope(scopeTag));
+
+        if(searchMode == ServiceSearchMode.INCLUDE_PARENT_SERVICE && parentServices != null) {
+            if(parentScopeTag != null) {
+                localServices.addAll(parentServices.findServicesFromScope(parentScopeTag, searchMode));
+            } else {
+                localServices.addAll(parentServices.findServices(searchMode));
+            }
+        }
+
+        return Collections.unmodifiableList(localServices);
     }
 
     /**

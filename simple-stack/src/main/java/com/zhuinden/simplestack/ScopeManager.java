@@ -55,6 +55,64 @@ class ScopeManager {
         }
     };
 
+    public List<ServiceSearchResult> getAllServices() {
+        List<ServiceSearchResult> results = new ArrayList<>();
+
+        List<String> scopeTags = scopes.getScopeTagsInTraversalOrder();
+        for(String scopeTag : scopeTags) {
+            ScopeRegistrations.ScopeInternals internals = null;
+
+            Set<Map.Entry<String, ScopeRegistrations.ScopeInternals>> set = scopes.entrySet();
+            for(Map.Entry<String, ScopeRegistrations.ScopeInternals> entry : set) {
+                if(scopeTag != null && scopeTag.equals(entry.getKey())) {
+                    internals = entry.getValue();
+                    break;
+                }
+            }
+            if(internals != null) {
+                Set<Map.Entry<String, Object>> services = internals.scopeNode.services();
+                for(Map.Entry<String, Object> entry : services) {
+                    results.add(new ServiceSearchResult(backstack, scopeTag, entry.getKey(), entry.getValue()));
+                }
+            }
+        }
+
+        return Collections.unmodifiableList(results);
+    }
+
+    public List<ServiceSearchResult> getAllServicesFromScope(String firstScopeTag) {
+        List<ServiceSearchResult> results = new ArrayList<>();
+
+        List<String> scopeTags = scopes.getScopeTagsInTraversalOrderFromScope(firstScopeTag);
+        boolean didFindFirstScopeTag = false;
+        for(String scopeTag : scopeTags) {
+            if(scopeTag.equals(firstScopeTag)) {
+                didFindFirstScopeTag = true;
+            }
+            if(!didFindFirstScopeTag) {
+                continue;
+            }
+
+            ScopeRegistrations.ScopeInternals internals = null;
+
+            Set<Map.Entry<String, ScopeRegistrations.ScopeInternals>> set = scopes.entrySet();
+            for(Map.Entry<String, ScopeRegistrations.ScopeInternals> entry : set) {
+                if(scopeTag != null && scopeTag.equals(entry.getKey())) {
+                    internals = entry.getValue();
+                    break;
+                }
+            }
+            if(internals != null) {
+                Set<Map.Entry<String, Object>> services = internals.scopeNode.services();
+                for(Map.Entry<String, Object> entry : services) {
+                    results.add(new ServiceSearchResult(backstack, scopeTag, entry.getKey(), entry.getValue()));
+                }
+            }
+        }
+
+        return Collections.unmodifiableList(results);
+    }
+
     private static class ScopeRegistrations {
         public static class ScopeInternals {
             public final ScopeNode scopeNode;
@@ -154,6 +212,33 @@ class ScopeManager {
                 }
                 for(int j = registration.explicitParentScopes.size() - 1; j >= 0; j--) {
                     scopeTags.add(registration.explicitParentScopes.get(j));
+                }
+            }
+
+            return Collections.unmodifiableList(new ArrayList<>(scopeTags));
+        }
+
+        public List<String> getScopeTagsInTraversalOrderFromScope(String scopeTag) {
+            LinkedHashSet<String> scopeTags = new LinkedHashSet<>();
+            List<ScopeRegistration> registrations = new ArrayList<>(scopeRegistrations.keySet());
+            boolean didFindFirstScope = false;
+            for(int i = registrations.size() - 1; i >= 0; i--) {
+                ScopeRegistration registration = registrations.get(i);
+                if(!registration.isDummyScope) {
+                    if(registration.scopeTag.equals(scopeTag)) {
+                        didFindFirstScope = true;
+                    }
+                    if(didFindFirstScope) {
+                        scopeTags.add(registration.scopeTag);
+                    }
+                }
+                for(int j = registration.explicitParentScopes.size() - 1; j >= 0; j--) {
+                    if(scopeTag.equals(registration.explicitParentScopes.get(j))) {
+                        didFindFirstScope = true;
+                    }
+                    if(didFindFirstScope) {
+                        scopeTags.add(registration.explicitParentScopes.get(j));
+                    }
                 }
             }
 

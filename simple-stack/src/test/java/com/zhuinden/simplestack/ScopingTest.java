@@ -2527,9 +2527,9 @@ public class ScopingTest {
         final Object serviceP2 = new MyService("serviceP2");
         final Object serviceP3 = new MyService("serviceP3");
 
-        final Object service1 = new MyService("serviceBeep");
-        final Object service2 = new MyService("serviceBoop");
-        final Object service3 = new MyService("serviceBraap");
+        final Object service1 = new MyService("service1");
+        final Object service2 = new MyService("service2");
+        final Object service3 = new MyService("service3");
 
         parentBackstack.setGlobalServices(GlobalServices.builder()
             .addService("service0", service0)
@@ -2824,5 +2824,248 @@ public class ScopingTest {
 
         assertThat(backstack.canFindFromScope("aaa", "service0")).isTrue();
         assertThat(backstack.canFindFromScope("aaa", "serviceP3")).isFalse();
+    }
+
+    @Test
+    public void findServicesWorks() {
+        abstract class TestKeyWithScope
+            extends TestKey
+            implements HasServices {
+            TestKeyWithScope(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithScope(Parcel in) {
+                super(in);
+            }
+
+            @Nonnull
+            @Override
+            public String getScopeTag() {
+                return name;
+            }
+        }
+
+
+        class MyService {
+            private final String id;
+
+            MyService(String id) {
+                this.id = id;
+            }
+
+            @Override
+            public String toString() {
+                return "MyService{" +
+                    "id=" + id +
+                    '}';
+            }
+        }
+
+        Backstack parentBackstack = new Backstack();
+        parentBackstack.setScopedServices(new ServiceProvider());
+
+        MyService serviceParentGlobal = new MyService("serviceParentGlobal");
+
+        parentBackstack.setGlobalServices(GlobalServices.builder()
+            .addService("serviceParentGlobal", serviceParentGlobal)
+            .build());
+
+        final Object parentService1 = new MyService("parentService1");
+        final Object parentService2 = new MyService("parentService2");
+
+        final Object service0 = new MyService("service0");
+        final Object serviceP1 = new MyService("serviceP1");
+        final Object serviceP2 = new MyService("serviceP2");
+        final Object serviceP3 = new MyService("serviceP3");
+
+        final Object service1 = new MyService("serviceBeep");
+        final Object service2 = new MyService("serviceBoop");
+        final Object service3 = new MyService("serviceBraap");
+
+        TestKeyWithScope parentScope1Key = new TestKeyWithScope("parentScope1") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("parentScope1Service", parentService1);
+            }
+        };
+
+        TestKeyWithScope parentScope2Key = new TestKeyWithScope("parentScope2") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("parentScope2Service", parentService2);
+            }
+        };
+
+        parentBackstack.setup(Arrays.asList(parentScope1Key, parentScope2Key));
+
+        parentBackstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        TestKeyWithScope scope1Key = new TestKeyWithScope("scope1") {
+            @Override
+            public void bindServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service1", service1);
+            }
+        };
+
+        abstract class TestKeyWithExplicitParent
+            extends TestKeyWithScope
+            implements HasParentServices {
+            TestKeyWithExplicitParent(String name) {
+                super(name);
+            }
+
+            protected TestKeyWithExplicitParent(Parcel in) {
+                super(in);
+            }
+
+            @Override
+            public final void bindServices(ServiceBinder serviceBinder) {
+                if(name.equals(serviceBinder.getScopeTag())) {
+                    bindOwnServices(serviceBinder);
+                } else {
+                    bindParentServices(serviceBinder);
+                }
+            }
+
+            public void bindParentServices(ServiceBinder serviceBinder) {
+                if(serviceBinder.getScopeTag().equals("parent1")) {
+                    serviceBinder.addService("serviceP1", serviceP1);
+                } else if(serviceBinder.getScopeTag().equals("parent2")) {
+                    serviceBinder.addService("serviceP2", serviceP2);
+                } else if(serviceBinder.getScopeTag().equals("parent3")) {
+                    serviceBinder.addService("serviceP3", serviceP3);
+                }
+            }
+
+            abstract void bindOwnServices(ServiceBinder serviceBinder);
+        }
+
+        TestKeyWithExplicitParent scope2Key = new TestKeyWithExplicitParent("scope2") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent2");
+            }
+
+            @Override
+            void bindOwnServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service2", service2);
+            }
+        };
+
+        TestKeyWithExplicitParent scope3Key = new TestKeyWithExplicitParent("scope3") {
+            @Nonnull
+            @Override
+            public List<String> getParentScopes() {
+                return History.of("parent1", "parent3");
+            }
+
+            @Override
+            void bindOwnServices(ServiceBinder serviceBinder) {
+                serviceBinder.addService("service3", service3);
+            }
+        };
+
+        /*                      GLOBAL
+         *                                PARENT1
+         *                        PARENT2        PARENT3
+         *   BEEP               BOOP                 BRAAP
+         */
+
+
+        Backstack backstack = new Backstack();
+        backstack.setParentServices(parentBackstack, "parentScope1");
+        backstack.setup(History.of(scope1Key, scope2Key, scope3Key));
+        backstack.setGlobalServices(GlobalServices.builder()
+            .addService("service0", service0)
+            .build());
+        backstack.setScopedServices(new ServiceProvider());
+        backstack.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        assertThat(backstack.canFindService("service1")).isTrue();
+        assertThat(backstack.canFindService("service2")).isTrue();
+        assertThat(backstack.canFindService("service3")).isTrue();
+        assertThat(backstack.canFindService("serviceP1")).isTrue();
+        assertThat(backstack.canFindService("serviceP2")).isTrue();
+        assertThat(backstack.canFindService("serviceP3")).isTrue();
+        assertThat(backstack.canFindService("service0")).isTrue();
+
+        assertThat(backstack.lookupService("service1")).isSameAs(service1);
+        assertThat(backstack.lookupService("service2")).isSameAs(service2);
+        assertThat(backstack.lookupService("service3")).isSameAs(service3);
+
+        assertThat(backstack.lookupService("serviceP1")).isSameAs(serviceP1);
+        assertThat(backstack.lookupService("serviceP2")).isSameAs(serviceP2);
+        assertThat(backstack.lookupService("serviceP3")).isSameAs(serviceP3);
+
+        assertThat(backstack.lookupService("service0")).isSameAs(service0);
+
+        List<ServiceSearchResult> results = backstack.findServices(ServiceSearchMode.LOCAL_SERVICES_ONLY);
+        List<Object> servicesInResults = new ArrayList<>();
+        for(ServiceSearchResult result : results) {
+            servicesInResults.add(result.getService());
+        }
+        assertThat(servicesInResults).containsExactly(service3, serviceP3, serviceP1, service2, serviceP2, service1, service0);
+
+        List<ServiceSearchResult> results2 = backstack.findServices(ServiceSearchMode.INCLUDE_PARENT_SERVICE);
+        List<Object> servicesInResults2 = new ArrayList<>();
+        for(ServiceSearchResult result : results2) {
+            servicesInResults2.add(result.getService());
+        }
+        assertThat(servicesInResults2).containsExactly(service3, serviceP3, serviceP1, service2, serviceP2, service1, service0,
+            parentService1, serviceParentGlobal);
+
+        Backstack backstack2 = new Backstack();
+        backstack2.setParentServices(parentBackstack, null);
+        backstack2.setup(History.of(scope1Key, scope2Key, scope3Key));
+        backstack2.setGlobalServices(GlobalServices.builder()
+            .addService("service0", service0)
+            .build());
+        backstack2.setScopedServices(new ServiceProvider());
+        backstack2.setStateChanger(new StateChanger() {
+            @Override
+            public void handleStateChange(@Nonnull StateChange stateChange, @Nonnull Callback completionCallback) {
+                completionCallback.stateChangeComplete();
+            }
+        });
+
+        List<ServiceSearchResult> results3 = backstack2.findServices(ServiceSearchMode.INCLUDE_PARENT_SERVICE);
+        List<Object> servicesInResults3 = new ArrayList<>();
+        for(ServiceSearchResult result : results3) {
+            if(result.getService() == service3) {
+                assertThat(result.getScopeTag()).isEqualTo("scope3");
+                assertThat(result.getBackstack()).isSameAs(backstack2);
+                assertThat(result.getServiceTag()).isEqualTo("service3");
+            }
+            if(result.getService() == serviceParentGlobal) {
+                assertThat(result.getScopeTag()).isEqualTo(GlobalServices.SCOPE_TAG);
+                assertThat(result.getBackstack()).isSameAs(parentBackstack);
+                assertThat(result.getServiceTag()).isEqualTo("serviceParentGlobal");
+            }
+            servicesInResults3.add(result.getService());
+        }
+        assertThat(servicesInResults3).containsExactly(service3, serviceP3, serviceP1, service2, serviceP2, service1, service0,
+            parentService2, parentService1, serviceParentGlobal);
+
+        List<ServiceSearchResult> partialResults = backstack.findServicesFromScope("scope2", ServiceSearchMode.INCLUDE_PARENT_SERVICE);
+
+        List<Object> servicesInResults4 = new ArrayList<>();
+        for(ServiceSearchResult result : partialResults) {
+            servicesInResults4.add(result.getService());
+        }
+
+        assertThat(servicesInResults4).containsExactly(service2, serviceP2, serviceP1, service1, service0, parentService1,
+            serviceParentGlobal); // funny how serviceP1 wasn't found until getScopeTagsInTraversalOrderFromScope was added... unit tests are great
     }
 }
