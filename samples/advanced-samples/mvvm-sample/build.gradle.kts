@@ -58,25 +58,25 @@ kotlin.sourceSets.all {
 dependencies {
     implementation(project(":simple-stack"))
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.4") {
         exclude(module = "simple-stack")
     }
 

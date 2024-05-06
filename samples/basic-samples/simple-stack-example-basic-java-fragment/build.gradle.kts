@@ -47,10 +47,10 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.4") {
         exclude(module = "simple-stack")
     }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.3") {
+    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.4") {
         exclude(module = "simple-stack")
     }
 
