@@ -1,5 +1,16 @@
 # Change log
 
+-Simple Stack 2.X.X (XXXX-XX-XX)
+
+- ADDED: `Backstack.exitScopes(scopeTags)`,
+  `Backstack.exitScopes(scopeTags, direction)`,
+  `Backstack.exitScopesTo(scopeTags)`,
+  `Backstack.exitScopesTo(scopeTags, direction)` (as per #290).
+
+This new function allows passing in multiple scopes, out of which the left-most is the one that will be exited.
+
+If neither scope is found, the navigation operation is still invalid, so that throws an exception.
+
 -Simple Stack 2.9.0 (2024-05-06)
 --------------------------------
 

@@ -23,7 +23,7 @@ import android.view.View;
 import com.zhuinden.statebundle.StateBundle;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1483,36 +1483,7 @@ public class Backstack
      * @throws IllegalStateException    when the backstack is still empty.
      */
     public void exitScope(@Nonnull String scopeTag, @StateChange.StateChangeDirection int direction) {
-        checkBackstack("A backstack must be set up before navigation.");
-
-        assertCorrectThread();
-
-        //noinspection ConstantConditions
-        if(scopeTag == null) {
-            throw new NullPointerException("scopeTag must not be null!");
-        }
-
-        History<Object> keys = getHistory();
-
-        if(keys.isEmpty()) {
-            throw new IllegalStateException("Cannot exit scope [" + scopeTag + "] within an empty backstack.");
-        }
-
-        if(!scopeManager.hasScope(scopeTag)) {
-            throw new IllegalArgumentException("Cannot exit scope [" + scopeTag + "] as it does not exist.");
-        }
-
-        Object candidateKey = keys.get(0);
-
-        for(Object key : keys) {
-            if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
-                break;
-            }
-
-            candidateKey = key;
-        }
-
-        core.setHistory(History.builderFrom(keys).removeUntil(candidateKey).build(), direction);
+        exitScopes(Collections.singletonList(scopeTag), direction);
     }
 
     /**
@@ -1526,11 +1497,107 @@ public class Backstack
      * @throws IllegalStateException    when the backstack is still empty.
      */
     public void exitScopeTo(@Nonnull String scopeTag, @Nonnull Object targetKey, @StateChange.StateChangeDirection int direction) {
+        exitScopesTo(Collections.singletonList(scopeTag), targetKey, direction);
+    }
+
+    /**
+     * Exits the provided scope, removing all keys that exist that include the given scope.
+     *
+     * @param scopeTags the scopes to exit from
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException    when the backstack is still empty.
+     */
+    public void exitScopes(@Nonnull List<String> scopeTags) {
+        exitScopes(scopeTags, StateChange.BACKWARD);
+    }
+
+    /**
+     * Exits the provided scope, removing all keys that exist that include the given scope.
+     * <p>
+     * If the scope is provided by the first key in the history, then it works as {@link Backstack#jumpToRoot(int direction)}.
+     *
+     * @param scopeTags the scopes to exit from
+     * @param direction the direction
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException    when the backstack is still empty.
+     */
+    public void exitScopes(@Nonnull List<String> scopeTags, @StateChange.StateChangeDirection int direction) {
+        checkBackstack("A backstack must be set up before navigation.");
+
+        assertCorrectThread();
+
+        //noinspection ConstantConditions
+        if(scopeTags == null) {
+            throw new NullPointerException("scopeTags must not be null!");
+        }
+
+        if(scopeTags.isEmpty()) {
+            throw new IllegalArgumentException("scopeTags must not be empty");
+        }
+
+        History<Object> keys = getHistory();
+
+        if(keys.isEmpty()) {
+            throw new IllegalStateException("Cannot exit scopes [" + Arrays.toString(scopeTags.toArray()) + "] within an empty backstack.");
+        }
+
+        boolean hasEitherScopes = false;
+
+        for(String scopeTag : scopeTags) {
+            if(scopeManager.hasScope(scopeTag)) {
+                hasEitherScopes = true;
+
+                break;
+            }
+        }
+
+        if(!hasEitherScopes) {
+            throw new IllegalArgumentException(
+                "Cannot exit scopes [" + Arrays.toString(scopeTags.toArray()) + "] as neither scopes exist.");
+        }
+
+        Object candidateKey = keys.get(0);
+
+        for(Object key : keys) {
+            boolean couldLookupScope = false;
+
+            for(String scopeTag : scopeTags) {
+                if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
+                    couldLookupScope = true;
+                    break;
+                }
+            }
+
+            if(couldLookupScope) {
+                break;
+            }
+
+            candidateKey = key;
+        }
+
+        core.setHistory(History.builderFrom(keys).removeUntil(candidateKey).build(), direction);
+    }
+
+    /**
+     * Exits the provided scope, removing all keys that exist that include the given scope.
+     * During the exit, the provided new key will be appended to the history if it's not yet added, otherwise, it'll go to it.
+     *
+     * @param scopeTags the scope to exit from
+     * @param targetKey the key to exit to, inclusive if found, appended if not found
+     * @param direction the direction
+     * @throws IllegalArgumentException when the scope does not exist.
+     * @throws IllegalStateException    when the backstack is still empty.
+     */
+    public void exitScopesTo(@Nonnull List<String> scopeTags, @Nonnull Object targetKey, @StateChange.StateChangeDirection int direction) {
         checkBackstack("A backstack must be set up before navigation.");
 
         //noinspection ConstantConditions
-        if(scopeTag == null) {
-            throw new NullPointerException("scopeTag must not be null!");
+        if(scopeTags == null) {
+            throw new NullPointerException("scopeTags must not be null!");
+        }
+
+        if(scopeTags.isEmpty()) {
+            throw new IllegalArgumentException("scopeTags should not be empty!");
         }
 
         //noinspection ConstantConditions
@@ -1541,17 +1608,42 @@ public class Backstack
         History<Object> keys = getHistory();
 
         if(keys.isEmpty()) {
-            throw new IllegalStateException("Cannot exit scope [" + scopeTag + "] within an empty backstack.");
+            throw new IllegalStateException("Cannot exit scopes [" + Arrays.toString(scopeTags.toArray()) + "] within an empty backstack.");
         }
 
-        if(!scopeManager.hasScope(scopeTag)) {
-            throw new IllegalArgumentException("Cannot exit scope [" + scopeTag + "] as it does not exist.");
+        boolean hasEitherScope = false;
+
+        for(String scopeTag : scopeTags) {
+            if(scopeManager.hasScope(scopeTag)) {
+                hasEitherScope = true;
+                break;
+            }
         }
+
+        if(!hasEitherScope) {
+            throw new IllegalArgumentException(
+                "Cannot exit scopes [" + Arrays.toString(scopeTags.toArray()) + "] as neither scopes exist.");
+        }
+
 
         Object candidateKey = keys.get(0);
 
+        String foundFirstScope = null;
+
         for(Object key : keys) {
-            if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
+            boolean couldLookupScope = false;
+
+            for(String scopeTag : scopeTags) {
+                if(scopeManager.canFindScope(key, scopeTag, ScopeLookupMode.EXPLICIT)) {
+                    foundFirstScope = scopeTag;
+
+                    couldLookupScope = true;
+
+                    break;
+                }
+            }
+
+            if(couldLookupScope) {
                 break;
             }
 
@@ -1560,7 +1652,7 @@ public class Backstack
 
         History.Builder builder = History.builderFrom(keys).removeUntil(candidateKey);
 
-        if(scopeManager.canFindScope(builder.get(0), scopeTag, ScopeLookupMode.EXPLICIT)) { // root had the scope
+        if(scopeManager.canFindScope(builder.get(0), foundFirstScope, ScopeLookupMode.EXPLICIT)) { // root had the scope
             builder.removeAt(0);
         }
 
