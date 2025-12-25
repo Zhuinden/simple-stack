@@ -61,31 +61,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
-    implementation("com.github.Zhuinden.simple-stack-extensions:core-ktx:2.3.5") {
-        exclude(module = "simple-stack")
-    }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments:2.3.5") {
-        exclude(module = "simple-stack")
-    }
-    implementation("com.github.Zhuinden.simple-stack-extensions:fragments-ktx:2.3.5") {
-        exclude(module = "simple-stack")
-    }
-    implementation("com.github.Zhuinden.simple-stack-extensions:lifecycle-ktx:2.3.5") {
-        exclude(module = "simple-stack")
-    }
-    implementation("com.github.Zhuinden.simple-stack-extensions:navigator-ktx:2.3.5") {
-        exclude(module = "simple-stack")
-    }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services:2.3.5") {
-        exclude(module = "simple-stack")
-    }
-    implementation("com.github.Zhuinden.simple-stack-extensions:services-ktx:2.3.5") {
+    implementation("com.github.Zhuinden:simple-stack-extensions:2.3.4") {
         exclude(module = "simple-stack")
     }
 
     implementation("com.github.Zhuinden:fragmentviewbindingdelegate-kt:1.0.2")
 
-    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.2.1")
+    implementation("com.github.Zhuinden:rx-combinetuple-kt:1.3.0")
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
