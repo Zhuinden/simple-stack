@@ -69,7 +69,7 @@ and then, add the dependency to your module's `build.gradle.kts` (or `build.grad
 
 ``` kotlin
 // build.gradle.kts
-implementation("com.github.Zhuinden:simple-stack:2.9.0")
+implementation("com.github.Zhuinden:simple-stack:2.9.1")
 implementation("com.github.Zhuinden:simple-stack-extensions:2.3.4")
 ```
 
@@ -77,7 +77,7 @@ or
 
 ``` groovy
 // build.gradle
-implementation 'com.github.Zhuinden:simple-stack:2.9.0'
+implementation 'com.github.Zhuinden:simple-stack:2.9.1'
 implementation 'com.github.Zhuinden:simple-stack-extensions:2.3.4'
 ```
 
@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), SimpleStateChanger.NavigationHandler {
             .setStateChanger(SimpleStateChanger(this))
             .install(this, binding.container, History.single(HomeKey))
 
-        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- !
+        backPressedCallback.isEnabled = backstack.willHandleAheadOfTimeBack() // <-- IMPORTANT!
         backstack.addAheadOfTimeWillHandleBackChangedListener(updateBackPressedCallback) // <-- !
     }
 
@@ -180,7 +180,7 @@ and `KEYCODE_BACK`) will no longer be called. In that case, the `AHEAD_OF_TIME` 
 
 ## Screens
 
-`FirstScreen` looks like this (assuming you have `data object` enabled):
+`FirstScreen` looks like this (assuming you have `data object` enabled, this is enabled by default in Kotlin 1.9.0):
 
 ```groovy
 kotlinOptions {
@@ -416,7 +416,7 @@ to `AHEAD_OF_TIME` back handling model and `AheadOfTimeBackCallback` (see exampl
 
 ## License
 
-    Copyright 2017-2023 Gabor Varadi
+    Copyright 2017-2025 Gabor Varadi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

@@ -1,6 +1,7 @@
 # Change log
 
--Simple Stack 2.X.X (XXXX-XX-XX)
+-Simple Stack 2.9.1 (2025-12-25)
+--------------------------------
 
 - ADDED: `Backstack.exitScopes(scopeTags)`,
   `Backstack.exitScopes(scopeTags, direction)`,
